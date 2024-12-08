@@ -22,51 +22,53 @@ class URLToSearch {
       return url.startsWith('https://www.canada.ca') || url.startsWith('http://www.canada.ca');
     };
 
-    // Only check Canada.ca URLs to see if they are going to 404
+    // Only check Canada.ca URLs to see if they are going to 404 problem here when they redirect from a canada.ca domain to a non-canada.ca domain like isc
     let checkResult = { isValid: true };
     if (isCanadaCaDomain(url)) {
       checkResult = await checkCitationUrl(url);
     }
 
-    // Only return the URL with high confidence if both conditions are met: valid URL that isn't 404 and Canada.ca domain
-    if (checkResult.isValid && isCanadaCaDomain(url)) {
+    // Only return the URL with high confidence if:
+    // 1. It's a valid Canada.ca URL that isn't 404, OR
+    // 2. It's not a Canada.ca domain at all
+    if ((checkResult.isValid && isCanadaCaDomain(url)) || !isCanadaCaDomain(url)) {
       return {
         isValid: true,
         url: url,  // Keep the original URL
-        confidenceRating: checkResult.confidenceRating
+        confidenceRating: checkResult.confidenceRating || '0.5' // Use checkResult rating if available, otherwise default to 0.5
       };
     }
 
-    // Prepare the search URL based on department
-    const encodedQuestion = encodeURIComponent(question);
-    let searchUrl;
-    
-    switch(department?.toLowerCase()) {
-      case 'isc':
-        searchUrl = lang === 'en' 
-          ? `https://www.canada.ca/${lang}/indigenous-services-canada/search.html?q=${encodedQuestion}&wb-srch-sub=`
-          : `https://www.canada.ca/${lang}/services-autochtones-canada/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
-        break;
-      case 'cra':
-        searchUrl = lang === 'en'
-          ? `https://www.canada.ca/${lang}/revenue-agency/search.html?q=${encodedQuestion}&wb-srch-sub=`
-          : `https://www.canada.ca/${lang}/agence-revenu/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
-        break;
-      case 'ircc':
-        searchUrl = lang === 'en'
-          ? `https://www.canada.ca/${lang}/services/immigration-citizenship/search.html?q=${encodedQuestion}&wb-srch-sub=`
-          : `https://www.canada.ca/${lang}/services/immigration-citoyennete/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
-        break;
-      default:
-        searchUrl = `https://www.canada.ca/${lang}/sr/srb.html?q=${encodedQuestion}&wb-srch-sub=`;
-    }
-
-    return {
-      isValid: false,
-      fallbackUrl: searchUrl,
-      fallbackText: t('homepage.chat.citation.fallbackText'),
-      confidenceRating: '0.1'
-    };
+  //   Prepare the search URL based on department
+  const encodedQuestion = encodeURIComponent(question);
+  let searchUrl;
+  
+  switch(department?.toLowerCase()) {
+    case 'isc':
+      searchUrl = lang === 'en' 
+        ? `https://www.canada.ca/${lang}/indigenous-services-canada/search.html?q=${encodedQuestion}&wb-srch-sub=`
+        : `https://www.canada.ca/${lang}/services-autochtones-canada/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
+      break;
+    case 'cra':
+      searchUrl = lang === 'en'
+        ? `https://www.canada.ca/${lang}/revenue-agency/search.html?q=${encodedQuestion}&wb-srch-sub=`
+        : `https://www.canada.ca/${lang}/agence-revenu/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
+      break;
+    case 'ircc':
+      searchUrl = lang === 'en'
+        ? `https://www.canada.ca/${lang}/services/immigration-citizenship/search.html?q=${encodedQuestion}&wb-srch-sub=`
+        : `https://www.canada.ca/${lang}/services/immigration-citoyennete/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
+      break;
+    default:
+      searchUrl = `https://www.canada.ca/${lang}/sr/srb.html?q=${encodedQuestion}&wb-srch-sub=`;
+  }
+  
+  return {
+    isValid: false,
+    fallbackUrl: searchUrl,
+    fallbackText: t('homepage.chat.citation.fallbackText'),
+    confidenceRating: '0.1'
+  };
   }
 
 };

@@ -47,11 +47,13 @@ const ContextService = {
       
       // Parse the XML-style tags from the response
       const topicMatch = response.match(/<topic>(.*?)<\/topic>/);
+      const topicUrlMatch = response.match(/<topicUrl>(.*?)<\/topicUrl>/);
       const departmentMatch = response.match(/<department>(.*?)<\/department>/);
       const departmentUrlMatch = response.match(/<departmentUrl>(.*?)<\/departmentUrl>/);
       
       return {
         topic: topicMatch ? topicMatch[1] : 'none',
+        topicUrl: topicUrlMatch ? topicUrlMatch[1] : '',
         department: departmentMatch ? departmentMatch[1] : '',
         departmentUrl: departmentUrlMatch ? departmentUrlMatch[1] : ''
       };

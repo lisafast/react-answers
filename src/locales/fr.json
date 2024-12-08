@@ -68,6 +68,7 @@
           }
         },
         "messages": {
+          "startingToThink": "Début de la réflexion...",
           "thinking": "En réflexion...",
           "thinkingMore": "En réflexion prolongée...",
           "limitReached": "Votre limite de 3 questions par conversation a été atteinte. Actualisez la page pour commencer une nouvelle conversation.",

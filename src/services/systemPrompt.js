@@ -1,8 +1,6 @@
 import { BASE_SYSTEM_PROMPT } from './systemPrompt/base.js';
 import { SCENARIOS } from './systemPrompt/scenarios-all.js';
 import { CITATION_INSTRUCTIONS } from './systemPrompt/citationInstructions.js';
-// import { menuStructure_EN } from './systemPrompt/menuStructure_EN.js';
-// import { menuStructure_FR } from './systemPrompt/menuStructure_FR.js';
 
 // Create a map of department-specific content imports
 const departmentModules = {

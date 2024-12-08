@@ -245,93 +245,122 @@ const ChatAppContainer = ({ lang = 'en' }) => {
   }, []);
 
   const handleSendMessage = useCallback(async () => {
-    if (inputText.trim() !== '') {
-      // Add console log to check referringUrl
-      console.log('Referring URL before sending message:', referringUrl);
-
-      if (inputText.length > MAX_CHAR_LIMIT) {
-        setMessages(prevMessages => [
-          ...prevMessages,
-          { 
-            text: t('homepage.chat.messages.characterLimit'),
-            sender: 'system',
-            error: true
-          }
-        ]);
-        return;
-      }
-
-      if (turnCount >= MAX_CONVERSATION_TURNS) {
-        return;
-      }
-
-      setShowFeedback(false);
-      const userMessage = inputText.trim();
-      const { redactedText, redactedItems } = RedactionService.redactText(userMessage);
-
-      // Check for any blocked content by looking for three or more consecutive '#' symbols
-      const hasBlockedContent = redactedText.includes('###');
-
-      // If message contains blocked content, add rejection message and return
-      if (hasBlockedContent) {
-        setMessages(prevMessages => [
-          ...prevMessages,
-          { 
-            text: redactedText,
-            redactedText: redactedText,
-            redactedItems: redactedItems,
-            sender: 'user'
-          },
-          { 
-            text: t('homepage.chat.messages.blockedContent'),
-            sender: 'system',
-            error: true
-          }
-        ]);
-        clearInput();
-        return;
-      }
-      console.log('department before ContextService: ', selectedDepartment);
-// use the context service to send the question and language and referring url(if there is oneto ContextService to use an AI service to derive the topic and department from the question. 
-
-      // Set department and topic to use even if referringUrl is provided
-      let department = selectedDepartment;
-      let topic = 'general';
-      let departmentUrl = '';
-
-        try {
-          const contextMessage = referringUrl 
-            ? `${redactedText}\n<referring-url>${referringUrl}</referring-url>`
-            : redactedText;
-            // call the context service to derive the topic and department and department url  from the question
-            //TODO determine if we need to only call this for the first message in the conversation
-          const derivedContext = await ContextService.deriveContext(contextMessage, lang, department);
-          department = derivedContext.department;
-          topic = derivedContext.topic;
-          departmentUrl = derivedContext.departmentUrl;
-          console.log('Derived context:', { department, topic, departmentUrl });
-        } catch (error) {
-          console.error('Error deriving context:', error);
-          // Fall back to general if context derivation fails
-          department = 'general';
-          topic = 'general';
+    if (inputText.trim() !== '' && !isLoading) {
+      try {
+        setIsLoading(true);
+        
+        // Initial validation checks
+        if (inputText.length > MAX_CHAR_LIMIT) {
+          setMessages(prevMessages => [
+            ...prevMessages,
+            { 
+              text: t('homepage.chat.messages.characterLimit'),
+              sender: 'system',
+              error: true
+            }
+          ]);
+          return;
         }
 
-      // Add message to chat history
-      addMessage({
-        text: userMessage,
-        redactedText: redactedText,
-        redactedItems: redactedItems,
-        sender: 'user',
-        ...(referringUrl.trim() && { referringUrl: referringUrl.trim() })
-      });
+        if (turnCount >= MAX_CONVERSATION_TURNS) {
+          return;
+        }
 
-      clearInput();
+        // Prepare user message and check for blocked content
+        const userMessage = inputText.trim();
+        const { redactedText, redactedItems } = RedactionService.redactText(userMessage);
 
-      // Continue with normal AI processing if no profanity/threats
-      setIsLoading(true);
-      try {
-        // Now create the message with the derived or selected department
+        // Check for blocked content
+        const hasBlockedContent = redactedText.includes('###');
+        if (hasBlockedContent) {
+          setMessages(prevMessages => [
+            ...prevMessages,
+            { 
+              text: redactedText,
+              redactedText: redactedText,
+              redactedItems: redactedItems,
+              sender: 'user'
+            },
+            { 
+              text: t('homepage.chat.messages.blockedContent'),
+              sender: 'system',
+              error: true
+            }
+          ]);
+          clearInput();
+          return;
+        }
+
+        // Add initial thinking message
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { 
+            text: t('homepage.chat.messages.startingToThink'), 
+            sender: 'system', 
+            temporary: true 
+          }
+        ]);
+
+        // Get context only for the first message
+        let department = selectedDepartment;
+        let topic = '';
+        let topicUrl = '';
+        let departmentUrl = '';
+
+        if (!referringUrl && turnCount === 0) {  // Only for first message
+          try {
+            // Update message to show deriving context
+            setMessages(prevMessages => [
+              ...prevMessages.filter(m => !m.temporary),
+              { 
+                text: t('homepage.chat.messages.derivingContext'), 
+                sender: 'system', 
+                temporary: true 
+              }
+            ]);
+            // Start context derivation
+            const contextMessage = `${redactedText}${
+              referringUrl ? `\n<referring-url>${referringUrl}</referring-url>` : ''
+            }`;
+            const derivedContext = await ContextService.deriveContext(contextMessage, lang, department);
+            department = derivedContext.department;
+            topic = derivedContext.topic;
+            topicUrl = derivedContext.topicUrl;
+            departmentUrl = derivedContext.departmentUrl;
+            console.log('Derived context:', { department, topic, topicUrl, departmentUrl });
+          } catch (error) {
+            console.error('Error deriving context:', error);
+            department = '';
+            topic = '';
+          }
+        }
+
+        // Add user message after context derivation
+        addMessage({
+          text: userMessage,
+          redactedText: redactedText,
+          redactedItems: redactedItems,
+          sender: 'user',
+          department: department,
+          topic: topic,
+          topicUrl: topicUrl,
+          departmentUrl: departmentUrl,
+          ...(referringUrl.trim() && { referringUrl: referringUrl.trim() })
+        });
+
+        clearInput();
+
+        // Update thinking message for AI processing
+        setMessages(prevMessages => [
+          ...prevMessages.filter(m => !m.temporary),
+          { 
+            text: t('homepage.chat.messages.processingRequest'), 
+            sender: 'system', 
+            temporary: true 
+          }
+        ]);
+
+        // Rest of the existing AI processing code...
         const messageWithUrl = `${redactedText}${
           referringUrl ? `\n<referring-url>${referringUrl}</referring-url>` : ''
         }${
@@ -339,21 +368,58 @@ const ChatAppContainer = ({ lang = 'en' }) => {
         }${
           topic ? `\n<topic>${topic}</topic>` : ''
         }${
-          departmentUrl ? `\n<department-url>${departmentUrl}</department-url>` : ''
+          topicUrl ? `\n<topicUrl>${topicUrl}</topicUrl>` : ''
+        }${
+          departmentUrl ? `\n<departmentUrl>${departmentUrl}</departmentUrl>` : ''
         }`;
 
+        // console.log('Final message being sent to AI:', messageWithUrl);
+
         // Create conversation history
-        const conversationHistory = messages.map(msg => ({
-          role: msg.sender === 'user' ? 'user' : 'assistant',
-          content: msg.sender === 'user' ? msg.redactedText : msg.text
-        }));
+        const conversationHistory = messages
+          .filter(msg => !msg.temporary && !msg.error)
+          .map(msg => {
+            if (msg.sender === 'user') {
+              // For user messages, include all the context that was originally sent
+              const contextEnrichedContent = `${msg.redactedText}${
+                msg.referringUrl ? `\n<referring-url>${msg.referringUrl}</referring-url>` : ''
+              }${
+                msg.department ? `\n<department>${msg.department}</department>` : ''
+              }${
+                msg.topic ? `\n<topic>${msg.topic}</topic>` : ''
+              }${
+                msg.topicUrl ? `\n<topicUrl>${msg.topicUrl}</topicUrl>` : ''
+              }${
+                msg.departmentUrl ? `\n<departmentUrl>${msg.departmentUrl}</departmentUrl>` : ''
+              }`;
+              return {
+                role: 'user',
+                content: contextEnrichedContent
+              };
+            } else if (msg.sender === 'ai') {
+              // For AI responses, preserve the complete response including any tags
+              return {
+                role: 'assistant',
+                content: msg.text,
+                aiService: msg.aiService
+              };
+            } else {
+              // For any other message types (system messages, etc.)
+              return {
+                role: 'system',
+                content: msg.text
+              };
+            }
+          });
+
+        console.log('Final message being sent to AI:', messageWithUrl);
 
         let response;
         let usedAI = selectedAI;
 
         try {
           response = await tryAIService(selectedAI, messageWithUrl, conversationHistory, lang);
-          console.log('Raw AI response:', response);
+          // console.log('Raw AI response:', response);
           
           // Remove this addMessage call since we'll add it after URL validation
           // addMessage({
@@ -435,7 +501,8 @@ const ChatAppContainer = ({ lang = 'en' }) => {
           id: newMessageId,
           text: response,
           sender: 'ai',
-          aiService: usedAI
+          aiService: usedAI,
+          department: department
         }]);
         
         setShowFeedback(true);
@@ -452,7 +519,7 @@ const ChatAppContainer = ({ lang = 'en' }) => {
         setIsLoading(false);
       }
     }
-  }, [inputText, referringUrl, turnCount, addMessage, clearInput, t, messages, selectedAI, parseAIResponse, lang, logInteraction, selectedDepartment]);
+  }, [inputText, referringUrl, turnCount, addMessage, clearInput, t, messages, selectedAI, parseAIResponse, lang, logInteraction, selectedDepartment, isLoading]);
 
   useEffect(() => {
     if (pageUrl && !referringUrl) {
@@ -469,12 +536,12 @@ const ChatAppContainer = ({ lang = 'en' }) => {
     if (isTyping.current) return {};
 
     const responses = {};
-    const processedIds = new Set(); // Track which messages we've processed
+    const processedIds = new Set();
 
     messages.forEach((message) => {
-      if (message.sender === 'ai' && !processedIds.has(message.id)) {
+      if (message.sender === 'ai' && !processedIds.has(message.id) && message.id !== undefined) {
         processedIds.add(message.id);
-        console.log(`Parsing message ${message.id}:`, message.text.substring(0, 100) + '...');
+        // console.log(`Parsing message ${message.id}:`, message.text.substring(0, 100) + '...');
         
         const { responseType, content } = parseMessageContent(message.text);
         const { paragraphs, citationHead } = parseAIResponse(content, message.aiService);
@@ -491,8 +558,8 @@ const ChatAppContainer = ({ lang = 'en' }) => {
   }, [messages, parseAIResponse]);
 
   const formatAIResponse = useCallback((text, aiService, messageId) => {
-    if (!isTyping.current) {
-      console.log('Formatting message:', messageId);
+    if (!isTyping.current && messageId !== undefined) {
+      // console.log('Formatting message:', messageId);
     }
     
     const parsedResponse = parsedResponses[messageId];
@@ -502,36 +569,41 @@ const ChatAppContainer = ({ lang = 'en' }) => {
     const displayUrl = citationResult?.finalCitationUrl || citationResult?.url || citationResult?.fallbackUrl;
     const finalConfidenceRating = citationResult ? citationResult.confidenceRating : '0.1';
 
+    // Find the message to get its department
+    const message = messages.find(m => m.id === messageId);
+    const messageDepartment = message?.department || selectedDepartment;
+
     return (
       <div className="ai-message-content">
         {parsedResponse.paragraphs.map((paragraph, index) => {
           const sentences = extractSentences(paragraph);
           return sentences.map((sentence, sentenceIndex) => (
-            <p key={`${messageId}-${index}-${sentenceIndex}`} className="ai-sentence">
+            <p key={`${messageId}-p${index}-s${sentenceIndex}`} className="ai-sentence">
               {sentence}
             </p>
           ));
         })}
         {parsedResponse.responseType === 'normal' && (parsedResponse.citationHead || displayUrl) && (
           <div className="citation-container">
-            {parsedResponse.citationHead && <p className="citation-head">{parsedResponse.citationHead}</p>}
+            {parsedResponse.citationHead && <p key={`${messageId}-head`} className="citation-head">{parsedResponse.citationHead}</p>}
             {displayUrl && (
-              <p className="citation-link">
+              <p key={`${messageId}-link`} className="citation-link">
                 <a href={displayUrl} target="_blank" rel="noopener noreferrer">
                   {displayUrl}
                 </a>
               </p>
             )}
-            <p className="confidence-rating">
+            <p key={`${messageId}-confidence`} className="confidence-rating">
               {finalConfidenceRating !== undefined && `${t('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
-              {finalConfidenceRating !== undefined && aiService && ' | '}
+              {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
               {aiService && `${t('homepage.chat.citation.ai')} ${aiService}`}
+              {messageDepartment && ` | ${messageDepartment}`}
             </p>
           </div>
         )}
       </div>
     );
-  }, [parsedResponses, checkedCitations, t]);
+  }, [parsedResponses, checkedCitations, t, selectedDepartment, messages]);
 
   const privacyMessage = t('homepage.chat.messages.privacy');
 
@@ -551,7 +623,7 @@ const ChatAppContainer = ({ lang = 'en' }) => {
     <div className="chat-container">
       <div className="message-list">
         {messages.map((message) => (
-          <div key={message.id} className={`message ${message.sender}`}>
+          <div key={`message-${message.id}`} className={`message ${message.sender}`}>
             {message.sender === 'user' ? (
               <div className={`user-message-box ${message.redactedItems && message.redactedItems.length > 0 ? 'redacted-box' : ''}`}>
                 <p className={message.redactedItems && message.redactedItems.length > 0 ? "redacted-message" : ""}>
@@ -585,9 +657,9 @@ const ChatAppContainer = ({ lang = 'en' }) => {
             )}
           </div>
         ))}
-        {isLoading && <div className="message ai">{t('homepage.chat.messages.thinking')}</div>}
+        {isLoading && <div key="loading" className="message ai">{t('homepage.chat.messages.thinking')}</div>}
         {turnCount >= MAX_CONVERSATION_TURNS && (
-          <div className="message ai">
+          <div key="limit-reached" className="message ai">
             <div className="limit-reached-message">
               {t('homepage.chat.messages.limitReached', { count: MAX_CONVERSATION_TURNS })}
               <GcdsButton onClick={handleReload} className="reload-button">
