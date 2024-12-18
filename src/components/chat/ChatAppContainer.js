@@ -10,6 +10,7 @@ import { useTranslations } from '../../hooks/useTranslations.js';
 import { usePageContext, DEPARTMENT_MAPPINGS } from '../../hooks/usePageParam.js';
 import ContextService from '../../services/ContextService.js';
 import ChatInterface from './ChatInterface.js';
+import FeedbackComponent from './FeedbackComponent.js';
 
 // Utility functions go here, before the component
 const extractSentences = (paragraph) => {
@@ -147,6 +148,31 @@ const ChatAppContainer = ({ lang = 'en' }) => {
     }
   }, []);
 
+  // Move parsedResponses up, before handleFeedback
+  const parsedResponses = useMemo(() => {
+    if (isTyping.current) return {};
+
+    const responses = {};
+    const processedIds = new Set();
+
+    messages.forEach((message) => {
+      if (message.sender === 'ai' && !processedIds.has(message.id) && message.id !== undefined) {
+        processedIds.add(message.id);
+        
+        const { responseType, content } = parseMessageContent(message.text);
+        const { paragraphs, citationHead } = parseAIResponse(content, message.aiService);
+        
+        responses[message.id] = {
+          responseType,
+          paragraphs,
+          citationHead,
+          aiService: message.aiService
+        };
+      }
+    });
+    return responses;
+  }, [messages, parseAIResponse]);
+
   const handleFeedback = useCallback((isPositive, expertFeedback = null) => {
     const feedback = isPositive ? 'positive' : 'negative';
     console.log(`User feedback: ${feedback}`, expertFeedback);
@@ -154,9 +180,14 @@ const ChatAppContainer = ({ lang = 'en' }) => {
     // Get the last message (which should be the AI response)
     const lastMessage = messages[messages.length - 1];
     if (lastMessage && lastMessage.sender === 'ai') {
-      const { text: aiResponse, aiService } = lastMessage;
+      // Get the parsed response for this message
+      const parsedResponse = parsedResponses[lastMessage.id];
+      const sentenceCount = parsedResponse ? parsedResponse.paragraphs.reduce((count, paragraph) => {
+        return count + extractSentences(paragraph).length;
+      }, 0) : 0;
+
       // Get original URL from AI response
-      const { citationUrl: originalCitationUrl, confidenceRating } = parseAIResponse(aiResponse, aiService);
+      const { citationUrl: originalCitationUrl, confidenceRating } = parseAIResponse(lastMessage.text, lastMessage.aiService);
 
       // Get validated URL from checkedCitations
       const lastIndex = messages.length - 1;
@@ -169,8 +200,8 @@ const ChatAppContainer = ({ lang = 'en' }) => {
         // Only log if there's feedback
         logInteraction(
           userMessage.redactedText,
-          aiResponse,
-          aiService,
+          lastMessage.text,
+          lastMessage.aiService,
           userMessage.referringUrl,
           finalCitationUrl,
           originalCitationUrl,
@@ -179,8 +210,11 @@ const ChatAppContainer = ({ lang = 'en' }) => {
           expertFeedback
         );
       }
+
+      // Pass sentenceCount to FeedbackComponent
+      return <FeedbackComponent onFeedback={handleFeedback} lang={lang} sentenceCount={sentenceCount} />;
     }
-  }, [messages, checkedCitations, logInteraction, parseAIResponse]);
+  }, [messages, checkedCitations, logInteraction, parseAIResponse, parsedResponses, lang]);
 
   const handleReferringUrlChange = (e) => {
     const url = e.target.value.trim();
@@ -519,32 +553,6 @@ const ChatAppContainer = ({ lang = 'en' }) => {
       setSelectedDepartment(urlDepartment);
     }
   }, [pageUrl, urlDepartment, referringUrl, selectedDepartment]);
-
-  // Memoize the parsed responses with better message tracking
-  const parsedResponses = useMemo(() => {
-    if (isTyping.current) return {};
-
-    const responses = {};
-    const processedIds = new Set();
-
-    messages.forEach((message) => {
-      if (message.sender === 'ai' && !processedIds.has(message.id) && message.id !== undefined) {
-        processedIds.add(message.id);
-        // console.log(`Parsing message ${message.id}:`, message.text.substring(0, 100) + '...');
-        
-        const { responseType, content } = parseMessageContent(message.text);
-        const { paragraphs, citationHead } = parseAIResponse(content, message.aiService);
-        
-        responses[message.id] = {
-          responseType,
-          paragraphs,
-          citationHead,
-          aiService: message.aiService
-        };
-      }
-    });
-    return responses;
-  }, [messages, parseAIResponse]);
 
   const formatAIResponse = useCallback((text, aiService, messageId) => {
     if (!isTyping.current && messageId !== undefined) {

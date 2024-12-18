@@ -501,3 +501,46 @@ gcds-container:first-of-type {
     margin-bottom: 0px !important;
 }
 
+.sentence-rating-group,
+.citation-rating-group {
+  margin-bottom: 2rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.answer-improvement {
+  margin: 2rem 0;
+}
+
+.answer-improvement textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-top: 0.5rem;
+}
+
+.answer-details,
+.citation-details {
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.answer-details summary,
+.citation-details summary {
+  cursor: pointer;
+  padding: 0.5rem;
+  font-weight: bold;
+}
+
+.answer-details[open] summary,
+.citation-details[open] summary {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 1rem;
+}
+

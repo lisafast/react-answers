@@ -49,7 +49,6 @@ const ChatLogsDashboard = () => {
   };
 
   const downloadCSV = () => {
-    // Update columns to match new expertFeedback structure on 16December
     const columns = [
       'timestamp',
       'redactedQuestion',
@@ -63,12 +62,13 @@ const ChatLogsDashboard = () => {
       'sentence4',
       'referringUrl',
       'feedback',
-      'expertFeedback.incomplete',
-      'expertFeedback.sentence1Incorrect',
-      'expertFeedback.sentence2Incorrect',
-      'expertFeedback.sentence3Incorrect',
-      'expertFeedback.sentence4Incorrect',
-      'expertFeedback.citationIncorrect',
+      'expertFeedback.totalScore',
+      'expertFeedback.sentence1Score',
+      'expertFeedback.sentence2Score',
+      'expertFeedback.sentence3Score',
+      'expertFeedback.sentence4Score',
+      'expertFeedback.citationScore',
+      'expertFeedback.answerImprovement',
       'expertFeedback.expertCitationUrl'
     ];
 
