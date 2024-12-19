@@ -86,21 +86,25 @@
         }
       },
       "expertRating": {
-        "title": "Why wasn't this answer useful?",
-        "hint": "Select all that apply",
+        "title": "Answer rating",
+        "hint": "Rate each part of the answer",
+        "sentence1": "Sentence 1",
+        "sentence2": "Sentence 2",
+        "sentence3": "Sentence 3",
+        "sentence4": "Sentence 4",
+        "citation": "Citation",
         "options": {
-          "incomplete": "Answer is incomplete",
-          "sentence1Incorrect": "Sentence 1 is incorrect",
-          "sentence2Incorrect": "Sentence 2 is incorrect",
-          "sentence3Incorrect": "Sentence 3 is incorrect",
-          "sentence4Incorrect": "Sentence 4 is incorrect",
-          "citationIncorrect": "Citation URL is incorrect",
+          "good": "Good",
+          "needsImprovement": "Needs improvement",
+          "incorrect": "Incorrect",
+          "answerImprovement": "How could the answer be improved (optional)?",
           "betterCitation": "Better canada.ca or gc.ca citation URL (optional):"
         },
         "submit": "Submit feedback",
         "errors": {
           "invalidUrl": "Please enter a valid canada.ca or gc.ca URL"
-        }
+        },
+        "intro": "Rate the sentences in the answer, or the citation, or both"
       }
     }
   }

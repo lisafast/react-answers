@@ -85,21 +85,25 @@
         }
       },
       "expertRating": {
-        "title": "Pourquoi cette réponse n'était-elle pas utile?",
-        "hint": "Sélectionnez tout ce qui s'applique",
+        "title": "Évaluation de la réponse",
+        "hint": "Évaluez chaque partie de la réponse",
+        "sentence1": "Phrase 1",
+        "sentence2": "Phrase 2",
+        "sentence3": "Phrase 3",
+        "sentence4": "Phrase 4",
+        "citation": "Citation",
         "options": {
-          "incomplete": "La réponse est incomplète",
-          "sentence1Incorrect": "La phrase 1 est incorrecte",
-          "sentence2Incorrect": "La phrase 2 est incorrecte",
-          "sentence3Incorrect": "La phrase 3 est incorrecte",
-          "sentence4Incorrect": "La phrase 4 est incorrecte",
-          "citationIncorrect": "L'URL de citation est incorrecte",
+          "good": "Bonne",
+          "needsImprovement": "Nécessite une amélioration",
+          "incorrect": "Incorrecte",
+          "answerImprovement": "Comment la réponse pourrait-elle être améliorée (facultatif)?",
           "betterCitation": "Meilleure URL de citation pour Canada.ca ou gc.ca (facultatif) :"
         },
         "submit": "Soumettre",
         "errors": {
           "invalidUrl": "Veuillez entrer une URL canada.ca ou gc.ca valide"
-        }
+        },
+        "intro": "Évaluez les phrases de la réponse, ou la citation, ou les deux"
       }
     }
   }

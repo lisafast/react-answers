@@ -516,3 +516,25 @@ gcds-container:first-of-type {
 .loading-text {
 /* Styles for the loading text */
 }
+
+.sentence-rating-group,
+.citation-rating-group {
+  margin-bottom: 2rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.answer-improvement {
+  margin: 2rem 0;
+}
+
+.answer-improvement textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-top: 0.5rem;
+}
