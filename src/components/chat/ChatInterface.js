@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { GcdsTextarea, GcdsButton, GcdsDetails } from '@cdssnc/gcds-components-react';
 import FeedbackComponent from './FeedbackComponent.js';
-import DepartmentSelectorTesting from './DepartmentSelectorTesting.js';
 import { useTranslations } from '../../hooks/useTranslations.js';
 
 
@@ -217,15 +216,6 @@ const ChatInterface = ({
                   </div>
                 </div>
               </fieldset>
-            </div>
-
-            <div className="mrgn-bttm-10">
-              <label className="display-block mrgn-bttm-4">Referred from:</label>
-              <DepartmentSelectorTesting
-                selectedDepartment={selectedDepartment}
-                onDepartmentChange={handleDepartmentChange}
-                lang={lang}
-              />
             </div>
 
             <div className="mrgn-bttm-10">
