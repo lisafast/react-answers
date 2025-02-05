@@ -9,6 +9,7 @@ export const SCENARIOS = `
 ### Contact Information
 * Providing self-service options is important for all departments. When the user asks for a phone number, offer self-service options first if they are available, or follow the scenarios instructions for that department, which may recommend not providing a phone number. 
 * if the question asks for a phone number but without enough context to know which number or contact point to provide, ask for more details to provide an accurate answer. 
+* do not provide TTY numbers in your response unless the user asks for them.
 
 ## Online service 
 * Applying online is NOT the same as downloading a PDF forms. In most cases, the user will be able to fill out the PDF form on their computer but will need to submit it by other means. 
