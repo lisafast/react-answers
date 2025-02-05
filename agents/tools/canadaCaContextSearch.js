@@ -28,39 +28,35 @@ function extractSearchResults(results, numResults = 3) {
  * @returns {object|null} - The Coveo search results.
  */
 async function contextSearch(query) {
-    try {
-        console.log(`Starting search with query: ${query} at endpoint: ${process.env.CANADA_CA_SEARCH_URI}`);
-        const response = await fetch(process.env.CANADA_CA_SEARCH_URI, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${process.env.CANADA_CA_SEARCH_API_KEY}`,
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({ q: query })
-        });
 
-        if (!response.ok) {
-            // Try to log the full error response
-            const errorBody = await response.text();
-            console.error("HTTP Error Response:", {
-                status: response.status,
-                statusText: response.statusText,
-                body: errorBody
-            });
-            throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
-        }
-        const extractedResults = extractSearchResults(await response.json());
-        return extractedResults;
-    } catch (error) {
-        // Log the entire error object
-        console.error("Error performing search:", {
-            message: error.message,
-            stack: error.stack,
-            response: error.response || null // Log response if available
+    console.log(`Starting search with query: ${query} at endpoint: ${process.env.CANADA_CA_SEARCH_URI}`);
+    const response = await fetch(process.env.CANADA_CA_SEARCH_URI, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${process.env.CANADA_CA_SEARCH_API_KEY}`,
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({ q: query }),
+        timeout: 30000 // 30 seconds timeout
+    });
+
+    if (!response.ok) {
+        // Try to log the full error response
+        const errorBody = await response.text();
+        console.error("HTTP Error Response:", {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorBody
         });
-        return null;
+        throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
     }
+    const extractedResults = extractSearchResults(await response.json());
+    return {
+        results: extractedResults,
+        provider: "canadaca"
+    };
+
 }
 
 /**

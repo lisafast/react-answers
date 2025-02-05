@@ -1,7 +1,7 @@
 import { contextSearch as canadaContextSearch } from '../agents/tools/canadaCaContextSearch.js';
 import { contextSearch as googleContextSearch } from '../agents/tools/googleContextSearch.js';
 
-async function exponentialBackoff(fn, retries = 5, delay = 1000) {
+async function exponentialBackoff(fn, retries = 10, delay = 1500) {
     for (let i = 0; i < retries; i++) {
         try {
             return await fn();

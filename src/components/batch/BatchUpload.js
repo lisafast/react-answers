@@ -27,6 +27,7 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
     const [selectedLanguage, setSelectedLanguage] = useState('en');
     const [adminCode, setAdminCode] = useState('');
     const [batchName, setBatchName] = useState('');
+    const [selectedSearch, setSelectedSearch] = useState('canadaca');
 
     const correctAdminCode = '2024';
 
@@ -51,6 +52,10 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
 
     const handleAIToggle = (e) => {
         setSelectedAI(e.target.value);
+    };
+
+    const handleSearchToggle = (e) => {
+        setSelectedSearch(e.target.value);
     };
 
     const handleUpload = async (e) => {
@@ -134,7 +139,7 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
 
             if (needsContext(entries)) {
                 console.log('Some entries need context. Deriving context batch processing...');
-                const result = await ContextService.deriveContextBatch(entries, selectedLanguage, selectedAI, batchName);
+                const result = await ContextService.deriveContextBatch(entries, selectedLanguage, selectedAI, batchName, selectedSearch);
                 console.log('Context batch started: ' + result.batchId);
                 return result;
             } else {
@@ -308,6 +313,39 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
                                             className="ai-toggle_radio-input"
                                         />
                                         <label htmlFor="claude">{t('batch.upload.aiService.anthropic')}</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        <div className="search-toggle">
+                            <fieldset className="ai-toggle_fieldset">
+                                <div className="ai-toggle_container">
+                                    <legend className="ai-toggle_legend">{t('batch.upload.searchService.label')}</legend>
+
+                                    <div className="flex-center">
+                                        <input
+                                            type="radio"
+                                            id="google"
+                                            name="search-selection"
+                                            value="google"
+                                            checked={selectedSearch === 'google'}
+                                            onChange={handleSearchToggle}
+                                            className="ai-toggle_radio-input"
+                                        />
+                                        <label className="mrgn-rght-15" htmlFor="google">{t('batch.upload.searchService.google')}</label>
+                                    </div>
+                                    <div className="ai-toggle_option">
+                                        <input
+                                            type="radio"
+                                            id="canadaca"
+                                            name="search-selection"
+                                            value="canadaca"
+                                            checked={selectedSearch === 'canadaca'}
+                                            onChange={handleSearchToggle}
+                                            className="ai-toggle_radio-input"
+                                        />
+                                        <label htmlFor="canadaca">{t('batch.upload.searchService.canadaca')}</label>
                                     </div>
                                 </div>
                             </fieldset>

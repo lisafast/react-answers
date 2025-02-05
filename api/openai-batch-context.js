@@ -36,7 +36,7 @@ export default async function handler(req, res) {
                 messages: [
                     {
                         role: "system",
-                        content: request.systemPrompt + "<searchResults>" + request.searchResults.searchResults + "</searchResults>",
+                        content: request.systemPrompt + "<searchResults>" + request.searchResults.results + "</searchResults>",
                     },
                     {
                         role: "user",

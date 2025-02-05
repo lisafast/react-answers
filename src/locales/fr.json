@@ -176,6 +176,11 @@
         "label": "Sélectionner le fichier CSV de rétroaction :",
         "selected": "Fichier sélectionné :"
       },
+      "searchService": {
+        "label": "Service de recherche",
+        "google": "Google",
+        "canadaca": "Recherche Canada.ca"
+      },
       "buttons": {
         "upload": "Télécharger le fichier",
         "startProcessing": "Démarrer le traitement"

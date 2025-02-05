@@ -189,6 +189,11 @@
         "title": "Processing Complete",
         "file": "File:",
         "entriesProcessed": "Entries processed:"
+      },
+      "searchService": {
+        "label": "Search Service",
+        "google": "Google",
+        "canadaca": "Canada.ca Search"
       }
     },
     "list": {

@@ -97,7 +97,7 @@ const ContextService = {
     };
   },
 
-  deriveContextBatch: async (entries, lang = 'en', aiService = 'anthropic', batchName) => {
+  deriveContextBatch: async (entries, lang = 'en', aiService = 'anthropic', batchName, searchProvider = 'google') => {
     try {
       console.log(`🤖 Context Service: Processing batch of ${entries.length} entries in ${lang.toUpperCase()}`);
 
@@ -105,11 +105,14 @@ const ContextService = {
         .map(entry => entry['REDACTEDQUESTION']);
       const SYSTEM_PROMPT = await loadContextSystemPrompt(lang);
 
-      const searchResults = await Promise.all(
-        requests.map(async (request) => {
-          return await ContextService.contextSearch(request);
-        })
-      );
+      const searchResults = [];
+      for (let i = 0; i < requests.length; i++) {
+        if (searchProvider === 'canadaca' && i > 0 && i % 10 === 0) {
+          console.log('Pausing for a minute to avoid rate limits for canadaca...');
+          await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute
+        }
+        searchResults.push(await ContextService.contextSearch(requests[i], searchProvider));
+      }
 
       const updatedRequests = requests.map((request, index) => ({
         message: request,

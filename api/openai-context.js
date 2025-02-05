@@ -8,7 +8,7 @@ const invokeAgent = async (agentType, systemPrompt, message, searchResults, sear
     const messages = [
       {
         role: "system",
-        content: `${systemPrompt}<searchResults>${searchResults}</searchResults>`,
+        content: `${systemPrompt}<searchResults>${searchResults.results}</searchResults>`,
       },
       {
         role: "user",
