@@ -12,6 +12,7 @@ const contextSchema = new Schema({
     outputTokens: { type: String, required: false, default: '' },
     model: { type: String, required: false, default: '' },
     searchProvider: { type: String, required: false, default: '' },
+    searchDepartment: { type: String, required: false, default: '' },
 }, {
     timestamps: true, versionKey: false,
     id: false,

@@ -15,8 +15,9 @@ function extractSearchResults(results, numResults = 3) {
             const link = result.clickUri;
             const linkText = result.title || "No title available";
             const summary = result.excerpt || "No summary available";
+            const department = result.raw.author[0] || "No department available";
 
-            extractedResults += `Summary: ${summary}\nLink: ${link}\nLink Text: ${linkText}\n\n`;
+            extractedResults += `Summary: ${summary}\nLink: ${link}\nLink Text: ${linkText}\nDepartment: ${department}\n\n`;
         });
     }
 

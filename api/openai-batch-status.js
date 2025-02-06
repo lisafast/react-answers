@@ -13,17 +13,8 @@ export default async function handler(req, res) {
         const { batchId } = req.query;
         const batch = await openai.batches.retrieve(batchId);
 
-        // Check if the batch is completed and has output
-        const isCompleted = batch.status === 'completed';
-        if (isCompleted) {
-            return res.status(200).json({
-                status: "completed",
-            });
-        } else {
-            return res.status(200).json({
-                status: "processing",
-            });
-        }
+        const status = batch.status === 'completed' ? 'completed' : batch.status === 'failed' ? 'failed' : 'processing';
+        return res.status(200).json({ status });
     } catch (error) {
         console.error('OpenAI Batch status error:', error);
         return res.status(500).json({ error: 'Failed to get batch status' });
