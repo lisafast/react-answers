@@ -395,9 +395,6 @@ const ChatInterface = ({
           </GcdsDetails>
         </div>
       )}
-      <div className="chat-id-container">
-        <p>{chatId}</p>
-      </div>
     </div>
   );
 };
