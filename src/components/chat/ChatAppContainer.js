@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import '../../styles/App.css';
 import { useTranslations } from '../../hooks/useTranslations.js';
 import { usePageContext, DEPARTMENT_MAPPINGS } from '../../hooks/usePageParam.js';
 import ChatInterface from './ChatInterface.js';
 import { ChatPipelineService, RedactionError } from '../../services/ChatPipelineService.js';
-import { DataStoreService } from '../../services/DataStoreService.js';
+
 
 // Utility functions go here, before the component
 const extractSentences = (paragraph) => {
@@ -40,18 +40,18 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
 
 
 
-  const statusMessages = useMemo(() => ({
-    redacting: t('homepage.chat.messages.redacting'),
-    searching: t('homepage.chat.messages.searching'),
-    gettingContext: t('homepage.chat.messages.gettingContext'),
-    generatingAnswer: t('homepage.chat.messages.generatingAnswer'),
-    complete: t('homepage.chat.messages.complete'),
-    error: t('homepage.chat.messages.error'),
-    verifyingCitation: t('homepage.chat.messages.verifyingCitation'),
-    updatingDatastore: t('homepage.chat.messages.updatingDatastore'),
-    moderatingAnswer: t('homepage.chat.messages.moderatingAnswer'),
-    needClarification: t('homepage.chat.messages.needClarification'),
-  }), [t]);
+  /* const statusMessages = useMemo(() => ({
+     redacting: t('homepage.chat.messages.redacting'),
+     searching: t('homepage.chat.messages.searching'),
+     gettingContext: t('homepage.chat.messages.gettingContext'),
+     generatingAnswer: t('homepage.chat.messages.generatingAnswer'),
+     complete: t('homepage.chat.messages.complete'),
+     error: t('homepage.chat.messages.error'),
+     verifyingCitation: t('homepage.chat.messages.verifyingCitation'),
+     updatingDatastore: t('homepage.chat.messages.updatingDatastore'),
+     moderatingAnswer: t('homepage.chat.messages.moderatingAnswer'),
+     needClarification: t('homepage.chat.messages.needClarification'),
+   }), [t]);*/
 
   const handleInputChange = (e) => {
     isTyping.current = true;
@@ -77,9 +77,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     setTextareaKey(prevKey => prevKey + 1);
   }, []);
 
-  const handleFeedback = useCallback((isPositive, expertFeedback = null) => {
-    //DataStoreService.persistFeedback(isPositive, expertFeedback);
-  }, [messages, referringUrl]);
+
 
   const handleReferringUrlChange = (e) => {
     const url = e.target.value.trim();
@@ -151,15 +149,15 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       try {
         const aiMessageId = messageIdCounter.current++;
         const interaction = await ChatPipelineService.processResponse(
-          chatId, 
-          userMessage, 
-          aiMessageId, 
-          messages, 
-          lang, 
-          selectedDepartment, 
-          referringUrl, 
+          chatId,
+          userMessage,
+          aiMessageId,
+          messages,
+          lang,
+          selectedDepartment,
+          referringUrl,
           selectedAI,
-          t, 
+          t,
           (status) => { setDisplayStatus(status); },
           selectedSearch  // Add this parameter
         );
@@ -224,6 +222,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
 
     }
   }, [
+    chatId,
     inputText,
     referringUrl,
     selectedAI,
@@ -234,7 +233,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     selectedDepartment,
     isLoading,
     messages,
-    turnCount,
+
   ]);
 
   useEffect(() => {
@@ -289,7 +288,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         )}
       </div>
     );
-  }, [t, messages]);
+  }, [t, selectedDepartment]);
 
   // Add handler for department changes
   const handleDepartmentChange = (department) => {
@@ -309,7 +308,6 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       handleSearchToggle={handleSearchToggle} // Add this line
       handleDepartmentChange={handleDepartmentChange}
       handleReferringUrlChange={handleReferringUrlChange}
-      handleFeedback={handleFeedback}
       formatAIResponse={formatAIResponse}
       selectedAI={selectedAI}
       selectedSearch={selectedSearch} // Add this line

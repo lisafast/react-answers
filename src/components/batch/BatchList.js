@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { createRoot } from 'react-dom/client'; // Import createRoot
 import DataTable from 'datatables.net-react';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
@@ -11,7 +11,7 @@ DataTable.use(DT);
 
 const BatchList = ({ buttonAction, batchStatus, lang }) => {
     const [batches, setBatches] = useState([]);
-    const [searchText, setSearchText] = useState('');
+    const [searchText] = useState('');
     const { t } = useTranslations(lang); // TODO: Pass actual language from props/context
 
     // Fetch batch status
@@ -27,7 +27,7 @@ const BatchList = ({ buttonAction, batchStatus, lang }) => {
     };
 
     // Fetch all statuses
-    const fetchStatuses = async (batches) => {
+    const fetchStatuses = useCallback(async (batches) => {
         try {
             const statusPromises = batches.map(batch => {
                 if (!batch.status) {
@@ -44,7 +44,7 @@ const BatchList = ({ buttonAction, batchStatus, lang }) => {
         } catch (error) {
             console.error('Error fetching statuses:', error);
         }
-    };
+    }, []); // No dependencies needed as it doesn't use any external values
 
     // Memoize the columns configuration to prevent unnecessary re-renders
     const columns = useMemo(() => [
@@ -78,7 +78,7 @@ const BatchList = ({ buttonAction, batchStatus, lang }) => {
 
         const intervalId = setInterval(fetchBatches, 5000); // Poll every 5 seconds
         return () => clearInterval(intervalId); // Cleanup on unmount
-    }, [lang]); // Add lang as a dependency
+    }, [lang,fetchStatuses]); // Add lang as a dependency
 
     // Handle button click
     const handleButtonClick = (batchId, action, provider) => {

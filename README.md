@@ -126,8 +126,17 @@ References: https://platform.openai.com/docs/guides/evals and https://github.com
 ### Privacy Protection
 - PII (Personally Identifiable Information) safeguards:
   - Basic redaction for name patterns in English and French - uses same algorithm from [feedback tool](https://github.com/alpha-canada-ca/feedback-viewer/blob/master/src/main/java/ca/gc/tbs/service/ContentService.java)
-  - Pattern detection for numbers like phone numbers, SIN or account numbers, and email/mailingaddresses also uses the feedback tool algorithm 
- - all the redaction happens in our code - no PII or threats,manipulation or obscenity gets logged into the database and no PII is sent to an AI service - user is warned that the question will not be sent to the AI service if it contains PII or threats,manipulation or obscenity- appropriate messages are displayed to the user
+  - Pattern detection for numbers like phone numbers, SIN or account numbers, and email/mailing addresses also uses the feedback tool algorithm 
+- All redaction happens in our code - no PII or threats, manipulation or obscenity gets logged into the database and no PII is sent to an AI service
+- User is warned that the question will not be sent to the AI service to protect their privacy if it contains PII  - appropriate messages are displayed to the user
+
+### Content Filtering and redaction
+Blocks four categories of inappropriate content:
+- Strong profanity and explicit vulgarities
+- Discriminatory slurs (racial, ethnic, homophobic, etc.)
+- Sexual insults and explicit vulgarities
+- Compound offensive terms and phrases
+ - User is warned that the question will not be sent to the AI service because it contains inappropriate words, they are asked to try asking the question differently
 
 ### Guardrails for security
 - Manipulative words and phrases are redacted and the user is warned that the question was not sent to the AI service 

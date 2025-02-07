@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { GcdsDetails } from '@cdssnc/gcds-components-react';
 import FeedbackComponent from './FeedbackComponent.js';
-import { useTranslations } from '../../hooks/useTranslations.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const MAX_CHARS = 400;
