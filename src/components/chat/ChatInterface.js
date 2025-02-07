@@ -217,7 +217,6 @@ const ChatInterface = ({
                   !message.error &&
                   (message.interaction.answer.answerType === 'normal') && (
                     <FeedbackComponent
-                      onFeedback={handleFeedback}
                       lang={lang}
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
