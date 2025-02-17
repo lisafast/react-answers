@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
 import AdminPage from './pages/AdminPage.js';
-import EvaluationPage from './pages/BatchPage.js';
+import BatchPage from './pages/BatchPage.js';
+import EvalPage from './pages/EvalPage.js';
 import { GcdsHeader, GcdsBreadcrumbs, GcdsBreadcrumbsItem, GcdsFooter } from '@cdssnc/gcds-components-react';
 import './styles/App.css';
 
@@ -77,7 +78,11 @@ const router = createBrowserRouter(
         },
         {
           path: "/en/batch",
-          element: <EvaluationPage lang="en" />,
+          element: <BatchPage lang="en" />,
+        },
+        {
+          path: "/en/eval",
+          element: <EvalPage lang="en" />,
         },
         {
           path: "/fr",
@@ -89,9 +94,12 @@ const router = createBrowserRouter(
         },
         {
           path: "/fr/batch",
-          element: <EvaluationPage lang="fr" />,
+          element: <BatchPage lang="fr" />,
         },
-       
+        {
+          path: "/fr/eval",
+          element: <EvalPage lang="fr" />,
+        },
       ],
     },
   ]

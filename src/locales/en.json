@@ -213,5 +213,28 @@
         "cancel": "Cancel"
       }
     }
+  },
+  "evaluation": {
+    "title": "AI Answer Evaluation",
+    "intro": "Evaluate AI answer accuracy using verified examples",
+    "description": "This evaluation system uses AI to automatically assess the accuracy of AI Answers responses from the chat logs by comparing them against both verified correct answers (golden_answers file), verified incorrect answers (brown_answers file) and any human-scored responses already in the chatlog being scored. By learning from both accurate and inaccurate examples, the system scores each new answer sentence by sentence, identifying potential factual errors.",
+    "upload": {
+      "goldenAnswers": "Golden Answers File (Verified Correct Answers)",
+      "brownAnswers": "Brown Answers File (Verified Incorrect Answers)",
+      "selectedFile": "Selected: {name}",
+      "duration": {
+        "label": "Select Chat Logs Duration:",
+        "7days": "Last 7 Days",
+        "30days": "Last 30 Days",
+        "90days": "Last 90 Days",
+        "all": "All Time"
+      }
+    },
+    "buttons": {
+      "startScoring": "Start Scoring"
+    },
+    "errors": {
+      "missingFiles": "Please upload both golden and brown answer files"
+    }
   }
 }

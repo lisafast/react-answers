@@ -1530,3 +1530,78 @@ fieldset.gc-chckbxrdio {
     color: #555;
     text-align: center;
   }
+
+.evaluation-description {
+  background-color: #f5f5f5;
+  padding: 1.5rem;
+  border-radius: 4px;
+  border-left: 4px solid #26374a;
+}
+
+.file-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.upload-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-label {
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.file-name {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.duration-selection {
+  margin-top: 1.5rem;
+}
+
+.duration-label {
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.duration-select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.start-scoring-button {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #26374a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.start-scoring-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.start-scoring-button:hover:not(:disabled) {
+  background-color: #1a2533;
+}

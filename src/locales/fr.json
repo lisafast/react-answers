@@ -215,5 +215,28 @@
         "cancel": "Annuler"
       }
     }
+  },
+  "evaluation": {
+    "title": "Évaluation des réponses IA",
+    "intro": "Évaluer la précision des réponses IA à l'aide d'exemples vérifiés",
+    "description": "Ce système d'évaluation utilise l'IA pour évaluer automatiquement l'exactitude des réponses IA à partir des journaux de conversation en les comparant aux réponses correctes vérifiées (fichier golden_answers), aux réponses incorrectes vérifiées (fichier brown_answers) et à toutes les réponses notées par des humains déjà dans le journal de conversation évalué. En apprenant à partir d'exemples précis et imprécis, le système note chaque nouvelle réponse phrase par phrase, identifiant les erreurs factuelles potentielles.",
+    "upload": {
+      "goldenAnswers": "Fichier de réponses dorées (Réponses correctes vérifiées)",
+      "brownAnswers": "Fichier de réponses brunes (Réponses incorrectes vérifiées)",
+      "selectedFile": "Sélectionné : {name}",
+      "duration": {
+        "label": "Sélectionner la durée des journaux de conversation :",
+        "7days": "7 derniers jours",
+        "30days": "30 derniers jours",
+        "90days": "90 derniers jours",
+        "all": "Tout"
+      }
+    },
+    "buttons": {
+      "startScoring": "Commencer l'évaluation"
+    },
+    "errors": {
+      "missingFiles": "Veuillez téléverser les fichiers de réponses dorées et brunes"
+    }
   }
 }
