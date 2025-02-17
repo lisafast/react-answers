@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GcdsContainer, GcdsText } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
+import { getApiUrl } from '../utils/apiToUrl.js';
 
 const EvalPage = ({ lang = 'en' }) => {
   const { t } = useTranslations(lang);
@@ -21,12 +22,33 @@ const EvalPage = ({ lang = 'en' }) => {
   };
 
   const handleStartScoring = async () => {
-    // TODO: Implement scoring logic
-    if (!goldenFile || !brownFile) {
-      alert('Please upload both golden and brown answer files');
-      return;
+    // (!goldenFile || !brownFile) {
+    //  alert('Please upload both golden and brown answer files');
+    //  return;
+    //}
+
+    const formData = new FormData();
+    formData.append('goldenFile', goldenFile);
+    formData.append('brownFile', brownFile);
+    formData.append('duration', selectedDuration);
+
+    try {
+      const response = await fetch(getApiUrl('evaluation-start'), {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to start evaluation');
+      }
+
+      const result = await response.json();
+      console.log('Evaluation started:', result);
+      // TODO: Add success message UI
+    } catch (error) {
+      console.error('Error starting evaluation:', error);
+      // TODO: Add error message UI
     }
-    console.log('Starting scoring with duration:', selectedDuration);
   };
 
   return (
@@ -93,7 +115,6 @@ const EvalPage = ({ lang = 'en' }) => {
 
         <button
           onClick={handleStartScoring}
-          disabled={!goldenFile || !brownFile}
           className="start-scoring-button"
         >
           {t('evaluation.buttons.startScoring')}
