@@ -4,12 +4,15 @@ import { ChatAnthropic } from '@langchain/anthropic';
 import { ChatCohere } from '@langchain/cohere';
 import downloadWebPageTool from './tools/downloadWebPage.js';
 import checkUrlStatusTool from './tools/checkURL.js';
+import { contextSearchTool as canadaCaSearchTool } from './tools/canadaCaContextSearch.js';
+import { contextSearchTool as googleSearchTool } from './tools/googleContextSearch.js';
 import { getModelConfig } from '../config/ai-models.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const tools = [downloadWebPageTool, checkUrlStatusTool]; // Use the imported tools
+const researchTools = [downloadWebPageTool, checkUrlStatusTool, canadaCaSearchTool, googleSearchTool];
 
 const createOpenAIAgent = async () => {
   const modelConfig = getModelConfig('openai');
@@ -100,16 +103,46 @@ const createContextAgent = async (agentType) => {
   return agent;
 }
 
+const createResearchAgent = async () => {
+  const modelConfig = getModelConfig('openai', 'gpt-4o-mini');
+  const researchModel = new ChatOpenAI({
+    modelName: modelConfig.name,
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    temperature: modelConfig.temperature,
+    maxTokens: modelConfig.maxTokens,
+    timeoutMs: modelConfig.timeoutMs,
+  });
+  const agent = await createReactAgent({
+    llm: researchModel,
+    tools: researchTools,
+  });
+  return agent;
+};
 
-
-
+const createEvaluatorAgent = async () => {
+  const modelConfig = getModelConfig('openai', 'gpt-4o-mini');
+  const evaluatorModel = new ChatOpenAI({
+    modelName: modelConfig.name,
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    temperature: modelConfig.temperature,
+    maxTokens: modelConfig.maxTokens,
+    timeoutMs: modelConfig.timeoutMs,
+  });
+  const agent = await createReactAgent({
+    llm: evaluatorModel,
+    tools: [], // No tools needed for evaluation
+  });
+  return agent;
+};
 
 const createAgents = async () => {
   const openAIAgent = await createOpenAIAgent();
   const cohereAgent = null; //await createCohereAgent();
   const claudeAgent = await createClaudeAgent();
   const contextAgent = await createContextAgent();
-  return { openAIAgent, cohereAgent, claudeAgent, contextAgent };
+  const researchAgent = await createResearchAgent();
+  const evaluatorAgent = await createEvaluatorAgent();
+  return { openAIAgent, cohereAgent, claudeAgent, contextAgent, researchAgent, evaluatorAgent };
 };
 
 const getAgent = (agents, selectedAgent) => {
@@ -122,9 +155,13 @@ const getAgent = (agents, selectedAgent) => {
       return agents.claudeAgent;
     case 'context':
       return agents.contextAgent;
+    case 'research':
+      return agents.researchAgent;
+    case 'evaluator':
+      return agents.evaluatorAgent;
     default:
       throw new Error('Invalid agent specified');
   }
 };
 
-export { createAgents, getAgent, createClaudeAgent, createCohereAgent, createOpenAIAgent, createContextAgent };
+export { createAgents, getAgent, createClaudeAgent, createCohereAgent, createOpenAIAgent, createContextAgent, createResearchAgent, createEvaluatorAgent };

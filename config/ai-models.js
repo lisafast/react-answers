@@ -1,3 +1,5 @@
+import { faLowVision } from "@fortawesome/free-solid-svg-icons";
+
 // config/ai-models.js
 const AI_MODELS = {
   openai: {
@@ -17,7 +19,13 @@ const AI_MODELS = {
         maxTokens: 1024,
         temperature: 0.0,
         timeoutMs: 60000,
-    }
+      },
+      'o3-mini': {
+        max_completion_tokens: 4000,
+        timeoutMs: 60000,
+        reasoning_effort: "low"
+      }
+
 
     }
   },
