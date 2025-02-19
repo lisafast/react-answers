@@ -16,11 +16,9 @@ export default async function handler(req, res) {
     if (!batchId) {
       return res.status(400).json({ error: 'Batch ID is required' });
     }
-
-    const batch = await openai.batches.cancel(batchId);
     await dbConnect();
     await Batch.findOneAndDelete({ batchId });
-
+    const batch = await openai.batches.cancel(batchId);
     return res.status(200).json({
       message: 'Cancellation initiated',
       note: 'Cancellation may not take immediate effect'

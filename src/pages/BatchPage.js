@@ -62,7 +62,7 @@ const BatchPage = ({ lang = 'en' }) => {
         <h2 className='mt-400 mb-400'>{t('batch.sections.running.title')}</h2>
         <BatchList
           buttonAction={handleCompleteCancelClick}
-          batchStatus="processing,completed" lang={lang} />
+          batchStatus="validating,failed,in_progress,finalizing,completed,expired,canceling,canceled" lang={lang} />
       </section>
 
       <section id="processed-evaluation" className="mb-600">

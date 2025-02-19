@@ -29,9 +29,13 @@ const BatchList = ({ buttonAction, batchStatus, lang }) => {
     // Fetch all statuses
     const fetchStatuses = useCallback(async (batches) => {
         try {
-            const statusPromises = batches.map(batch => {
-                if (!batch.status) {
-                    return fetchStatus(batch.batchId, batch.aiProvider);
+            const statusPromises = batches.map(async batch => {
+                if (!batch.status || (batch.status !== 'processed')) {
+                    const statusResult = await fetchStatus(batch.batchId, batch.aiProvider);
+                    if (statusResult.status === 'not_found') {
+                        await fetch(getProviderApiUrl(batch.aiProvider, `batch-cancel?batchId=${batch.batchId}`));
+                    }
+                    return statusResult;
                 } else {
                     return Promise.resolve({ batchId: batch.batchId, status: batch.status });
                 }
@@ -76,9 +80,9 @@ const BatchList = ({ buttonAction, batchStatus, lang }) => {
 
         fetchBatches();
 
-        const intervalId = setInterval(fetchBatches, 5000); // Poll every 5 seconds
+        const intervalId = setInterval(fetchBatches, 10000); // Poll every 5 seconds
         return () => clearInterval(intervalId); // Cleanup on unmount
-    }, [lang,fetchStatuses]); // Add lang as a dependency
+    }, [lang, fetchStatuses]); // Add lang as a dependency
 
     // Handle button click
     const handleButtonClick = (batchId, action, provider) => {
@@ -105,32 +109,41 @@ const BatchList = ({ buttonAction, batchStatus, lang }) => {
                     order: [[1, 'desc']], // Order by Created Date (column index 1) descending
                     createdRow: (row, data) => {
                         const { batchId, status, aiProvider } = data;
-
-                        // Clear and append custom buttons dynamically
                         const actionsCell = row.querySelector('td:last-child');
+                        actionsCell.innerHTML = '';
+                        const root = createRoot(actionsCell);
+
                         if (status === 'processed') {
-                            actionsCell.innerHTML = '';
-                            const root = createRoot(actionsCell);
-                            root.render(
-                                <>
+                            const ActionButtons = () => {
+                                const [clicked, setClicked] = useState(false);
+                                if (clicked) return null;
+                                return (
                                     <div style={{ display: 'flex', gap: '8px' }}>
-                                        <GcdsButton size="small" onClick={() => handleButtonClick(batchId, 'csv')}>{t('batch.list.actions.csv')}</GcdsButton>
-                                        <GcdsButton size="small" onClick={() => handleButtonClick(batchId, 'excel')}>{t('batch.list.actions.excel')}</GcdsButton>
+                                        <GcdsButton size="small" onClick={() => { handleButtonClick(batchId, 'csv', aiProvider); setClicked(true); }}>{t('batch.list.actions.csv')}</GcdsButton>
+                                        <GcdsButton size="small" onClick={() => { handleButtonClick(batchId, 'excel', aiProvider); setClicked(true); }}>{t('batch.list.actions.excel')}</GcdsButton>
+                                        <GcdsButton size="small" onClick={() => { handleButtonClick(batchId, 'cancel', aiProvider); setClicked(true); }}>{t('batch.list.actions.cancel')}</GcdsButton>
                                     </div>
-                                </>
-                            );
+                                );
+                            };
+                            root.render(<ActionButtons />);
                         } else if (status === 'completed') {
-                            actionsCell.innerHTML = '';
-                            const root = createRoot(actionsCell);
-                            root.render(
-                                <GcdsButton size="small" onClick={() => handleButtonClick(batchId, 'complete', aiProvider)}>{t('batch.list.actions.process')}</GcdsButton>
-                            );
-                        } else if (status === 'processing') {
-                            actionsCell.innerHTML = '';
-                            const root = createRoot(actionsCell);
-                            root.render(
-                                <GcdsButton size="small" onClick={() => handleButtonClick(batchId, 'cancel', aiProvider)}>{t('batch.list.actions.cancel')}</GcdsButton>
-                            );
+                            const ActionButtonComplete = () => {
+                                const [clicked, setClicked] = useState(false);
+                                if (clicked) return null;
+                                return (
+                                    <GcdsButton size="small" onClick={() => { handleButtonClick(batchId, 'complete', aiProvider); setClicked(true); }}>{t('batch.list.actions.process')}</GcdsButton>
+                                );
+                            };
+                            root.render(<ActionButtonComplete />);
+                        } else {
+                            const ActionButtonCancel = () => {
+                                const [clicked, setClicked] = useState(false);
+                                if (clicked) return null;
+                                return (
+                                    <GcdsButton size="small" onClick={() => { handleButtonClick(batchId, 'cancel', aiProvider); setClicked(true); }}>{t('batch.list.actions.cancel')}</GcdsButton>
+                                );
+                            };
+                            root.render(<ActionButtonCancel />);
                         }
                     },
                 }}
