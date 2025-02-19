@@ -19,10 +19,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ### Tuned for Canada.ca user needs 
 - AI response is tagged so sentences in answer can be displayed in accessible canada.ca format and citation urls can be displayed in a single url for next step of task, with clickable link available for clickthrough rate measurement
-- assumes the AI service will be called from a specific canada.ca page, and uses the referral url to pass that information to the AI service. The referral url is either passed to the AI service from the chat interface Options for testing purposes, or from the query tag on the call of the application. 
-- system prompt forces short answers of a maximum of 4 sentences to improve clarity, use plain language, and reduce risk of hallucinations
+- assumes the AI service will be called from a specific canada.ca page, and uses the referral url to pass that information to the AI service. The referral url is either passed to the AI service from the chat interface  for testing purposes, or from the query tag on the call of the application. The query tag is the url of the page that AI Answers is called from - it must be encoded properly.
+- system prompt forces short answers of a maximum of 4 sentences to improve clarity, use plain language, and reduce risk of hallucinations.
 - scenarios address top user issues and general instructions for the AI service to use the context service, answer service and tools to answer the question and provide a citation url for all answers sourced from canada.ca or gc.ca sites. 
-- uses canada.ca search to provide a set of search results to help the AI service derive the departmental context, and helps the AI answer serviceanswer the question and provide a citation url 
+- uses canada.ca search to provide a set of search results to help the AI service derive the departmental context, and helps the AI answer service answer the question and provide a citation url 
 - takes advantage of canada.ca interaction patterns and support - e.g. if a wizard is already in place, direct the user to answer those questions rather than having the AI service attempt to answer. AI services aren't optimized for layers of question logic and aren't effective for that purpose.  
 - since pages are added and updated frequently, the AI answer service calls a tool to read the page if it identifies a new, updated or unfamiliar url (from the search results, the contextual scenario and update files, or the referral url)   
 - PII is redacted programmatically in the code, no PII is sent to the AI service or logged into the database. When PII is detected in the user question, the user is alerted that the question will not be sent to the AI service to protect their privacy, and that they should ask the question without private personal details. 
@@ -94,14 +94,16 @@ The application uses several specialized tools to enhance AI interactions:
 These tools work together to ensure accurate information retrieval, URL validation, and content verification for AI responses.
 
 #### 1. Context AI service 
-The context service uses the user question, the selected language and the referral url if available, to derive the topic and topic url from the [`menu-structure.js`](src/services/systemPrompt/menuStructure_EN.js) files for Canada.ca, and the department and department url from the [`department-structure.js`](src/services/systemPrompt/departments_EN.js) file for Canada.ca. The context service is run from the [`ContextSystem.js`](src/services/contextSystemPrompt.js) file which loads the department and menu structure files and contains the instructions for the selected AI service on how to derive the context from the user question.
+The context service uses the user question, the selected language and the referral url if available to derive the department and department url from the [`department-structure.js`](src/services/systemPrompt/departments_EN.js) file for Canada.ca. The context service is run from the [`ContextSystem.js`](src/services/contextSystemPrompt.js) file which loads the department structure files and contains the instructions for the selected AI service on how to derive the context from the user question.
+
 - The [`(src/services/contextService.js)`](src/services/contextService.js) is the first service to be called in the prompt-chaining architecture.
-- The referring URL input field in the Options expand/collapse section of the chat interface is a temporary testing phase solution because there are no AI buttons on any live web pages that can pass a url parameter yet.  
--Context service uses a small light AI model (Anthropic Haiku or GPT-4o Mini) to evaluate the question to determine the best-fitting canada.ca topic and matching topic url from the menu structure file provided in the prompt. Then it derives the department most likely to have content related to the question - it uses the department and agency list of names and urls (pulled from Canada.ca) to get the full name, abbreviation and url. The context service returns the topicname, department and matching topic and department urls to be used by the AI Answer service
-Output: topic and topic url if found, department and department url if found
+- The referring URL input field in the Options expand/collapse section of the chat interface is a temporary testing phase solution because there are no AI buttons on any live web pages that can pass a url parameter yet.  Referring url can also be passed from the query tag on the call of the application.
+
+- Context service uses a small light AI model (Anthropic Haiku or GPT-4o Mini) to evaluate the question to determine the department most likely to have content related to the question - it uses the department and agency list of names and urls (pulled from Canada.ca) to get the full name, abbreviation and url.
+Output: department and department url if found
 
 #### 2. Answer service
-Input: user message with topic and department context from context service, search results,  and referral url (from referral url input field or from query tag on the call of the application). Uses selected AI service.
+Input: user message with department context from context service, search results, and referral url (from referral url input field or from query tag on the call of the application). Uses selected AI service.
 Output: answer and citation url if provided (no citation url if the user question is not about Government of Canada services)
 Loading department-specific context:  
 - The scenarios-all.js file is always loaded - it contains the general scenarios that apply to all departments.
@@ -174,6 +176,10 @@ TODO:contributing guidelines and code of conduct for details on how to participa
 flowchart TB
     User(["User/Browser"])
     
+    subgraph LanguageLayer
+        LangHandler["**Language Handler**<br>- Translations<br>- Locale Management"]
+    end
+
     subgraph PreProcessing
         Redaction["**Redaction Service**<br>- PII Detection<br>- Pattern Matching<br>- Threat Filtering"]
         SearchService["**Search Service**<br>- Coordinates Search Tools<br>- Prepares Context Data"]
@@ -185,8 +191,12 @@ flowchart TB
     end
 
     subgraph AI_Services
-        Context["**Context AI Service**<br>- Topic/Dept Detection<br>- Menu Structure Analysis<br>(Haiku/GPT-Mini)"]
+        Context["**Context AI Service**<br>- Department Detection<br>- Department URL Analysis<br>(Haiku/GPT-Mini)"]
         Answer["**Answer AI Service**<br>- Question Processing<br>- Response Generation<br>(Sonnet/GPT-4)"]
+    end
+
+    subgraph ContextSystem
+        DeptContext["**Department Context**<br>- Scenarios<br>- Updates<br>- Department-Specific Content"]
     end
 
     subgraph AI_Support_Tools
@@ -195,26 +205,31 @@ flowchart TB
     end
 
     subgraph Infrastructure
-        AIManager["**AI Service Manager**<br>- API Key Management<br>- Service Selection<br>- Failover Handling<br>- Feedback Scoring<br>- Interaction Logging"]
+        AIManager["**AI Service Manager**<br>- API Key Management<br>- Service Selection<br>- Failover Handling"]
         DB["**Database Service**<br>- MongoDB Atlas<br>- Logging<br>- Data Export"]
         Eval["**Evaluation Service**<br>- Response Scoring"]
+        Feedback["**Feedback System**<br>- User Feedback Collection<br>- Answer Scoring<br>- Citation Rating"]
     end
     
-    User -->|Question| Redaction
+    User -->|Question| LangHandler
+    LangHandler -->|Localized Input| Redaction
     Redaction -->|Sanitized Question| SearchService
     
     SearchService -->|Search Requests| SearchTools
     SearchTools -->|Search Results| SearchService
     SearchService -->|Question + Search Results| Context
     
-    Context -->|Department/Topic Context| Answer
+    Context -->|Department| DeptContext
+    DeptContext -->|Contextual Data| Answer
     
     Answer -.->|Tool Requests| AI_Support_Tools
     AI_Support_Tools -.->|Tool Results| Answer
     
     AIManager -->|API Keys & Config| Context
     AIManager -->|API Keys & Config| Answer
-    AIManager -->|Interaction Data| DB
+    
+    Answer -->|Response| Feedback
+    Feedback -->|Scores & Ratings| DB
     DB -->|Historical Data| Eval
     
     subgraph AI_Providers
@@ -225,4 +240,3 @@ flowchart TB
     Context -->|API Calls| AI_Providers
     Answer -->|API Calls| AI_Providers
 ```
-

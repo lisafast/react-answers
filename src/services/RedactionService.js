@@ -185,8 +185,8 @@ class RedactionService {
         description: 'Passport Numbers'
       },
       {
-        pattern: /\b(?<!\$)(?!\d{4}\b)[0-9][A-Z0-9\s\-.]{3,}[0-9]\b/gi,
-        description: 'Sequences of 5+ characters starting and ending with digits, excluding 4-digit numbers (catches various ID numbers, SSN, SIN, credit cards, etc.)'
+        pattern: /\b(?<!\$)(?!\d+\b)[0-9][A-Z0-9\s\-.]{3,}[0-9]\b/gi,
+        description: 'Sequences starting and ending with digits that contain non-numeric characters (catches various ID numbers, SSN, SIN, credit cards, etc., but excludes pure number sequences)'
       },
       {
         pattern: /(?<=\b(name\s+is|nom\s+est|name:|nom:)\s+)([A-Za-z]+(?:\s+[A-Za-z]+)?)\b/gi,
