@@ -28,7 +28,7 @@ class EvaluationService {
    * @param {string} answer - The answer to evaluate
    * @returns {Promise<object>} Evaluation results
    */
-  static async evaluateAnswer(question, answer, questionId = null) {
+  static async evaluateAnswer(question, answer, interactionId = null) {
     try {
       // Step 1: Find similar questions with highly-rated answers
       const similarQuestions = await SimilarityService.findSimilarQuestions(question);
@@ -36,12 +36,8 @@ class EvaluationService {
       // Step 2: If we have similar golden answers, use them for comparison
       if (similarQuestions.length > 0) {
         const evaluation = await this.compareWithGoldenAnswers(answer, similarQuestions);
-        if (questionId) {
-          await this.storeEvaluationResults({
-            questionId,
-            evaluation,
-            type: 'comparison'
-          });
+        if (interactionId) {
+          await DataStoreService.persistEvaluation(interactionId, evaluation, 'comparison');
         }
         return {
           success: true,
@@ -51,12 +47,8 @@ class EvaluationService {
       
       // Step 3: If no similar questions, perform pure AI evaluation
       const aiEvaluation = await this.performAIEvaluation(question, answer);
-      if (questionId) {
-        await this.storeEvaluationResults({
-          questionId,
-          evaluation: aiEvaluation,
-          type: 'claude-3-7-sonnet'
-        });
+      if (interactionId) {
+        await DataStoreService.persistEvaluation(interactionId, aiEvaluation, 'claude-3-7-sonnet');
       }
       return {
         success: true,
@@ -364,31 +356,6 @@ class EvaluationService {
         reject(error);
       }
     });
-  }
-
-  /**
-   * Store evaluation results in database
-   * @param {object} data - Evaluation data to store
-   */
-  static async storeEvaluationResults(data) {
-    try {
-      const response = await fetch('/api/db-persist-evaluation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to store evaluation: ${response.statusText}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error storing evaluation results:', error);
-      throw error;
-    }
   }
 }
 

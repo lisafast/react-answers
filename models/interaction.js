@@ -27,6 +27,11 @@ const InteractionSchema = new mongoose.Schema({
     ref: 'ExpertFeedback',
     default: null
   },
+  aiFeedback: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ExpertFeedback',
+    default: []
+  }],
   context: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Context',

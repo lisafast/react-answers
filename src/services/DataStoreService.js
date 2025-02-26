@@ -126,6 +126,28 @@ export const DataStoreService = {
       });
     }
 
+  },
+  persistEvaluation: async (interactionId, evaluation, type) => {
+    try {
+      const response = await fetch(getApiUrl('db-persist-evaluation'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          interactionId,
+          evaluation,
+          type
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to persist evaluation');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error persisting evaluation:', error);
+      throw error;
+    }
   }
 };
 

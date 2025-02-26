@@ -3,6 +3,7 @@ import AnswerService from './AnswerService.js';
 import { DataStoreService } from './DataStoreService.js';
 import { urlToSearch } from '../utils/urlToSearch.js';
 import RedactionService from './RedactionService.js';
+import EvaluationService from '../../services/EvaluationService.js';
 
 export const PipelineStatus = {
     REDACTING: 'redacting',
@@ -15,8 +16,10 @@ export const PipelineStatus = {
     UPDATING_DATASTORE: 'updatingDatastore',
     MODERATING_ANSWER: 'moderatingAnswer',
     ERROR: 'error',
-    NEED_CLARIFICATION: 'needClarification'
+    NEED_CLARIFICATION: 'needClarification',
+    EVALUATING_ANSWER: 'evaluatingAnswer'
 };
+
 export const ChatPipelineService = {
     processResponse: async (chatId, userMessage, userMessageId, conversationHistory, lang, department, referringUrl, selectedAI, translationF, onStatusUpdate, searchProvider) => {
         const startTime = Date.now();
@@ -72,7 +75,7 @@ export const ChatPipelineService = {
         const totalResponseTime = endTime - startTime;
         console.log("➡️ Total response time:", totalResponseTime, "ms");
         // Log the interaction with both the original and validated URL
-        await DataStoreService.persistInteraction(
+        const interaction = await DataStoreService.persistInteraction(
             selectedAI,
             userMessage,
             userMessageId,
@@ -88,6 +91,20 @@ export const ChatPipelineService = {
         );
 
         onStatusUpdate(PipelineStatus.MODERATING_ANSWER);
+        
+        // Start the AI evaluation process in the background
+        if (answer.answerType === 'normal') {
+            onStatusUpdate(PipelineStatus.EVALUATING_ANSWER);
+            // Start the evaluation process but don't wait for it to complete
+            ChatPipelineService.startEvaluation(userMessage, answer, interaction.interactionId)
+                .then(result => {
+                    console.log("➡️ Evaluation completed:", result);
+                })
+                .catch(error => {
+                    console.error("❌ Error during evaluation:", error);
+                });
+        }
+        
         console.log("➡️ pipeline complete");
         return {
             answer: answer,
@@ -97,6 +114,22 @@ export const ChatPipelineService = {
             confidenceRating: confidenceRating,
         };
     },
+    
+    startEvaluation: async (question, answer, interactionId) => {
+        try {
+            console.log("➡️ Starting evaluation for interaction:", interactionId);
+            const evaluation = await EvaluationService.evaluateAnswer(
+                question, 
+                answer.paragraphs.join('\n'),
+                interactionId
+            );
+            return evaluation;
+        } catch (error) {
+            console.error("❌ Error in evaluation process:", error);
+            throw error;
+        }
+    },
+    
     verifyCitation: async (originalCitationUrl, lang, redactedText, selectedDepartment, t) => {
         
         const validationResult = await urlToSearch.validateAndCheckUrl(
