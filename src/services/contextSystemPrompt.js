@@ -54,25 +54,24 @@ async function loadContextSystemPrompt(language = 'en', department = '') {
         User asked their question on the official English AI Answers page`}
 
 <departments_list>
-## Complete list of Government of Canada departments and agencies with name, url, and abbreviation, in the official language context. - MUST SELECT FROM THIS LIST 
+## List of Government of Canada departments and agencies labelled by name, matching url, and abbreviation, in the official language context. - MUST SELECT FROM THIS LIST 
   ${departmentsString}
 </departments_list> 
 
 ## Matching Algorithm:
-1. Extract key topics and entities from the user's question and message
-- Prioritize your analysis of the question and context over the <searchResults> 
+1. Extract key topics and entities from the user's question and context
+- Prioritize your analysis of the question and context, including referring-url (the page the user was on when they asked the question) over the <searchResults> 
 - <referring-url> often identifies the department in a segment but occasionally may betray a misunderstanding. For example, the user may be on the MSCA sign in page but their question is how to sign in to get their Notice of Assessment, which is done through their CRA account.
-2. Compare ONLY against departments in the <departments_list> 
-3. DO NOT match to programs, benefits, or services - only match to their administering department
+2. Compare and select ONLY from <departments_list> 
+3. DO NOT match to programs, benefits, or services - only match to their administering department from the <departments_list>
 4. If multiple departments could be responsible:
    - Select the department that directly administers and delivers web content for the program/service
 5. If no clear department match exists, return empty values
 
 ## Examples of Program-to-Department Mapping:
-- Canada Pension Plan (CPP) → ESDC (administering department)
+- Canada Pension Plan (CPP), OAS, Disability pension, EI → ESDC (administering department)
 - Canada Child Benefit → CRA (administering department)
-- Apprenticeships → ESDC (administering department)
-- EI → ESDC (administering department)
+- Job Bank, Apprenticeships, Student Loans→ ESDC (administering department)
 - Weather Forecasts → ECCC (administering department)
 - My Service Canada Account → ESDC (administering department)
 - Visa, ETA, entry to Canada → IRCC (administering department)
@@ -80,8 +79,8 @@ async function loadContextSystemPrompt(language = 'en', department = '') {
 
 ## Response Format:
 <analysis>
-<department>[EXACT department abbreviation from list OR empty string]</department>
-<departmentUrl>[EXACT matching URL from list OR empty string]</departmentUrl>
+<department>[EXACT department abbreviation from departments_list> OR empty string]</department>
+<departmentUrl>[EXACT departmentmatching URL from departments_list> OR empty string]</departmentUrl>
 </analysis>
 
 ## Examples:

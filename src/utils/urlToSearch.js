@@ -17,6 +17,11 @@ class URLToSearch {
    * @returns {Promise<object>} Validation result with network check
    */
   async validateAndCheckUrl(url, lang, question, department, t) {
+    // If URL is empty, null, or undefined, skip validation and return a fallback search URL
+    if (!url) {
+      return this.generateFallbackSearchUrl(lang, question, department, t);
+    }
+
     // Function to check if a URL is a Canada.ca domain
     const isCanadaCaDomain = (url) => {
       return url.startsWith('https://www.canada.ca') || url.startsWith('http://www.canada.ca');
@@ -39,38 +44,48 @@ class URLToSearch {
       };
     }
 
-  //   Prepare the search URL based on department
-  const encodedQuestion = encodeURIComponent(question);
-  let searchUrl;
-  
-  switch(department?.toLowerCase()) {
-    case 'isc':
-      searchUrl = lang === 'en' 
-        ? `https://www.canada.ca/${lang}/indigenous-services-canada/search.html?q=${encodedQuestion}&wb-srch-sub=`
-        : `https://www.canada.ca/${lang}/services-autochtones-canada/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
-      break;
-    case 'cra':
-      searchUrl = lang === 'en'
-        ? `https://www.canada.ca/${lang}/revenue-agency/search.html?q=${encodedQuestion}&wb-srch-sub=`
-        : `https://www.canada.ca/${lang}/agence-revenu/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
-      break;
-    case 'ircc':
-      searchUrl = lang === 'en'
-        ? `https://www.canada.ca/${lang}/services/immigration-citizenship/search.html?q=${encodedQuestion}&wb-srch-sub=`
-        : `https://www.canada.ca/${lang}/services/immigration-citoyennete/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
-      break;
-    default:
-      searchUrl = `https://www.canada.ca/${lang}/sr/srb.html?q=${encodedQuestion}&wb-srch-sub=`;
-  }
-  
-  return {
-    isValid: false,
-    fallbackUrl: searchUrl,
-    fallbackText: t('homepage.chat.citation.fallbackText'),
-    confidenceRating: '0.1'
-  };
+    return this.generateFallbackSearchUrl(lang, question, department, t);
   }
 
+  /**
+   * Generate a fallback search URL based on department and question
+   * @param {string} lang - Language code ('en' or 'fr')
+   * @param {string} question - User's question to append to search
+   * @param {string} department - Department code (isc, cra, ircc, or undefined)
+   * @param {function} t - Translation function
+   * @returns {object} Fallback search URL information
+   */
+  generateFallbackSearchUrl(lang, question, department, t) {
+    const encodedQuestion = encodeURIComponent(question);
+    let searchUrl;
+    
+    switch(department?.toLowerCase()) {
+      case 'isc':
+        searchUrl = lang === 'en' 
+          ? `https://www.canada.ca/${lang}/indigenous-services-canada/search.html?q=${encodedQuestion}&wb-srch-sub=`
+          : `https://www.canada.ca/${lang}/services-autochtones-canada/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
+        break;
+      case 'cra':
+        searchUrl = lang === 'en'
+          ? `https://www.canada.ca/${lang}/revenue-agency/search.html?q=${encodedQuestion}&wb-srch-sub=`
+          : `https://www.canada.ca/${lang}/agence-revenu/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
+        break;
+      case 'ircc':
+        searchUrl = lang === 'en'
+          ? `https://www.canada.ca/${lang}/services/immigration-citizenship/search.html?q=${encodedQuestion}&wb-srch-sub=`
+          : `https://www.canada.ca/${lang}/services/immigration-citoyennete/rechercher.html?q=${encodedQuestion}&wb-srch-sub=`;
+        break;
+      default:
+        searchUrl = `https://www.canada.ca/${lang}/sr/srb.html?q=${encodedQuestion}&wb-srch-sub=`;
+    }
+    
+    return {
+      isValid: false,
+      fallbackUrl: searchUrl,
+      fallbackText: t('homepage.chat.citation.fallbackText'),
+      confidenceRating: '0.1'
+    };
+  }
 }
   
 // Export a singleton instance

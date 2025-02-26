@@ -82,10 +82,15 @@ export const DataStoreService = {
       formattedExpertFeedback = {
         totalScore: expertFeedback.totalScore ?? null,
         sentence1Score: expertFeedback.sentence1Score ?? null,
+        sentence1Explanation: expertFeedback.sentence1Explanation || '',
         sentence2Score: expertFeedback.sentence2Score ?? null,
+        sentence2Explanation: expertFeedback.sentence2Explanation || '',
         sentence3Score: expertFeedback.sentence3Score ?? null,
+        sentence3Explanation: expertFeedback.sentence3Explanation || '',
         sentence4Score: expertFeedback.sentence4Score ?? null,
+        sentence4Explanation: expertFeedback.sentence4Explanation || '',
         citationScore: expertFeedback.citationScore ?? null,
+        citationExplanation: expertFeedback.citationExplanation || '',
         answerImprovement: expertFeedback.answerImprovement || '',
         expertCitationUrl: expertFeedback.expertCitationUrl || '',
         feedback: expertFeedback.isPositive ? 'positive' : 'negative'

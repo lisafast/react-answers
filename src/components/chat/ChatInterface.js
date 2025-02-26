@@ -180,7 +180,7 @@ const ChatInterface = ({
                       message.redactedText?.includes('###') ? "redacted-preview" : ""
                   }>
                     {message.redactedText?.includes('XXX') && (
-                      <><FontAwesomeIcon icon="circle-info" /> {t('homepage.chat.messages.privacyMessage')}</>
+                      <><FontAwesomeIcon icon="fa-circle-exclamation" /> {t('homepage.chat.messages.privacyMessage')}</>
                     )}
                     {message.redactedText?.includes('###') &&
                       t('homepage.chat.messages.blockedMessage')}

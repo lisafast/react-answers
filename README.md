@@ -8,7 +8,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - this is a proof of concept  - usability testing is underway
 - Back-end MongoDB database to store conversation history and SME scores to use for evaluation (human and later AI)
 - Evaluation input of csv files generated from user feedback questions to score AI responses
-- Can choose either Claude Sonnet 3.5 or OpenAI GPT-4o API AI service for both shorter Context call (Haiku or Mini) and longer Answer call (Sonnet orGPT-4o)
+- Can choose either Claude Sonnet 3.7 or OpenAI GPT-4o API AI service for both shorter Context call (Haiku or Mini) and longer Answer call (Sonnet or GPT-4o)
 - System prompts are built from sets of files, including agentic instructions for the AI service, and contextual scenarios and updates for the answer service pulled in for specific departments, based on the department selected byt the Context AI service 
 - Admin page for access to chatlogs in JSON or CSV format, Batch page to submit csv files of questions for human evaluation, Evaluation page planned later to score AI chatlogs using the set of human-scored question/answer pairs
 
@@ -38,11 +38,9 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ### Multi-model design - independent of AI service provider
 - Multiple AI service providers enables testing and exploration of strengths and weaknesses of different models
-- Anthropic Claude Sonnet  and OpenAI GPT are currently supported - Cohere was in progress but has been put on hold 
+- Anthropic Claude Sonnet  and OpenAI GPT latest models are currently supported - Cohere was in progress but has been put on hold 
 - Failover in place, to switch to the other AI service if one fails
 - Prompt caching implemented to improve response quality and speed
-  - Claude: Using `anthropic-beta: prompt-caching-2024-07-31`
-  - GPT: Automatic caching
 - Confidence rating system for citation urls 
 - Temperature set to 0 for more deterministic responses for both models
 - Conversation history management - pass conversation history to AI service for context in 'message' field

@@ -103,9 +103,14 @@ const ExportService = {
     toSpreadsheet: async (chats, headerOrder, type = 'excel', filename) => {
         const worksheetData = [];
         const headersSet = new Set(chats.flatMap(chat => ExportService.getHeaders(chat.interactions)));
-        const headers = Array.from(headersSet);
+        const headers = ['uniqueID', ...Array.from(headersSet)];
         for (const chat of chats) {
-            const interactions = chat.interactions;
+            const interactions = chat.interactions.map(interaction => ({
+                ...interaction,
+                uniqueID: chat.chatId ? 
+                    `${chat.chatId}${interaction.interactionId}` : 
+                    `${chat.batchId || 'batch'}_${interaction.interactionId}`
+            }));
             const items = interactions;
             const rows = ExportService.jsonToFlatTable(items, headers);
             const filteredHeaders = headers.filter(header => !header.includes('_id') && !header.includes('__v'));
@@ -155,6 +160,7 @@ const ExportService = {
 
     export: (items, filename) => {
         const headerOrder = [
+            { dataLabel: 'uniqueID', outputLabel: 'uniqueID' },
             { dataLabel: 'chatId', outputLabel: 'chatId' },
             { dataLabel: 'createdAt', outputLabel: 'createdAt' },
             { dataLabel: 'pageLanguage', outputLabel: 'pageLanguage' },
@@ -174,10 +180,15 @@ const ExportService = {
             { dataLabel: 'expertFeedback.feedback', outputLabel: 'feedback' },
             { dataLabel: 'expertFeedback.totalScore', outputLabel: 'expertFeedback.totalScore' },
             { dataLabel: 'expertFeedback.sentence1Score', outputLabel: 'expertFeedback.sentence1Score' },
+            { dataLabel: 'expertFeedback.sentence1Explanation', outputLabel: 'expertFeedback.sentence1Explanation' },
             { dataLabel: 'expertFeedback.sentence2Score', outputLabel: 'expertFeedback.sentence2Score' },
+            { dataLabel: 'expertFeedback.sentence2Explanation', outputLabel: 'expertFeedback.sentence2Explanation' },
             { dataLabel: 'expertFeedback.sentence3Score', outputLabel: 'expertFeedback.sentence3Score' },
+            { dataLabel: 'expertFeedback.sentence3Explanation', outputLabel: 'expertFeedback.sentence3Explanation' },
             { dataLabel: 'expertFeedback.sentence4Score', outputLabel: 'expertFeedback.sentence4Score' },
+            { dataLabel: 'expertFeedback.sentence4Explanation', outputLabel: 'expertFeedback.sentence4Explanation' },
             { dataLabel: 'expertFeedback.citationScore', outputLabel: 'expertFeedback.citationScore' },
+            { dataLabel: 'expertFeedback.citationExplanation', outputLabel: 'expertFeedback.citationExplanation' },
             { dataLabel: 'expertFeedback.answerImprovement', outputLabel: 'expertFeedback.answerImprovement' },
             { dataLabel: 'expertFeedback.expertCitationUrl', outputLabel: 'expertFeedback.expertCitationUrl' },
         ];

@@ -106,7 +106,7 @@ const BatchList = ({ buttonAction, batchStatus, lang }) => {
                     paging: true,
                     searching: true,
                     ordering: true,
-                    order: [[1, 'desc']], // Order by Created Date (column index 1) descending
+                    order: [[2, 'desc']], // Order by Created Date (createdAt column) descending
                     createdRow: (row, data) => {
                         const { batchId, status, aiProvider } = data;
                         const actionsCell = row.querySelector('td:last-child');

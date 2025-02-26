@@ -46,12 +46,20 @@ export const ChatPipelineService = {
         const answer = await AnswerService.sendMessage(selectedAI, userMessage, conversationHistory, lang, context, false, referringUrl);
         console.log("➡️ Answer Received:", answer);
         let finalCitationUrl, confidenceRating = null;
+        
         if (answer.answerType === 'normal') {
             onStatusUpdate(PipelineStatus.VERIFYING_CITATION);
+            // Use answer.citationUrl directly
             const citationResult = await ChatPipelineService.verifyCitation(answer.citationUrl, lang, userMessage, department, translationF);
-            finalCitationUrl = citationResult.url;
+            
+            // Extract the URL correctly depending on whether it's a valid URL or a fallback
+            finalCitationUrl = citationResult.url || citationResult.fallbackUrl;
             confidenceRating = citationResult.confidenceRating;
-            console.log("➡️ Citation validated:", { finalCitationUrl, confidenceRating });
+            console.log("➡️ Citation validated:", { 
+                originalUrl: answer.citationUrl,
+                finalCitationUrl, 
+                confidenceRating 
+            });
         }
 
         if (answer.answerType === 'question') {
@@ -63,14 +71,14 @@ export const ChatPipelineService = {
         const endTime = Date.now();
         const totalResponseTime = endTime - startTime;
         console.log("➡️ Total response time:", totalResponseTime, "ms");
-        // Log the interaction with the validated URL
+        // Log the interaction with both the original and validated URL
         await DataStoreService.persistInteraction(
             selectedAI,
             userMessage,
             userMessageId,
             referringUrl,
             answer,
-            finalCitationUrl,
+            finalCitationUrl,  
             confidenceRating,
             context,
             chatId,
@@ -86,22 +94,20 @@ export const ChatPipelineService = {
             context: context,
             question: userMessage,
             citationUrl: finalCitationUrl,
-            confidenceRating: confidenceRating
+            confidenceRating: confidenceRating,
         };
     },
     verifyCitation: async (originalCitationUrl, lang, redactedText, selectedDepartment, t) => {
-        if (originalCitationUrl) {
-            const validationResult = await urlToSearch.validateAndCheckUrl(
-                originalCitationUrl,
-                lang,
-                redactedText,
-                selectedDepartment,
-                t
-            );
-            console.log(`✅ Validated URL:`, validationResult);
-            return validationResult;
-        }
-        return { url: null, confidenceRating: null };
+        
+        const validationResult = await urlToSearch.validateAndCheckUrl(
+            originalCitationUrl,
+            lang,
+            redactedText,
+            selectedDepartment,
+            t
+        );
+        console.log(`✅ Validated URL:`, validationResult);
+        return validationResult;
     },
     processRedaction: (userMessage) => {
         const { redactedText, redactedItems } = RedactionService.redactText(userMessage);

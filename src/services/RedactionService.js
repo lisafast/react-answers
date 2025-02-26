@@ -185,8 +185,8 @@ class RedactionService {
         description: 'Passport Numbers'
       },
       {
-        pattern: /\b(?<!\$)(?!\d+\b)[0-9][A-Z0-9\s\-.]{3,}[0-9]\b/gi,
-        description: 'Sequences starting and ending with digits that contain non-numeric characters (catches various ID numbers, SSN, SIN, credit cards, etc., but excludes pure number sequences)'
+        pattern: /\b(?<!\$)(?=[A-Z0-9-]*[0-9])(?=[A-Z0-9-]*[A-Z])[A-Z0-9-]{5,}\b/gi,
+        description: 'Alphanumeric sequences of 5+ chars that contain both letters and numbers (catches various ID numbers, passport numbers, account codes, etc., but excludes pure text or numbers)'
       },
       {
         pattern: /(?<=\b(name\s+is|nom\s+est|name:|nom:)\s+)([A-Za-z]+(?:\s+[A-Za-z]+)?)\b/gi,
@@ -265,12 +265,6 @@ class RedactionService {
     const validPatterns = this.redactionPatterns.filter(({ pattern }) => pattern !== null);
 
     validPatterns.forEach(({ pattern, type }, index) => {
-      // Skip processing if this pattern type has already been redacted
-      if ((type === 'profanity' || type === 'threat' || type === 'manipulation') && 
-          redactedText.includes('XXX')) {
-        return;
-      }
-
       redactedText = redactedText.replace(pattern, (match) => {
         console.log(`Pattern ${index} matched: "${match}"`);
         redactedItems.push({ value: match, type });

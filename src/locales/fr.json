@@ -13,7 +13,7 @@
       "title": "À propos de Réponses IA",
       "privacyNote": "Pour protéger votre vie privée, les numéros et les adresses ne sont pas envoyés au service d'IA.",
       "aiServices": {
-        "claude": "Service d'IA Claude : Claude 3.5 Sonnet d'Anthropic, connaissances jusqu'en octobre 2024",
+        "claude": "Service d'IA Claude : Claude 3.7 Sonnet d'Anthropic, connaissances jusqu'en février 2025",
         "chatgpt": "Service d'IA ChatGPT : GPT-4o d'OpenAI, connaissances jusqu'en novembre 2024",
         "cohere": "Autres services peuvent être ajoutés dans le futur."
       },
@@ -118,6 +118,7 @@
         "good": "Bonne",
         "needsImprovement": "Nécessite une amélioration",
         "incorrect": "Incorrecte",
+        "explanation": "Veuillez expliquer votre évaluation (facultatif) :",
         "answerImprovement": "Comment la réponse pourrait-elle être améliorée (facultatif)?",
         "betterCitation": "Meilleure URL de citation pour Canada.ca ou gc.ca (facultatif) :"
       },

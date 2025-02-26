@@ -214,7 +214,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             {
               id: blockedMessageId,
               text: <div dangerouslySetInnerHTML={{
-                __html: '<i class="fa-solid fa-circle-exclamation"></i>' +
+                __html:
                   (error.redactedText.includes('XXX') ? t('homepage.chat.messages.privateContent') : t('homepage.chat.messages.blockedContent'))
               }} />,
               sender: 'system',
