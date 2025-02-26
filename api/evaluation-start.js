@@ -1,4 +1,4 @@
-import EvaluationService from '../services/EvaluationService.js';
+import { EvaluationService } from '../services/EvaluationService.js';
 import multer from 'multer';
 import fs from 'fs';
 import os from 'os';
@@ -12,9 +12,15 @@ export const config = {
   },
 };
 
+/**
+ * API endpoint to start the evaluation process
+ */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ 
+      success: false, 
+      error: 'Method not allowed' 
+    });
   }
 
   // Use multer middleware
