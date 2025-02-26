@@ -12,12 +12,16 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
   const [expertFeedback, setExpertFeedback] = useState({
     sentence1Score: null,
     sentence1Explanation: '',
+    sentence1Harmful: false,
     sentence2Score: null,
     sentence2Explanation: '',
+    sentence2Harmful: false,
     sentence3Score: null,
     sentence3Explanation: '',
+    sentence3Harmful: false,
     sentence4Score: null,
     sentence4Explanation: '',
+    sentence4Harmful: false,
     citationScore: null,
     citationExplanation: '',
     expertCitationUrl: '',
@@ -25,12 +29,23 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
 
   const handleRadioChange = (event) => {
     const { name, value } = event.target;
-    setExpertFeedback(prev => ({ ...prev, [name]: parseInt(value) }));
+    const sentenceNumber = name.replace('Score', '');
+    const updates = { 
+      [name]: parseInt(value),
+      [`${sentenceNumber}Harmful`]: false // Always reset harmful when changing score
+    };
+    
+    setExpertFeedback(prev => ({ ...prev, ...updates }));
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setExpertFeedback(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setExpertFeedback(prev => ({ ...prev, [name]: checked }));
   };
 
     // Prevent form submission on enter key press inside text areas
@@ -117,125 +132,76 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
         <details className="answer-details" open>
       <summary>{t('homepage.expertRating.title')}</summary>
           
-          {/* Sentence 1 */}
-          <div className="sentence-rating-group">
-            <legend>
-              {t('homepage.expertRating.sentence1')}
-              {sentences[0] && <div className="sentence-text">"{sentences[0]}"</div>}
-            </legend>
-            <ul className="list-unstyled lst-spcd-2">
-              <li className="radio">
-                <input
-                  type="radio"
-                  name="sentence1Score"
-                  id="sentence1-100"
-                  value="100"
-                  checked={expertFeedback.sentence1Score === 100}
-                  onChange={handleRadioChange}
-                />
-                <label htmlFor="sentence1-100">
-                  {t('homepage.expertRating.options.good')} (100)
-                </label>
-              </li>
-              <li className="radio">
-                <input
-                  type="radio"
-                  name="sentence1Score"
-                  id="sentence1-80"
-                  value="80"
-                  checked={expertFeedback.sentence1Score === 80}
-                  onChange={handleRadioChange}
-                />
-                <label htmlFor="sentence1-80">
-                  {t('homepage.expertRating.options.needsImprovement')} (80)
-                </label>
-              </li>
-              <li className="radio">
-                <input
-                  type="radio"
-                  name="sentence1Score"
-                  id="sentence1-0"
-                  value="0"
-                  checked={expertFeedback.sentence1Score === 0}
-                  onChange={handleRadioChange}
-                />
-                <label htmlFor="sentence1-0">
-                  {t('homepage.expertRating.options.incorrect')} (0)
-                </label>
-              </li>
-            </ul>
-            {(expertFeedback.sentence1Score === 80 || expertFeedback.sentence1Score === 0) && (
-              <div className="explanation-field">
-                <label htmlFor="sentence1-explanation">
-                  {t('homepage.expertRating.options.explanation')}
-                  <textarea
-                    id="sentence1-explanation"
-                    name="sentence1Explanation"
-                    value={expertFeedback.sentence1Explanation}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyPress}
-                  />
-                </label>
-              </div>
-            )}
-          </div>
-
-          {/* Dynamic sentences 2-4 */}
-          {[...Array(Math.min(3, sentenceCount - 1))].map((_, index) => (
-            <div key={index + 2} className="sentence-rating-group">
+          {/* All sentences 1-4 */}
+          {[...Array(Math.min(4, sentenceCount))].map((_, index) => (
+            <div key={index + 1} className="sentence-rating-group">
               <legend>
-                {t(`homepage.expertRating.sentence${index + 2}`)}
-                {sentences[index + 1] && <div className="sentence-text">"{sentences[index + 1]}"</div>}
+                {t(`homepage.expertRating.sentence${index + 1}`)}
+                {sentences[index] && <div className="sentence-text">"{sentences[index]}"</div>}
               </legend>
               <ul className="list-unstyled lst-spcd-2">
                 <li className="radio">
                   <input
                     type="radio"
-                    name={`sentence${index + 2}Score`}
-                    id={`sentence${index + 2}-100`}
+                    name={`sentence${index + 1}Score`}
+                    id={`sentence${index + 1}-100`}
                     value="100"
-                    checked={expertFeedback[`sentence${index + 2}Score`] === 100}
+                    checked={expertFeedback[`sentence${index + 1}Score`] === 100}
                     onChange={handleRadioChange}
                   />
-                  <label htmlFor={`sentence${index + 2}-100`}>
+                  <label htmlFor={`sentence${index + 1}-100`}>
                     {t('homepage.expertRating.options.good')} (100)
                   </label>
                 </li>
                 <li className="radio">
                   <input
                     type="radio"
-                    name={`sentence${index + 2}Score`}
-                    id={`sentence${index + 2}-80`}
+                    name={`sentence${index + 1}Score`}
+                    id={`sentence${index + 1}-80`}
                     value="80"
-                    checked={expertFeedback[`sentence${index + 2}Score`] === 80}
+                    checked={expertFeedback[`sentence${index + 1}Score`] === 80}
                     onChange={handleRadioChange}
                   />
-                  <label htmlFor={`sentence${index + 2}-80`}>
+                  <label htmlFor={`sentence${index + 1}-80`}>
                     {t('homepage.expertRating.options.needsImprovement')} (80)
                   </label>
                 </li>
                 <li className="radio">
                   <input
                     type="radio"
-                    name={`sentence${index + 2}Score`}
-                    id={`sentence${index + 2}-0`}
+                    name={`sentence${index + 1}Score`}
+                    id={`sentence${index + 1}-0`}
                     value="0"
-                    checked={expertFeedback[`sentence${index + 2}Score`] === 0}
+                    checked={expertFeedback[`sentence${index + 1}Score`] === 0}
                     onChange={handleRadioChange}
                   />
-                  <label htmlFor={`sentence${index + 2}-0`}>
+                  <label htmlFor={`sentence${index + 1}-0`}>
                     {t('homepage.expertRating.options.incorrect')} (0)
                   </label>
                 </li>
+                {expertFeedback[`sentence${index + 1}Score`] === 0 && (
+                  <li className="checkbox">
+                    <input
+                      type="checkbox"
+                      name={`sentence${index + 1}Harmful`}
+                      id={`sentence${index + 1}-harmful`}
+                      checked={expertFeedback[`sentence${index + 1}Harmful`]}
+                      onChange={handleCheckboxChange}
+                    />
+                    <label htmlFor={`sentence${index + 1}-harmful`}>
+                      Harmful
+                    </label>
+                  </li>
+                )}
               </ul>
-              {(expertFeedback[`sentence${index + 2}Score`] === 80 || expertFeedback[`sentence${index + 2}Score`] === 0) && (
+              {(expertFeedback[`sentence${index + 1}Score`] === 80 || expertFeedback[`sentence${index + 1}Score`] === 0) && (
                 <div className="explanation-field">
-                  <label htmlFor={`sentence${index + 2}-explanation`}>
+                  <label htmlFor={`sentence${index + 1}-explanation`}>
                     {t('homepage.expertRating.options.explanation')}
                     <textarea
-                      id={`sentence${index + 2}-explanation`}
-                      name={`sentence${index + 2}Explanation`}
-                      value={expertFeedback[`sentence${index + 2}Explanation`]}
+                      id={`sentence${index + 1}-explanation`}
+                      name={`sentence${index + 1}Explanation`}
+                      value={expertFeedback[`sentence${index + 1}Explanation`]}
                       onChange={handleInputChange}
                       onKeyDown={handleKeyPress}
                     />

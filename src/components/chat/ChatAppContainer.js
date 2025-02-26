@@ -40,7 +40,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   // Add a ref to track if we're currently typing
   const isTyping = useRef(false);
 
-  const processNextStatus = () => {
+  const processNextStatus = useCallback(() => {
     if (statusQueueRef.current.length === 0) {
       statusTimeoutRef.current = null;
       return;
@@ -52,9 +52,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     statusTimeoutRef.current = setTimeout(() => {
       processNextStatus();
     }, 1500);
-  };
+  }, []);
 
-  const updateStatusWithTimer = (status) => {
+  const updateStatusWithTimer = useCallback((status) => {
     // Add the new status to the queue
     statusQueueRef.current.push(status);
 
@@ -62,7 +62,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     if (!statusTimeoutRef.current) {
       processNextStatus();
     }
-  };
+  }, [processNextStatus]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -254,7 +254,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     selectedDepartment,
     isLoading,
     messages,
-
+    updateStatusWithTimer
   ]);
 
   useEffect(() => {
