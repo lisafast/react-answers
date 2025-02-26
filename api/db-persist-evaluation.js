@@ -3,6 +3,7 @@
  */
 import mongoose from 'mongoose';
 import { ExpertFeedback } from '../models/expertFeedback.js';
+import { Interaction } from '../models/interaction.js';
 
 /**
  * Save evaluation data to database
@@ -18,12 +19,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { questionId, evaluation, type = 'ai' } = req.body;
+    const { questionId, interactionId, evaluation, type = 'ai' } = req.body;
 
-    if (!questionId || !evaluation) {
+    if ((!questionId && !interactionId) || !evaluation) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: questionId and evaluation are required'
+        error: 'Missing required fields: either questionId or interactionId, and evaluation are required'
       });
     }
 
@@ -60,11 +61,24 @@ export default async function handler(req, res) {
     // Create the expert feedback document
     const feedbackDoc = new ExpertFeedback({
       ...mappedData,
-      questionId: new mongoose.Types.ObjectId(questionId)
+      ...(questionId && { questionId: new mongoose.Types.ObjectId(questionId) })
     });
 
     // Save to database
     await feedbackDoc.save();
+
+    // If interactionId is provided, update the interaction with this feedback
+    if (interactionId) {
+      const interaction = await Interaction.findOne({ interactionId });
+      if (interaction) {
+        // Add this feedback to the aiFeedback array
+        if (!interaction.aiFeedback) {
+          interaction.aiFeedback = [];
+        }
+        interaction.aiFeedback.push(feedbackDoc._id);
+        await interaction.save();
+      }
+    }
 
     return res.status(200).json({
       success: true,
