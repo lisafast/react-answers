@@ -5,6 +5,7 @@ import { Context } from '../models/context.js';
 import { Question } from '../models/question.js';
 import { Citation } from '../models/citation.js';
 import { Answer } from '../models/answer.js';
+import EmbeddingService from '../services/EmbeddingService.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -61,6 +62,28 @@ export default async function handler(req, res) {
 
     await dbInteraction.save();
     await chat.save();
+
+    // Generate embeddings for question using the embedding service
+    try {
+      // Create embedding for the question with sliding window context
+      await EmbeddingService.createQuestionEmbedding({
+        questionText: interaction.question,
+        chat: chat,
+        interactionId: dbInteraction._id,
+        questionId: question._id
+      });
+      
+      // Optionally, also create embedding for the answer if needed
+      // await EmbeddingService.createAnswerEmbedding({
+      //   answerText: interaction.answer.content,
+      //   answerId: answer._id
+      // });
+      
+      console.log(`Embeddings created for question in chat ${chatId}, interaction ${dbInteraction.interactionId}`);
+    } catch (embeddingError) {
+      console.error('Error generating embeddings:', embeddingError);
+      // Continue execution even if embedding fails - don't block the response
+    }
 
     res.status(200).json({ message: 'Interaction logged successfully' });
   } catch (error) {
