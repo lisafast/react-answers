@@ -104,6 +104,8 @@ const ExportService = {
         const worksheetData = [];
         const headersSet = new Set(chats.flatMap(chat => ExportService.getHeaders(chat.interactions)));
         const headers = ['uniqueID', ...Array.from(headersSet)];
+        // Add required global info headers that should always be present
+        const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService', 'startedDownloads', 'completedDownloads'];
         for (const chat of chats) {
             const interactions = chat.interactions.map(interaction => ({
                 ...interaction,
@@ -124,17 +126,16 @@ const ExportService = {
                 chat.pageLanguage, 
                 chat.aiProvider, 
                 chat.searchProvider,
-                // Format download logs into comma-separated strings
-                chat.downloadStartLogs ? chat.downloadStartLogs.map(log => {
+                // Always include download columns, even if empty
+                (chat.downloadStartLogs ? chat.downloadStartLogs.map(log => {
                     const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
                     return match ? match[1] : '';
-                }).filter(url => url).join(', ') : '',
-                chat.downloadCompleteLogs ? chat.downloadCompleteLogs.map(log => {
+                }).filter(url => url).join(', ') : ''),
+                (chat.downloadCompleteLogs ? chat.downloadCompleteLogs.map(log => {
                     const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
                     return match ? match[1] : '';
-                }).filter(url => url).join(', ') : ''
+                }).filter(url => url).join(', ') : '')
             ];
-            const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService'];
 
             const rowsWithGlobalInfo = filteredRows.map(row => globalInfo.concat(row));
 
