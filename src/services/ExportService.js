@@ -131,15 +131,8 @@ const ExportService = {
                 chat.pageLanguage, 
                 chat.aiProvider, 
                 chat.searchProvider,
-                // Always include download columns, even if empty
-                (chat.downloadStartLogs ? chat.downloadStartLogs.map(log => {
-                    const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
-                    return match ? match[1] : '';
-                }).filter(url => url).join(', ') : ''),
-                (chat.downloadCompleteLogs ? chat.downloadCompleteLogs.map(log => {
-                    const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
-                    return match ? match[1] : '';
-                }).filter(url => url).join(', ') : '')
+                '', // Placeholder for downloadStartLogs
+                ''  // Placeholder for downloadCompleteLogs
             ];
 
             const rowsWithGlobalInfo = filteredRows.map(row => globalInfo.concat(row));
@@ -154,16 +147,42 @@ const ExportService = {
                 orderedHeaders.map(header => {
                     // Special handling for download logs
                     if (header === 'downloadStartLogs') {
-                        return chat.downloadStartLogs ? chat.downloadStartLogs.map(log => {
-                            const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
-                            return match ? match[1] : '';
-                        }).filter(url => url).join(', ') : '';
+                        if (chat.downloadStartLogs && chat.downloadStartLogs.length > 0) {
+                            const urls = chat.downloadStartLogs.map(log => {
+                                // First try to get URL from metadata
+                                if (log.metadata && log.metadata.url) {
+                                    return log.metadata.url;
+                                }
+                                // Fallback to message parsing
+                                const successMatch = log.message.match(/webpage: ([^{\s]+)/);
+                                if (successMatch) return successMatch[1];
+                                
+                                const urlMatch = log.message.match(/https?:\/\/[^\s{\]]+/);
+                                return urlMatch ? urlMatch[0] : '';
+                            }).filter(url => url);
+                            console.log('Found start URLs:', urls); // Debug log
+                            return urls.join(', ');
+                        }
+                        return '';
                     }
                     if (header === 'downloadCompleteLogs') {
-                        return chat.downloadCompleteLogs ? chat.downloadCompleteLogs.map(log => {
-                            const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
-                            return match ? match[1] : '';
-                        }).filter(url => url).join(', ') : '';
+                        if (chat.downloadCompleteLogs && chat.downloadCompleteLogs.length > 0) {
+                            const urls = chat.downloadCompleteLogs.map(log => {
+                                // First try to get URL from metadata
+                                if (log.metadata && log.metadata.url) {
+                                    return log.metadata.url;
+                                }
+                                // Fallback to message parsing
+                                const successMatch = log.message.match(/Successfully downloaded webpage: ([^{\s]+)/);
+                                if (successMatch) return successMatch[1];
+                                
+                                const urlMatch = log.message.match(/https?:\/\/[^\s{\]]+/);
+                                return urlMatch ? urlMatch[0] : '';
+                            }).filter(url => url);
+                            console.log('Found complete URLs:', urls); // Debug log
+                            return urls.join(', ');
+                        }
+                        return '';
                     }
                     // Default handling for other fields
                     const index = updatedHeaders.indexOf(header);
