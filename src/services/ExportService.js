@@ -123,9 +123,18 @@ const ExportService = {
                 chat.chatId, 
                 chat.pageLanguage, 
                 chat.aiProvider, 
-                chat.searchProvider
+                chat.searchProvider,
+                // Format download logs into comma-separated strings
+                chat.downloadStartLogs ? chat.downloadStartLogs.map(log => {
+                    const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
+                    return match ? match[1] : '';
+                }).filter(url => url).join(', ') : '',
+                chat.downloadCompleteLogs ? chat.downloadCompleteLogs.map(log => {
+                    const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
+                    return match ? match[1] : '';
+                }).filter(url => url).join(', ') : ''
             ];
-            const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService'];
+            const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService', 'startedDownloads', 'completedDownloads'];
 
             const rowsWithGlobalInfo = filteredRows.map(row => globalInfo.concat(row));
 
@@ -195,6 +204,8 @@ const ExportService = {
             { dataLabel: 'expertFeedback.citationExplanation', outputLabel: 'expertFeedback.citationExplanation' },
             { dataLabel: 'expertFeedback.answerImprovement', outputLabel: 'expertFeedback.answerImprovement' },
             { dataLabel: 'expertFeedback.expertCitationUrl', outputLabel: 'expertFeedback.expertCitationUrl' },
+            { dataLabel: 'downloadStartLogs', outputLabel: 'startedDownloads' },
+            { dataLabel: 'downloadCompleteLogs', outputLabel: 'completedDownloads' }
         ];
         const type = filename.endsWith('.csv') ? 'csv' : filename.endsWith('.xlsx') ? 'xlsx' : 'xlsx';
         return ExportService.toSpreadsheet(items, headerOrder, type, filename);

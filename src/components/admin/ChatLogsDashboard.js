@@ -149,7 +149,7 @@ const ChatLogsDashboard = () => {
               columns={[
                 { title: 'Date', data: 'createdAt', render: (data) => data ? data : '' },
                 { title: 'Chat ID', data: 'chatId', render: (data) => data ? data : '' },
-                { title: 'Interactions', data: 'interactions', render: (data) => data ? data.length : 0 },
+                { title: 'Interactions', data: 'interactions', render: (data) => data ? data.length : 0 }
               ]}
               options={{
                 paging: true,

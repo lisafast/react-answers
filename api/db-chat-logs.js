@@ -1,8 +1,7 @@
 // api/chat-logs.js to retrieve logs from the database for evaluation purposes
 import dbConnect from './db-connect.js';
 import { Chat } from '../models/chat.js';
-
-
+import { Logs } from '../models/logs.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -40,13 +39,29 @@ export default async function handler(req, res) {
       })
       .sort({ createdAt: -1 });
 
-    
+    // For each chat, find related download logs
+    for (const chat of chats) {
+      // Find download start logs
+      const downloadStartLogs = await Logs.find({
+        chatId: chat.chatId,
+        message: { $regex: "Downloading webpage:" }
+      }).lean();
+
+      // Find download complete logs
+      const downloadCompleteLogs = await Logs.find({
+        chatId: chat.chatId,
+        message: { $regex: "Successfully downloaded webpage:" }
+      }).lean();
+
+      // Add these logs to the chat object
+      chat.downloadStartLogs = downloadStartLogs;
+      chat.downloadCompleteLogs = downloadCompleteLogs;
+    }
 
     return res.status(200).json({
       success: true,
       logs: chats
     });
-
 
   } catch (error) {
     console.error('API Error:', error);
