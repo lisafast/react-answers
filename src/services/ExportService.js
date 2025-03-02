@@ -105,7 +105,12 @@ const ExportService = {
         const headersSet = new Set(chats.flatMap(chat => ExportService.getHeaders(chat.interactions)));
         const headers = ['uniqueID', ...Array.from(headersSet)];
         // Add required global info headers that should always be present
-        const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService', 'startedDownloads', 'completedDownloads'];
+        const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService', 'downloadStartLogs', 'downloadCompleteLogs'];
+
+        // Initialize the worksheet with headers
+        const finalHeaders = headerOrder.map(headerObj => headerObj.outputLabel);
+        worksheetData.push(finalHeaders);
+
         for (const chat of chats) {
             const interactions = chat.interactions.map(interaction => ({
                 ...interaction,
@@ -143,8 +148,7 @@ const ExportService = {
             const updatedHeaders = globalInfoHeaders.concat(filteredHeaders);
 
             // Update orderedHeaders and orderedRows to include chatInfo
-            const orderedHeaders = headerOrder.map(headerObj => headerObj.dataLabel)
-                .concat(updatedHeaders.filter(header => !headerOrder.some(headerObj => headerObj.dataLabel === header)));
+            const orderedHeaders = headerOrder.map(headerObj => headerObj.dataLabel);
 
             const orderedRows = rowsWithGlobalInfo.map(row =>
                 orderedHeaders.map(header => {
@@ -162,18 +166,11 @@ const ExportService = {
                         }).filter(url => url).join(', ') : '';
                     }
                     // Default handling for other fields
-                    return row[updatedHeaders.indexOf(header)] || '';
+                    const index = updatedHeaders.indexOf(header);
+                    return index >= 0 ? row[index] : '';
                 })
             );
 
-            const finalHeaders = orderedHeaders.map(header => {
-                const headerObj = headerOrder.find(headerObj => headerObj.dataLabel === header);
-                return headerObj ? headerObj.outputLabel : header;
-            });
-
-            if (worksheetData.length === 0) {
-                worksheetData.push(finalHeaders);
-            }
             worksheetData.push(...orderedRows);
         }
 
