@@ -41,17 +41,22 @@ export default async function handler(req, res) {
 
     // For each chat, find related download logs
     for (const chat of chats) {
-      // Find download start logs
+      // Find download start logs (including error logs)
       const downloadStartLogs = await Logs.find({
         chatId: chat.chatId,
-        message: { $regex: "Downloading webpage:" }
+        'metadata.action': 'download_start'
       }).lean();
 
       // Find download complete logs
       const downloadCompleteLogs = await Logs.find({
         chatId: chat.chatId,
-        message: { $regex: "Successfully downloaded webpage:" }
+        'metadata.action': 'download_complete'
       }).lean();
+
+      console.log(`Found logs for chat ${chat.chatId}:`, {
+        starts: downloadStartLogs.length,
+        completes: downloadCompleteLogs.length
+      });
 
       // Add these logs to the chat object
       chat.downloadStartLogs = downloadStartLogs;

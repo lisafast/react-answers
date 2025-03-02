@@ -148,18 +148,9 @@ const ExportService = {
                     // Special handling for download logs
                     if (header === 'downloadStartLogs') {
                         if (chat.downloadStartLogs && chat.downloadStartLogs.length > 0) {
-                            const urls = chat.downloadStartLogs.map(log => {
-                                // First try to get URL from metadata
-                                if (log.metadata && log.metadata.url) {
-                                    return log.metadata.url;
-                                }
-                                // Fallback to message parsing
-                                const successMatch = log.message.match(/webpage: ([^{\s]+)/);
-                                if (successMatch) return successMatch[1];
-                                
-                                const urlMatch = log.message.match(/https?:\/\/[^\s{\]]+/);
-                                return urlMatch ? urlMatch[0] : '';
-                            }).filter(url => url);
+                            const urls = chat.downloadStartLogs
+                                .filter(log => log.metadata && log.metadata.url)
+                                .map(log => log.metadata.url);
                             console.log('Found start URLs:', urls); // Debug log
                             return urls.join(', ');
                         }
@@ -167,18 +158,9 @@ const ExportService = {
                     }
                     if (header === 'downloadCompleteLogs') {
                         if (chat.downloadCompleteLogs && chat.downloadCompleteLogs.length > 0) {
-                            const urls = chat.downloadCompleteLogs.map(log => {
-                                // First try to get URL from metadata
-                                if (log.metadata && log.metadata.url) {
-                                    return log.metadata.url;
-                                }
-                                // Fallback to message parsing
-                                const successMatch = log.message.match(/Successfully downloaded webpage: ([^{\s]+)/);
-                                if (successMatch) return successMatch[1];
-                                
-                                const urlMatch = log.message.match(/https?:\/\/[^\s{\]]+/);
-                                return urlMatch ? urlMatch[0] : '';
-                            }).filter(url => url);
+                            const urls = chat.downloadCompleteLogs
+                                .filter(log => log.metadata && log.metadata.url)
+                                .map(log => log.metadata.url);
                             console.log('Found complete URLs:', urls); // Debug log
                             return urls.join(', ');
                         }
