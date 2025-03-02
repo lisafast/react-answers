@@ -134,7 +134,7 @@ const ExportService = {
                     return match ? match[1] : '';
                 }).filter(url => url).join(', ') : ''
             ];
-            const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService', 'startedDownloads', 'completedDownloads'];
+            const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService'];
 
             const rowsWithGlobalInfo = filteredRows.map(row => globalInfo.concat(row));
 
@@ -146,7 +146,23 @@ const ExportService = {
                 .concat(updatedHeaders.filter(header => !headerOrder.some(headerObj => headerObj.dataLabel === header)));
 
             const orderedRows = rowsWithGlobalInfo.map(row =>
-                orderedHeaders.map(header => row[updatedHeaders.indexOf(header)])
+                orderedHeaders.map(header => {
+                    // Special handling for download logs
+                    if (header === 'downloadStartLogs') {
+                        return chat.downloadStartLogs ? chat.downloadStartLogs.map(log => {
+                            const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
+                            return match ? match[1] : '';
+                        }).filter(url => url).join(', ') : '';
+                    }
+                    if (header === 'downloadCompleteLogs') {
+                        return chat.downloadCompleteLogs ? chat.downloadCompleteLogs.map(log => {
+                            const match = log.message.match(/webpage: (.*?)(?:\s|$)/);
+                            return match ? match[1] : '';
+                        }).filter(url => url).join(', ') : '';
+                    }
+                    // Default handling for other fields
+                    return row[updatedHeaders.indexOf(header)] || '';
+                })
             );
 
             const finalHeaders = orderedHeaders.map(header => {
