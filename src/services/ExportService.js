@@ -101,6 +101,12 @@ const ExportService = {
     },
 
     toSpreadsheet: async (chats, headerOrder, type = 'excel', filename) => {
+        console.log('Starting export with chats:', chats.map(chat => ({
+            chatId: chat.chatId,
+            hasStartLogs: chat.downloadStartLogs?.length > 0,
+            hasCompleteLogs: chat.downloadCompleteLogs?.length > 0
+        })));
+
         const worksheetData = [];
         const headersSet = new Set(chats.flatMap(chat => ExportService.getHeaders(chat.interactions)));
         const headers = ['uniqueID', ...Array.from(headersSet)];
@@ -148,6 +154,7 @@ const ExportService = {
                     // Special handling for download logs
                     if (header === 'downloadStartLogs') {
                         if (chat.downloadStartLogs && chat.downloadStartLogs.length > 0) {
+                            console.log('Processing start logs for chat', chat.chatId, chat.downloadStartLogs);
                             const urls = chat.downloadStartLogs
                                 .filter(log => log.metadata && log.metadata.url)
                                 .map(log => log.metadata.url);
@@ -158,6 +165,7 @@ const ExportService = {
                     }
                     if (header === 'downloadCompleteLogs') {
                         if (chat.downloadCompleteLogs && chat.downloadCompleteLogs.length > 0) {
+                            console.log('Processing complete logs for chat', chat.chatId, chat.downloadCompleteLogs);
                             const urls = chat.downloadCompleteLogs
                                 .filter(log => log.metadata && log.metadata.url)
                                 .map(log => log.metadata.url);

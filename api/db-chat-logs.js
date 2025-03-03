@@ -41,6 +41,8 @@ export default async function handler(req, res) {
 
     // For each chat, find related download logs
     for (const chat of chats) {
+      console.log(`Looking for logs for chat ${chat.chatId}`);
+      
       // Find download start logs (including error logs)
       const downloadStartLogs = await Logs.find({
         chatId: chat.chatId,
@@ -58,10 +60,24 @@ export default async function handler(req, res) {
         completes: downloadCompleteLogs.length
       });
 
+      if (downloadStartLogs.length > 0) {
+        console.log('Download start logs found:', downloadStartLogs.map(log => ({
+          url: log.metadata?.url,
+          action: log.metadata?.action,
+          message: log.message
+        })));
+      }
+
       // Add these logs to the chat object
       chat.downloadStartLogs = downloadStartLogs;
       chat.downloadCompleteLogs = downloadCompleteLogs;
     }
+
+    console.log('Returning chats with logs:', chats.map(chat => ({
+      chatId: chat.chatId,
+      hasStartLogs: chat.downloadStartLogs?.length > 0,
+      hasCompleteLogs: chat.downloadCompleteLogs?.length > 0
+    })));
 
     return res.status(200).json({
       success: true,
