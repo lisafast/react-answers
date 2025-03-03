@@ -159,11 +159,12 @@ const ExportService = {
                     // Special handling for download logs
                     if (header === 'downloadStartLogs') {
                         console.log('Processing downloadStartLogs for chat', chat.chatId);
-                        console.log('Download start logs:', chat.downloadStartLogs);
+                        console.log('Download start logs structure:', JSON.stringify(chat.downloadStartLogs, null, 2));
                         if (chat.downloadStartLogs && chat.downloadStartLogs.length > 0) {
+                            console.log('First log entry:', JSON.stringify(chat.downloadStartLogs[0], null, 2));
                             const urls = chat.downloadStartLogs
-                                .filter(log => log.url)
-                                .map(log => log.url);
+                                .filter(log => log && log.metadata && log.metadata.url)
+                                .map(log => log.metadata.url);
                             console.log('Found start URLs for chat', chat.chatId, ':', urls);
                             const urlString = urls.join(', ');
                             console.log('Final URL string for startedDownloads:', urlString);
@@ -176,9 +177,9 @@ const ExportService = {
                         if (chat.downloadCompleteLogs && chat.downloadCompleteLogs.length > 0) {
                             console.log('Processing complete logs for chat', chat.chatId, chat.downloadCompleteLogs);
                             const urls = chat.downloadCompleteLogs
-                                .filter(log => log.url)
-                                .map(log => log.url);
-                            console.log('Found complete URLs:', urls); // Debug log
+                                .filter(log => log && log.metadata && log.metadata.url)
+                                .map(log => log.metadata.url);
+                            console.log('Found complete URLs:', urls);
                             return urls.join(', ');
                         }
                         return '';
