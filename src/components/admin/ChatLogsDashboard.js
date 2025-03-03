@@ -26,9 +26,10 @@ const ChatLogsDashboard = () => {
     try {
       const response = await fetch(getApiUrl("db-chat-logs?days=") + timeRange);
       const data = await response.json();
-      console.log('API Response:', data);
+      console.log('API Response:', JSON.stringify(data, null, 2));
 
       if (data.success) {
+        console.log('Setting logs with data:', JSON.stringify(data.logs, null, 2));
         setLogs(data.logs || []);
       } else {
         console.error('API returned error:', data.error);
@@ -63,6 +64,7 @@ const ChatLogsDashboard = () => {
   };
 
   const downloadExcel = () => {
+    console.log('Passing logs to ExportService:', JSON.stringify(logs, null, 2));
     ExportService.export(logs, filename('xlsx'));
   };
 

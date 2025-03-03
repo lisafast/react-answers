@@ -46,12 +46,14 @@ export default async function handler(req, res) {
       // Find download start logs (including error logs)
       const downloadStartLogs = await Logs.find({
         chatId: chat.chatId,
+        logLevel: 'info',
         'metadata.action': 'download_start'
       }).lean();
 
       // Find download complete logs
       const downloadCompleteLogs = await Logs.find({
         chatId: chat.chatId,
+        logLevel: 'info',
         'metadata.action': 'download_complete'
       }).lean();
 
@@ -61,11 +63,7 @@ export default async function handler(req, res) {
       });
 
       if (downloadStartLogs.length > 0) {
-        console.log('Download start logs found:', downloadStartLogs.map(log => ({
-          url: log.metadata?.url,
-          action: log.metadata?.action,
-          message: log.message
-        })));
+        console.log('Download start logs found:', JSON.stringify(downloadStartLogs, null, 2));
       }
 
       // Add these logs to the chat object

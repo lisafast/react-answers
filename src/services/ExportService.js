@@ -104,7 +104,9 @@ const ExportService = {
         console.log('Starting export with full chat objects:', JSON.stringify(chats.map(chat => ({
             chatId: chat.chatId,
             downloadStartLogs: chat.downloadStartLogs,
-            downloadCompleteLogs: chat.downloadCompleteLogs
+            downloadCompleteLogs: chat.downloadCompleteLogs,
+            hasStartLogs: chat.downloadStartLogs?.length > 0,
+            hasCompleteLogs: chat.downloadCompleteLogs?.length > 0
         })), null, 2));
 
         const worksheetData = [];
@@ -160,7 +162,7 @@ const ExportService = {
                     if (header === 'downloadStartLogs') {
                         console.log('Processing downloadStartLogs for chat', chat.chatId);
                         console.log('Download start logs structure:', JSON.stringify(chat.downloadStartLogs, null, 2));
-                        if (chat.downloadStartLogs && chat.downloadStartLogs.length > 0) {
+                        if (chat.downloadStartLogs && Array.isArray(chat.downloadStartLogs) && chat.downloadStartLogs.length > 0) {
                             console.log('First log entry:', JSON.stringify(chat.downloadStartLogs[0], null, 2));
                             const urls = chat.downloadStartLogs
                                 .filter(log => log && log.metadata && log.metadata.url)
@@ -174,8 +176,9 @@ const ExportService = {
                         return '';
                     }
                     if (header === 'downloadCompleteLogs') {
-                        if (chat.downloadCompleteLogs && chat.downloadCompleteLogs.length > 0) {
-                            console.log('Processing complete logs for chat', chat.chatId, chat.downloadCompleteLogs);
+                        console.log('Processing complete logs for chat', chat.chatId);
+                        console.log('Download complete logs:', JSON.stringify(chat.downloadCompleteLogs, null, 2));
+                        if (chat.downloadCompleteLogs && Array.isArray(chat.downloadCompleteLogs) && chat.downloadCompleteLogs.length > 0) {
                             const urls = chat.downloadCompleteLogs
                                 .filter(log => log && log.metadata && log.metadata.url)
                                 .map(log => log.metadata.url);
