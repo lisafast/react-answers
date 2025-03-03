@@ -162,8 +162,8 @@ const ExportService = {
                         console.log('Download start logs:', chat.downloadStartLogs);
                         if (chat.downloadStartLogs && chat.downloadStartLogs.length > 0) {
                             const urls = chat.downloadStartLogs
-                                .filter(log => log.metadata && log.metadata.url)
-                                .map(log => log.metadata.url);
+                                .filter(log => log.url)
+                                .map(log => log.url);
                             console.log('Found start URLs for chat', chat.chatId, ':', urls);
                             const urlString = urls.join(', ');
                             console.log('Final URL string for startedDownloads:', urlString);
@@ -176,8 +176,8 @@ const ExportService = {
                         if (chat.downloadCompleteLogs && chat.downloadCompleteLogs.length > 0) {
                             console.log('Processing complete logs for chat', chat.chatId, chat.downloadCompleteLogs);
                             const urls = chat.downloadCompleteLogs
-                                .filter(log => log.metadata && log.metadata.url)
-                                .map(log => log.metadata.url);
+                                .filter(log => log.url)
+                                .map(log => log.url);
                             console.log('Found complete URLs:', urls); // Debug log
                             return urls.join(', ');
                         }
@@ -186,7 +186,7 @@ const ExportService = {
                     // Default handling for other fields
                     const index = updatedHeaders.indexOf(header);
                     return index >= 0 ? row[index] : '';
-                })
+                });
             });
 
             worksheetData.push(...orderedRows);
