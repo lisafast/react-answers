@@ -10,11 +10,6 @@ export default async function handler(req, res) {
 
   try {
     await dbConnect();
-    console.log('DB Connected in chat-logs endpoint');
-
-    const totalCount = await Chat.countDocuments();
-    console.log('Total documents in collection:', totalCount);
-
     const days = parseInt(req.query.days) || 1;
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -41,8 +36,6 @@ export default async function handler(req, res) {
 
     // For each chat, find related download logs
     for (const chat of chats) {
-      console.log(`Looking for logs for chat ${chat.chatId}`);
-      
       // Find download start logs (including error logs)
       const downloadStartLogs = await Logs.find({
         chatId: chat.chatId,
@@ -57,25 +50,10 @@ export default async function handler(req, res) {
         'metadata.action': 'download_complete'
       }).lean();
 
-      console.log(`Found logs for chat ${chat.chatId}:`, {
-        starts: downloadStartLogs.length,
-        completes: downloadCompleteLogs.length
-      });
-
-      if (downloadStartLogs.length > 0) {
-        console.log('Download start logs found:', JSON.stringify(downloadStartLogs, null, 2));
-      }
-
       // Add these logs to the chat object
       chat.downloadStartLogs = downloadStartLogs;
       chat.downloadCompleteLogs = downloadCompleteLogs;
     }
-
-    console.log('Returning chats with logs:', chats.map(chat => ({
-      chatId: chat.chatId,
-      hasStartLogs: chat.downloadStartLogs?.length > 0,
-      hasCompleteLogs: chat.downloadCompleteLogs?.length > 0
-    })));
 
     return res.status(200).json({
       success: true,
@@ -83,7 +61,6 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('API Error:', error);
     return res.status(500).json({
       error: 'Failed to fetch logs',
       details: error.message

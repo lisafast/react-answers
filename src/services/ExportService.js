@@ -101,14 +101,7 @@ const ExportService = {
     },
 
     toSpreadsheet: async (chats, headerOrder, type = 'excel', filename) => {
-        console.log('Starting export with full chat objects:', JSON.stringify(chats.map(chat => ({
-            chatId: chat.chatId,
-            downloadStartLogs: chat.downloadStartLogs,
-            downloadCompleteLogs: chat.downloadCompleteLogs,
-            hasStartLogs: chat.downloadStartLogs?.length > 0,
-            hasCompleteLogs: chat.downloadCompleteLogs?.length > 0
-        })), null, 2));
-
+      
         const worksheetData = [];
         const headersSet = new Set(chats.flatMap(chat => ExportService.getHeaders(chat.interactions)));
         const headers = ['uniqueID', ...Array.from(headersSet)];
@@ -145,44 +138,40 @@ const ExportService = {
 
             console.log('Global info array for chat', chat.chatId, ':', globalInfo);
             const rowsWithGlobalInfo = filteredRows.map(row => globalInfo.concat(row));
-            console.log('Rows with global info for chat', chat.chatId, ':', rowsWithGlobalInfo);
+        
 
             // Update headers to include chatInfoHeaders
             const updatedHeaders = globalInfoHeaders.concat(filteredHeaders);
-            console.log('Updated headers:', updatedHeaders);
+          
 
             // Update orderedHeaders and orderedRows to include chatInfo
             const orderedHeaders = headerOrder.map(headerObj => headerObj.dataLabel);
-            console.log('Ordered headers:', orderedHeaders);
+          
 
             const orderedRows = rowsWithGlobalInfo.map(row => {
-                console.log('Processing row for chat', chat.chatId);
+              
                 return orderedHeaders.map(header => {
                     // Special handling for download logs
                     if (header === 'downloadStartLogs') {
-                        console.log('Processing downloadStartLogs for chat', chat.chatId);
-                        console.log('Download start logs structure:', JSON.stringify(chat.downloadStartLogs, null, 2));
+                        
                         if (chat.downloadStartLogs && Array.isArray(chat.downloadStartLogs) && chat.downloadStartLogs.length > 0) {
-                            console.log('First log entry:', JSON.stringify(chat.downloadStartLogs[0], null, 2));
+                            
                             const urls = chat.downloadStartLogs
                                 .filter(log => log && log.metadata && log.metadata.url)
                                 .map(log => log.metadata.url);
-                            console.log('Found start URLs for chat', chat.chatId, ':', urls);
+                            
                             const urlString = urls.join(', ');
-                            console.log('Final URL string for startedDownloads:', urlString);
+                        
                             return urlString;
                         }
-                        console.log('No download start logs found for chat', chat.chatId);
+
                         return '';
                     }
                     if (header === 'downloadCompleteLogs') {
-                        console.log('Processing complete logs for chat', chat.chatId);
-                        console.log('Download complete logs:', JSON.stringify(chat.downloadCompleteLogs, null, 2));
                         if (chat.downloadCompleteLogs && Array.isArray(chat.downloadCompleteLogs) && chat.downloadCompleteLogs.length > 0) {
                             const urls = chat.downloadCompleteLogs
                                 .filter(log => log && log.metadata && log.metadata.url)
                                 .map(log => log.metadata.url);
-                            console.log('Found complete URLs:', urls);
                             return urls.join(', ');
                         }
                         return '';
@@ -195,12 +184,6 @@ const ExportService = {
 
             worksheetData.push(...orderedRows);
         }
-
-        console.log('Final worksheet data structure:', {
-            numRows: worksheetData.length,
-            headers: worksheetData[0],
-            firstDataRow: worksheetData[1]
-        });
 
         if (type === 'xlsx') {
             ExportService.worksheetDataToExcel(worksheetData, filename);
