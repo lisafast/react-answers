@@ -101,11 +101,11 @@ const ExportService = {
     },
 
     toSpreadsheet: async (chats, headerOrder, type = 'excel', filename) => {
-        console.log('Starting export with chats:', chats.map(chat => ({
+        console.log('Starting export with full chat objects:', JSON.stringify(chats.map(chat => ({
             chatId: chat.chatId,
-            hasStartLogs: chat.downloadStartLogs?.length > 0,
-            hasCompleteLogs: chat.downloadCompleteLogs?.length > 0
-        })));
+            downloadStartLogs: chat.downloadStartLogs,
+            downloadCompleteLogs: chat.downloadCompleteLogs
+        })), null, 2));
 
         const worksheetData = [];
         const headersSet = new Set(chats.flatMap(chat => ExportService.getHeaders(chat.interactions)));
@@ -141,26 +141,35 @@ const ExportService = {
                 ''  // Placeholder for downloadCompleteLogs
             ];
 
+            console.log('Global info array for chat', chat.chatId, ':', globalInfo);
             const rowsWithGlobalInfo = filteredRows.map(row => globalInfo.concat(row));
+            console.log('Rows with global info for chat', chat.chatId, ':', rowsWithGlobalInfo);
 
             // Update headers to include chatInfoHeaders
             const updatedHeaders = globalInfoHeaders.concat(filteredHeaders);
+            console.log('Updated headers:', updatedHeaders);
 
             // Update orderedHeaders and orderedRows to include chatInfo
             const orderedHeaders = headerOrder.map(headerObj => headerObj.dataLabel);
+            console.log('Ordered headers:', orderedHeaders);
 
-            const orderedRows = rowsWithGlobalInfo.map(row =>
-                orderedHeaders.map(header => {
+            const orderedRows = rowsWithGlobalInfo.map(row => {
+                console.log('Processing row for chat', chat.chatId);
+                return orderedHeaders.map(header => {
                     // Special handling for download logs
                     if (header === 'downloadStartLogs') {
+                        console.log('Processing downloadStartLogs for chat', chat.chatId);
+                        console.log('Download start logs:', chat.downloadStartLogs);
                         if (chat.downloadStartLogs && chat.downloadStartLogs.length > 0) {
-                            console.log('Processing start logs for chat', chat.chatId, chat.downloadStartLogs);
                             const urls = chat.downloadStartLogs
                                 .filter(log => log.metadata && log.metadata.url)
                                 .map(log => log.metadata.url);
-                            console.log('Found start URLs:', urls); // Debug log
-                            return urls.join(', ');
+                            console.log('Found start URLs for chat', chat.chatId, ':', urls);
+                            const urlString = urls.join(', ');
+                            console.log('Final URL string for startedDownloads:', urlString);
+                            return urlString;
                         }
+                        console.log('No download start logs found for chat', chat.chatId);
                         return '';
                     }
                     if (header === 'downloadCompleteLogs') {
@@ -178,10 +187,16 @@ const ExportService = {
                     const index = updatedHeaders.indexOf(header);
                     return index >= 0 ? row[index] : '';
                 })
-            );
+            });
 
             worksheetData.push(...orderedRows);
         }
+
+        console.log('Final worksheet data structure:', {
+            numRows: worksheetData.length,
+            headers: worksheetData[0],
+            firstDataRow: worksheetData[1]
+        });
 
         if (type === 'xlsx') {
             ExportService.worksheetDataToExcel(worksheetData, filename);
