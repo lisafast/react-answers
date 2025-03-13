@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, '../build')));
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'Healthy' });
+  console.log('Health check endpoint was called');
 });
 
 app.get('*', (req, res, next) => {
