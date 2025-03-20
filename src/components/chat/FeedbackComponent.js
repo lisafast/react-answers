@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import ExpertRatingComponent from './ExpertRatingComponent.js';
 import '../../styles/App.css';
 import { useTranslations } from '../../hooks/useTranslations.js';
-import { DataStoreService } from '../../services/DataStoreService.js';
+import DataStoreService from '../../services/DataStoreService.js';
 
-const FeedbackComponent = ({ lang = 'en', sentenceCount = 1, chatId, userMessageId, sentences = [] }) => {
+const FeedbackComponent = ({
+  lang = 'en',
+  sentenceCount = 1,
+  chatId,
+  userMessageId,
+  sentences = [],
+}) => {
   const { t } = useTranslations(lang);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
   const [showExpertRating, setShowExpertRating] = useState(false);
@@ -31,35 +37,35 @@ const FeedbackComponent = ({ lang = 'en', sentenceCount = 1, chatId, userMessage
 
   if (feedbackGiven) {
     return (
-      <p className="thank-you"><span className="gcds-icon fa fa-solid fa-check-circle"></span>{t('homepage.feedback.thankYou')}</p>);
+      <p className="thank-you">
+        <span className="gcds-icon fa fa-solid fa-check-circle"></span>
+        {t('homepage.feedback.thankYou')}
+      </p>
+    );
   }
 
   if (showExpertRating) {
-    return <ExpertRatingComponent
-      onSubmit={handleExpertFeedback}
-      onClose={() => setShowExpertRating(false)}
-      lang={lang}
-      sentenceCount={sentenceCount}
-      sentences={sentences}
-    />;
+    return (
+      <ExpertRatingComponent
+        onSubmit={handleExpertFeedback}
+        onClose={() => setShowExpertRating(false)}
+        lang={lang}
+        sentenceCount={sentenceCount}
+        sentences={sentences}
+      />
+    );
   }
 
   return (
     <div className="feedback-container">
       <span className="feedback-text">{t('homepage.feedback.question')} </span>
-      <button
-        className="feedback-link button-as-link"
-        onClick={() => handleFeedback(true)}
-      >
+      <button className="feedback-link button-as-link" onClick={() => handleFeedback(true)}>
         {t('homepage.feedback.useful')}
       </button>
       <span className="feedback-separator">·</span>
       <span className="feedback-text">{t('homepage.feedback.or')}</span>
       <span className="feedback-separator">·</span>
-      <button
-        className="feedback-link button-as-link"
-        onClick={() => handleFeedback(false)}
-      >
+      <button className="feedback-link button-as-link" onClick={() => handleFeedback(false)}>
         {t('homepage.feedback.notUseful')}
       </button>
     </div>

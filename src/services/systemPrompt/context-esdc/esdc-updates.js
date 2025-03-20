@@ -14,4 +14,9 @@ export const ESDC_UPDATES = `
   - at least 12 years old
   - able to access and use MSCA only as yourself. No one is authorized to use or create an account on your behalf.  
 </esdc_register_msca_updates>
+<esdc-change-personal-info-updates>
+## ESDC Change personal information 
+- Updated 2025 - still NOT possible to change personal info or direct deposit info in MSCA, must call or visit a Service Canada office.
+- URL:https://www.canada.ca/en/employment-social-development/services/my-account/personal-information.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/renseignements-personnels.html
+</esdc-change-personal-info-updates>
 `;

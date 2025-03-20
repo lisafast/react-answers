@@ -27,3 +27,18 @@ server/node_modules/
 
 .vercel
 temp.jsonl
+
+# Terragrunt and Terraform
+.terragrunt-cache
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+# Ignored Terraform files
+*gitignore*.tf
+
+# Backup files
+*.bak
+
+# Ignore local stack data file
+.devcontainer/data

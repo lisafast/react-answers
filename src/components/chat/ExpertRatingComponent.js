@@ -3,11 +3,16 @@ import '../../styles/App.css';
 import { useTranslations } from '../../hooks/useTranslations.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-
 // Shows ratings for a maximum of 4 sentences, and for the citation score
 // if there are somehow 5 sentences, the 5th sentence is ignored _YES THIS IS A HACK
 
-const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount = 1, sentences = [] }) => {
+const ExpertRatingComponent = ({
+  onSubmit,
+  onClose,
+  lang = 'en',
+  sentenceCount = 1,
+  sentences = [],
+}) => {
   const { t } = useTranslations(lang);
   const [expertFeedback, setExpertFeedback] = useState({
     sentence1Score: null,
@@ -30,57 +35,42 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
   const handleRadioChange = (event) => {
     const { name, value } = event.target;
     const sentenceNumber = name.replace('Score', '');
-    const updates = { 
+    const updates = {
       [name]: parseInt(value),
-      [`${sentenceNumber}Harmful`]: false // Always reset harmful when changing score
+      [`${sentenceNumber}Harmful`]: false, // Always reset harmful when changing score
     };
-    
-    setExpertFeedback(prev => ({ ...prev, ...updates }));
+
+    setExpertFeedback((prev) => ({ ...prev, ...updates }));
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setExpertFeedback(prev => ({ ...prev, [name]: value }));
+    setExpertFeedback((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
-    setExpertFeedback(prev => ({ ...prev, [name]: checked }));
+    setExpertFeedback((prev) => ({ ...prev, [name]: checked }));
   };
 
-    // Prevent form submission on enter key press inside text areas
-    const handleKeyPress = (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-      }
-    };
+  // Prevent form submission on enter key press inside text areas
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+    }
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    
-    if (expertFeedback.expertCitationUrl && !isValidGovernmentUrl(expertFeedback.expertCitationUrl)) {
-      console.error(t('homepage.expertRating.errors.invalidUrl'));
-      return;
-    }
-    
+
     const totalScore = computeTotalScore(expertFeedback);
     const feedbackWithScore = {
       ...expertFeedback,
-      totalScore
+      totalScore,
     };
-    
+
     console.log('Submitting expert feedback:', feedbackWithScore);
     onSubmit(feedbackWithScore);
-  };
-
-  const isValidGovernmentUrl = (url) => {
-    try {
-      const urlObject = new URL(url);
-      return urlObject.hostname.includes('canada.ca') || 
-             urlObject.hostname.includes('gc.ca');
-    } catch {
-      return false;
-    }
   };
 
   const computeTotalScore = (feedback) => {
@@ -90,8 +80,8 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
       feedback.sentence2Score,
       feedback.sentence3Score,
       feedback.sentence4Score,
-      feedback.citationScore
-    ].some(score => score !== null);
+      feedback.citationScore,
+    ].some((score) => score !== null);
 
     // If no ratings were provided at all, return null
     if (!hasAnyRating) return null;
@@ -101,13 +91,14 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
       feedback.sentence1Score,
       feedback.sentence2Score,
       feedback.sentence3Score,
-      feedback.sentence4Score
+      feedback.sentence4Score,
     ]
       .slice(0, sentenceCount)
-      .map(score => score === null ? 100 : score);  // Unrated sentences = 100
+      .map((score) => (score === null ? 100 : score)); // Unrated sentences = 100
 
     // Calculate sentence component
-    const sentenceComponent = (sentenceScores.reduce((sum, score) => sum + score, 0) / sentenceScores.length) * 0.75;
+    const sentenceComponent =
+      (sentenceScores.reduce((sum, score) => sum + score, 0) / sentenceScores.length) * 0.75;
 
     // Citation score defaults to 25 (good) in two cases:
     // 1. Citation exists but wasn't rated
@@ -115,23 +106,26 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
     const citationComponent = feedback.citationScore !== null ? feedback.citationScore : 25;
 
     const totalScore = sentenceComponent + citationComponent;
-    
+
     return Math.round(totalScore * 100) / 100;
   };
 
   return (
     <form onSubmit={handleSubmit} className="expert-rating-container">
-    <FontAwesomeIcon icon="fa-solid fa-close" className="close-icon" 
-        onClick={onClose} 
-        onKeyDown={(e) => e.key === 'Enter' && onClose()} 
-        role="button" 
-        tabIndex={0} 
-        aria-label="Close" />
+      <FontAwesomeIcon
+        icon="fa-solid fa-close"
+        className="close-icon"
+        onClick={onClose}
+        onKeyDown={(e) => e.key === 'Enter' && onClose()}
+        role="button"
+        tabIndex={0}
+        aria-label="Close"
+      />
       <fieldset className="gc-chckbxrdio sm-v">
         <h2>{t('homepage.expertRating.intro')}</h2>
         <details className="answer-details" open>
-      <summary>{t('homepage.expertRating.title')}</summary>
-          
+          <summary>{t('homepage.expertRating.title')}</summary>
+
           {/* All sentences 1-4 */}
           {[...Array(Math.min(4, sentenceCount))].map((_, index) => (
             <div key={index + 1} className="sentence-rating-group">
@@ -189,12 +183,13 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
                       onChange={handleCheckboxChange}
                     />
                     <label htmlFor={`sentence${index + 1}-harmful`}>
-                      Harmful
+                      {t('homepage.expertRating.options.harmful')} (0)
                     </label>
                   </li>
                 )}
               </ul>
-              {(expertFeedback[`sentence${index + 1}Score`] === 80 || expertFeedback[`sentence${index + 1}Score`] === 0) && (
+              {(expertFeedback[`sentence${index + 1}Score`] === 80 ||
+                expertFeedback[`sentence${index + 1}Score`] === 0) && (
                 <div className="explanation-field">
                   <label htmlFor={`sentence${index + 1}-explanation`}>
                     {t('homepage.expertRating.options.explanation')}
@@ -226,9 +221,7 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
                   checked={expertFeedback.citationScore === 25}
                   onChange={handleRadioChange}
                 />
-                <label htmlFor="citation-25">
-                  {t('homepage.expertRating.options.good')} (25)
-                </label>
+                <label htmlFor="citation-25">{t('homepage.expertRating.options.good')} (25)</label>
               </li>
               <li className="radio">
                 <input
@@ -273,7 +266,7 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
             )}
           </div>
 
-          <div>
+          <div className="mrgn-bttm-lg">
             <label className="expert-citation-url" htmlFor="expert-citation-url">
               {t('homepage.expertRating.options.betterCitation')}
               <input
@@ -288,7 +281,9 @@ const ExpertRatingComponent = ({ onSubmit, onClose, lang = 'en', sentenceCount =
           </div>
         </details>
       </fieldset>
-      <button type="submit" className="btn-primary mrgn-lft-sm">{t('homepage.expertRating.submit')}</button>
+      <button type="submit" className="btn-primary mrgn-lft-sm">
+        {t('homepage.expertRating.submit')}
+      </button>
     </form>
   );
 };

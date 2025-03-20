@@ -2,6 +2,17 @@ import { faLowVision } from "@fortawesome/free-solid-svg-icons";
 
 // config/ai-models.js
 const AI_MODELS = {
+  azure: {
+    default: 'openai-gpt4o-mini',
+    models: {
+      'openai-gpt4o-mini': {
+        maxTokens: 1024,
+        temperature: 0.0,
+        timeoutMs: 60000,
+      }
+
+    }
+  },
   openai: {
     default: 'gpt-4o-2024-11-20',
     models: {
@@ -51,22 +62,7 @@ const AI_MODELS = {
       }
     }
   },
-  //TODO: When cohere is working on Vercel, implement via this config file
-  //   cohere: {
-  //     default: 'command-r-plus-08-2024',
-  //     models: {
-  //       'command-r-plus-08-2024': {
-  //         maxTokens: 1024,
-  //         temperature: 0.5,
-  //         knowledgeCutoff: '2024-08'
-  //       },
-  //       'command-r-plus': {
-  //         maxTokens: 1024,
-  //         temperature: 0.5,
-  //         knowledgeCutoff: '2024-05'
-  //       }
-  //     }
-  //   }
+ 
 };
 
 export const getModelConfig = (provider, modelName = null) => {

@@ -71,7 +71,7 @@ const ChatInterface = ({
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
 
     return () => observer.disconnect();
@@ -113,10 +113,12 @@ const ChatInterface = ({
 
   // TOOD is there a difference between paragraphs and sentrences?
   const getLastMessageSentenceCount = () => {
-    const lastAiMessage = messages.filter(m => m.sender === 'ai').pop();
+    const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
     if (lastAiMessage.interaction.answer.paragraphs.length > 0) {
-      return lastAiMessage.interaction.answer.paragraphs.reduce((count, paragraph) =>
-        count + extractSentences(paragraph).length, 0);
+      return lastAiMessage.interaction.answer.paragraphs.reduce(
+        (count, paragraph) => count + extractSentences(paragraph).length,
+        0
+      );
     }
     return 1;
   };
@@ -165,22 +167,41 @@ const ChatInterface = ({
         {messages.map((message) => (
           <div key={`message-${message.id}`} className={`message ${message.sender}`}>
             {message.sender === 'user' ? (
-              <div className={`user-message-box ${message.redactedText?.includes('XXX') ? 'privacy-box' :
-                message.redactedText?.includes('###') ? 'redacted-box' : ''
-                }`}>
-                <p className={
-                  message.redactedText?.includes('XXX') ? "privacy-message" :
-                    message.redactedText?.includes('###') ? "redacted-message" : ""
-                }>
+              <div
+                className={`user-message-box ${
+                  message.redactedText?.includes('XXX')
+                    ? 'privacy-box'
+                    : message.redactedText?.includes('###')
+                      ? 'redacted-box'
+                      : ''
+                }`}
+              >
+                <p
+                  className={
+                    message.redactedText?.includes('XXX')
+                      ? 'privacy-message'
+                      : message.redactedText?.includes('###')
+                        ? 'redacted-message'
+                        : ''
+                  }
+                >
                   {message.text}
                 </p>
                 {message.redactedItems?.length > 0 && message.redactedText && (
-                  <p className={
-                    message.redactedText?.includes('XXX') ? "privacy-preview" :
-                      message.redactedText?.includes('###') ? "redacted-preview" : ""
-                  }>
+                  <p
+                    className={
+                      message.redactedText?.includes('XXX')
+                        ? 'privacy-preview'
+                        : message.redactedText?.includes('###')
+                          ? 'redacted-preview'
+                          : ''
+                    }
+                  >
                     {message.redactedText?.includes('XXX') && (
-                      <><FontAwesomeIcon icon="fa-circle-exclamation" /> {t('homepage.chat.messages.privacyMessage')}</>
+                      <>
+                        <FontAwesomeIcon icon="fa-circle-exclamation" />{' '}
+                        {t('homepage.chat.messages.privacyMessage')}
+                      </>
                     )}
                     {message.redactedText?.includes('###') &&
                       t('homepage.chat.messages.blockedMessage')}
@@ -190,15 +211,24 @@ const ChatInterface = ({
             ) : (
               <>
                 {message.error ? (
-                  <div className={`error-message-box ${messages[messages.findIndex(m => m.id === message.id) - 1]?.redactedText?.includes('XXX')
-                    ? 'privacy-error-box'
-                    : 'error-box'
-                    }`}>
-                    <p className={
-                      messages[messages.findIndex(m => m.id === message.id) - 1]?.redactedText?.includes('XXX')
-                        ? "privacy-error-message"
-                        : "error-message"
-                    }>
+                  <div
+                    className={`error-message-box ${
+                      messages[
+                        messages.findIndex((m) => m.id === message.id) - 1
+                      ]?.redactedText?.includes('XXX')
+                        ? 'privacy-error-box'
+                        : 'error-box'
+                    }`}
+                  >
+                    <p
+                      className={
+                        messages[
+                          messages.findIndex((m) => m.id === message.id) - 1
+                        ]?.redactedText?.includes('XXX')
+                          ? 'privacy-error-message'
+                          : 'error-message'
+                      }
+                    >
                       {message.text}
                     </p>
                   </div>
@@ -207,7 +237,9 @@ const ChatInterface = ({
                     {formatAIResponse(message.aiService, message)}
                     {chatId && (
                       <div className="chat-id">
-                        <p>{t('homepage.chat.chatId')}: {chatId}</p>
+                        <p>
+                          {t('homepage.chat.chatId')}: {chatId}
+                        </p>
                       </div>
                     )}
                   </>
@@ -215,14 +247,14 @@ const ChatInterface = ({
                 {message.id === messages[messages.length - 1].id &&
                   showFeedback &&
                   !message.error &&
-                  (message.interaction.answer.answerType === 'normal') && (
+                  message.interaction.answer.answerType !== 'question' && (
                     <FeedbackComponent
                       lang={lang}
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
                     />
-                )}
+                  )}
               </>
             )}
           </div>
@@ -233,14 +265,14 @@ const ChatInterface = ({
             <div key="loading" className="loading-container">
               <div className="loading-animation"></div>
               <div className="loading-text">
-                {displayStatus === 'thinkingWithContext' ?
-                  `${t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment} - ${currentTopic}` :
-                  t(`homepage.chat.messages.${displayStatus}`)
-                }
+                {displayStatus === 'thinkingWithContext'
+                  ? `${t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment} - ${currentTopic}`
+                  : t(`homepage.chat.messages.${displayStatus}`)}
               </div>
             </div>
             <div className="loading-hint-text">
-              <FontAwesomeIcon icon="wand-magic-sparkles" />&nbsp;
+              <FontAwesomeIcon icon="wand-magic-sparkles" />
+              &nbsp;
               {t('homepage.chat.input.loadingHint')}
             </div>
           </>
@@ -250,9 +282,7 @@ const ChatInterface = ({
           <div key="limit-reached" className="message ai">
             <div className="limit-reached-message">
               <p>{t('homepage.chat.messages.limitReached', { count: MAX_CONVERSATION_TURNS })}</p>
-              <button
-                onClick={handleReload}
-                className="btn-primary visible">
+              <button onClick={handleReload} className="btn-primary visible">
                 {t('homepage.chat.buttons.reload')}
               </button>
             </div>
@@ -267,7 +297,8 @@ const ChatInterface = ({
               <div className="field-container">
                 <label htmlFor="message">{getLabelForInput()}</label>
                 <span className="hint-text">
-                  <FontAwesomeIcon icon="wand-magic-sparkles" />&nbsp;
+                  <FontAwesomeIcon icon="wand-magic-sparkles" />
+                  &nbsp;
                   {t('homepage.chat.input.hint')}
                 </span>
                 <div className="form-group">
@@ -295,31 +326,39 @@ const ChatInterface = ({
                   </button>
                 </div>
 
-                {charCount >= (MAX_CHARS - 10) && (
-                  <div className={charCount > MAX_CHARS ? "character-limit" : "character-warning"}>
-                    <FontAwesomeIcon icon="circle-exclamation" />&nbsp;
-                    {charCount > MAX_CHARS ?
-                      t('homepage.chat.messages.characterLimit')
-                        .replace('{count}', Math.max(1, charCount - MAX_CHARS))
-                        .replace('{unit}', charCount - MAX_CHARS === 1 ?
-                          t('homepage.chat.messages.character') :
-                          t('homepage.chat.messages.characters')) :
-                      t('homepage.chat.messages.characterWarning')
-                        .replace('{count}', MAX_CHARS - charCount)
-                        .replace('{unit}', MAX_CHARS - charCount === 1 ?
-                          t('homepage.chat.messages.character') :
-                          t('homepage.chat.messages.characters'))
-                    }
+                {charCount >= MAX_CHARS - 10 && (
+                  <div className={charCount > MAX_CHARS ? 'character-limit' : 'character-warning'}>
+                    <FontAwesomeIcon icon="circle-exclamation" />
+                    &nbsp;
+                    {charCount > MAX_CHARS
+                      ? t('homepage.chat.messages.characterLimit')
+                          .replace('{count}', Math.max(1, charCount - MAX_CHARS))
+                          .replace(
+                            '{unit}',
+                            charCount - MAX_CHARS === 1
+                              ? t('homepage.chat.messages.character')
+                              : t('homepage.chat.messages.characters')
+                          )
+                      : t('homepage.chat.messages.characterWarning')
+                          .replace('{count}', MAX_CHARS - charCount)
+                          .replace(
+                            '{unit}',
+                            MAX_CHARS - charCount === 1
+                              ? t('homepage.chat.messages.character')
+                              : t('homepage.chat.messages.characters')
+                          )}
                   </div>
                 )}
               </div>
             </form>
           )}
-          <GcdsDetails className='hr' detailsTitle={t('homepage.chat.options.title')}>
+          <GcdsDetails className="hr" detailsTitle={t('homepage.chat.options.title')}>
             <div className="ai-toggle">
               <fieldset className="ai-toggle_fieldset">
                 <div className="ai-toggle_container">
-                  <legend className="ai-toggle_legend">{t('homepage.chat.options.aiSelection.label')}</legend>
+                  <legend className="ai-toggle_legend">
+                    {t('homepage.chat.options.aiSelection.label')}
+                  </legend>
                   <div className="ai-toggle_option">
                     <input
                       type="radio"
@@ -330,7 +369,9 @@ const ChatInterface = ({
                       onChange={handleAIToggle}
                       className="ai-toggle_radio-input"
                     />
-                    <label htmlFor="claude">{t('homepage.chat.options.aiSelection.anthropic')}</label>
+                    <label htmlFor="claude">
+                      {t('homepage.chat.options.aiSelection.anthropic')}
+                    </label>
                   </div>
                   <div className="ai-toggle_option">
                     <input
@@ -344,7 +385,18 @@ const ChatInterface = ({
                     />
                     <label htmlFor="openai">{t('homepage.chat.options.aiSelection.openai')}</label>
                   </div>
-
+                  <div className="ai-toggle_option">
+                    <input
+                      type="radio"
+                      id="azure"
+                      name="ai-selection"
+                      value="azure"
+                      checked={selectedAI === 'azure'}
+                      onChange={handleAIToggle}
+                      className="ai-toggle_radio-input"
+                    />
+                    <label htmlFor="azure">{t('homepage.chat.options.aiSelection.azure')}</label>
+                  </div>
                 </div>
               </fieldset>
             </div>
@@ -352,7 +404,9 @@ const ChatInterface = ({
             <div className="search-toggle">
               <fieldset className="ai-toggle_fieldset">
                 <div className="ai-toggle_container">
-                  <legend className="ai-toggle_legend">{t('homepage.chat.options.searchSelection.label')}</legend>
+                  <legend className="ai-toggle_legend">
+                    {t('homepage.chat.options.searchSelection.label')}
+                  </legend>
                   <div className="ai-toggle_option">
                     <input
                       type="radio"
@@ -363,7 +417,9 @@ const ChatInterface = ({
                       onChange={handleSearchToggle}
                       className="ai-toggle_radio-input"
                     />
-                    <label htmlFor="search-canadaca">{t('homepage.chat.options.searchSelection.canadaca')}</label>
+                    <label htmlFor="search-canadaca">
+                      {t('homepage.chat.options.searchSelection.canadaca')}
+                    </label>
                   </div>
                   <div className="ai-toggle_option">
                     <input
@@ -375,7 +431,9 @@ const ChatInterface = ({
                       onChange={handleSearchToggle}
                       className="ai-toggle_radio-input"
                     />
-                    <label htmlFor="search-google">{t('homepage.chat.options.searchSelection.google')}</label>
+                    <label htmlFor="search-google">
+                      {t('homepage.chat.options.searchSelection.google')}
+                    </label>
                   </div>
                 </div>
               </fieldset>

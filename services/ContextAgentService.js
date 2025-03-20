@@ -2,8 +2,9 @@ import { createContextAgent } from '../agents/AgentService.js';
 
 const invokeContextAgent = async (agentType, request) => {
   try {
-    const contextAgent = await createContextAgent(agentType);
-    const { message, systemPrompt, searchResults, searchProvider, conversationHistory = [] } = request;
+
+    const { chatId, message, systemPrompt, searchResults, conversationHistory = [] } = request;
+    const contextAgent = await createContextAgent(agentType, chatId);
 
     const messages = [
       {

@@ -1,25 +1,25 @@
 const getApiUrl = (endpoint) => {
-    const baseUrl = process.env.NODE_ENV === 'production'
-        ? ''  // Base URL for production (assuming relative paths)
-        : 'http://localhost:3001';
-
-    return `${baseUrl}/api/${endpoint}`;
+  const serverUrl =
+    process.env.NODE_ENV === "development" ? "http://127.0.0.1:3001" : "";
+  const prefix = endpoint.split('-')[0];
+  return `${serverUrl}/api/${prefix}/${endpoint}`;
 };
 
-const getProviderApiUrl = (provider,endpoint) => {
-    // TOOD read from ModelConfig
-    if (provider === 'claude') {
-        provider = 'anthropic';
-    } else if (provider === 'chatgpt') {
-        provider = 'openai';
-    }
-    const baseUrl = process.env.NODE_ENV === 'production'
-        ? ''  // Base URL for production (assuming relative paths)
-        : 'http://localhost:3001';
+const getProviderApiUrl = (provider, endpoint) => {
+  const serverUrl =
+    process.env.NODE_ENV === "development" ? "http://127.0.0.1:3001" : "";
+  // Map provider aliases to their actual service names
+  if (provider === "claude") {
+    provider = "anthropic";
+  } else if (provider === "openai") {
+    provider = "openai";
+  } else if (provider === "azure-openai" || provider === "azure") {
+    provider = "azure";
+  }
 
-    return `${baseUrl}/api/${provider}-${endpoint}`;
+  return `${serverUrl}/api/${provider}/${provider}-${endpoint}`;
 };
 
-const providerOrder = ['openai', 'anthropic', 'cohere'];
+const providerOrder = ["openai", "azure", "anthropic", "cohere"];
 
 export { getApiUrl, getProviderApiUrl, providerOrder };

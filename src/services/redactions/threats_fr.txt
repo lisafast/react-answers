@@ -1,5 +1,3 @@
-anthrax
-attaque
 assassiner
 bombe
 bombarder
@@ -10,20 +8,18 @@ bombarderont
 bombes
 bombardement
 bombardé
-exécution
 explosif
 explosifs
+fusillade
 tirer
 tirerai
 tirera
 tirerons
 tireront
 tirons
-fusillade
 tiré
 otage
 meurtre
-suicider
 tuer
 tuerai
 tuera

@@ -11,6 +11,11 @@ const customsearch = google.customsearch('v1');
  * @returns {string} - The formatted top search results with summary, link, and link text.
  */
 function extractSearchResults(results, numResults = 3) {
+    if (!results?.items || results.items.length === 0) {
+        console.info("No search results found");
+        return "No results found.";
+    }
+
     const topResults = results.items.slice(0, numResults).map(result => ({
         link: result.link,
         linkText: result.title,
@@ -24,31 +29,56 @@ function extractSearchResults(results, numResults = 3) {
     return extractedResults;
 }
 
-const contextSearch = async (query) => {
-    const CX = process.env.GOOGLE_SEARCH_ENGINE_ID; // Ensure this is set in your environment variables
-    const API_KEY = process.env.GOOGLE_API_KEY; // Ensure this is set in your environment variables
+/**
+ * @param {string} query - The search query.
+ * @param {string} lang - The language of the search query.
+ * @returns {object|null} - The Google search results.
+ */
+const contextSearch = async (query, lang) => {
+    try {
+        const CX = process.env.GOOGLE_SEARCH_ENGINE_ID;
+        const API_KEY = process.env.GOOGLE_API_KEY;
 
-    const res = await customsearch.cse.list({
-        cx: CX,
-        q: query,
-        key: API_KEY,
-    });
-    const results = res.data;
-    const extractedResults = extractSearchResults(results);
-    return {
-        results: extractedResults,
-        provider: "google"
-    };
+        if (!CX || !API_KEY) {
+            throw new Error("Missing required environment variables: GOOGLE_SEARCH_ENGINE_ID or GOOGLE_API_KEY");
+        }
 
+        // You can use the lang parameter to customize the search if needed
+        // For example, to restrict results to a specific language
+        const searchOptions = {
+            cx: CX,
+            q: query,
+            key: API_KEY
+        };
+        
+        // Add language restriction if specified
+        if (lang) {
+            searchOptions.lr = lang.toLowerCase().startsWith('fr') ? 'lang_fr' : 'lang_en';
+        }
+
+        const res = await customsearch.cse.list(searchOptions);
+        const results = res.data;
+        const extractedResults = extractSearchResults(results);
+        return {
+            results: extractedResults,
+            provider: "google"
+        };
+    } catch (error) {
+        console.error("Error performing Google search:", error);
+        return {
+            results: "Search failed: " + error.message,
+            provider: "google"
+        };
+    }
 };
 
 const contextSearchTool = tool(
-    async ({ query }) => {
-        return await contextSearch(query);
+    async ({ query, lang }) => {
+        return await contextSearch(query, lang);
     },
     {
         name: "contextSearch",
-        description: "Perform a search on Google Custom Search. Provide 'query' as the search term. Example input: { query: 'What is SCIS? Canada' }",
+        description: "Perform a search on Google Custom Search. Provide 'query' as the search term and 'lang' as the language.",
         schema: {
             type: "object",
             properties: {
@@ -56,6 +86,10 @@ const contextSearchTool = tool(
                     type: "string",
                     description: "The search term to query on.",
                 },
+                lang: {
+                    type: "string",
+                    description: "The language of the search query (e.g., 'en' or 'fr').",
+                }
             },
             required: ["query"],
         },

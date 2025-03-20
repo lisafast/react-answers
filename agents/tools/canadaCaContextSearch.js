@@ -1,4 +1,3 @@
-import axios from "axios";
 import { tool } from "@langchain/core/tools";
 
 /**
@@ -25,9 +24,14 @@ function extractSearchResults(results, numResults = 3) {
 
 /**
  * @param {string} query - The search query.
+ * @param {string} lang - The language of the search query.
  * @returns {object|null} - The Coveo search results.
  */
-async function contextSearch(query) {
+async function contextSearch(query, lang) {
+    // Set originLevel3 based on language
+    const originLevel3 = lang && lang.toLowerCase().startsWith('fr') 
+        ? '/fr/sr/srb.html' 
+        : '/en/sr/srb.html';
 
     console.log(`Starting search with query: ${query} at endpoint: ${process.env.CANADA_CA_SEARCH_URI}`);
     const response = await fetch(process.env.CANADA_CA_SEARCH_URI, {
@@ -37,7 +41,11 @@ async function contextSearch(query) {
             "Content-Type": "application/json",
             "Accept": "application/json"
         },
-        body: JSON.stringify({ q: query }),
+        body: JSON.stringify({ 
+            q: query,
+            searchHub: "canada-gouv-public-websites",
+            originLevel3: originLevel3
+        }),
         timeout: 30000 // 30 seconds timeout
     });
 
@@ -56,7 +64,6 @@ async function contextSearch(query) {
         results: extractedResults,
         provider: "canadaca"
     };
-
 }
 
 /**
@@ -65,9 +72,9 @@ async function contextSearch(query) {
 const contextSearchTool = tool(
     async ({ lang, query, searchService = 'canadaca' }) => {
         try {
-            console.log(`Starting ${searchService} search with query: ${query}`);
+            console.log(`Starting ${searchService} search with query: ${query} in language: ${lang}`);
 
-            const results = await contextSearch(query);
+            const results = await contextSearch(query, lang);
 
             if (!results) {
                 return `Failed to retrieve search results for query: ${query}`;
@@ -83,7 +90,7 @@ const contextSearchTool = tool(
     },
     {
         name: "canadaCASearch",
-        description: "Perform a search using Coveo or Google. Provide the 'query' as the search term and optionally 'searchService' ('google' or 'canadaca')",
+        description: "Perform a search using Coveo or Google. Provide the 'query' as the search term and lang as the language of the search query.",
         schema: {
             type: "object",
             properties: {
@@ -91,12 +98,10 @@ const contextSearchTool = tool(
                     type: "string",
                     description: "The search term to query.",
                 },
-                searchService: {
+                lang: {
                     type: "string",
-                    description: "The search service to use ('google' or 'canadaca').",
-                    enum: ["google", "canadaca"],
-                    default: "canadaca"
-                },
+                    description: "The language of the search query.",
+                }
             },
             required: ["lang", "query"],
         },

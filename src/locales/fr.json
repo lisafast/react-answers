@@ -15,7 +15,7 @@
       "aiServices": {
         "claude": "Service d'IA Claude : Claude 3.7 Sonnet d'Anthropic, connaissances jusqu'en février 2025",
         "chatgpt": "Service d'IA ChatGPT : GPT-4o d'OpenAI, connaissances jusqu'en novembre 2024",
-        "cohere": "Autres services peuvent être ajoutés dans le futur."
+        "azure": "Service d'IA Azure : Microsoft Azure OpenAI"
       },
       "systemPrompt": "Lire l'invite système",
       "contact": "Le développement est toujours en cours — Contactez lisa.fast@cds-snc.ca pour plus d'informations."
@@ -63,7 +63,7 @@
           "label": "IA :",
           "anthropic": "Anthropic",
           "openai": "OpenAI",
-          "cohere": "Cohere"
+          "azure": "Azure"
         },
         "searchSelection": {
           "label": "Recherche :",
@@ -216,6 +216,83 @@
         "process": "Traiter",
         "cancel": "Annuler"
       }
+    }
+  },
+  "logging": {
+    "start": "Démarrer",
+    "pause": "Pause"
+  },
+  "admin": {
+    "title": "Tableau de bord d'administration",
+    "navigation": {
+      "ariaLabel": "Navigation administrateur",
+      "title": "Menu administrateur",
+      "aiAnswers": "Réponses IA",
+      "batches": "Lots",
+      "users": "Gestion des utilisateurs",
+      "logs": "Journaux de chat"
+    },
+    "chatLogs": {
+      "title": "Interactions de chat récentes"
+    },
+    "deleteChat": {
+      "title": "Supprimer la conversation",
+      "idLabel": "ID de la conversation",
+      "button": "Supprimer",
+      "confirm": "Confirmer la suppression",
+      "cancel": "Annuler",
+      "loading": "Suppression en cours...",
+      "success": "Conversation supprimée avec succès",
+      "error": "Échec de la suppression de la conversation : "
+    }
+  },
+  "signup": {
+    "title": "Inscription",
+    "email": "Courriel",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "submit": "S'inscrire",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "errorOccurred": "Une erreur est survenue lors de l'inscription",
+    "form": {
+      "submitting": "Création du compte...",
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe"
+    },
+    "messages": {
+      "success": "Inscription réussie ! Vous pouvez maintenant",
+      "error": "Une erreur s'est produite lors de l'inscription",
+      "failed": "L'inscription a échoué",
+      "loginLink": "vous connecter à votre compte"
+    }
+  },
+  "login": {
+    "title": "Connexion",
+    "email": "Courriel",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "invalidCredentials": "Courriel ou mot de passe invalide",
+    "form": {
+      "submitting": "Connexion en cours...",
+      "signupLink": "Besoin d'un compte ? Inscrivez-vous ici"
+    }
+  },
+  "users": {
+    "title": "Gestion des utilisateurs",
+    "columns": {
+      "email": "Courriel",
+      "role": "Rôle",
+      "status": "Statut",
+      "createdAt": "Créé le",
+      "action": "Action"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "actions": {
+      "activate": "Activer",
+      "deactivate": "Désactiver"
     }
   },
   "evaluation": {

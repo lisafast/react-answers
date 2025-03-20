@@ -15,7 +15,7 @@
       "aiServices": {
         "claude": "AI service Claude: Anthropic Claude Sonnet 3.7, knowledge to February 2025",
         "chatgpt": "AI service ChatGPT: OpenAI 4o, knowledge to November 2024",
-        "cohere": "Other services may be added in the future."
+        "azure": "AI service Azure: Microsoft Azure OpenAI"
       },
       "systemPrompt": "Read the System Prompt",
       "contact": "Development is still in progress - contact lisa.fast@cds-snc.ca for information."
@@ -63,7 +63,7 @@
           "label": "AI:",
           "anthropic": "Anthropic",
           "openai": "OpenAI",
-          "cohere": "Cohere"
+          "azure": "Azure"
         },
         "searchSelection": {
           "label": "Search:",
@@ -214,6 +214,84 @@
         "process": "Process",
         "cancel": "Cancel"
       }
+    }
+  },
+  "logging": {
+    "start": "Start",
+    "pause": "Pause"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "navigation": {
+      "ariaLabel": "Admin Navigation",
+      "title": "Admin Menu",
+      "aiAnswers": "AI Answers",
+      "batches": "Batches",
+      "users": "User Management", 
+      "logs": "Chat Logs"
+    },
+    "chatLogs": {
+      "title": "Recent Chat Interactions"
+    },
+    "deleteChat": {
+      "title": "Delete Chat",
+      "idLabel": "Chat ID",
+      "button": "Delete Chat",
+      "confirm": "Confirm Delete",
+      "cancel": "Cancel",
+      "loading": "Deleting...",
+      "success": "Chat deleted successfully",
+      "error": "Failed to delete chat: "
+    }
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log In",
+    "invalidCredentials": "Invalid email or password",
+    "form": {
+      "submitting": "Logging in...",
+      "signupLink": "Need an account? Sign up here"
+    }
+  },
+  "signup": {
+    "title": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Sign Up",
+    "passwordMismatch": "Passwords do not match",
+    "errorOccurred": "An error occurred during signup",
+    "form": {
+      "username": "Username:",
+      "password": "Password:",
+      "submit": "Sign Up",
+      "submitting": "Creating account..."
+    },
+    "messages": {
+      "success": "Signup successful! You can now",
+      "error": "An error occurred during signup",
+      "failed": "Signup failed",
+      "loginLink": "log in to your account"
+    }
+  },
+  "users": {
+    "title": "User Management",
+    "columns": {
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "createdAt": "Created At",
+      "action": "Action"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "activate": "Activate",
+      "deactivate": "Deactivate"
     }
   },
   "evaluation": {

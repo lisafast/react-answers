@@ -9,8 +9,13 @@ export const ESDC_SCENARIOS = `
 * Ask a clarifying question if it's not clear which program the user is asking about. 
 * For questions about contacting MSCA (My Service Canada Account, provide the contact page and number for the program that they are using on MSCA. There is no single contact number for MSCA. Ask a clarifying question to find out which program to direct them to. 
 
-* Cannot change mailing address, direct deposit information, or telephone number in MSCA, suggest this updated Managing your personal information page: https://www.canada.ca/en/employment-social-development/services/my-account/personal-information.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/renseignements-personnels.html
+* CHANGING PERSONAL INFO:  it's NOT currently possible to change mailing address, or phone or bank info in MSCA for EI or CPP. Do not tell people to sign in to change that info.  For questions about changing mailing address or telephone number for ESDC services like EI, CPP/OAS, or SIN, provide the phone number for the program and direct them to the Managing your personal information page: https://www.canada.ca/en/employment-social-development/services/my-account/personal-information.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/renseignements-personnels.html 
  
+### Account Type: EI Internet Reporting Service
+* Trigger phrases: "4 digit access code", "EI reporting"
+* Explanation: Separate from MSCA account - different service with different access code
+* Citation (EN): https://www.canada.ca/en/services/benefits/ei/employment-insurance-reporting.html
+* Citation (FR): https://www.canada.ca/fr/services/prestations/ae/declarations-assurance-emploi.html
 
 ### Employment Insurance
  * For questions about eligibility for all EI, do not attempt to answer as it is too complex, instead provide a link to this new estimator tool to assess eligibility and estimate possible benefits: https://estimateurae-eiestimator.service.canada.ca/en orhttps://estimateurae-eiestimator.service.canada.ca/fr/ 

@@ -32,7 +32,7 @@ class URLValidator {
       }
       // Add URLs from submenus
       if (section.submenus) {
-        Object.values(section.submenus).forEach(url => {
+        Object.values(section.submenus).forEach((url) => {
           if (typeof url === 'string') {
             this.menuUrls.add(url);
           }
@@ -40,7 +40,7 @@ class URLValidator {
       }
       // Add URLs from most requested links
       if (section.mostRequested) {
-        Object.values(section.mostRequested).forEach(url => {
+        Object.values(section.mostRequested).forEach((url) => {
           if (typeof url === 'string') {
             this.menuUrls.add(url);
           }
@@ -67,8 +67,8 @@ class URLValidator {
     if (checkResult.isValid) {
       return {
         isValid: true,
-        url: url,  // Keep the original URL
-        confidenceRating: '1.0'
+        url: url, // Keep the original URL
+        confidenceRating: '1.0',
       };
     }
 
@@ -80,7 +80,7 @@ class URLValidator {
       return {
         isValid: true,
         url: fallback.url,
-        confidenceRating: fallback.confidence.toFixed(1)
+        confidenceRating: fallback.confidence.toFixed(1),
       };
     }
 
@@ -89,12 +89,12 @@ class URLValidator {
       isValid: false,
       fallbackUrl: `https://www.canada.ca/${lang}/sr/srb.html`,
       fallbackText: t('homepage.chat.citation.fallbackText'),
-      confidenceRating: '0.1'
+      confidenceRating: '0.1',
     };
   }
 
   /**
-   * Get a fallback URL from the menu structure based on topic if it's 404 
+   * Get a fallback URL from the menu structure based on topic if it's 404
    */
   getFallbackUrl(url, lang = 'en') {
     const menuStructure = lang === 'fr' ? menuStructure_FR : menuStructure_EN;
@@ -104,10 +104,7 @@ class URLValidator {
     const urlObj = new URL(url);
     const urlSegments = urlObj.pathname
       .split('/')
-      .filter(segment =>
-        segment &&
-        !['en', 'fr', 'www', 'canada', 'ca'].includes(segment)
-      );
+      .filter((segment) => segment && !['en', 'fr', 'www', 'canada', 'ca'].includes(segment));
 
     console.log('404 URL segments:', urlSegments);
 
@@ -117,10 +114,7 @@ class URLValidator {
         const menuUrlObj = new URL(menuUrl);
         const menuSegments = menuUrlObj.pathname
           .split('/')
-          .filter(segment =>
-            segment &&
-            !['en', 'fr', 'www', 'canada', 'ca'].includes(segment)
-          );
+          .filter((segment) => segment && !['en', 'fr', 'www', 'canada', 'ca'].includes(segment));
 
         // console.log('Comparing with menu segments:', menuSegments);
 
@@ -128,7 +122,7 @@ class URLValidator {
         let matchingSegments = 0;
         let partialMatches = 0;
 
-        urlSegments.forEach(segment => {
+        urlSegments.forEach((segment) => {
           if (menuSegments.includes(segment)) {
             matchingSegments++;
             // console.log(`Exact segment match: ${segment}`);
@@ -145,7 +139,8 @@ class URLValidator {
         });
 
         // Calculate confidence based on matches
-        const confidence = (matchingSegments + (partialMatches * 0.5)) /
+        const confidence =
+          (matchingSegments + partialMatches * 0.5) /
           Math.max(urlSegments.length, menuSegments.length);
 
         // console.log(`Confidence for ${menuUrl}: ${confidence}`);

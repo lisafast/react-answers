@@ -27,7 +27,7 @@ class ErrorBoundary extends React.Component {
         <GcdsContainer size="xl" mainContainer centered>
           <h2>{t('homepage.errors.timeout.title')}</h2>
           <GcdsText>{t('homepage.errors.timeout.message')}</GcdsText>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="gcds-button gcds-button--primary"
           >
@@ -59,6 +59,7 @@ const HomePage = ({ lang = 'en' }) => {
         const res = await fetch(getApiUrl('db-chat-session'));
         const data = await res.json();
         setChatId(data.chatId);
+        localStorage.setItem('chatId', data.chatId);
       } catch (error) {
         console.error(error);
         setServiceStatus({
@@ -71,33 +72,38 @@ const HomePage = ({ lang = 'en' }) => {
   }, [t]);
 
   // Wrap ErrorBoundary to provide translations
-  const WrappedErrorBoundary = ({ children }) => (
-    <ErrorBoundary t={t}>
-      {children}
-    </ErrorBoundary>
-  );
+  const WrappedErrorBoundary = ({ children }) => <ErrorBoundary t={t}>{children}</ErrorBoundary>;
 
   return (
     <WrappedErrorBoundary>
-      <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600" chat-app-wrapper>
-        <h1 className='mb-400'>{t('homepage.title')}</h1>
+      <GcdsContainer
+        size="xl"
+        mainContainer
+        centered
+        tag="main"
+        className="mb-600"
+        chat-app-wrapper
+      >
+        <h1 className="mb-400">{t('homepage.title')}</h1>
         {serviceStatus && !serviceStatus.isAvailable && (
-          <div className="service-status-alert" style={{ 
-            backgroundColor: '#F3E9E8', 
-            border: '1px solid #BC3331', 
-            padding: '1rem', 
-            marginBottom: '1rem',
-            borderRadius: '4px'
-          }}>
-            <strong>Service Status: </strong>{serviceStatus.message}
+          <div
+            className="service-status-alert"
+            style={{
+              backgroundColor: '#F3E9E8',
+              border: '1px solid #BC3331',
+              padding: '1rem',
+              marginBottom: '1rem',
+              borderRadius: '4px',
+            }}
+          >
+            <strong>Service Status: </strong>
+            {serviceStatus.message}
           </div>
         )}
-        <h2 className='mt-400 mb-400'>{t('homepage.subtitle')}</h2>
-        <GcdsText className='mb-200'>
-          {t('homepage.intro.researchOnly')}
-        </GcdsText>
-        
-        <GcdsDetails detailsTitle={t('homepage.about.title')} className='mb-400'>
+        <h2 className="mt-400 mb-400">{t('homepage.subtitle')}</h2>
+        <GcdsText className="mb-200">{t('homepage.intro.researchOnly')}</GcdsText>
+
+        <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400">
           <GcdsText>{t('homepage.about.privacyNote')}</GcdsText>
           <GcdsText>{t('homepage.about.aiServices.claude')}</GcdsText>
           <GcdsText>{t('homepage.about.aiServices.chatgpt')}</GcdsText>
@@ -116,17 +122,17 @@ const HomePage = ({ lang = 'en' }) => {
       <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600">
         {/* TODO: make this only show up after an ai response was successfully displayed */}
         <GcdsText>
-          <a 
+          <a
             href={t('homepage.feedback.surveyUrl')}
-            className="feedback-survey-link" 
-            target="_blank" 
+            className="feedback-survey-link"
+            target="_blank"
             rel="noopener noreferrer"
           >
             {t('homepage.feedback.surveyLink')}
           </a>
         </GcdsText>
 
-        <GcdsDetails detailsTitle={t('homepage.privacy.title')} className='mb-400'>
+        <GcdsDetails detailsTitle={t('homepage.privacy.title')} className="mb-400">
           <GcdsText>{t('homepage.privacy.storage')}</GcdsText>
           <GcdsText>{t('homepage.privacy.disclaimer')}</GcdsText>
           <GcdsText>
