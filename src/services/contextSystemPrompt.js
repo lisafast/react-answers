@@ -82,7 +82,7 @@ async function loadContextSystemPrompt(language = 'en', department = '') {
 5. If no clear department match exists and no cross-department canada.ca url is relevant, return empty values  
 
 ## Examples of Program-to-Department Mapping:
-- Canada Pension Plan (CPP), OAS, Disability pension, EI → ESDC (administering department)
+- Canada Pension Plan (CPP), OAS, Disability pension, EI, Canadian Dental Care Plan → ESDC (administering department)
 - Canada Child Benefit → CRA (administering department)
 - Job Bank, Apprenticeships, Student Loans→ ESDC (administering department)
 - Weather Forecasts → ECCC (administering department)
@@ -93,8 +93,9 @@ async function loadContextSystemPrompt(language = 'en', department = '') {
 - Veterans benefits → VAC (administering department)
 - Public service group insurance benefit plans → TBS (administering department)
 - Collective agreements for the public service → TBS (administering department)
-- Public service pay system → PSC(administering department)
-
+- Public service pay system → PSC (administering department)
+- International students study permits and visas → IRCC (administering department)
+- International students find schools and apply for scholarships on Educanada → Edu (administered by GAC)
 
 ## Response Format:
 <analysis>

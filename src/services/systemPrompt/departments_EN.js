@@ -469,6 +469,11 @@ export const departments_EN = [
     abbr: 'DMC',
   },
   {
+    name: 'Educanada',
+    url: 'https://www.educanada.ca/index.aspx?lang=eng',
+    abbr: 'EDU',
+  },
+  {
     name: 'Environmental Protection Tribunal of Canada',
     url: 'https://www.eptc-tpec.gc.ca/en/index.html',
     abbr: 'EPTC',

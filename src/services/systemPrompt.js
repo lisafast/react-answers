@@ -11,47 +11,32 @@ const departmentModules = {
   // English abbreviations
   CRA: {
     getContent: async () => {
-      const [{ CRA_UPDATES }, { CRA_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-cra/cra-updates.js'),
-        import('./systemPrompt/context-cra/cra-scenarios.js'),
-      ]);
-      return { updates: CRA_UPDATES, scenarios: CRA_SCENARIOS };
+      const { CRA_SCENARIOS } = await import('./systemPrompt/context-cra/cra-scenarios.js');
+      return { scenarios: CRA_SCENARIOS };
     },
   },
   ESDC: {
     getContent: async () => {
-      const [{ ESDC_UPDATES }, { ESDC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-esdc/esdc-updates.js'),
-        import('./systemPrompt/context-esdc/esdc-scenarios.js'),
-      ]);
-      return { updates: ESDC_UPDATES, scenarios: ESDC_SCENARIOS };
+      const { ESDC_SCENARIOS } = await import('./systemPrompt/context-esdc/esdc-scenarios.js');
+      return { scenarios: ESDC_SCENARIOS };
     },
   },
   ISC: {
     getContent: async () => {
-      const [{ ISC_UPDATES }, { ISC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-isc/isc-updates.js'),
-        import('./systemPrompt/context-isc/isc-scenarios.js'),
-      ]);
-      return { updates: ISC_UPDATES, scenarios: ISC_SCENARIOS };
+      const { ISC_SCENARIOS } = await import('./systemPrompt/context-isc/isc-scenarios.js');
+      return { scenarios: ISC_SCENARIOS };
     },
   },
   PSPC: {
     getContent: async () => {
-      const [{ PSPC_UPDATES }, { PSPC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-pspc/pspc-updates.js'),
-        import('./systemPrompt/context-pspc/pspc-scenarios.js'),
-      ]);
-      return { updates: PSPC_UPDATES, scenarios: PSPC_SCENARIOS };
+      const { PSPC_SCENARIOS } = await import('./systemPrompt/context-pspc/pspc-scenarios.js');
+      return { scenarios: PSPC_SCENARIOS };
     },
   },
   IRCC: {
     getContent: async () => {
-      const [{ IRCC_UPDATES }, { IRCC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-ircc/ircc-updates.js'),
-        import('./systemPrompt/context-ircc/ircc-scenarios.js'),
-      ]);
-      return { updates: IRCC_UPDATES, scenarios: IRCC_SCENARIOS };
+      const { IRCC_SCENARIOS } = await import('./systemPrompt/context-ircc/ircc-scenarios.js');
+      return { scenarios: IRCC_SCENARIOS };
     },
   }
 };
@@ -85,9 +70,9 @@ async function loadSystemPrompt(language = 'en', context) {
       departmentKey && departmentModules[departmentKey]
         ? await departmentModules[departmentKey].getContent().catch((error) => {
             LoggingService.warn('system', `Failed to load content for ${departmentKey}:`, error);
-            return { updates: '', scenarios: '' };
+            return { scenarios: '' };
           })
-        : { updates: '', scenarios: '' };
+        : { scenarios: '' };
 
     const citationInstructions = CITATION_INSTRUCTIONS;
 
@@ -130,9 +115,7 @@ async function loadSystemPrompt(language = 'en', context) {
       ## General Instructions for All Departments
       ${SCENARIOS}
 
-      ${department ? `## Department-Specific Updates\n${content.updates}` : ''}
-
-      ${department ? `## Department-Specific Scenarios\n${content.scenarios}` : ''}
+      ${department ? `## Department-Specific Scenarios and updates:\n${content.scenarios}` : ''}
 
       ${citationInstructions}
 
