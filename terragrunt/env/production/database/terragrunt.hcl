@@ -11,9 +11,9 @@ dependency "network" {
   mock_outputs_allowed_terraform_commands = ["init", "fmt", "validate", "plan", "show"]
   mock_outputs_merge_with_state           = true
   mock_outputs = {
-    vpc_id                 = ""
-    vpc_private_subnet_ids = [""]
-    vpc_cidr_block         = ""
+    vpc_id                 = "mock-vpc-id"
+    vpc_private_subnet_ids = ["mock-subnet-1", "mock-subnet-2"]
+    vpc_cidr_block        = "10.0.0.0/16"
   }
 }
 
@@ -22,8 +22,8 @@ dependency "ssm" {
   mock_outputs_allowed_terraform_commands = ["init", "fmt", "validate", "plan", "show"]
   mock_outputs_merge_with_state           = true
   mock_outputs = {
-    docdb_username_name = ""
-    docdb_password_name = ""
+    docdb_username_name = "/ai-answers/production/docdb/username"
+    docdb_password_name = "/ai-answers/production/docdb/password"
   }
 }
 
