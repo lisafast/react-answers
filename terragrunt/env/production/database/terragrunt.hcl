@@ -31,8 +31,8 @@ inputs = {
   vpc_id                 = dependency.network.outputs.vpc_id
   vpc_private_subnet_ids = dependency.network.outputs.vpc_private_subnet_ids
   vpc_cidr_block         = dependency.network.outputs.vpc_cidr_block
-  docdb_password_name    = dependency.ssm.outputs.docdb_password_name
-  docdb_username_name    = dependency.ssm.outputs.docdb_username_name
+  docdb_password_name    = dependency.ssm.outputs.docdb_password
+  docdb_username_name    = dependency.ssm.outputs.docdb_username
 }
 
 include {
