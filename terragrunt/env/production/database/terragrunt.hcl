@@ -22,8 +22,8 @@ dependency "ssm" {
   mock_outputs_allowed_terraform_commands = ["init", "fmt", "validate", "plan", "show"]
   mock_outputs_merge_with_state           = true
   mock_outputs = {
-    docdb_username = ""
-    docdb_password = ""
+    docdb_username_name = ""
+    docdb_password_name = ""
   }
 }
 
