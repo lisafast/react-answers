@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "ai_answers" {
-  name                 = "ai-answers"
+  name                 = "${var.product_name}-${var.env}"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {

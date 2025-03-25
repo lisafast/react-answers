@@ -1,6 +1,6 @@
 resource "aws_security_group" "ai_answers_load_balancer_sg" {
-  name        = "ai_answers_load_balancer_sg"
-  description = "Security group for load balancer"
+  name        = "${var.product_name}-${var.env}-load-balancer-sg"
+  description = "Security group for ${var.product_name} ${var.env} load balancer"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -18,6 +18,6 @@ resource "aws_security_group" "ai_answers_load_balancer_sg" {
   }
 
   tags = {
-    "CostCentre" = var.billing_code
+    CostCentre = var.billing_code
   }
 }

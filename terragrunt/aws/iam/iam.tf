@@ -37,8 +37,8 @@ data "aws_iam_policy_document" "ai-answers-ssm-policy" {
 }
 
 resource "aws_iam_policy" "ai-answers-ssm-policy" {
-  name        = "ai-answers-ssm-policy"
-  description = "Policy for AI Answers to access SSM parameters"
+  name        = "${var.product_name}-${var.env}-ssm-policy"
+  description = "Policy for ${var.product_name} ${var.env} to access SSM parameters"
   policy      = data.aws_iam_policy_document.ai-answers-ssm-policy.json
 
   tags = {
@@ -48,7 +48,7 @@ resource "aws_iam_policy" "ai-answers-ssm-policy" {
 }
 
 resource "aws_iam_role" "ai-answers-ecs-role" {
-  name               = "ai-answers-ecs-role"
+  name               = "${var.product_name}-${var.env}-ecs-role"
   assume_role_policy = data.aws_iam_policy_document.ai-answers-ecs-policy.json
 }
 
@@ -58,7 +58,7 @@ resource "aws_iam_role_policy_attachment" "ai-answers-ecs-policy" {
 }
 
 resource "aws_iam_policy_attachment" "ai-answers-ssm-policy" {
-  name       = "ai-answers-ssm-policy"
+  name       = "${var.product_name}-${var.env}-ssm-policy-attachment"
   policy_arn = aws_iam_policy.ai-answers-ssm-policy.arn
   roles      = [aws_iam_role.ai-answers-ecs-role.name]
 }

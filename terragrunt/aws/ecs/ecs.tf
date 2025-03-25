@@ -39,8 +39,8 @@ module "ai_answers" {
   source = "github.com/cds-snc/terraform-modules//ecs?ref=v10.3.0"
 
   # Cluster and service
-  cluster_name = "ai-answers-cluster"
-  service_name = "ai-answers-app-service"
+  cluster_name = "${var.product_name}-${var.env}-cluster"
+  service_name = "${var.product_name}-${var.env}-app-service"
   depends_on = [
     var.lb_listener,
     var.ai-answers-ecs-policy_attachment
@@ -48,7 +48,7 @@ module "ai_answers" {
 
   # Task/Container definition
   container_image            = "${var.ecr_repository_url}:latest"
-  container_name             = "ai-answers"
+  container_name             = "${var.product_name}-${var.env}"
   task_cpu                   = var.fargate_cpu
   task_memory                = var.fargate_memory
   container_port             = 3001
@@ -65,10 +65,9 @@ module "ai_answers" {
   container_read_only_root_filesystem = false
 
   # Task definition
-  task_name          = "ai-answers-task"
+  task_name          = "${var.product_name}-${var.env}-task"
   task_exec_role_arn = var.iam_role_ai-answers-ecs-role_arn
   task_role_arn      = var.iam_role_ai-answers-ecs-role_arn
-
 
   # Scaling
   enable_autoscaling = true
@@ -87,11 +86,11 @@ module "ai_answers" {
 }
 
 resource "aws_cloudwatch_log_group" "ai_answers_group" {
-  name              = "/aws/ecs/ai-answers-cluster"
+  name              = "/aws/ecs/${var.product_name}-${var.env}-cluster"
   retention_in_days = 30
 }
 
 resource "aws_cloudwatch_log_stream" "ai_answers_stream" {
-  name           = "ai-answers-log-stream"
+  name           = "${var.product_name}-${var.env}-log-stream"
   log_group_name = aws_cloudwatch_log_group.ai_answers_group.name
 }

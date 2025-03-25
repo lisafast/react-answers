@@ -3,12 +3,13 @@
 ###
 
 resource "aws_security_group" "ecs_tasks" {
-  name        = "ai-answers-security-group"
-  description = "Allow inbound and outbound traffic for AI Answers"
+  name        = "${var.product_name}-${var.env}-security-group"
+  description = "Allow inbound and outbound traffic for ${var.product_name} ${var.env}"
   vpc_id      = var.vpc_id
 
   ingress = []
   egress  = []
+
   tags = {
     "CostCentre" = var.billing_code
   }
