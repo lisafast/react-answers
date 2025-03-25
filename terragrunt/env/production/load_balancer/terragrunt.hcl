@@ -26,7 +26,7 @@ dependency "network" {
     vpc_id                 = "mock-vpc-id"
     vpc_private_subnet_ids = ["mock-private-subnet-1"]
     vpc_public_subnet_ids  = ["mock-public-subnet-1"]
-    vpc_cidr_block        = "10.0.0.0/16"
+    vpc_cidr_block         = "10.0.0.0/16"
   }
 }
 
