@@ -8,7 +8,7 @@ on:
 
 env:
   GITHUB_SHA: ${{ github.sha }}
-  REGISTRY: 992382783569.dkr.ecr.ca-central-1.amazonaws.com
+  REGISTRY: 730335533085.dkr.ecr.ca-central-1.amazonaws.com
 
 permissions:
   id-token: write
@@ -32,7 +32,7 @@ jobs:
       - name: Configure aws credentials using OIDC
         uses: aws-actions/configure-aws-credentials@master
         with:
-          role-to-assume: arn:aws:iam::992382783569:role/ai-answers-apply
+          role-to-assume: arn:aws:iam::730335533085:role/ai-answers-apply
           role-session-name: AIAnswersGitHubActions
           aws-region: "ca-central-1"
 
