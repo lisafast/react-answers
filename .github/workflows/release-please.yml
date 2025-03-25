@@ -12,39 +12,15 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: google-github-actions/release-please-action@v4
-        id: release
+      - uses: actions/create-github-app-token@21cfef2b496dd8ef5b904c159339626a10ad380e # v1.11.6
+        id: sre-app-token
         with:
-          release-type: node
-          package-name: ai-answers
-          changelog-types: |
-            [
-              {"type":"feat","section":"Features","hidden":false},
-              {"type":"fix","section":"Bug Fixes","hidden":false},
-              {"type":"chore","section":"Miscellaneous","hidden":false},
-              {"type":"refactor","section":"Refactoring","hidden":false},
-              {"type":"docs","section":"Documentation","hidden":false},
-              {"type":"perf","section":"Performance","hidden":false},
-              {"type":"test","section":"Testing","hidden":false},
-              {"type":"ci","section":"CI/CD","hidden":false},
-              {"type":"build","section":"Build","hidden":false}
-            ]
+          app-id: ${{ secrets.SRE_BOT_RW_APP_ID }}
+          private-key: ${{ secrets.SRE_BOT_RW_PRIVATE_KEY }}
 
-  # Only run deployment if a new release was created
-  deploy-production:
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-      - name: Trigger Production Deployment
-        run: |
-          echo "New release ${{ needs.release-please.outputs.tag_name }} created. Triggering production deployment..."
-          gh workflow run build_and_deploy_production.yml --ref ${{ needs.release-please.outputs.tag_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: googleapis/release-please-action@a02a34c4d625f9be7cb89156071d8567266a2445 # v4.2.0
+        with:
+          token: ${{ steps.sre-app-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
