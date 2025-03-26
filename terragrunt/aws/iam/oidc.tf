@@ -41,7 +41,7 @@ resource "aws_iam_policy" "ecr_deploy_policy" {
 
   name        = "ai-answers-ecr-deploy-policy"
   description = "Policy for GitHub Actions to deploy to ECR and update ECS"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
