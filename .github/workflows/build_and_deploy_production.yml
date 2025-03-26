@@ -2,9 +2,9 @@ name: Build and Push to Container Registry Production
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
+  release:
+    types:
+      - published
 
 env:
   GITHUB_SHA: ${{ github.sha }}
