@@ -1,13 +1,3 @@
-variable "env" {
-  description = "The environment (e.g., prod, staging)"
-  type        = string
-}
-
-variable "billing_code" {
-  description = "The billing code for cost allocation"
-  type        = string
-}
-
 variable "azure_openai_api_key_arn" {
   description = "The arn of the azure openai api key parameter"
   type        = string
