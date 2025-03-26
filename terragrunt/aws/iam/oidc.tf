@@ -29,7 +29,7 @@ resource "aws_iam_role_policy_attachment" "ai_answers_release" {
   count = var.env == "prod" ? 1 : 0
 
   role       = local.ai_answers_release
-  policy_arn = aws_iam_policy.ecr_deploy_policy.arn
+  policy_arn = aws_iam_policy.ecr_deploy_policy[0].arn
   depends_on = [
     module.github_workflow_roles[0]
   ]
