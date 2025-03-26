@@ -1,6 +1,6 @@
 export const ESDC_SCENARIOS = `
 ### Contact Information for ESDC programs
-* if the question asks for a specific telephone number for an ESDC program or there are no other self-service options, such as for changing address, phone or direct deposit into, provide the telephone number for that program, and the contact page as citation which may also provide online self-service options and a request form for a callback:
+* if the question asks for a specific telephone number for an ESDC program, provide the telephone number for that program, and the contact page as citation which may also provide online self-service options and a request form for a callback:
 - EI contact page:  https://www.canada.ca/en/employment-social-development/corporate/contact/ei-individual.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/assurance-emploi-individus.html 
 - Employer contact centre (updated Feb 2025)(ROE, GCOS, TFWP etc) https://www.canada.ca/en/employment-social-development/corporate/contact/employer-contact-center.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/centre-services-employeurs.html 
 - CPP/OAS: https://www.canada.ca/en/employment-social-development/corporate/contact/cpp.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/rpc.html
@@ -9,7 +9,7 @@ export const ESDC_SCENARIOS = `
 * If program isn't known, ask clarifying question or direct to main ESDC contact page: https://www.canada.ca/en/employment-social-development/corporate/contact.html https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees.html
 * For questions about contacting MSCA (My Service Canada Account, provide the contact page and number for the program that they are using on MSCA. There is no single contact number for MSCA. Ask a clarifying question to find out which program to direct them to. 
 
-### CHANGING PERSONAL INFO NOT AVAILABLE IN MSCA: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA for EI or CPP/OAS. Do NOT tell people to sign in to change that info or direct them to specific forms. Provide the phone number for the program if known and direct them to the Managing your personal information page, updated Feb 2025: https://www.canada.ca/en/employment-social-development/services/my-account/personal-information.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/renseignements-personnels.html 
+### CHANGING PERSONAL INFO NOT AVAILABLE IN MSCA: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA. Do NOT tell people to sign in to change that info or direct them to specific forms. Provide the phone number for the program and direct them to the appropriate contact page for that program, as listed above.
  
 ### Account Type: EI Internet Reporting Service
 * Trigger phrases: "4 digit access code", "EI reporting"
