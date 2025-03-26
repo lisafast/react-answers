@@ -13,7 +13,7 @@ data "aws_ssm_parameter" "docdb_password" {
 
 # Create a security group for the DocumentDB cluster
 resource "aws_security_group" "ai-answers-docdb-sg" {
-  name        = "ai-answers-example-docdb-sg"
+  name        = "${var.product_name}-example-docdb-sg"
   description = "Security group for DocumentDB for the AI Answers app"
   vpc_id      = var.vpc_id
 
@@ -32,6 +32,7 @@ resource "aws_security_group" "ai-answers-docdb-sg" {
     protocol    = "-1"
     cidr_blocks = [var.vpc_cidr_block]
   }
+
   tags = {
     CostCentre = var.billing_code
     Terraform  = true
@@ -40,10 +41,9 @@ resource "aws_security_group" "ai-answers-docdb-sg" {
 
 # DocumentDB Subnet Group
 resource "aws_docdb_subnet_group" "ai-answers-docdb-subnet-group" {
-  name        = "ai-answers-example-docdb-subnet-group"
-  description = "Subnet group for DocumentDB for the AI Answers app"
-
-  subnet_ids = var.vpc_private_subnet_ids
+  name        = "${var.product_name}-example-docdb-subnet-group"
+  description = "Subnet group for DocumentDB for the ${var.product_name} ${var.env} app"
+  subnet_ids  = var.vpc_private_subnet_ids
 
   tags = {
     CostCentre = var.billing_code
@@ -53,15 +53,16 @@ resource "aws_docdb_subnet_group" "ai-answers-docdb-subnet-group" {
 
 # DocumentDB Cluster Parameter Group
 resource "aws_docdb_cluster_parameter_group" "ai-answers-docdb-cluster-parameter-group" {
-  name        = "ai-asnwers-docdb-cluster-parameter-group"
+  name        = "${var.product_name}-docdb-cluster-parameter-group"
   family      = "docdb5.0" # Latest engine version
-  description = "Parameter group for DocumentDB"
+  description = "Parameter group for ${var.product_name} ${var.env} DocumentDB"
 
   # Parameter overrides. Enabled TLS encryption.
   parameter {
     name  = "tls"
     value = "enabled"
   }
+
   tags = {
     CostCentre = var.billing_code
     Terraform  = true
@@ -70,7 +71,7 @@ resource "aws_docdb_cluster_parameter_group" "ai-answers-docdb-cluster-parameter
 
 # DocumentDB Cluster
 resource "aws_docdb_cluster" "ai-answers-docdb-cluster" {
-  cluster_identifier              = "ai-answers-docdb-cluster"
+  cluster_identifier              = "${var.product_name}-docdb-cluster"
   engine                          = "docdb"
   engine_version                  = "5.0.0" # DocDB engine version
   master_username                 = data.aws_ssm_parameter.docdb_username.value
@@ -92,7 +93,7 @@ resource "aws_docdb_cluster" "ai-answers-docdb-cluster" {
 # DocumentDB Cluster Instance
 resource "aws_docdb_cluster_instance" "ai-answers-docdb-instance" {
   count              = var.docdb_instane_count
-  identifier         = "ai-answers-docdb-instance"
+  identifier         = "${var.product_name}-docdb-instance"
   cluster_identifier = aws_docdb_cluster.ai-answers-docdb-cluster.id
   instance_class     = "db.t3.medium" # We are using the smallest instance class for now and can scale later. 
   engine             = "docdb"
