@@ -1,5 +1,5 @@
 resource "aws_lb" "ai_answers" {
-  name               = "${var.product_name}-${var.env}-lb"
+  name               = "${var.product_name}-lb"
   internal           = false #tfsec:ignore:AWS005
   load_balancer_type = "application"
 
@@ -37,7 +37,7 @@ resource "aws_lb_listener" "ai_answers_listener" {
 }
 
 resource "aws_lb_target_group" "ai_answers" {
-  name                 = "${var.product_name}-${var.env}"
+  name                 = var.product_name
   port                 = 3001
   protocol             = "HTTP"
   protocol_version     = "HTTP1"

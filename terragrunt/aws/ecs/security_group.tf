@@ -3,7 +3,7 @@
 ###
 
 resource "aws_security_group" "ecs_tasks" {
-  name        = "${var.product_name}-${var.env}-security-group"
+  name        = "${var.product_name}-security-group"
   description = "Allow inbound and outbound traffic for ${var.product_name} ${var.env}"
   vpc_id      = var.vpc_id
 

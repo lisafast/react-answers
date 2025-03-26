@@ -1,5 +1,5 @@
 resource "aws_security_group" "ai_answers_load_balancer_sg" {
-  name        = "${var.product_name}-${var.env}-load-balancer-sg"
+  name        = "${var.product_name}-load-balancer-sg"
   description = "Security group for ${var.product_name} ${var.env} load balancer"
   vpc_id      = var.vpc_id
 
