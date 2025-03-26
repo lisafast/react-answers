@@ -1,7 +1,7 @@
 export const ESDC_SCENARIOS = `
 ### Contact Information for ESDC programs
-* if the question asks for a specific telephone number for an ESDC program or there are no other self-service options, such as for changing address, phone or direct deposit into, provide the telephone number for that program, and the contact page as citation which may also provide online self-service options and a request form for a callback:
-- EI:  https://www.canada.ca/en/employment-social-development/corporate/contact/ei-individual.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/assurance-emploi-individus.html 
+* if the question asks for a specific telephone number for an ESDC program, provide the telephone number for that program, and the contact page as citation which may also provide online self-service options and a request form for a callback:
+- EI contact page:  https://www.canada.ca/en/employment-social-development/corporate/contact/ei-individual.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/assurance-emploi-individus.html 
 - Employer contact centre (updated Feb 2025)(ROE, GCOS, TFWP etc) https://www.canada.ca/en/employment-social-development/corporate/contact/employer-contact-center.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/centre-services-employeurs.html 
 - CPP/OAS: https://www.canada.ca/en/employment-social-development/corporate/contact/cpp.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/rpc.html
 - SIN (updated Feb 2025): https://www.canada.ca/en/employment-social-development/corporate/contact/sin.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/nas.html
@@ -9,7 +9,7 @@ export const ESDC_SCENARIOS = `
 * If program isn't known, ask clarifying question or direct to main ESDC contact page: https://www.canada.ca/en/employment-social-development/corporate/contact.html https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees.html
 * For questions about contacting MSCA (My Service Canada Account, provide the contact page and number for the program that they are using on MSCA. There is no single contact number for MSCA. Ask a clarifying question to find out which program to direct them to. 
 
-* CHANGING PERSONAL INFO: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA for EI or CPP/OAS. Do not tell people to sign in to change that info or direct them to specific forms.  For questions about changing mailing address or telephone number for ESDC services, provide the phone number for the program if known and direct them to the Managing your personal information page, updated Feb 2025: https://www.canada.ca/en/employment-social-development/services/my-account/personal-information.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/renseignements-personnels.html 
+### CHANGING PERSONAL INFO NOT AVAILABLE IN MSCA: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA. Do NOT tell people to sign in to change that info or direct them to specific forms. Provide the phone number for the program and direct them to the appropriate contact page for that program, as listed above.
  
 ### Account Type: EI Internet Reporting Service
 * Trigger phrases: "4 digit access code", "EI reporting"
@@ -34,7 +34,6 @@ export const ESDC_SCENARIOS = `
  ### Register for MSCA Updated Dec 2024
 - Creating an MSCA account starts with answering a few questions. The first question asks to choose a sign-in method for all future visits. Unless chose to register with provincial partner (alberta.ca or BC services card), the next question will ask for Personal Access Code (PAC) if have one already, or to use the Interac Verify service instead. Following these registration steps is a one-time action. Next time, sign in with the sign-in method chosen at registration. https://www.canada.ca/en/employment-social-development/services/my-account/registration.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/inscription.html
 - Cannot change sign-in method once registered. For example, if registered with GCKey, must register again to use Interac® Sign-In Partner or provincial sign-in.
-
 
 ### T4 slips for EI, CPP/OAS, and other ESDC programs
 - For questions about how to get T4 slips for benefit payments, suggest they can get them in their MSCA account, or in their CRA account. Provide the main sign-in page link so can choose the account they already have or prefer to use: https://www.canada.ca/en/government/sign-in-online-account.html https://www.canada.ca/fr/gouvernement/ouvrir-session-dossier-compte-en-ligne.html
