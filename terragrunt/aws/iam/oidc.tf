@@ -17,6 +17,11 @@ module "github_workflow_roles" {
       name      = local.ai_answers_release
       repo_name = "ai-answers"
       claim     = "ref:refs/tags/v*"
+    },
+    {
+      name      = local.ai_answers_release
+      repo_name = "ai-answers"
+      claim     = "release"
     }
   ]
 }
