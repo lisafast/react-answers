@@ -64,7 +64,6 @@ const AI_MODELS = {
       'claude-3-7-sonnet-latest': {
         maxTokens: 1024,
         temperature: 0.0,
-        knowledgeCutoff: '2024-04',
         beta: {
           messageBatches: 'message-batches-2024-09-24'
         }
