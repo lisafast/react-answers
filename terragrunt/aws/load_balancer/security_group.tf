@@ -1,6 +1,6 @@
 resource "aws_security_group" "ai_answers_load_balancer_sg" {
-  name        = "${var.product_name}_load_balancer_sg"
-  description = "Security group for ${var.product_name} ${var.env} load balancer"
+  name        = "ai_answers_load_balancer_sg"
+  description = "Security group for load balancer"
   vpc_id      = var.vpc_id
 
   ingress {
