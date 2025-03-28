@@ -34,7 +34,7 @@ async function invokeHandler(req, res) {
       console.log('Request body:', req.body);
 
 
-      const openAIAgent = await createOpenAIAgent();
+      const openAIAgent = await createOpenAIAgent(chatId);
 
       const messages = [
         {
@@ -53,12 +53,12 @@ async function invokeHandler(req, res) {
       });
 
       if (Array.isArray(answer.messages) && answer.messages.length > 0) {
-        answer.messages.forEach((msg, index) => {
+        /*answer.messages.forEach((msg, index) => {
           ServerLoggingService.debug(`OpenAI Response [${index}]:`, chatId, {
             content: msg.content,
             classType: msg.constructor.name,
           });
-        });
+        });*/
         const lastMessage = answer.messages[answer.messages.length - 1];
         
         // Find the correct tool tracking handler from callbacks
