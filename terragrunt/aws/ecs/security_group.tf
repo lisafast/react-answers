@@ -1,5 +1,5 @@
 ###
-# Security groups for ECS.
+# Security groups for ECS
 ###
 
 resource "aws_security_group" "ecs_tasks" {
@@ -8,7 +8,6 @@ resource "aws_security_group" "ecs_tasks" {
   vpc_id      = var.vpc_id
 
   ingress = []
-  egress  = []
   tags = {
     "CostCentre" = var.billing_code
   }
