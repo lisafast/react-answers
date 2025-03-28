@@ -1,5 +1,5 @@
 ###
-# Security groups for ECS
+# Security groups for ECS.
 ###
 
 resource "aws_security_group" "ecs_tasks" {
