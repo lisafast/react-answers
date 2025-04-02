@@ -14,10 +14,10 @@ resource "aws_security_group" "ecs_tasks" {
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_ingress_lb" {
   security_group_id = aws_security_group.ecs_tasks.id
-  cidr_ipv4 = var.vpc_cidr_block 
-  from_port = 3001
-  to_port = 3001
-  ip_protocol = "tcp"
+  cidr_ipv4         = var.vpc_cidr_block
+  from_port         = 3001
+  to_port           = 3001
+  ip_protocol       = "tcp"
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_egress_all" {

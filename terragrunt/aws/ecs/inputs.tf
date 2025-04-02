@@ -5,7 +5,7 @@ variable "vpc_id" {
 
 variable "vpc_cidr_block" {
   description = "List of cidr block ips for the React Answers VPC"
-  type =  string
+  type        = string
 }
 
 variable "vpc_private_subnet_ids" {
