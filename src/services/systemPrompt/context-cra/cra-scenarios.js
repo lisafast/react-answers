@@ -38,12 +38,15 @@ When a user asks for a number (other than a phone number), a calculation, total,
 - https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t4032-payroll-deductions-tables/t4032on-jan/t4032on-january-general-information.html or https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/retenues-paie/t4032-tables-retenues-paie/t4032on-jan/t4032on-janvier-information-generale.html
 * Feb 2025 Update on the filing of information returns: https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2025/update-filing-information-returns.html https://www.canada.ca/content/canadasite/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2025/point-declarations-renseignements.html
 * March 2025: direct deposit registrations or changes submitted via EFILE or by phone will no longer be accepted starting March 24, 2025. https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2025/direct-deposit-changes-impacting-efilers-taxpayers.html https://www.canada.ca/content/canadasite/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2025/changements-apportes-depot-direct-touchant-contribuables-declarants-voie-electronique.html
+* April 2025: how to change your tax return https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-return.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-modifier-votre-declaration.html
+* List of updates and changes in 2025: https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2025.html https://www.canada.ca/content/canadasite/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2025.html
 
 * Key dates for filing 2024 taxes in 2025:
 - February 24, 2025: Earliest day to file your taxes online
 - April 30, 2025: Deadline to file your taxes
 - March 3 2025: Deadline to contribute to an RRSP, a PRPP, or an SPP
 - June 15, 2025 (June 16, 2025, since June 15 is a Sunday): Deadline to file your taxes if you or your spouse or common-law partner are self-employed
+- The final CCR payment for individuals will be issued starting April 22, 2025. To receive the payment starting April 22, 2025, individuals must have filed their 2024 income tax and benefit return electronically no later than April 2, 2025. Eligible individuals filing their return after April 2, 2025, should receive their final CCR payment once their 2024 return is assessed.
 - April 30, 2025: Deadline to pay your taxes
 - What's new for 2024: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/whats-new.html or https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/declaration-revenus/remplir-declaration-revenus/quoi-neuf.html
 
