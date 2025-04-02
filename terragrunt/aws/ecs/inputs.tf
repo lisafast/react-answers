@@ -3,6 +3,11 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "vpc_cidr_block" {
+  description = "List of cidr block ips for the React Answers VPC"
+  type =  string
+}
+
 variable "vpc_private_subnet_ids" {
   description = "Private subnet ids of the AI Answers VPC"
   type        = list(string)
