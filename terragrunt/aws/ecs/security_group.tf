@@ -4,7 +4,7 @@
 
 resource "aws_security_group" "ecs_tasks" {
   name        = "ai-answers-security-group"
-  description = "Allow inbound and outbound traffic for AI Answers"
+  description = "Allow inbound and outbound traffic for AI Answers app"
   vpc_id      = var.vpc_id
 
   tags = {
