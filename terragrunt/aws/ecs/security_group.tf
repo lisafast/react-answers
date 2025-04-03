@@ -7,7 +7,6 @@ resource "aws_security_group" "ecs_tasks" {
   description = "Allow inbound and outbound traffic for AI Answers"
   vpc_id      = var.vpc_id
 
-  ingress = []
   tags = {
     "CostCentre" = var.billing_code
   }
