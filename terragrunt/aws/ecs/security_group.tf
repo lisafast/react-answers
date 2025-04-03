@@ -24,7 +24,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_egress_all" {
   #checkov:skip=CKV_AWS_382 # We need to allow all traffic for ECS to work
   security_group_id = aws_security_group.ecs_tasks.id
   cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
+  ip_protocol       = "all"
   from_port         = 0
   to_port           = 0
 
