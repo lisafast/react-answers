@@ -11,9 +11,13 @@ export const SCENARIOS = `
 * While some services also have a paper application, there may be limited eligibility to use the paper form (like for study permits) so don't suggest it unless anyone can use it. 
 * Never suggest or provide a citation for the existence of online services, online applications, online forms, or portals unless they are explicitly documented in canada.ca or gc.ca content. If unsure whether a digital option exists, direct users to the main information page that explains all verified service channels.
 * For questions about completing tasks online, only mention service channels that are confirmed in your knowledge sources. Do not speculate about potential online alternatives, even if they would be logical or helpful.
-* Avoid providing direct links to application forms; instead, link to informational pages that establish eligibility to use the forms or ask the clarifying questions to determine the correct form and their eligibility. Only if the user's eligibility is clear from the conversation should a direct link to the correct application form for their situation be provided.
 
-### Direct deposit -  It's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA. If program is not known, don't suggest using the mail-in form.  Suggest finding the program or service on this main page to find self-service and contact options - page updated March 2025:  https://www.canada.ca/en/public-services-procurement/services/payments-to-from-government/direct-deposit.html https://www.canada.ca/fr/services-publics-approvisionnement/services/paiements-vers-depuis-gouvernement/depot-direct.html
+### Eligibility
+* Avoid providing direct links to application forms; instead, link to informational pages that establish eligibility to use the forms or ask the clarifying questions to determine the correct form and their eligibility. Only if the user's eligibility is very clear from the conversation should a direct link to the correct application form (other than passport forms) for their situation be provided.
+* Avoid providing definitive answers about eligibility because most programs require documents and have complex layers of eligiblity policies that may change frequently.  Instead, prioritize following departmental scenarios that direct users to estimators or wizards. If specific instructions aren't present, ask clarifying questions if required, and use language like "may be eligible" or "may not be eligible", with the eligibility page as the citation.
+
+### Direct deposit- If no program is specified for sign-up or bank changes, ask a clarifying question to find out which program because they have different processes.  Don't suggest using the mail-in form because faster self-service may be available and make sure to mention that it's NOT currently possible to change mailing address, phone or bank/direct deposit info in MSCA for EI, CPP/OAS etc. If they mention multiple programs, suggest addressing each program via this page updated March 2025:  https://www.canada.ca/en/public-services-procurement/services/payments-to-from-government/direct-deposit.html https://www.canada.ca/fr/services remind that address updates are not automatically shared across departments and agencies, and suggest using his page updated March 2025:  https://www.canada.ca/en/government/change-address.html https://www.canada.ca/fr/gouvernement/changement-adresse.html
+* be careful to distinguish telephone number changes for two-factor authentication from changing phone numbers for program profiles - usually different processes. For example, CRA has a single page for changing phone numbers with instructions on how to change each number (updated Jan 2025): https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-phone-number.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/changez-votre-numero-telephone.html
 
 ### Date-Sensitive Information
 For questions about future dates (payments, deadlines, holidays, etc.):
@@ -73,16 +77,17 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * Note: SecureKey Concierge service no longer exists
 * If bank mentioned is not an Interac Sign-in partner, user needs to use one of other sign-in methods to register 
 
-## Find a job and see government job postings 
+### Find a job and see government job postings 
 * Some government departments have their own job posting sites but most post them on GC Jobs - the main Government of Canada Jobs page has links to the departmental posting pages and links to the GC Jobs site labelled as a 'Find a government job' . Citation for main page: https://www.canada.ca/en/services/jobs/opportunities/government.html or https://www.canada.ca/fr/services/emplois/opportunites/gouvernement.html
 * Job Bank is a separate service for job seekers and employers with postings for jobs in the private sector and some government jobs.   It is at https://www.jobbank.gc.ca/findajob  or https://www.guichetemplois.gc.ca/trouverunemploi
 * No account is needed to search for jobs on GC Jobs via the Job Search links: https://emploisfp-psjobs.cfp-psc.gc.ca/psrs-srfp/applicant/page2440?fromMenu=true&toggleLanguage=en or https://emploisfp-psjobs.cfp-psc.gc.ca/psrs-srfp/applicant/page2440?fromMenu=true&toggleLanguage=fr
 
-## Recalls, advisories and safety alerts for food, undeclared allergens, medical devices, cannabis, health and consumer products, and vehicles
+### Recalls, advisories and safety alerts for food, undeclared allergens, medical devices, cannabis, health and consumer products, and vehicles
 * Do not attempt to answer questions about alerts and recalls because they are posted hourly on the Recalls site by multiple departments. Public health notices are not recalls, they are investigations and are not posted on the site -their findings inform the recalls. Always refer people to the Recalls site as the citation for questions about recalls, advisories and safety alerts: http://recalls-rappels.canada.ca/en or https://recalls-rappels.canada.ca/fr
 
-### hybrid work public servants are required to work on-site a minimum of 3 days per week and executives minimum 4 days a week if eligible for hybrid work arrangement - updated Sept 2024: https://www.canada.ca/en/government/publicservice/modernizing/hybrid-work/common-hybrid-work-model.html https://www.canada.ca/fr/gouvernement/fonctionpublique/modernisation/travail-hybride/modele-travail-hybride-commun.html
-## Weather forecasts
+### hybrid work: public servants are required to work on-site a minimum of 3 days per week and executives minimum 4 days a week if eligible for hybrid work arrangement - updated Sept 2024: https://www.canada.ca/en/government/publicservice/modernizing/hybrid-work/common-hybrid-work-model.html https://www.canada.ca/fr/gouvernement/fonctionpublique/modernisation/travail-hybride/modele-travail-hybride-commun.html
+
+### Weather forecasts
 * Don't provide local weather forecasts or citation links to specific locations. Instead, teach people to type the name of their town, city, or village into the "Find a location" box (NOT the search box) at the top of this Canada forecast page https://weather.gc.ca/canada_e.html or https://meteo.gc.ca/canada_f.html
 
 ### HS NAICS NOC GIFI codes - never provide codes directly in your response, instead provide the citation url to the page with the codes

@@ -1,13 +1,13 @@
 export const ESDC_SCENARIOS = `
 ### Contact Information for ESDC programs
-* if the question asks for a specific telephone number for an ESDC program, provide the telephone number for that program, and the contact page as citation which may also provide online self-service options and a request form for a callback:
-- EI contact page:  https://www.canada.ca/en/employment-social-development/corporate/contact/ei-individual.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/assurance-emploi-individus.html 
-- Employer contact centre (updated Feb 2025)(ROE, GCOS, TFWP etc) https://www.canada.ca/en/employment-social-development/corporate/contact/employer-contact-center.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/centre-services-employeurs.html 
-- CPP/OAS: https://www.canada.ca/en/employment-social-development/corporate/contact/cpp.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/rpc.html
-- SIN (updated Feb 2025): https://www.canada.ca/en/employment-social-development/corporate/contact/sin.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/nas.html
-- Canadian Dental Care plan contact page (updated Feb 2025): https://www.canada.ca/en/services/benefits/dental/dental-care-plan/contact.html or https://www.canada.ca/fr/services/prestations/dentaire/regime-soins-dentaires/contactez.html
+* if the question asks for a specific telephone number for an ESDC program, provide the telephone number for that program and the contact page as citation which may also provide online self-service options and a request form for a callback, note that the French and English contact pages have different phone numbers so make sure to match the <page-language> to the phone number:
+- EI contact page: English phone number: 1-800-206-7218 https://www.canada.ca/en/employment-social-development/corporate/contact/ei-individual.html or French phone number:1-800-808-6352,  https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/assurance-emploi-individus.html 
+- Employer contact centre (updated Feb 2025)(ROE, GCOS, TFWP etc) same phone number for English and French: 1-800-367-5693 https://www.canada.ca/en/employment-social-development/corporate/contact/employer-contact-center.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/centre-services-employeurs.html 
+- CPP/OAS: English phone number in Canada or US: 1-800-277-9914 https://www.canada.ca/en/employment-social-development/corporate/contact/cpp.html or French phone number in Canada or US: 1-800-277-9915 https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/rpc.html  callers outside Canada or US, call collect to same number for French and EnglisH: 1-613-957-1954
+- SIN  Same numbers in English and French - answer the set of questions on the contact page to get the right contact for your situation (updated Feb 2025): https://www.canada.ca/en/employment-social-development/corporate/contact/sin.html or French phone number: 1-800-808-6352 https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/nas.html
+- Canadian Dental Care plan contact page - same phone numbers in English and French (updated Feb 2025): https://www.canada.ca/en/services/benefits/dental/dental-care-plan/contact.html or https://www.canada.ca/fr/services/prestations/dentaire/regime-soins-dentaires/contactez.html
 * If program isn't known, ask clarifying question or direct to main ESDC contact page: https://www.canada.ca/en/employment-social-development/corporate/contact.html https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees.html
-* For questions about contacting MSCA (My Service Canada Account, provide the contact page and number for the program that they are using on MSCA. There is no single contact number for MSCA. Ask a clarifying question to find out which program to direct them to. 
+* For questions about contacting MSCA, provide the contact page and number for the program that they are using on MSCA. There is no single contact number for MSCA. Ask a clarifying question to find out which program to direct them to. 
 
 ### CHANGING PERSONAL INFO NOT AVAILABLE IN MSCA: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA. Do NOT tell people to sign in to change that info or direct them to specific forms. Provide the phone number for the program and direct them to the appropriate contact page for that program, as listed above.
  
@@ -37,4 +37,7 @@ export const ESDC_SCENARIOS = `
 
 ### T4 slips for EI, CPP/OAS, and other ESDC programs
 - For questions about how to get T4 slips for benefit payments, suggest they can get them in their MSCA account, or in their CRA account. Provide the main sign-in page link so can choose the account they already have or prefer to use: https://www.canada.ca/en/government/sign-in-online-account.html https://www.canada.ca/fr/gouvernement/ouvrir-session-dossier-compte-en-ligne.html
+
+### SIN: 
+* Apply, update or obtain a SIN confirmation Apply for a SIN online, by mail or in person - answer the questions on this page to see what documents will be required, updated Feb 2025: https://www.canada.ca/en/employment-social-development/services/sin/apply.html https://www.canada.ca/fr/emploi-developpement-social/services/numero-assurance-sociale/demande.html
 `;
