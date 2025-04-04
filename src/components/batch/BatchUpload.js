@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from '../../hooks/useTranslations.js';
 import { GcdsContainer, GcdsHeading, GcdsText } from '@cdssnc/gcds-components-react';
-import MessageService from '../../services/AnswerService.js';
-import ContextService from '../../services/ContextService.js';
 import '../../styles/App.css';
 import * as XLSX from 'xlsx';
 
@@ -141,23 +139,17 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
 
       if (needsContext(entries)) {
         console.log('Some entries need context. Deriving context batch processing...');
-        const result = await ContextService.deriveContextBatch(
-          entries,
-          selectedLanguage,
-          selectedAI,
-          batchName,
-          selectedSearch
-        );
-        console.log('Context batch started: ' + result.batchId);
-        return result;
+        
+        //console.log('Context batch started: ' + result.batchId);
+        return null;
       } else {
         try {
-          const data = await MessageService.sendBatchMessages(
+          const data = null;/* await MessageService.sendBatchMessages(
             selectedAI,
             entries,
             selectedLanguage,
             batchName
-          );
+          );*/
 
           console.log(`${selectedAI} batch response:`, data);
 

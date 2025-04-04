@@ -1,9 +1,10 @@
-import { createDirectOpenAIClient } from '../../agents/AgentService.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
+import { createDirectOpenAIClient } from '../../llm/clientFactory.js';
 
-const openai = createDirectOpenAIClient();
+
 
 async function batchStatusHandler(req, res) {
+    const openai = createDirectOpenAIClient();
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }

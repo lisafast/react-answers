@@ -1,4 +1,4 @@
-import { invokeContextAgent } from '../../services/ContextAgentService.js';
+import { invokeContextAgent } from '../../agents/contextAgentInvoker.js';
 import { exponentialBackoff } from '../../src/utils/backoff.js';
 
 export default async function handler(req, res) {

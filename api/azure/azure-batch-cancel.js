@@ -1,7 +1,7 @@
 import { Batch } from '../../models/batch.js';
 import dbConnect from '../../api/db/db-connect.js';
-import { createDirectAzureOpenAIClient } from '../../agents/AgentService.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
+import { createDirectAzureOpenAIClient } from '../../llm/clientFactory.js';
 
 const openai = createDirectAzureOpenAIClient();
 

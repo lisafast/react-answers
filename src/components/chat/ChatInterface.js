@@ -32,7 +32,6 @@ const ChatInterface = ({
   t,
   lang,
   parsedResponses,
-  extractSentences,
   chatId,
 }) => {
   const [charCount, setCharCount] = useState(0);
@@ -111,16 +110,11 @@ const ChatInterface = ({
     return t('homepage.chat.input.initial');
   };
 
-  // TOOD is there a difference between paragraphs and sentrences?
+  
   const getLastMessageSentenceCount = () => {
     const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
-    if (lastAiMessage.interaction.answer.paragraphs.length > 0) {
-      return lastAiMessage.interaction.answer.paragraphs.reduce(
-        (count, paragraph) => count + extractSentences(paragraph).length,
-        0
-      );
-    }
-    return 1;
+    return lastAiMessage?.interaction?.sentences?.length || 0;
+    
   };
 
   const handleTextareaInput = (event) => {
@@ -264,13 +258,15 @@ const ChatInterface = ({
           <>
             <div key="loading" className="loading-container">
               <div className="loading-animation"></div>
-              <div className="loading-text">
-                {displayStatus === 'thinkingWithContext'
-                  ? `${t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment} - ${currentTopic}`
-                  : t(`homepage.chat.messages.${displayStatus}`)}
+                <div className="loading-text">
+                  {/* Translate using key/params if key exists, otherwise display direct message */}
+                  {displayStatus.key
+                    ? t(displayStatus.key, displayStatus.params || {})
+                    : displayStatus.message
+                  }
+                </div>
               </div>
-            </div>
-            <div className="loading-hint-text">
+              <div className="loading-hint-text">
               <FontAwesomeIcon icon="wand-magic-sparkles" />
               &nbsp;
               {t('homepage.chat.input.loadingHint')}

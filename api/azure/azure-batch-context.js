@@ -4,11 +4,11 @@ import { Batch } from '../../models/batch.js';
 import { Interaction } from '../../models/interaction.js';
 import { Context } from '../../models/context.js';
 import { Question } from '../../models/question.js';
-import { createDirectAzureOpenAIClient } from '../../agents/AgentService.js';
+import { createDirectAzureOpenAIClient } from '../../llm/clientFactory.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 const modelConfig = getModelConfig('azure', 'gpt4a-mini');
-const openai = createDirectAzureOpenAIClient();
+const getAzureClient = () => createDirectAzureOpenAIClient();
 
 async function batchContextHandler(req, res) {
     if (req.method !== 'POST') {
@@ -23,6 +23,8 @@ async function batchContextHandler(req, res) {
         if (!req.body.requests || !Array.isArray(req.body.requests)) {
             throw new Error('Invalid requests array in payload');
         }
+
+        const openai = getAzureClient();
 
         const jsonlRequests = req.body.requests.map((request, index) => ({
             custom_id: `batch-${index}`,

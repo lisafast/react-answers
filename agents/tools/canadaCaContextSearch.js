@@ -89,7 +89,7 @@ const contextSearchTool = tool(
         }
     },
     {
-        name: "canadaCASearch",
+        name: "contextSearch",
         description: "Perform a search using Coveo or Google. Provide the 'query' as the search term and lang as the language of the search query.",
         schema: {
             type: "object",

@@ -4,13 +4,15 @@ import { Batch } from '../../models/batch.js';
 import { Interaction } from '../../models/interaction.js';
 import { Context } from '../../models/context.js';
 import { Question } from '../../models/question.js';
-import { createDirectOpenAIClient } from '../../agents/AgentService.js';
+import { createDirectOpenAIClient } from '../../llm/clientFactory.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
-const modelConfig = getModelConfig('openai', 'gpt-4o-mini');
-const openai = createDirectOpenAIClient();
+
+
 
 async function batchContextHandler(req, res) {
+    const modelConfig = getModelConfig('openai', 'gpt-4o-mini');
+    const openai = createDirectOpenAIClient();
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }

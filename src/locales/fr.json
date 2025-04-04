@@ -100,10 +100,27 @@
         "moderatingQuestion": "Modération de la question...",
         "needClarification" : "Nécessite des précisions..."
       },
+      "status": {
+        "agent_start": "Début de la réflexion...",
+        "llm_start": "Réflexion...",
+        "tool_error": "Erreur lors de l'utilisation de l'outil {{toolName}}: {{message}}",
+        "using_tool_unknown": "Utilisation d'un outil inconnu...",
+        "tool": {
+          "downloadWebPage": "Lecture de la page web...",
+          "checkUrl": "Vérification de l'URL...",
+          "departmentScenarios": "Recherche de scénarios de ministère...",
+          "departmentLookup": "Recherche d'informations sur le ministère...",
+          "verifyOutputFormat": "Vérification du format de la réponse...",
+          "googleContextSearch": "Recherche Google...",
+          "canadaCASearch": "Recherche Canada.ca...",
+          "unknown": "Utilisation d'un outil..."
+        }
+      },
       "citation": {
         "confidence": "Niveau de confiance :",
         "ai": "IA :",
-        "fallbackText": "Impossible de trouver une citation - utilisez la recherche canada.ca"
+        "fallbackText": "Impossible de trouver une citation - utilisez la recherche canada.ca",
+        "head": "Vérifiez votre réponse et passez à l'étape suivante :"
       }
     },
     "expertRating": {
@@ -158,7 +175,6 @@
       "csvRequirements": {
         "title": "Le CSV doit contenir :",
         "items": {
-          "problemDetails": "Détails du problème/Question - requis",
           "url": "URL - optionnel",
           "context": "Propriétés de contexte - optionnel - Si laissé vide, le lot dérivera d'abord le contexte, si fourni, il utilisera le contexte fourni pour récupérer les réponses"
         }
@@ -199,7 +215,7 @@
       }
     },
     "list": {
-      
+
       "title": "title",
       "columns": {
         "batchName": "Nom",

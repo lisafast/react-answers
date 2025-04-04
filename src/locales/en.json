@@ -100,10 +100,27 @@
         "moderatingQuestion": "Moderating question...",
         "needClarification" : "Requires clarification..."
       },
+      "status": {
+        "agent_start": "Starting to think...",
+        "llm_start": "Thinking...",
+        "tool_error": "Error using tool {{toolName}}: {{message}}",
+        "using_tool_unknown": "Using an unknown tool...",
+        "tool": {
+          "downloadWebPage": "Reading web page...",
+          "checkUrl": "Verifying URL...",
+          "departmentScenarios": "Looking up department scenarios...",
+          "departmentLookup": "Looking up department information...",
+          "verifyOutputFormat": "Checking response format...",
+          "googleContextSearch": "Searching Google...",
+          "canadaCASearch": "Searching Canada.ca...",
+          "unknown": "Using a tool..."
+        }
+      },
       "citation": {
         "confidence": "Confidence:",
         "ai": "AI:",
-        "fallbackText": "Unable to find a citation - use canada.ca search"
+        "fallbackText": "Unable to find a citation - use canada.ca search",
+        "head": "Check your answer and take the next step:"
       }
     },
     "expertRating": {

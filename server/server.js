@@ -1,4 +1,4 @@
-// server/server.js - this is only used for local development NOT for Vercel
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -30,7 +30,7 @@ import openAIContextAgentHandler from '../api/openai/openai-context.js';
 import dbChatSessionHandler from '../api/db/db-chat-session.js';
 import dbVerifyChatSessionHandler from '../api/db/db-verify-chat-session.js';
 import dbCheckhandler from '../api/db/db-check.js';
-import dbPersistInteraction from '../api/db/db-persist-interaction.js';
+// import dbPersistInteraction from '../api/db/db-persist-interaction.js'; // Removed - handled by ChatProcessingService
 import dbPersistFeedback from '../api/db/db-persist-feedback.js';
 import dbLogHandler from '../api/db/db-log.js';
 import signupHandler from '../api/db/db-auth-signup.js';
@@ -41,6 +41,9 @@ import deleteChatHandler from '../api/db/db-delete-chat.js';
 import generateEmbeddingsHandler from '../api/db/db-generate-embeddings.js';
 import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
+import chatHandler from '../api/chat/chat.js';
+import createBatchHandler from '../api/batch/create.js'; // Added batch create handler
+import batchStatusHandler from '../api/batch/status.js'; // Added batch status handler
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -72,7 +75,7 @@ app.get("*", (req, res, next) => {
 });
 
 app.post('/api/db/db-persist-feedback', dbPersistFeedback);
-app.post('/api/db/db-persist-interaction', dbPersistInteraction);
+// app.post('/api/db/db-persist-interaction', dbPersistInteraction); // Removed route
 app.get('/api/db/db-chat-session', dbChatSessionHandler);
 app.get('/api/db/db-verify-chat-session', dbVerifyChatSessionHandler);
 app.get('/api/db/db-batch-list', dbBatchListHandler);
@@ -114,6 +117,11 @@ app.post("/api/azure/azure-context", azureContextHandler);
 //app.get('/api/azure-batch-process-results', azureBatchProcessResultsHandler);
 
 app.post('/api/search/search-context', contextSearchHandler);
+app.post('/api/chat/chat', chatHandler); // Keep existing chat handler (now refactored)
+
+// Add new batch routes
+app.post('/api/batch/create', createBatchHandler);
+app.get('/api/batch/status', batchStatusHandler);
 
 const PORT = process.env.PORT || 3001;
 

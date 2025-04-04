@@ -1,5 +1,5 @@
-// api/chatgpt.js
-import { createOpenAIAgent } from '../../agents/AgentService.js';
+// api/openai/openai-message.js
+import { createMessageAgent } from '../../agents/agentFactory.js'; // Updated import
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import { ToolTrackingHandler } from '../../agents/ToolTrackingHandler.js';
 
@@ -33,8 +33,13 @@ async function invokeHandler(req, res) {
       const { message, systemPrompt, conversationHistory, chatId } = req.body;
       console.log('Request body:', req.body);
 
+      // Use the new generic message agent creator
+      const openAIAgent = await createMessageAgent('openai', chatId);
 
-      const openAIAgent = await createOpenAIAgent(chatId);
+      // Handle potential agent creation failure
+      if (!openAIAgent) {
+          throw new Error('Failed to create OpenAI message agent.');
+      }
 
       const messages = [
         {
@@ -53,14 +58,13 @@ async function invokeHandler(req, res) {
       });
 
       if (Array.isArray(answer.messages) && answer.messages.length > 0) {
-        /*answer.messages.forEach((msg, index) => {
-          ServerLoggingService.debug(`OpenAI Response [${index}]:`, chatId, {
-            content: msg.content,
-            classType: msg.constructor.name,
-          });
-        });*/
-        const lastMessage = answer.messages[answer.messages.length - 1];
         
+        const lastMessage = answer.messages[answer.messages.length - 1];
+
+        // Extract context from agent response metadata (adjust path if agent structure differs)
+        const agentContext = lastMessage.metadata?.context || {};
+        ServerLoggingService.debug('Extracted context from agent metadata:', chatId, agentContext);
+
         // Find the correct tool tracking handler from callbacks
         let toolTrackingHandler = null;
         for (const callback of openAIAgent.callbacks) {
@@ -75,20 +79,21 @@ async function invokeHandler(req, res) {
 
         const response = {
           content: lastMessage.content,
-          inputTokens: lastMessage.response_metadata.tokenUsage.promptTokens,
-          outputTokens: lastMessage.response_metadata.tokenUsage.completionTokens,
-          model: lastMessage.response_metadata.model_name,
-          tools: toolUsage // Include tool usage data in the response
+          inputTokens: lastMessage.response_metadata?.tokenUsage?.promptTokens, // Add safe navigation
+          outputTokens: lastMessage.response_metadata?.tokenUsage?.completionTokens, // Add safe navigation
+          model: lastMessage.response_metadata?.model_name, // Add safe navigation
+          tools: toolUsage, // Include tool usage data in the response
+          context: agentContext // Include the extracted context object
         };
-        ServerLoggingService.info('OpenAI API request completed successfully', chatId, response);
+        ServerLoggingService.info('OpenAI API request completed successfully', chatId, { content: response.content, model: response.model, contextTopic: response.context?.topic }); // Log selectively
         res.json(response);
       } else {
         throw new Error('OpenAI returned no messages');
       }
     } catch (error) {
       const chatId = req.body?.chatId || 'system';
-      ServerLoggingService.error('Error calling OpenAI API:', chatId, error);
-      res.status(500).json({ error: 'Error processing your request', details: error.message });
+      ServerLoggingService.error('Error processing OpenAI message:', chatId, error); // More specific error message
+      res.status(500).json({ message: 'Error processing OpenAI message', error: error.message }); // Match test structure
     }
   } else {
     res.setHeader('Allow', ['POST']);

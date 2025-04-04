@@ -1,11 +1,12 @@
+import { createDirectOpenAIClient } from '../../llm/clientFactory.js';
 import { getModelConfig } from '../../config/ai-models.js';
 import dbConnect from '../../api/db/db-connect.js';
 import { Batch } from '../../models/batch.js';
 import { Interaction } from '../../models/interaction.js';
 import { Context } from '../../models/context.js';
 import { Question } from '../../models/question.js';
-import { createDirectOpenAIClient } from '../../agents/AgentService.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
+
 
 const MAX_JSONL_SIZE = 50000000; // Set a size limit for JSONL content
 

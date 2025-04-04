@@ -1,11 +1,12 @@
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
+import { createDirectOpenAIClient } from '../../llm/clientFactory.js';
 import { Batch } from '../../models/batch.js';
 import dbConnect from '../../api/db/db-connect.js';
-import { createDirectOpenAIClient } from '../../agents/AgentService.js';
-import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
-const openai = createDirectOpenAIClient();
+
 
 async function batchCancelHandler(req, res) {
+  const openai = createDirectOpenAIClient();
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

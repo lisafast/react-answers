@@ -1,11 +1,12 @@
 import { Batch } from '../../models/batch.js';
 import dbConnect from '../../api/db/db-connect.js';
-import { createDirectAzureOpenAIClient } from '../../agents/AgentService.js';
+import { createDirectAzureOpenAIClient } from '../../llm/clientFactory.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
-const openai = createDirectAzureOpenAIClient();
+
 
 const handleAzure = async (batch) => {
+  const openai = createDirectAzureOpenAIClient();
   let logString = '';
   try {
     logString += 'Starting batch processing...\n';

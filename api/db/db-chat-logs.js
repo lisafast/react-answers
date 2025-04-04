@@ -25,7 +25,10 @@ async function chatLogsHandler(req, res) {
             .populate({
                 path: 'interactions',
                 populate: [
-                    { path: 'context'},
+                    { 
+                        path: 'context',
+                        populate: { path: 'tools' } // Populate tools within context
+                    },
                     { path: 'expertFeedback' },
                     { 
                         path: 'question',

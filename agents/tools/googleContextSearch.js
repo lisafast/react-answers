@@ -72,7 +72,7 @@ const contextSearch = async (query, lang) => {
     }
 };
 
-const contextSearchTool = tool(
+const googleContextSearch = tool(
     async ({ query, lang }) => {
         return await contextSearch(query, lang);
     },
@@ -96,4 +96,4 @@ const contextSearchTool = tool(
     }
 );
 
-export { contextSearchTool, contextSearch };
+export { googleContextSearch, contextSearch };

@@ -1,6 +1,7 @@
 // api/claude.js
-import { createClaudeAgent } from '../../agents/AgentService.js';
+import { createMessageAgent } from '../../agents/agentFactory.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
+import { ToolTrackingHandler } from '../../agents/ToolTrackingHandler.js';
 
 const NUM_RETRIES = 3;
 const BASE_DELAY = 1000; // 1 second
@@ -31,7 +32,7 @@ async function invokeHandler(req, res) {
       ServerLoggingService.debug('Request body:', chatId, { message, systemPrompt, conversationHistoryLength: conversationHistory.length });
 
       // Create agent (callbacks are automatically attached in AgentService)
-      const claudeAgent = await createClaudeAgent(chatId);
+      const claudeAgent = await createMessageAgent(chatId);
 
       const messages = [
         {

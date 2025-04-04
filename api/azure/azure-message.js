@@ -1,4 +1,4 @@
-import { createAzureOpenAIAgent } from '../../agents/AgentService.js';
+import { createMessageAgent } from '../../agents/agentFactory.js'; // Updated import
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import { ToolTrackingHandler } from '../../agents/ToolTrackingHandler.js';
 
@@ -28,8 +28,15 @@ async function invokeHandler(req, res) {
       console.log('Azure OpenAI API request received');
       const { message, systemPrompt, conversationHistory, chatId } = req.body;
       console.log('Request body:', req.body);
-      
-      const azureAgent = await createAzureOpenAIAgent(chatId);
+
+      // Use the new generic message agent creator
+      const azureAgent = await createMessageAgent('azure', chatId);
+
+      // Handle potential agent creation failure
+      if (!azureAgent) {
+          throw new Error('Failed to create Azure message agent.');
+      }
+
       const messages = [
         {
           role: "system",

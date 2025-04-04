@@ -1,11 +1,11 @@
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
+import { createDirectOpenAIClient } from '../../llm/clientFactory.js';
 import { Batch } from '../../models/batch.js';
 import dbConnect from '../../api/db/db-connect.js';
 import { Citation } from '../../models/citation.js';
-import AnswerService from '../../src/services/AnswerService.js';
+
 import { Answer } from '../../models/answer.js';
 import { Context } from '../../models/context.js';
-import { createDirectOpenAIClient } from '../../agents/AgentService.js';
-import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 const handleOpenAI = async (batch) => {
   let logString = '';
@@ -96,9 +96,6 @@ const handleOpenAI = async (batch) => {
         }
       }
     }
-
-
-
 
     batch.status = 'processed';
     await batch.save();
