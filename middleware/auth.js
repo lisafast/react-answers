@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.js';
 import dbConnect from '../api/db/db-connect.js';
+import ServerLoggingService from '../services/ServerLoggingService.js'; // Added for logging in helper
 
-const JWT_SECRET = process.env.JWT_SECRET_KEY;
+const JWT_SECRET = process.env.JWT_SECRET_KEY; // Using JWT_SECRET_KEY as confirmed
 
 export const generateToken = (user) => {
   console.log('Generating token for user:', { userId: user._id, email: user.email, role: user.role });
@@ -58,17 +59,20 @@ const verifyAuth = async (req, res) => {
     const token = authHeader.split(' ')[1];
     console.log('Attempting to verify token');
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log('Token verified successfully:', { userId: decoded.userId, role: decoded.role });
+    console.log('Token verified successfully:', { userId: decoded.userId, email: decoded.email, role: decoded.role }); // Log email too
     await dbConnect();
-    const user = await User.findById(decoded.userId);
+    // Find user by email instead of _id
+    const user = await User.findOne({ email: decoded.email }); 
     if (!user) {
-      console.log('Auth failed: User not found in database:', decoded.userId);
+      console.log('Auth failed: User not found in database using email:', decoded.email); // Log email on failure
       res.status(401).json({ message: 'User not found' });
       return false;
     }
-
-    console.log('Auth successful for user:', { userId: user._id, role: user.role });
-    req.user = decoded;
+    req.user = user.toObject(); 
+    // Log email along with userId and role upon successful authentication
+    console.log('Auth successful for user:', { userId: user._id, email: user.email, role: user.role }); 
+    // Assign a plain JavaScript object representation of the user, not the full Mongoose document
+    
     return true;
   } catch (error) {
     console.error('Auth error:', error.message);
@@ -78,13 +82,16 @@ const verifyAuth = async (req, res) => {
 };
 
 const verifyAdmin = (req, res) => {
+  // Log using available identifiers (_id and email) from req.user
   console.log('Verifying admin access for user:', { 
-    userId: req.user?.userId,
+    userId: req.user?._id, // Use _id from the user object
+    email: req.user?.email, // Also log email for clarity
     role: req.user?.role 
   });
   
   if (req.user.role !== 'admin') {
-    console.log('Admin access denied for user:', req.user?.userId);
+    // Log using available identifiers (_id and email) on denial
+    console.log('Admin access denied for user:', { userId: req.user?._id, email: req.user?.email });
     res.status(403).json({ message: 'Admin access required' });
     return false;
   }
@@ -119,6 +126,30 @@ export const withProtection = (handler, ...middleware) => {
     return handler(req, res);
   };
 };
+
+// New helper function to verify an optional token without DB lookup or error response
+export const verifyOptionalToken = (req) => {
+  const authHeader = req.headers.authorization;
+  const logContext = { method: req.method, path: req.path };
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    // No token provided, which is acceptable for an optional check
+    return null;
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    // Token is valid, return the decoded payload
+    ServerLoggingService.debug('Optional token verified successfully', null, { ...logContext, userId: decoded.userId, role: decoded.role });
+    return decoded;
+  } catch (error) {
+    // Token is invalid or expired
+    ServerLoggingService.warn(`Invalid or expired optional token received: ${error.message}`, null, logContext);
+    return null;
+  }
+};
+
 
 export const authMiddleware = verifyAuth;
 export const adminMiddleware = verifyAdmin;

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import dbConnect from '../api/db/db-connect.js'; // Assuming db-connect handles connection logic
+import { User } from '../models/user.js'; // Assuming User model exists and is needed for userId validation/population
 import { Chat } from '../models/chat.js';
 import { Interaction } from '../models/interaction.js';
 import { Context } from '../models/context.js';
@@ -7,8 +7,10 @@ import { Question } from '../models/question.js';
 import { Citation } from '../models/citation.js';
 import { Answer } from '../models/answer.js';
 import { Tool } from '../models/tool.js';
-import { Batch } from '../models/batch.js'; // Assuming Batch model exists or will be BatchRun
-// Import other models as needed (User, Eval, ExpertFeedback etc.)
+import { Batch } from '../models/batch.js';
+import dbConnect from '../api/db/db-connect.js';
+import PromptOverride from '../models/promptOverride.js'; // Added PromptOverride model
+import ServerLoggingService from './ServerLoggingService.js'; // Added for logging within new methods
 
 /**
  * Service responsible for all direct interactions with the MongoDB database.
@@ -243,6 +245,152 @@ class DataStoreService {
        return { message: 'Chat deleted successfully' };
      }
      return { message: 'Chat not found' };
+  }
+
+  // --- Prompt Override Methods ---
+
+  /**
+   * Gets a specific active prompt override for a given user and filename.
+   * @param {string} userId - The ID of the user.
+   * @param {string} filename - The filename of the prompt.
+   * @returns {Promise<PromptOverride|null>} The active override document or null.
+   */
+  async getPromptOverride(userId, filename) {
+    await this.ensureDbConnection();
+    try {
+      const override = await PromptOverride.findOne({ userId, filename, isActive: true });
+      return override;
+    } catch (error) {
+      ServerLoggingService.error('Error fetching active prompt override', null, { userId, filename, error: error.message });
+      throw error; // Rethrow or handle as appropriate
+    }
+  }
+
+  /**
+   * Gets all prompt overrides for a specific user, regardless of active status.
+   * Useful for the management page.
+   * @param {string} userId - The ID of the user.
+   * @returns {Promise<Array<PromptOverride>>} An array of override documents.
+   */
+  async getAllUserOverrides(userId) {
+    await this.ensureDbConnection();
+    try {
+      const overrides = await PromptOverride.find({ userId });
+      return overrides;
+    } catch (error) {
+      ServerLoggingService.error('Error fetching all user prompt overrides', null, { userId, error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Saves (creates or updates) a prompt override for a user.
+   * If creating, sets isActive to true by default. If updating, preserves isActive status unless explicitly changed.
+   * @param {string} userId - The ID of the user.
+   * @param {string} filename - The filename of the prompt.
+   * @param {string} content - The new content for the prompt override.
+   * @returns {Promise<PromptOverride>} The saved override document.
+   */
+  async savePromptOverride(userId, filename, content) {
+    await this.ensureDbConnection();
+    try {
+      // Use findOneAndUpdate with upsert:true to create if not exists, update if exists
+      const updatedOverride = await PromptOverride.findOneAndUpdate(
+        { userId, filename },
+        {
+          $set: { content }, // Update the content
+          $setOnInsert: { isActive: true, userId, filename } // Set fields only on insert (creation)
+        },
+        {
+          new: true, // Return the modified document
+          upsert: true, // Create if it doesn't exist
+          runValidators: true, // Ensure schema validation runs
+        }
+      );
+      ServerLoggingService.info('Prompt override saved successfully', null, { userId, filename });
+      return updatedOverride;
+    } catch (error) {
+      ServerLoggingService.error('Error saving prompt override', null, { userId, filename, error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Sets the active state of a specific prompt override for a user.
+   * @param {string} userId - The ID of the user.
+   * @param {string} filename - The filename of the prompt.
+   * @param {boolean} isActive - The desired active state.
+   * @returns {Promise<object>} The update result object from MongoDB.
+   */
+  async setPromptOverrideActiveState(userId, filename, isActive) {
+    await this.ensureDbConnection();
+    try {
+      // Options for the update operation
+      const updateOptions = {};
+      if (isActive) {
+       // Only upsert (create if not found) when activating - REMOVED, upsert logic moved to API handler
+       // updateOptions.upsert = true;
+     }
+
+     // Update only, do not upsert from this method anymore
+     const result = await PromptOverride.updateOne(
+       { userId, filename },
+       { $set: { isActive } }
+       // Removed updateOptions
+     );
+
+     // Logging based on the result of the update attempt
+      if (isActive) {
+        if (result.upsertedCount > 0 || result.modifiedCount > 0) {
+           ServerLoggingService.info('Prompt override activated (created or updated)', null, { userId, filename });
+        } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
+           // This case means it existed but was already active - still success
+           ServerLoggingService.info('Prompt override already active', null, { userId, filename });
+        } else {
+           // Should not happen with upsert:true, log warning if it does
+          // This case should no longer happen if upsert is removed, but keep log just in case
+          ServerLoggingService.warn('Unexpected result when trying to update prompt override active state', null, { userId, filename, result });
+        }
+      } else { // Deactivating
+         if (result.matchedCount === 0) {
+            // Log that it didn't exist, but this isn't an error for deactivation
+            ServerLoggingService.info('Attempted to deactivate non-existent prompt override', null, { userId, filename });
+         } else if (result.modifiedCount > 0) {
+            // Log successful deactivation
+            ServerLoggingService.info('Prompt override deactivated successfully', null, { userId, filename, isActive });
+         } else {
+            // Matched but not modified (was already inactive)
+            ServerLoggingService.info('Prompt override already inactive', null, { userId, filename });
+         }
+      }
+      // Return the result object
+      return result;
+    } catch (error) {
+      ServerLoggingService.error('Error setting prompt override active state', null, { userId, filename, isActive, error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes a specific prompt override for a user.
+   * @param {string} userId - The ID of the user.
+   * @param {string} filename - The filename of the prompt.
+   * @returns {Promise<object>} The deletion result object from MongoDB.
+   */
+  async deletePromptOverride(userId, filename) {
+    await this.ensureDbConnection();
+    try {
+      const result = await PromptOverride.deleteOne({ userId, filename });
+      if (result.deletedCount > 0) {
+        ServerLoggingService.info('Prompt override deleted successfully', null, { userId, filename });
+      } else {
+        ServerLoggingService.warn('Attempted to delete non-existent prompt override', null, { userId, filename });
+      }
+      return result;
+    } catch (error) {
+      ServerLoggingService.error('Error deleting prompt override', null, { userId, filename, error: error.message });
+      throw error;
+    }
   }
 
   // Add other methods as needed (e.g., findUser, saveUser, etc.)

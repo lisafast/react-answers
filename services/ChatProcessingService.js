@@ -5,11 +5,11 @@ import { getAgent } from '../agents/agentFactory.js'; // Import the actual agent
 import { StatusEventEmitterHandler } from '../agents/StatusEventEmitterHandler.js'; // Import new handler
 import { ToolTrackingHandler } from '../agents/ToolTrackingHandler.js'; // Import tool tracking handler
 import { parseResponse } from '../utils/responseParser.js';
-// import loadSystemPrompt from '../prompts/systemPrompt.js'; // REMOVED old prompt loader
 import PromptBuilderService from './PromptBuilderService.js'; // ADDED new prompt builder service
 import CitationVerificationService from './CitationVerificationService.js'; // Import the new service
 import EmbeddingService from './EmbeddingService.js'; // Import EmbeddingService
 import EvaluationService from './EvaluationService.js'; // Import EvaluationService
+import PromptOverride from '../models/promptOverride.js'; // Import the PromptOverride model
 /**
  * Service responsible for orchestrating the entire workflow
  * for processing a single user chat message.
@@ -28,15 +28,15 @@ class ChatProcessingService {
  * @param {string} params.selectedSearch - The selected search provider.
  * @param {string} [params.referringUrl] - Optional referring URL.
  * @param {string} [params.requestId] - Optional unique ID for tracking/SSE.
- * @param {string} [params.overrideSystemPrompt] - Optional system prompt override for testing.
  * @param {object} [params.user] - Optional user context for authorization checks.
+ * @param {string} [params.overrideUserId] - Optional ID of an admin user whose prompt overrides should be applied.
  * @returns {Promise<object>} The final response object to be sent to the user.
  */
    async processMessage(params) {
-    // Destructure all potential parameters, including new ones for override
+    // Destructure all potential parameters
     const {
         chatId, userMessage, lang, selectedAI, selectedSearch, referringUrl,
-        requestId: providedRequestId, overrideSystemPrompt, user
+        requestId: providedRequestId, user, overrideUserId // Added overrideUserId
     } = params;
 
     // Step 0: Initialization
@@ -50,23 +50,26 @@ class ChatProcessingService {
       // Step 2: Preprocess Message
       const processedMessage = await this._preprocessMessage(userMessage, chatId, requestId);
 
-      // Step 3: Invoke Agent Layer - Pass override and user context
+      // Step 3: Build System Prompt
+      const systemPrompt = await this._buildSystemPrompt(lang, referringUrl, overrideUserId, chatId, requestId);
+
+      // Step 4: Invoke Agent Layer - Pass overrideUserId and user context
       const agentResult = await this._invokeAgentLayer({
         selectedAI, selectedSearch, chatId, requestId, lang, referringUrl,
-        agentHistory, processedMessage, callbacks, overrideSystemPrompt, user // Pass new params
+        agentHistory, processedMessage, callbacks, user, overrideUserId, systemPrompt // Pass new params + systemPrompt
       });
 
-      // Step 4: Process Agent Result
+      // Step 5: Process Agent Result
       const { finalAnswer, finalContext, finalQuestion } = this._processAgentResult(
         agentResult, processedMessage, selectedAI, toolTrackingHandler, chatId, requestId
       );
 
-      // Step 5: Post-processing (e.g., Citation Verification)
+      // Step 6: Post-processing (e.g., Citation Verification)
       const { finalCitationUrl, confidenceRating } = await this._performPostProcessing({
         finalAnswer, lang, chatId, requestId
       });
 
-      // Step 6: Persistence (Synchronous for ID)
+      // Step 7: Persistence (Synchronous for ID)
       const endTime = Date.now();
       const totalResponseTime = endTime - startTime;
       const interactionData = {
@@ -87,19 +90,19 @@ class ChatProcessingService {
       ServerLoggingService.info('Interaction persisted successfully', chatId, { requestId, interactionId: savedInteraction._id });
 
 
-      // Step 7: Format Final Response (using savedInteraction ID)
+      // Step 8: Format Final Response (using savedInteraction ID)
       const finalResponse = this._formatFinalResponse({
         finalAnswer, finalCitationUrl, confidenceRating, savedInteraction
       });
 
-      // Step 8: Trigger Background Tasks (Asynchronous - Fire and Forget)
+      // Step 9: Trigger Background Tasks (Asynchronous - Fire and Forget)
       this._runBackgroundTasks(savedInteraction, chatId, requestId)
         .catch(bgError => {
           // Log errors from the async background task initiation itself, if any
           ServerLoggingService.error('Error initiating background tasks', chatId, { requestId, interactionId: savedInteraction?._id, error: bgError.message });
         });
 
-      // Step 9: Finalize (Logging, Events for main response)
+      // Step 10: Finalize (Logging, Events for main response)
       this._finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler });
 
       // Return the response to the user immediately
@@ -234,44 +237,30 @@ class ChatProcessingService {
    * @param {string} params.requestId - The unique ID for tracking.
    * @param {string} params.lang - The language code.
    * @param {string} [params.referringUrl] - Optional referring URL.
-   * @param {Array<object>} params.agentHistory - Prepared chat history.
+ * @param {Array<object>} params.agentHistory - Prepared chat history.
  * @param {string} params.processedMessage - The preprocessed user message.
  * @param {Array<object>} params.callbacks - Callbacks for the agent invocation.
- * @param {string} [params.overrideSystemPrompt] - Optional system prompt override.
  * @param {object} [params.user] - Optional user context for authorization.
- * @returns {Promise<object>} The raw result from the agent invocation.
- */
-  async _invokeAgentLayer({ selectedAI, selectedSearch, chatId, requestId, lang, referringUrl, agentHistory, processedMessage, callbacks, overrideSystemPrompt, user }) {
-    const agent = await getAgent(selectedAI, selectedSearch, chatId);
+ * @param {string} [params.overrideUserId] - Optional ID of admin user for prompt overrides.
+ * @param {string} params.systemPrompt - The pre-built system prompt.
+   * @returns {Promise<object>} The raw result from the agent invocation.
+  */
+  async _invokeAgentLayer({ selectedAI, selectedSearch, chatId, requestId, lang, referringUrl, agentHistory, processedMessage, callbacks, user, overrideUserId, systemPrompt }) { // Added systemPrompt
+
+    // Retrieve overrides
+    const overrides = await this._getPromptOverrides(overrideUserId, chatId, requestId);
+
+    // Pass the overrides map to getAgent
+    const agent = await getAgent(selectedAI, selectedSearch, chatId, overrides); // Pass overrides map
     if (!agent) {
       throw new Error(`Failed to create or retrieve agent for type: ${selectedAI}`);
     }
     ServerLoggingService.debug('Agent instance retrieved/created', chatId, { requestId, agentType: selectedAI, searchType: selectedSearch });
 
-    // --- Determine System Prompt ---
-    let systemPrompt;
-    // Placeholder for actual authorization logic
-    const isUserAuthorizedForOverride = (userData) => {
-        // Replace with your actual check (e.g., check role, permissions)
-        // For now, let's assume only users with an 'admin' role can override
-        return userData && userData.role === 'admin';
-    };
-
-    if (overrideSystemPrompt && isUserAuthorizedForOverride(user)) {
-        systemPrompt = overrideSystemPrompt;
-        ServerLoggingService.info('Using system prompt override provided by authorized client.', chatId, { requestId });
-    } else {
-        if (overrideSystemPrompt && !isUserAuthorizedForOverride(user)) {
-            ServerLoggingService.warn('System prompt override provided but user is not authorized. Using default prompt.', chatId, { requestId });
-        }
-        // Use the PromptBuilderService for the standard prompt
-        systemPrompt = await PromptBuilderService.buildPrompt(lang, referringUrl);
-        ServerLoggingService.debug('Using standard system prompt built by PromptBuilderService.', chatId, { requestId });
-    }
-    // --- End Determine System Prompt ---
+    // System prompt is now built and passed in
 
     const agentMessages = [
-      { role: "system", content: systemPrompt },
+      { role: "system", content: systemPrompt }, // Use passed systemPrompt
       ...agentHistory,
       { role: "user", content: processedMessage }
     ];
@@ -279,10 +268,71 @@ class ChatProcessingService {
     ServerLoggingService.debug('Invoking agent', chatId, { requestId, messageCount: agentMessages.length });
     const agentResult = await agent.invoke(
       { messages: agentMessages },
-      { callbacks }
+      { callbacks } // Pass the original callbacks
     );
     ServerLoggingService.debug('Agent layer invocation complete', chatId, { requestId });
     return agentResult;
+  }
+
+  /**
+   * Retrieves active prompt overrides for a given user ID and returns them as a map.
+   * @param {string} overrideUserId - The ID of the user whose overrides to fetch.
+   * @param {string} chatId - The chat ID for logging.
+   * @param {string} requestId - The request ID for logging.
+   * @returns {Promise<object>} A map where keys are filenames and values are override content.
+   */
+  async _getPromptOverrides(overrideUserId, chatId, requestId) {
+    const overridesMap = {};
+    if (!overrideUserId) {
+      return overridesMap; // Return empty map if no user ID
+    }
+
+    try {
+      const overrides = await PromptOverride.find({
+        userId: overrideUserId,
+        isActive: true,
+      }).lean(); // Use .lean() for plain JS objects
+
+      if (overrides && overrides.length > 0) {
+        ServerLoggingService.debug(`Found ${overrides.length} active overrides for user`, chatId, { requestId, overrideUserId });
+        overrides.forEach(override => {
+          // Use a consistent key format (e.g., relative path from prompts dir)
+          // Assuming override.filename stores something like 'base/availableTools.js' or 'scenarios/context-specific/cra/cra-scenarios.js'
+          overridesMap[override.filename] = override.content;
+        });
+      } else {
+        ServerLoggingService.debug('No active overrides found for user', chatId, { requestId, overrideUserId });
+      }
+    } catch (error) {
+      ServerLoggingService.error('Error fetching prompt overrides', chatId, { requestId, overrideUserId, error: error.message });
+      // Decide if you want to throw or just return an empty map
+    }
+    return overridesMap;
+  }
+
+
+  /**
+   * Builds the system prompt using the PromptBuilderService.
+   * @param {string} lang - The language code.
+   * @param {string} referringUrl - Optional referring URL.
+   * @param {string} overrideUserId - Optional ID of admin user for prompt overrides.
+   * @param {string} chatId - The chat ID.
+   * @param {string} requestId - The unique ID for tracking.
+   * @returns {Promise<string>} The built system prompt.
+   */
+  async _buildSystemPrompt(lang, referringUrl, overrideUserId, chatId, requestId) {
+    // Retrieve overrides first
+    const overrides = await this._getPromptOverrides(overrideUserId, chatId, requestId);
+
+    // Pass overrides map to PromptBuilderService
+    let systemPrompt = await PromptBuilderService.buildPrompt(lang, referringUrl, overrides); // Pass overrides map
+
+    if (overrideUserId) {
+      ServerLoggingService.debug('Built system prompt using overrides map.', chatId, { requestId, overrideUserId, overrideCount: Object.keys(overrides).length });
+    } else {
+      ServerLoggingService.debug('Building standard system prompt using PromptBuilderService.', chatId, { requestId });
+    }
+    return systemPrompt;
   }
 
   /**

@@ -42,8 +42,15 @@ import generateEmbeddingsHandler from '../api/db/db-generate-embeddings.js';
 import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 import chatHandler from '../api/chat/chat.js';
-import createBatchHandler from '../api/batch/create.js'; // Added batch create handler
-import batchStatusHandler from '../api/batch/status.js'; // Added batch status handler
+import createBatchHandler from '../api/batch/create.js';
+import batchStatusHandler from '../api/batch/status.js';
+// Import prompt API handlers
+import promptListHandler from '../api/prompts/list.js';
+import promptGetHandler from '../api/prompts/get.js';
+import promptSaveHandler from '../api/prompts/save.js';
+import promptStatusHandler from '../api/prompts/status.js';
+import promptDeleteHandler from '../api/prompts/delete.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -122,6 +129,14 @@ app.post('/api/chat/chat', chatHandler); // Keep existing chat handler (now refa
 // Add new batch routes
 app.post('/api/batch/create', createBatchHandler);
 app.get('/api/batch/status', batchStatusHandler);
+
+// Add new prompt management routes with specific paths (protection applied in handlers)
+app.get('/api/prompts/list', promptListHandler);
+app.get('/api/prompts/get/:filename', promptGetHandler);
+app.put('/api/prompts/save/:filename', promptSaveHandler);
+app.patch('/api/prompts/status/:filename', promptStatusHandler);
+app.delete('/api/prompts/delete/:filename', promptDeleteHandler);
+
 
 const PORT = process.env.PORT || 3001;
 

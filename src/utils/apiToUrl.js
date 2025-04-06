@@ -22,4 +22,16 @@ const getProviderApiUrl = (provider, endpoint) => {
 
 const providerOrder = ["openai", "azure", "anthropic", "cohere"];
 
-export { getApiUrl, getProviderApiUrl, providerOrder };
+// Generic function to prepend development server URL to any relative API path
+const getAbsoluteApiUrl = (relativePath) => {
+  // Ensure the relative path starts with a slash
+  if (!relativePath.startsWith('/')) {
+    console.warn(`getAbsoluteApiUrl expects a path starting with '/', received: ${relativePath}`);
+    relativePath = `/${relativePath}`;
+  }
+  const serverUrl =
+    process.env.NODE_ENV === "development" ? "http://127.0.0.1:3001" : "";
+  return `${serverUrl}${relativePath}`;
+};
+
+export { getApiUrl, getProviderApiUrl, getAbsoluteApiUrl, providerOrder };

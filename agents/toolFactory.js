@@ -1,19 +1,15 @@
+import { tool } from "@langchain/core/tools"; // Import the 'tool' function
 import downloadWebPage from './tools/downloadWebPage.js';
 import checkUrlStatusTool from './tools/checkURL.js';
-// import { ContextTool } from './tools/ContextTool.js'; // Removed LLM-based context tool
-import departmentScenarios from './tools/departmentScenariosTool.js'; // Renamed and default import
+// Import the logic and config separately
+import { departmentScenariosLogic, departmentScenariosConfig } from './tools/departmentScenariosTool.js';
 import departmentLookup from './tools/departmentLookupTool.js'; // Corrected casing and name
 import verifyOutputFormat from './tools/verifyOutputFormatTool.js'; // Changed to default import and name
 const { googleContextSearch } = await import('./tools/googleContextSearch.js'); // Adjusted import structure
 const { contextSearchTool: canadaCaContextSearchTool } = await import('./tools/canadaCaContextSearch.js'); // Keep this as is for now, assuming canadaCaContextSearch.js exports contextSearchTool
-// Removed ToolTrackingHandler import
 import ServerLoggingService from '../services/ServerLoggingService.js';
 
-// Removed wrapToolWithTracking helper function
-
-// Function to get the standard set of tools (unwrapped)
-// Update signature to accept aiProvider and selectedSearch
-export const getStandardTools = (chatId = 'system', aiProvider, selectedSearch = 'google') => { // Default to google if not provided
+export const getStandardTools = (chatId = 'system', aiProvider, selectedSearch = 'google', overrides = {}) => { // Added overrides parameter
     if (!aiProvider) {
         ServerLoggingService.warn('aiProvider not provided to getStandardTools, ContextTool might fail.', chatId);
         // Consider throwing an error or setting a default if appropriate
@@ -22,10 +18,20 @@ export const getStandardTools = (chatId = 'system', aiProvider, selectedSearch =
 
     // Define the base toolset for the main agent
     // Note: verifyOutputFormat is now imported directly, no instantiation needed.
+
+    // Create a wrapped function that includes overrides when calling the original logic
+    const wrappedDepartmentScenariosLogic = async (args) => {
+        // Call the original logic function, merging overrides with the args from the LLM
+        return departmentScenariosLogic({ ...args, overrides });
+    };
+
+    // Create the actual tool instance using the wrapped logic and the imported config
+    const departmentScenariosToolInstance = tool(wrappedDepartmentScenariosLogic, departmentScenariosConfig);
+
     const toolDefinitions = [
         downloadWebPage,
         checkUrlStatusTool, // Assuming this one is correct or out of scope
-        departmentScenarios, // Use imported tool directly
+        departmentScenariosToolInstance, // Use the correctly constructed tool instance
         departmentLookup, // Use imported tool directly
         verifyOutputFormat // Use imported tool directly
         // contextToolInstance removed

@@ -31,6 +31,10 @@ const ChatInterface = ({
   MAX_CONVERSATION_TURNS,
   t,
   lang,
+  // Add new props for override toggle
+  isAdmin,
+  isOverrideTestingActive,
+  handleOverrideToggleChange,
   parsedResponses,
   chatId,
 }) => {
@@ -445,6 +449,23 @@ const ChatInterface = ({
                 className="chat-border"
               />
             </div>
+
+            {/* Conditionally render the override toggle for admins */}
+            {isAdmin && (
+              <div className="override-toggle">
+                 <input
+                  type="checkbox"
+                  id="override-toggle-checkbox"
+                  name="overrideToggle"
+                  checked={isOverrideTestingActive}
+                  onChange={handleOverrideToggleChange} // Use the passed handler
+                />
+                <label htmlFor="override-toggle-checkbox">
+                  {t('homepage.chat.options.overrideToggle.label', 'Test with my prompt overrides')}
+                </label>
+               
+              </div>
+            )}
           </GcdsDetails>
         </div>
       )}

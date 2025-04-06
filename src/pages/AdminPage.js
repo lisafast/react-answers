@@ -46,6 +46,11 @@ const AdminPage = () => {
               {t('admin.navigation.eval', 'Evaluation Tools')}
             </GcdsLink>
           </li>
+          <li className="">
+            <GcdsLink href={`/${language}/prompts`}>
+              {t('admin.navigation.prompts', 'Manage Prompts')}
+            </GcdsLink>
+          </li>
         </ul>
       </nav>
 

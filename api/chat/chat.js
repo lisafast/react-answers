@@ -1,7 +1,10 @@
 // api/chat.js - Refactored for SSE streaming via ChatProcessingService events
+// Removed jwt import, using helper from auth middleware now
+// import User from '../../models/user.js'; // Keep commented if not needed for role check
 import ServerLoggingService from '../../services/ServerLoggingService.js';
+import { verifyOptionalToken } from '../../middleware/auth.js'; // Import the new helper
 import ChatProcessingService from '../../services/ChatProcessingService.js';
-import statusEmitter from '../../utils/statusEmitter.js'; // Import shared emitter
+import statusEmitter from '../../utils/statusEmitter.js';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper to format and send SSE messages
@@ -89,12 +92,32 @@ async function sseMessageHandler(req, res) {
 
 
   try {
+    // --- Check for Optional Admin Override Token using Middleware Helper ---
+    const decodedToken = verifyOptionalToken(req); // Call the helper
+    let overrideUserId = null;
+
+    if (decodedToken) {
+        // Token was present and valid, now check the role
+        if (decodedToken.role === 'admin') {
+             overrideUserId = decodedToken.userId;
+             // Logging is now handled within verifyOptionalToken or here if specific to override
+             ServerLoggingService.info(`Admin override activated by user ${overrideUserId}`, chatId, { requestId });
+        } else {
+             // Token valid but user is not an admin
+             ServerLoggingService.warn(`Token validated for user ${decodedToken.userId} but role is not admin. Overrides not applied.`, chatId, { requestId });
+        }
+    }
+    // If decodedToken is null (no token, invalid, or expired), overrideUserId remains null.
+    // --- End Check ---
+
     const {
       userMessage,
       lang,
       referringUrl,
       selectedAI,
-      selectedSearch
+      selectedSearch,
+      // Extract user context if provided by authenticated requests (might be needed elsewhere)
+      user // Assuming middleware might attach user info if standard auth applied
     } = req.body;
 
     // Basic validation
@@ -115,7 +138,8 @@ async function sseMessageHandler(req, res) {
       selectedAI,
       selectedSearch,
       referringUrl,
-      requestId // Pass requestId so service can use it if needed
+      requestId, // Pass requestId so service can use it if needed
+      overrideUserId // Pass the admin user ID if overrides are requested
     };
 
     // Call the service and AWAIT its completion.

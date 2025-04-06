@@ -1,5 +1,7 @@
 import { getApiUrl, getProviderApiUrl } from '../utils/apiToUrl.js';
 import AuthService from './AuthService.js';
+// NOTE: Removed backend model imports (PromptOverride, User) and ServerLoggingService
+// This file should only contain frontend logic making API calls.
 
 class DataStoreService {
   static async checkDatabaseConnection() {

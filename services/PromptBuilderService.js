@@ -23,24 +23,23 @@ import fs from 'fs/promises'; // Needed to read default files
 class PromptBuilderService {
 
   /**
- * Builds the complete system prompt string, potentially using user-specific overrides.
+ * Builds the complete system prompt string, using provided overrides if available.
  * @param {string} [language='en'] - The language code ('en' or 'fr').
  * @param {string} [referringUrl=''] - The referring URL from the user's context.
- * @param {string|null} [overrideUserId=null] - The ID of the admin user whose overrides should be checked.
+ * @param {object} [overrides={}] - Optional map of filename/content overrides.
  * @returns {Promise<string>} The assembled system prompt.
  */
-  async buildPrompt(language = 'en', referringUrl = '', overrideUserId = null) {
+  async buildPrompt(language = 'en', referringUrl = '', overrides = {}) { // Changed overrideUserId to overrides map
     try {
       // Helper function to get prompt content (override or default)
       const getPromptContent = async (filename, defaultExportedContent) => {
-        if (overrideUserId) {
-          const override = await DataStoreService.getPromptOverride(overrideUserId, filename);
-          if (override) {
-            ServerLoggingService.debug(`Using DB override for prompt: ${filename}`, null, { overrideUserId });
-            return override.content;
-          }
+        // Check if an override exists in the provided map
+        if (overrides && overrides[filename]) {
+            ServerLoggingService.debug(`Using provided override for prompt: ${filename}`);
+            return overrides[filename];
         }
-        // No active override, try reading default file content
+
+        // No override provided, use the default content
         // This assumes the defaultExportedContent is the actual content string.
         // If it's an object/module, adjust logic.
         // A more robust way might be to read from file path if defaultExportedContent isn't the raw string.
@@ -57,7 +56,8 @@ class PromptBuilderService {
       const languageContext = language === 'fr'
         ? "<page-language>French</page-language>"
         : "<page-language>English</page-language>";
-      const referringUrlContext = `<referring-url>\${referringUrl || 'Not provided'}</referring-url>`;
+      // Correctly interpolate the referringUrl variable
+      const referringUrlContext = `<referring-url>${referringUrl || 'Not provided'}</referring-url>`;
       const dynamicContext = `
 ## Current date
 Today is ${currentDate}.
@@ -82,9 +82,6 @@ ${referringUrlContext}
         getPromptContent('translationInstructions.js', TRANSLATION_INSTRUCTIONS),
         getPromptContent('citationInstructions.js', CITATION_INSTRUCTIONS),
         getPromptContent('formatVerificationInstructions.js', FORMAT_VERIFICATION_INSTRUCTIONS),
-        // TODO: Handle scenarios - might need separate logic if they aren't simple string exports
-        // For now, assume GENERAL_SCENARIOS is the default content string for 'scenarios-all.js'
-        // getPromptContent('scenarios-all.js', GENERAL_SCENARIOS),
         getPromptContent('keyGuidelines.js', KEY_GUIDELINES),
         Promise.resolve("\nReminder: Follow all steps and guidelines meticulously. Accuracy, adherence to format, and appropriate tool usage are critical.") // Final reminder isn't overridden
       ]);
@@ -94,7 +91,7 @@ ${referringUrlContext}
 
       const fullPrompt = validSectionsContent.join('\n\n'); // Join sections with double newline
 
-      ServerLoggingService.info('System prompt assembled successfully', null, { language, overrideUserId: overrideUserId || 'none', promptLength: fullPrompt.length });
+      ServerLoggingService.info('System prompt assembled successfully', null, { language, overrideProvided: Object.keys(overrides).length > 0, promptLength: fullPrompt.length });
       return fullPrompt.trim();
 
     } catch (error) {

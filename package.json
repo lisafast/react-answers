@@ -79,11 +79,6 @@
     "test:vitest:utils": "vitest run \"src/utils/**/__tests__/**/*.test.js\"",
     "test:vitest:coverage": "vitest run --coverage"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",

@@ -4,7 +4,9 @@ import { useTranslations } from '../../hooks/useTranslations.js';
 import { usePageContext, DEPARTMENT_MAPPINGS } from '../../hooks/usePageParam.js';
 import ChatInterface from './ChatInterface.js';
 import { ChatService, RedactionError, PipelineStatus } from '../../services/ChatService.js';
+import AuthService from '../../services/AuthService.js'; // Added for admin check and token
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 
 const ChatAppContainer = ({ lang = 'en', chatId }) => {
@@ -16,59 +18,72 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [textareaKey, setTextareaKey] = useState(0);
-  const [selectedAI, setSelectedAI] = useState('openai'); 
-  const [selectedSearch, setSelectedSearch] = useState('google'); 
+  // Load initial state from localStorage or use defaults
+  const [selectedAI, setSelectedAI] = useState(() => localStorage.getItem('selectedAI') || 'openai');
+  const [selectedSearch, setSelectedSearch] = useState(() => localStorage.getItem('selectedSearch') || 'google');
   const [showFeedback, setShowFeedback] = useState(false);
-  const [referringUrl, setReferringUrl] = useState(pageUrl || '');
-  const [selectedDepartment, setSelectedDepartment] = useState(urlDepartment || '');
+  const [referringUrl, setReferringUrl] = useState(() => localStorage.getItem('referringUrl') || pageUrl || '');
+  const [selectedDepartment, setSelectedDepartment] = useState(urlDepartment || ''); // Department is derived, not stored directly
   const [turnCount, setTurnCount] = useState(0);
   const messageIdCounter = useRef(0);
-  // Update displayStatus state to hold an object { key: string|null, params?: object, message?: string }
   const [displayStatus, setDisplayStatus] = useState({ key: null, message: '' });
-  const statusQueueRef = useRef([]); // Queue for status detail objects
+  // Load override state, ensuring it's treated as a boolean
+  const [isOverrideTestingActive, setIsOverrideTestingActive] = useState(() => localStorage.getItem('isOverrideTestingActive') === 'true');
+  const isAdmin = AuthService.isAdmin(); // Check if user is admin
+  const statusQueueRef = useRef([]);
   const statusTimeoutRef = useRef(null); // Ref for the active display timeout
   const isProcessingQueue = useRef(false); // Ref to prevent concurrent processing
   const isTyping = useRef(false);
-  // Ref to store the ID of the message currently being streamed into (no longer used for placeholder)
-  // const streamingMessageIdRef = useRef(null); // Removed as placeholder is gone
+
+  // --- Save state changes to localStorage ---
+  useEffect(() => {
+    localStorage.setItem('selectedAI', selectedAI);
+  }, [selectedAI]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedSearch', selectedSearch);
+  }, [selectedSearch]);
+
+  useEffect(() => {
+    // Only save if it's not the initial pageUrl to avoid overwriting dynamic context
+    if (referringUrl !== pageUrl) {
+      localStorage.setItem('referringUrl', referringUrl);
+    }
+  }, [referringUrl, pageUrl]);
+
+  useEffect(() => {
+    localStorage.setItem('isOverrideTestingActive', isOverrideTestingActive);
+  }, [isOverrideTestingActive]);
+
 
   // --- Function to Process the Status Queue ---
   const processStatusQueue = useCallback(() => {
     if (isProcessingQueue.current || statusQueueRef.current.length === 0) {
-      return; // Don't process if already processing or queue is empty
+      return;
     }
 
-    isProcessingQueue.current = true; // Mark as processing
-    const nextStatusDetails = statusQueueRef.current.shift(); // Get the next status details object
+    isProcessingQueue.current = true;
+    const nextStatusDetails = statusQueueRef.current.shift();
 
-    setDisplayStatus(nextStatusDetails); // Display the status object
+    setDisplayStatus(nextStatusDetails);
 
-    // Clear the status after a delay
     statusTimeoutRef.current = setTimeout(() => {
-      setDisplayStatus({ key: null, message: '' }); // Clear the displayed status object
-      statusTimeoutRef.current = null; // Clear the timeout ref
-      isProcessingQueue.current = false; // Mark as not processing
-      processStatusQueue(); // Process the next item if any
-    }, 2500); // Display for 2.5 seconds
-  }, []); // No dependencies needed as it uses refs and setDisplayStatus
+      isProcessingQueue.current = false;
+      processStatusQueue();
+    }, 500);
+  }, []);
 
   // --- Define Single Status Update Handler ---
   // Receives status (enum) and details ({ key, params } or { message }) from ChatService
   const handleStatusUpdate = useCallback((status, details) => {
     console.log("Status Update Received:", status, details); // Debugging
 
-    // Only queue statuses that have a key or a message intended for display
-    // Ignore events like TOOL_END, AGENT_END, COMPLETE etc. unless they provide specific details
-    if (details && (details.key || details.message)) {
-       // Add the details object directly to the queue
-      statusQueueRef.current.push(details);
-      processStatusQueue(); // Attempt to process the queue
-    } else if (status === PipelineStatus.COMPLETE || status === PipelineStatus.AGENT_END) {
-       // If it's a completion event with no specific message, ensure the queue processes to clear
-       processStatusQueue();
+    statusQueueRef.current.push(details); // Add to queue
+
+    if (!isProcessingQueue.current) {
+      processStatusQueue();
     }
-    // No translation ('t()') happens here anymore.
-  }, [processStatusQueue]); // Only depends on processStatusQueue (stable)
+  }, [processStatusQueue]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -89,13 +104,21 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   };
 
   const handleAIToggle = (e) => {
-    setSelectedAI(e.target.value);
-    console.log('AI toggled to:', e.target.value); // Add this line for debugging
+    const newAI = e.target.value;
+    setSelectedAI(newAI);
+    console.log('AI toggled to:', newAI);
   };
 
   const handleSearchToggle = (e) => {
-    setSelectedSearch(e.target.value);
-    console.log('Search toggled to:', e.target.value);
+    const newSearch = e.target.value;
+    setSelectedSearch(newSearch);
+    console.log('Search toggled to:', newSearch);
+  };
+
+  // Handler for the override toggle
+  const handleOverrideToggleChange = (e) => {
+    const newOverrideState = e.target.checked;
+    setIsOverrideTestingActive(newOverrideState);
   };
 
   const clearInput = useCallback(() => {
@@ -106,13 +129,19 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
 
 
   const handleReferringUrlChange = (e) => {
-    const url = e.target.value.trim();
-    console.log('Referring URL changed:', url);
-    setReferringUrl(url);
+    const newUrl = e.target.value.trim();
+    console.log('Referring URL changed:', newUrl);
+    setReferringUrl(newUrl);
 
     // Parse department from manually entered URL
     try {
-      const urlObj = new URL(url);
+      // Avoid parsing if the URL is empty
+      if (!newUrl) {
+        setSelectedDepartment(''); // Clear department if URL is cleared
+        return;
+      }
+      const urlObj = new URL(newUrl);
+      // const urlObj = new URL(url); // Removed duplicate declaration
       const pathSegments = urlObj.pathname.split('/').filter(Boolean);
 
       // Find matching department
@@ -179,9 +208,15 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       clearInput(); // Clear input after adding user message
 
       // --- Initiate Stream and Wait for Final Result ---
-      // NOTE: Placeholder AI message is removed. Message is added only on success.
       try {
-        // Call the service, passing the single status handler
+        // Determine if we need to send the auth token
+        const authToken = (isAdmin && isOverrideTestingActive) ? AuthService.getToken() : null;
+        if (authToken) {
+           console.log("Sending chat request with admin auth token for override testing.");
+        }
+
+        // Call the service, passing the single status handler AND the auth token if applicable
+        // **NOTE:** This assumes ChatService.processChatStream will be updated to accept authToken
         const finalInteraction = await ChatService.processChatStream(
           chatId,
           userMessage,
@@ -191,8 +226,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           selectedDepartment,
           referringUrl,
           selectedAI,
-          handleStatusUpdate, // Pass the single callback
-          selectedSearch
+          handleStatusUpdate,
+          selectedSearch,
+          authToken // Pass the token (or null)
         );
 
         // --- Process Final Result ---
@@ -215,21 +251,27 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         setIsLoading(false);
         setShowFeedback(true);
         setTurnCount(prev => prev + 1);
-        // Status queue will clear itself via timeouts
+        clearTimeout(statusTimeoutRef.current);
+        setDisplayStatus({ key: null, message: '' });
+        statusQueueRef.current = [];
+        isProcessingQueue.current = false;
 
       } catch (error) {
-         // Handle errors from the promise (e.g., connection failure, stream error, redaction)
+        console.error('Chat stream failed:', error);
+
+        clearTimeout(statusTimeoutRef.current);
+        setDisplayStatus({ key: null, message: '' });
+        statusQueueRef.current = [];
+        isProcessingQueue.current = false;
+
         if (error instanceof RedactionError) {
-          // Handle redaction error (remove user msg, add redacted user + system msg)
           const redactionUserMsgId = messageIdCounter.current++;
           const redactionBlockedMsgId = messageIdCounter.current++;
-          // Filter only the original user message
           setMessages(prevMessages => prevMessages.filter(msg => msg.id !== userMessageId));
-          // Add the redacted user message and the system block message
           setMessages(prevMessages => [
             ...prevMessages,
             {
-              id: redactionUserMsgId, // Use new ID for redacted user message
+              id: redactionUserMsgId,
               text: error.redactedText,
               redactedText: error.redactedText,
               redactedItems: error.redactedItems,
@@ -237,19 +279,15 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
               error: true
             },
             {
-              id: redactionBlockedMsgId, // Use new ID for system block message
+              id: redactionBlockedMsgId,
               text: <div dangerouslySetInnerHTML={{ __html: (error.redactedText.includes('XXX') ? t('homepage.chat.messages.privateContent') : t('homepage.chat.messages.blockedContent')) }} />,
               sender: 'system',
               error: true
             }
           ]);
           setIsLoading(false);
-          // Status queue will clear itself
-          return; // Stop further processing
+          return;
         } else {
-          // Handle other errors from the promise or stream
-          console.error('Chat stream failed:', error);
-          // Add a system error message instead of updating a placeholder
           const systemErrorMsgId = messageIdCounter.current++;
           setMessages(prevMessages => [
             ...prevMessages,
@@ -261,7 +299,6 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             }
           ]);
           setIsLoading(false);
-          // Status queue will clear itself
         }
       }
     }
@@ -276,8 +313,8 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     clearInput,
     selectedDepartment,
     isLoading,
-    messages, // Ensure 'messages' is a dependency
-    handleStatusUpdate, // Add handleStatusUpdate as dependency
+    messages,
+    handleStatusUpdate,
     clearInput,
     lang,
     selectedAI,
@@ -286,17 +323,53 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     referringUrl,
     t,
     chatId
-    // processStatusQueue is stable due to useCallback([])
   ]);
 
+  // Effect to set initial referringUrl from page context if not already set or loaded
   useEffect(() => {
-    if (pageUrl && !referringUrl) {
+    const storedUrl = localStorage.getItem('referringUrl');
+    // Only set from pageUrl if there's no stored URL and pageUrl exists
+    if (!storedUrl && pageUrl) {
       setReferringUrl(pageUrl);
     }
+    // Set department based on URL context (either initial page or loaded/changed referringUrl)
     if (urlDepartment && !selectedDepartment) {
-      setSelectedDepartment(urlDepartment);
+       setSelectedDepartment(urlDepartment);
     }
-  }, [pageUrl, urlDepartment, referringUrl, selectedDepartment]);
+    // Re-parse department if referringUrl changes after initial load
+    // This handles cases where the user manually changes the URL
+    try {
+        if (referringUrl) {
+            const urlObj = new URL(referringUrl);
+            const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+            let newDepartment = '';
+            for (const segment of pathSegments) {
+                for (const [, value] of Object.entries(DEPARTMENT_MAPPINGS)) {
+                    if (segment === value.en || segment === value.fr) {
+                        newDepartment = value.code;
+                        break;
+                    }
+                }
+                if (newDepartment) break;
+            }
+            if (newDepartment && newDepartment !== selectedDepartment) {
+                setSelectedDepartment(newDepartment);
+            } else if (!newDepartment && selectedDepartment) {
+                 // Clear department if URL no longer maps to one
+                 // setSelectedDepartment(''); // Optional: Decide if clearing is desired
+            }
+        } else if (selectedDepartment) {
+             // Clear department if URL is empty
+             // setSelectedDepartment(''); // Optional: Decide if clearing is desired
+        }
+    } catch (error) {
+        console.log('Invalid URL format during effect:', error);
+        // Optionally clear department on invalid URL
+        // if (selectedDepartment) setSelectedDepartment('');
+    }
+
+  }, [pageUrl, urlDepartment, referringUrl]); // Rerun when referringUrl changes too
+
 
   const formatAIResponse = useCallback((aiService, message) => {
     const messageId = message.id;
@@ -372,6 +445,10 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       MAX_CONVERSATION_TURNS={MAX_CONVERSATION_TURNS}
       t={t}
       lang={lang}
+      // Pass admin status and override toggle state/handler to ChatInterface
+      isAdmin={isAdmin}
+      isOverrideTestingActive={isOverrideTestingActive}
+      handleOverrideToggleChange={handleOverrideToggleChange}
       privacyMessage={t('homepage.chat.messages.privacy')}
       getLabelForInput={() => turnCount >= 1 ? t('homepage.chat.input.followUp') : t('homepage.chat.input.initial')}
       chatId={chatId}

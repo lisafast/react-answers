@@ -14,6 +14,7 @@ import './styles/App.css';
 import UsersPage from './pages/UsersPage.js';
 import EvalPage from './pages/EvalPage.js';
 import DatabasePage from './pages/DatabasePage.js';
+import PromptsPage from './pages/PromptsPage.js'; // Added for prompts management
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -163,6 +164,15 @@ const router = createBrowserRouter([
       {
         path: "/fr/database",
         element: <ProtectedRoute element={<DatabasePage lang="fr" />} />,
+      },
+      // Added Prompts routes
+      {
+        path: "/en/prompts",
+        element: <ProtectedRoute element={<PromptsPage lang="en" />} />,
+      },
+      {
+        path: "/fr/prompts",
+        element: <ProtectedRoute element={<PromptsPage lang="fr" />} />,
       },
     ],
   },
