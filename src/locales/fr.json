@@ -72,13 +72,13 @@
         },
         "referringUrl": {
           "label": "URL de référence Canada.ca (facultatif)"
+        },
+        "overrideToggle": {
+          "label": "Tester avec mes invites modifiées"
         }
       },
       "messages": {
-        "startingToThink": "Réflexion...",
-        "thinking": "Réflexion...",
-        "thinkingWithContext": "Tirant la réponse à partir de ",
-        "thinkingMore": "Réflexion prolongée...",
+        
         "limitReached": "Votre limite de 3 questions par conversation a été atteinte. Actualisez la page pour commencer une nouvelle conversation.",
         "error": "Désolé, nous avons un problème de connexion au service en ce moment. Veuillez réessayer dans quelques minutes.",
         "blockedContent": "Votre question contenait des mots qui ne sont pas acceptés.\nVeuillez la reformuler différemment.",
@@ -88,19 +88,14 @@
         "characterWarning": "{count} {unit} restants",
         "characterLimit": "Votre message est trop long de {count} {unit}. Veuillez simplifier votre question.",
         "character": "caractère",
-        "characters": "caractères",
-        "redacting": "Vérification du message...",
-        "searching": "Recherche d'informations pertinentes...",
-        "gettingContext": "Compréhension du contexte...",
-        "generatingAnswer": "Génération de la réponse...",
-        "complete": "Réponse prête...",
-        "verifyingCitation": "Vérification de l'URL de citation...",
-        "updatingDatastore": "Mise à jour du datastore...",
-        "moderatingAnswer": "Modération de la réponse...",
-        "moderatingQuestion": "Modération de la question...",
-        "needClarification" : "Nécessite des précisions..."
+        "characters": "caractères"
+
       },
       "status": {
+        "startingToThink": "Réflexion...",
+        "thinking": "Réflexion...",
+        "thinkingWithContext": "Tirant la réponse à partir des résultats de recherche et du ministère.",
+        "thinkingMore": "Réflexion prolongée...",
         "agent_start": "Début de la réflexion...",
         "llm_start": "Réflexion...",
         "tool_error": "Erreur lors de l'utilisation de l'outil {{toolName}}: {{message}}",
@@ -113,7 +108,18 @@
           "verifyOutputFormat": "Vérification du format de la réponse...",
           "googleContextSearch": "Recherche Google...",
           "canadaCASearch": "Recherche Canada.ca...",
-          "unknown": "Utilisation d'un outil..."
+          "unknown": "Utilisation d'un outil...",
+          "redacting": "Vérification du message...",
+          "searching": "Recherche d'informations pertinentes...",
+          "gettingContext": "Compréhension du contexte...",
+          "generatingAnswer": "Génération de la réponse...",
+          "complete": "Réponse prête...",
+          "verifyingCitation": "Vérification de l'URL de citation...",
+          "updatingDatastore": "Mise à jour du datastore...",
+          "moderatingAnswer": "Modération de la réponse...",
+          "moderatingQuestion": "Modération de la question...",
+          "needClarification" : "Nécessite des précisions...",
+          "contextSearch" : "Recherche..."
         }
       },
       "citation": {
@@ -249,7 +255,8 @@
       "users": "Gestion des utilisateurs",
       "chatViewer": "Visualiseur de chat",
       "database": "Gestion de la base de données",
-      "eval": "Outils d'évaluation"
+      "eval": "Outils d'évaluation",
+      "prompts": "Gérer les invites"
     },
     "chatLogs": {
       "title": "Interactions de chat récentes"
@@ -313,5 +320,30 @@
       "activate": "Activer",
       "deactivate": "Désactiver"
     }
+  },
+  "prompts": {
+    "title": "Gérer les invites système",
+    "saveButton": "Enregistrer les modifications (Espace réservé)",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "saveSuccessPlaceholder": "Espace réservé : Les modifications seraient enregistrées !",
+    "noChangesPlaceholder": "Espace réservé : Aucune modification à enregistrer.",
+    "deleteButton": "Supprimer la modification",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer la modification pour {filename} ? Cela rétablira l'invite par défaut.",
+    "deleteSuccess": "Modification pour {filename} supprimée.",
+    "errorDelete": "Échec de la suppression de la modification.",
+    "errorList": "Échec du chargement de la liste des invites.",
+    "errorContent": "Échec du chargement du contenu.",
+    "errorStatus": "Échec de la mise à jour du statut.",
+    "errorSave": "Échec de l'enregistrement.",
+    "saveSuccessCount": "{count} invite(s) enregistrée(s) avec succès.",
+    "saveErrorCount": "Échec de l'enregistrement de {count} invite(s). Vérifiez les erreurs individuelles.",
+    "noChanges": "Aucune modification à enregistrer.",
+    "saving": "Enregistrement...",
+    "loadingList": "Chargement de la liste des invites...",
+    "errorListTitle": "Erreur de chargement des invites",
+    "saveSuccessTitle": "Enregistrement réussi",
+    "saveErrorTitle": "Erreur d'enregistrement",
+    "errorContentTitle": "Erreur de contenu"
   }
 }

@@ -72,13 +72,13 @@
         },
         "referringUrl": {
           "label": "Referring Canada.ca URL (optional)"
+        },
+        "overrideToggle": {
+          "label": "Test with my prompt overrides"
         }
       },
       "messages": {
-        "startingToThink": "Thinking...",
-        "thinking": "Thinking...",
-        "thinkingWithContext": "Deriving answer from search results and department.",
-        "thinkingMore": "Thinking some more...",
+        
         "limitReached": "You've reached the limit of 3 questions per conversation.\nReload to start a new conversation.",
         "error": "Sorry, we're having a problem connecting to the service right now. Please try again in a few minutes.",
         "blockedContent": "Your question used words that aren't accepted. Please try asking it differently.",
@@ -88,19 +88,14 @@
         "characterWarning": "{count} {unit} remaining",
         "characterLimit": "Your message is {count} {unit} too long. Please simplify your question.",
         "character": "character",
-        "characters": "characters",
-        "redacting": "Redacting message...",
-        "searching": "Searching for relevant information...",
-        "gettingContext": "Understanding context...",
-        "generatingAnswer": "Generating response...",
-        "complete": "Response ready...",
-        "verifyingCitation": "Verifying citation URL...",
-        "updatingDatastore": "Updating datastore...",
-        "moderatingAnswer": "Moderating answer...",
-        "moderatingQuestion": "Moderating question...",
-        "needClarification" : "Requires clarification..."
+        "characters": "characters"
+
       },
       "status": {
+        "startingToThink": "Thinking...",
+        "thinking": "Thinking...",
+        "thinkingWithContext": "Deriving answer from search results and department.",
+        "thinkingMore": "Thinking some more...",
         "agent_start": "Starting to think...",
         "llm_start": "Thinking...",
         "tool_error": "Error using tool {{toolName}}: {{message}}",
@@ -112,8 +107,19 @@
           "departmentLookup": "Looking up department information...",
           "verifyOutputFormat": "Checking response format...",
           "googleContextSearch": "Searching Google...",
+          "contextSearch" : "Searching...",
           "canadaCASearch": "Searching Canada.ca...",
-          "unknown": "Using a tool..."
+          "unknown": "Using a tool...",
+          "redacting": "Redacting message...",
+          "searching": "Searching for relevant information...",
+          "gettingContext": "Understanding context...",
+          "generatingAnswer": "Generating response...",
+          "complete": "Response ready...",
+          "verifyingCitation": "Verifying citation URL...",
+          "updatingDatastore": "Updating datastore...",
+          "moderatingAnswer": "Moderating answer...",
+          "moderatingQuestion": "Moderating question...",
+          "needClarification" : "Requires clarification..."
         }
       },
       "citation": {
@@ -248,7 +254,8 @@
       "users": "User Management",
       "chatViewer": "Chat Viewer",
       "database": "Database Management",
-      "eval": "Evaluation Tools"
+      "eval": "Evaluation Tools",
+      "prompts": "Manage Prompts"
     },
     "chatLogs": {
       "title": "Recent Chat Interactions"
@@ -313,5 +320,30 @@
       "activate": "Activate",
       "deactivate": "Deactivate"
     }
-  }
+  },
+  "prompts": {
+    "title": "Manage System Prompts",
+    "saveButton": "Save Changes",
+    "loading": "Loading...",
+    "error": "Error",
+    "saveSuccessPlaceholder": "Placeholder: Changes would be saved!",
+    "noChangesPlaceholder": "Placeholder: No changes to save.",
+    "deleteButton": "Delete Override",
+    "confirmDelete": "Are you sure you want to delete the override for {filename}? This will revert it to the default prompt.",
+    "deleteSuccess": "Override for {filename} deleted.",
+    "errorDelete": "Failed to delete override.",
+    "errorList": "Failed to load prompt list.",
+    "errorContent": "Failed to load content.",
+    "errorStatus": "Failed to update status.",
+    "errorSave": "Failed to save.",
+    "saveSuccessCount": "Successfully saved {count} prompt(s).",
+    "saveErrorCount": "Failed to save {count} prompt(s). Check individual errors.",
+    "noChanges": "No changes to save.",
+    "saving": "Saving...",
+    "loadingList": "Loading prompt list...",
+    "errorListTitle": "Error Loading Prompts",
+    "saveSuccessTitle": "Save Successful",
+    "saveErrorTitle": "Save Error",
+    "errorContentTitle": "Content Error"
+    }
 }
