@@ -1,18 +1,11 @@
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { getLangchainClient } from '../llm/clientFactory.js';
 import { getStandardTools } from './toolFactory.js'; // Removed getContextSearchTool import
-import departmentLookupTool from './tools/departmentLookupTool.js'; // Corrected casing to lowercase 'd'
+
 // Removed ToolTrackingHandler import
 import ServerLoggingService from '../services/ServerLoggingService.js';
 
-// --- Agent Cache ---
-const agentCache = new Map();
 
-// --- Helper Functions ---
-
-// Removed updateChatIdInCallbacks function
-
-// --- Generic Agent Creation ---
 
 /**
  * Creates a LangChain React Agent with the specified LLM and tools.
@@ -49,20 +42,14 @@ const createGenericAgent = async (llmType, tools, chatId) => { // Keep chatId fo
  * @param {string} agentType - The type of LLM ('openai', 'azure', 'anthropic', etc.).
  * @param {string} chatId - The chat ID for context/tracking.
  * @param {string} selectedSearch - The search provider ('google', 'canadaca').
+ * @param {object} [overrides={}] - Optional overrides for tool parameters.
  * @returns {Promise<object|null>} The created agent or null if creation fails.
  */
-export const createMessageAgent = async (agentType, chatId = 'system', selectedSearch = 'google') => {
-    // Check agent cache first - include selectedSearch in the key
-    const cacheKey = `message-${agentType}-${selectedSearch}`;
-    if (agentCache.has(cacheKey)) {
-        const cachedAgent = agentCache.get(cacheKey);
-        // updateChatIdInCallbacks(cachedAgent, chatId); // Removed callback update
-        // No need to update chatId here, it's handled during invocation
-        return cachedAgent;
-    }
+export const createMessageAgent = async (agentType, chatId = 'system', selectedSearch = 'google', overrides = {}) => { // Added overrides parameter
+    
 
-    // Pass selectedSearch to getStandardTools - tools are now unwrapped
-    const standardTools = getStandardTools(chatId, agentType, selectedSearch); // Pass agentType as aiProvider
+    // Pass selectedSearch and overrides to getStandardTools - tools are now unwrapped
+    const standardTools = getStandardTools(chatId, agentType, selectedSearch, overrides); // Pass agentType as aiProvider // Added overrides
     if (!standardTools || standardTools.length === 0) {
         ServerLoggingService.warn(`No standard tools found for chatId: ${chatId} and search: ${selectedSearch}. Agent might lack capabilities.`, chatId);
     }
@@ -70,15 +57,11 @@ export const createMessageAgent = async (agentType, chatId = 'system', selectedS
     // Pass unwrapped tools to createGenericAgent
     const agent = await createGenericAgent(agentType, standardTools || [], chatId);
 
-    // Cache the agent if successfully created
-    if (agent) {
-        agentCache.set(cacheKey, agent);
-    }
-
+   
     return agent;
 };
 
-// Removed createContextAgent as its logic is now integrated into createMessageAgent
+
 
 // --- Agent Selection and Retrieval ---
 
@@ -87,16 +70,17 @@ export const createMessageAgent = async (agentType, chatId = 'system', selectedS
  * @param {string} selectedAgent - The type of agent ('openai', 'azure', 'anthropic', 'claude').
  * @param {string} selectedSearch - The search provider ('google', 'canadaca').
  * @param {string} chatId - The chat ID for context/tracking.
+ * @param {object} [overrides={}] - Optional overrides for tool parameters.
  * @returns {Promise<object|null>} The agent or null if creation fails.
  */
-export const getAgent = async (selectedAgent, selectedSearch, chatId = 'system') => {
+export const getAgent = async (selectedAgent, selectedSearch, chatId = 'system', overrides = {}) => { // Added overrides parameter
     switch (selectedAgent?.toLowerCase()) {
         case 'openai':
         case 'azure':
         case 'anthropic':
         case 'claude':
-            // Pass selectedSearch to createMessageAgent
-            return createMessageAgent(selectedAgent, chatId, selectedSearch);
+            // Pass selectedSearch and overrides to createMessageAgent
+            return createMessageAgent(selectedAgent, chatId, selectedSearch, overrides); // Added overrides
         // Removed 'context' case
         default:
             ServerLoggingService.error(`Invalid agent specified: ${selectedAgent}`, chatId);
