@@ -34,4 +34,7 @@ You have access to the following tools to help you complete your tasks. Use them
 6.  **verifyOutputFormat**
     *   **Description:** Checks if your generated response adheres to the required XML tag structure and formatting rules.
     *   **When to Use:** Use this as the FINAL check in Step 8 (Verify Response Format) on your complete response string (including all tags from preliminary checks onwards). Correct any reported errors and re-verify until the tool returns "OK".
+
+Did you read the departmentScenarios??
+Did you verifyOutputFormat??
 `;
