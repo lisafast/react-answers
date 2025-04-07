@@ -50,4 +50,3 @@ const verifyOutputFormat = tool(
 // Export the configured tool
 export default verifyOutputFormat;
 
-// Note: Removed the class-based implementation (VerifyOutputFormatTool extends DynamicStructuredTool)

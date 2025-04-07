@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -42,8 +41,7 @@ import generateEmbeddingsHandler from '../api/db/db-generate-embeddings.js';
 import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 import chatHandler from '../api/chat/chat.js';
-import createBatchHandler from '../api/batch/create.js';
-import batchStatusHandler from '../api/batch/status.js';
+import { createBatchHandler, listBatchesHandler, getBatchResultsHandler, batchStatusHandler, cancelBatchHandler } from '../api/batch/index.js';
 // Import prompt API handlers
 import promptListHandler from '../api/prompts/list.js';
 import promptGetHandler from '../api/prompts/get.js';
@@ -129,6 +127,9 @@ app.post('/api/chat/chat', chatHandler); // Keep existing chat handler (now refa
 // Add new batch routes
 app.post('/api/batch/create', createBatchHandler);
 app.get('/api/batch/status', batchStatusHandler);
+app.get('/api/batch/list', listBatchesHandler);
+app.get('/api/batch/results', getBatchResultsHandler);
+app.post('/api/batch/cancel', cancelBatchHandler);
 
 // Add new prompt management routes with specific paths (protection applied in handlers)
 app.get('/api/prompts/list', promptListHandler);

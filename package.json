@@ -28,6 +28,7 @@
     "compute-cosine-similarity": "^1.1.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "csv-parse": "^5.6.0",
     "datatables.net": "^2.2.1",
     "datatables.net-dt": "^2.2.1",
     "datatables.net-react": "^1.0.0",

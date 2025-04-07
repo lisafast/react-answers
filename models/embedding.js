@@ -5,10 +5,10 @@ const embeddingSchema = new mongoose.Schema({
   interactionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Interaction', required: true },
   questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true },
   answerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Answer', required: true },
-  questionEmbedding: { type: [Number], required: false }, // Remove index
-  questionsEmbedding: { type: [Number], required: false }, // Remove index
-  questionsAnswerEmbedding: { type: [Number], required: false }, // Remove index
-  answerEmbedding: { type: [Number], required: false }, // Remove index
+  questionEmbedding: { type: [Number], required: false }, 
+  questionsEmbedding: { type: [Number], required: false }, 
+  questionsAnswerEmbedding: { type: [Number], required: false }, 
+  answerEmbedding: { type: [Number], required: false }, 
   sentenceEmbeddings: [{ type: [Number], required: false }],
 }, {
   timestamps: true,

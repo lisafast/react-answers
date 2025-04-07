@@ -395,6 +395,84 @@ class DataStoreService {
 
   // Add other methods as needed (e.g., findUser, saveUser, etc.)
 
+  /**
+   * Creates a new batch processing run
+   * @param {Object} batchData The batch data to create
+   * @returns {Promise<Batch>} The created batch document
+   */
+  async createBatchRun(batchData) {
+    await this.ensureDbConnection();
+    ServerLoggingService.info('Creating new batch run', batchData.batchId, batchData);
+    
+    const newBatch = new Batch(batchData);
+    return newBatch.save();
+  }
+
+  /**
+   * Updates a batch run with new status and progress
+   * @param {string} batchId The MongoDB _id of the batch
+   * @param {Object} update The update to apply
+   * @returns {Promise<Batch>} The updated batch document
+   */
+  async updateBatchRun(batchId, update) {
+    await this.ensureDbConnection();
+    ServerLoggingService.debug('Updating batch run', batchId, update);
+
+    const result = await Batch.findByIdAndUpdate(
+      batchId,
+      update,
+      { new: true, runValidators: true }
+    );
+
+    if (!result) {
+      throw new Error(`Batch ${batchId} not found`);
+    }
+
+    return result;
+  }
+
+  /**
+   * Finds a batch run by its MongoDB _id
+   * @param {string} batchId The MongoDB _id of the batch
+   * @returns {Promise<Batch>} The batch document
+   */
+  async findBatchRunById(batchId) {
+    await this.ensureDbConnection();
+    return Batch.findById(batchId).populate({
+      path: 'interactions',
+      populate: [
+        { 
+          path: 'question',
+          select: 'redactedQuestion englishQuestion'
+        },
+        {
+          path: 'answer',
+          select: 'englishAnswer content sentences citation',
+          populate: {
+            path: 'citation',
+            select: 'aiCitationUrl citationHead confidenceRating'
+          }
+        },
+        {
+          path: 'context',
+          select: 'topic topicUrl department departmentUrl searchResults'
+        }
+      ]
+    });
+  }
+
+  /**
+   * Finds all batches for a user
+   * @param {string} userId The user's MongoDB _id
+   * @returns {Promise<Array<Batch>>} Array of batch documents
+   */
+  async findBatchesByUser(userId) {
+    await this.ensureDbConnection();
+    return Batch.find({ uploaderUserId: userId })
+      .select('name status totalItems processedItems failedItems aiProvider searchProvider pageLanguage createdAt updatedAt')
+      .sort({ createdAt: -1 });
+  }
+
 }
 
 // Export a singleton instance
