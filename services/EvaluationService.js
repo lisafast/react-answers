@@ -11,6 +11,12 @@ import { Chat } from '../models/chat.js';
 
 class EvaluationService {
     async validateInteractionAndCheckExisting(interaction, chatId) {
+        ServerLoggingService.debug('Validating interaction', chatId, {
+            hasInteraction: !!interaction,
+            hasQuestion: !!interaction?.question,
+            hasAnswer: !!interaction?.answer
+        });
+
         if (!interaction || !interaction.question || !interaction.answer) {
             ServerLoggingService.warn('Invalid interaction or missing question/answer', chatId);
             return null;
@@ -18,20 +24,37 @@ class EvaluationService {
 
         const existingEval = await Eval.findOne({ interaction: interaction._id });
         if (existingEval) {
-            ServerLoggingService.info('Evaluation already exists for interaction', chatId);
+            ServerLoggingService.info('Evaluation already exists for interaction', chatId, {
+                evaluationId: existingEval._id
+            });
             return existingEval;
         }
 
+        ServerLoggingService.debug('Interaction validation successful', chatId);
         return true;
     }
 
     async getEmbeddingForInteraction(interaction) {
-        return await Embedding.findOne({
+        ServerLoggingService.debug('Fetching embeddings for interaction', interaction._id.toString());
+        
+        const embedding = await Embedding.findOne({
             interactionId: interaction._id,
             questionsAnswerEmbedding: { $exists: true, $not: { $size: 0 } },
             answerEmbedding: { $exists: true, $not: { $size: 0 } },
             sentenceEmbeddings: { $exists: true, $not: { $size: 0 } }
         });
+
+        if (!embedding) {
+            ServerLoggingService.warn('No embeddings found for interaction', interaction._id.toString());
+        } else {
+            ServerLoggingService.debug('Found embeddings for interaction', interaction._id.toString(), {
+                hasQuestionAnswerEmbedding: !!embedding.questionsAnswerEmbedding,
+                hasAnswerEmbedding: !!embedding.answerEmbedding,
+                sentenceEmbeddingsCount: embedding.sentenceEmbeddings?.length || 0
+            });
+        }
+
+        return embedding;
     }
 
     async findSimilarEmbeddingsWithFeedback(sourceEmbedding, similarityThreshold = 0.85, limit = 20) {
@@ -67,6 +90,10 @@ class EvaluationService {
                 }
             }
         ]);
+
+        ServerLoggingService.debug('Found similar embeddings with expert feedback', "system", {
+            count: embeddings.length    
+        });
 
         // Calculate similarity for each embedding and filter by threshold
         const similarEmbeddings = embeddings
