@@ -102,6 +102,7 @@ export default async function handler(req, res) {
 
     // 6. Perform evaluation on the saved interaction
     try {
+      ServerLoggingService.info('Starting evaluation for interaction', chat.chatId, { });
       const evaluationResult = await EvaluationService.evaluateInteraction(dbInteraction, chatId);
       if (evaluationResult) {
         ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {

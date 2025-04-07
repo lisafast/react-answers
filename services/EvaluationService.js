@@ -35,29 +35,56 @@ class EvaluationService {
     }
 
     async findSimilarEmbeddingsWithFeedback(sourceEmbedding, similarityThreshold = 0.85, limit = 20) {
-        // Find all embeddings where the interaction has expert feedback
-        const embeddings = await Embedding.find({
-            questionsAnswerEmbedding: { $exists: true, $not: { $size: 0 } }
-        }).populate({
-            path: 'interactionId',
-            populate: {
-                path: 'expertFeedback',
+        // Find embeddings that have expert feedback using $lookup and $match
+        const embeddings = await Embedding.aggregate([
+            {
+                $match: {
+                    questionsAnswerEmbedding: { $exists: true, $not: { $size: 0 } }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'interactions',
+                    localField: 'interactionId',
+                    foreignField: '_id',
+                    as: 'interaction'
+                }
+            },
+            {
+                $unwind: '$interaction'
+            },
+            {
+                $lookup: {
+                    from: 'expertfeedbacks',
+                    localField: 'interaction.expertFeedback',
+                    foreignField: '_id',
+                    as: 'expertFeedback'
+                }
+            },
+            {
+                $match: {
+                    'expertFeedback.0': { $exists: true }
+                }
             }
-        });
-
-        // Filter embeddings to those that have expertFeedback
-        const embeddingsWithFeedback = embeddings.filter(
-            emb => emb.interactionId?.expertFeedback
-        );
+        ]);
 
         // Calculate similarity for each embedding and filter by threshold
-        const similarEmbeddings = embeddingsWithFeedback
+        const similarEmbeddings = embeddings
             .map(embedding => {
                 const similarity = cosineSimilarity(
                     sourceEmbedding.questionsAnswerEmbedding,
                     embedding.questionsAnswerEmbedding
                 );
-                return { embedding, similarity };
+                return { 
+                    embedding: {
+                        ...embedding,
+                        interactionId: {
+                            ...embedding.interaction,
+                            expertFeedback: embedding.expertFeedback[0]
+                        }
+                    }, 
+                    similarity 
+                };
             })
             .filter(item => item.similarity >= similarityThreshold)
             .sort((a, b) => b.similarity - a.similarity)
@@ -128,6 +155,43 @@ class EvaluationService {
         return sentenceMatches;
     }
 
+    computeTotalScore(feedback, sentenceCount) {
+        // Check if any ratings were provided at all
+        const hasAnyRating = [
+            feedback.sentence1Score,
+            feedback.sentence2Score,
+            feedback.sentence3Score,
+            feedback.sentence4Score,
+            feedback.citationScore,
+        ].some((score) => score !== null);
+
+        // If no ratings were provided at all, return null
+        if (!hasAnyRating) return null;
+
+        // Get scores for existing sentences (up to sentenceCount)
+        const sentenceScores = [
+            feedback.sentence1Score,
+            feedback.sentence2Score,
+            feedback.sentence3Score,
+            feedback.sentence4Score,
+        ]
+            .slice(0, sentenceCount)
+            .map((score) => (score === null ? 100 : score)); // Unrated sentences = 100
+
+        // Calculate sentence component
+        const sentenceComponent =
+            (sentenceScores.reduce((sum, score) => sum + score, 0) / sentenceScores.length) * 0.75;
+
+        // Citation score defaults to 25 (good) in two cases:
+        // 1. Citation exists but wasn't rated
+        // 2. Answer has no citation section at all
+        const citationComponent = feedback.citationScore !== null ? feedback.citationScore : 25;
+
+        const totalScore = sentenceComponent + citationComponent;
+
+        return Math.round(totalScore * 100) / 100;
+    }
+
     async createEvaluation(interaction, bestMatch, sentenceMatches, chatId) {
         // Get the expert feedback from the best match
         const matchInteraction = bestMatch.embedding.interactionId;
@@ -135,6 +199,15 @@ class EvaluationService {
         const expertFeedback = matchInteraction.expertFeedback;
         if (!expertFeedback) {
             ServerLoggingService.warn('No expert feedback found for the matched interaction', chatId, {
+                interactionId: matchInteraction._id
+            });
+            return null;
+        }
+
+        // Find the chat for the matched interaction
+        const matchedChat = await Chat.findOne({ interactions: matchInteraction._id });
+        if (!matchedChat) {
+            ServerLoggingService.warn('No chat found for the matched interaction', chatId, {
                 interactionId: matchInteraction._id
             });
             return null;
@@ -168,12 +241,16 @@ class EvaluationService {
             }
         });
 
+        // Recalculate the total score based on the new sentence ordering
+        const recalculatedScore = this.computeTotalScore(newExpertFeedback, orderedMatches.length);
+        newExpertFeedback.totalScore = recalculatedScore;
+
         const savedFeedback = await newExpertFeedback.save();
 
-        // Create new evaluation with just the ordered similarity scores
+        // Create new evaluation using the matched chat's ID and interaction ID
         const newEval = new Eval({
-            chatId: chatId,
-            interactionId: interaction.interactionId,
+            chatId: matchedChat.chatId,
+            interactionId: matchInteraction._id,
             expertFeedback: savedFeedback._id,
             similarityScores: {
                 question: bestMatch.similarity,
@@ -193,10 +270,10 @@ class EvaluationService {
             { new: true }
         );
 
-        ServerLoggingService.info('Created evaluation with matched sentence feedback', chatId, {
+        ServerLoggingService.info('Created evaluation with matched sentence feedback', matchedChat.chatId, {
             evaluationId: savedEval._id,
             feedbackId: savedFeedback._id,
-            interactionId: interaction._id,
+            interactionId: matchInteraction._id,
             similarityScores: {
                 question: bestMatch.similarity,
                 answer: bestMatch.answerSimilarity,
