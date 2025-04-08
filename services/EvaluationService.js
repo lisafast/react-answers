@@ -58,64 +58,116 @@ class EvaluationService {
     }
 
     async findSimilarEmbeddingsWithFeedback(sourceEmbedding, similarityThreshold = 0.85, limit = 20) {
-        // Find embeddings that have expert feedback using $lookup and $match
-        const embeddings = await Embedding.aggregate([
-            {
-                $match: {
-                    questionsAnswerEmbedding: { $exists: true, $not: { $size: 0 } }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'interactions',
-                    localField: 'interactionId',
-                    foreignField: '_id',
-                    as: 'interaction'
-                }
-            },
-            {
-                $unwind: '$interaction'
-            },
-            {
-                $lookup: {
-                    from: 'expertfeedbacks',
-                    localField: 'interaction.expertFeedback',
-                    foreignField: '_id',
-                    as: 'expertFeedback'
-                }
-            },
-            {
-                $match: {
-                    'expertFeedback.0': { $exists: true }
-                }
-            }
-        ]);
-
-        ServerLoggingService.debug('Found similar embeddings with expert feedback', "system", {
-            count: embeddings.length    
+        ServerLoggingService.debug('Starting findSimilarEmbeddingsWithFeedback', 'system', {
+            threshold: similarityThreshold,
+            limit
         });
 
-        // Calculate similarity for each embedding and filter by threshold
-        const similarEmbeddings = embeddings
-            .map(embedding => {
-                const similarity = cosineSimilarity(
-                    sourceEmbedding.questionsAnswerEmbedding,
-                    embedding.questionsAnswerEmbedding
-                );
-                return { 
-                    embedding: {
-                        ...embedding,
-                        interactionId: {
-                            ...embedding.interaction,
-                            expertFeedback: embedding.expertFeedback[0]
+        const similarEmbeddings = [];
+        let processedCount = 0;
+        let skip = 0;
+        const batchSize = 10; // Process expert feedback in smaller batches
+
+        while (true) {
+            // Get expert feedback in batches, ordered by most recent first
+            const expertFeedbackBatch = await ExpertFeedback.find({})
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(batchSize)
+                .lean();
+
+            if (expertFeedbackBatch.length === 0) {
+                break; // No more expert feedback to process
+            }
+
+            ServerLoggingService.debug('Processing expert feedback batch', 'system', {
+                batchSize: expertFeedbackBatch.length,
+                currentSkip: skip
+            });
+
+            // Process each expert feedback
+            for (const feedback of expertFeedbackBatch) {
+                try {
+                    // Find interaction and its embedding in a single query with projection
+                    const interaction = await Interaction.findOne(
+                        { expertFeedback: feedback._id },
+                        { _id: 1, expertFeedback: 1, createdAt: 1 }
+                    ).lean();
+
+                    if (!interaction) continue;
+
+                    const embedding = await Embedding.findOne({
+                        interactionId: interaction._id,
+                        questionsAnswerEmbedding: { $exists: true, $not: { $size: 0 } }
+                    }).lean();
+
+                    if (!embedding) continue;
+
+                    // Calculate similarity
+                    const similarity = cosineSimilarity(
+                        sourceEmbedding.questionsAnswerEmbedding,
+                        embedding.questionsAnswerEmbedding
+                    );
+
+                    processedCount++;
+
+                    // Only add if it meets the threshold
+                    if (similarity >= similarityThreshold) {
+                        similarEmbeddings.push({
+                            embedding: {
+                                ...embedding,
+                                interactionId: {
+                                    _id: interaction._id,
+                                    expertFeedback: feedback,
+                                    createdAt: interaction.createdAt
+                                }
+                            },
+                            similarity
+                        });
+
+                        // Sort by similarity and trim to limit
+                        if (similarEmbeddings.length > limit) {
+                            similarEmbeddings.sort((a, b) => b.similarity - a.similarity);
+                            similarEmbeddings.length = limit;
                         }
-                    }, 
-                    similarity 
-                };
-            })
-            .filter(item => item.similarity >= similarityThreshold)
-            .sort((a, b) => b.similarity - a.similarity)
-            .slice(0, limit);
+
+                        // Exit early if we have enough high-quality matches
+                        if (similarEmbeddings.length >= limit && 
+                            similarEmbeddings[similarEmbeddings.length - 1].similarity >= similarityThreshold + 0.1) {
+                            ServerLoggingService.debug('Found enough high-quality matches, exiting early', 'system', {
+                                processedCount,
+                                totalMatches: similarEmbeddings.length
+                            });
+                            return similarEmbeddings;
+                        }
+                    }
+
+                    // Log progress periodically
+                    if (processedCount % 100 === 0) {
+                        ServerLoggingService.debug('Processing progress', 'system', {
+                            processed: processedCount,
+                            matchesFound: similarEmbeddings.length
+                        });
+                    }
+
+                } catch (error) {
+                    ServerLoggingService.error('Error processing feedback', feedback._id.toString(), error);
+                }
+            }
+
+            skip += batchSize;
+        }
+
+        // Final sort by similarity
+        similarEmbeddings.sort((a, b) => b.similarity - a.similarity);
+
+        ServerLoggingService.info('Completed finding similar embeddings', 'system', {
+            totalProcessed: processedCount,
+            matchesFound: similarEmbeddings.length,
+            averageSimilarity: similarEmbeddings.length > 0 
+                ? similarEmbeddings.reduce((sum, item) => sum + item.similarity, 0) / similarEmbeddings.length 
+                : 0
+        });
 
         return similarEmbeddings;
     }
