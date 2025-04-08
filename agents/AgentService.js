@@ -106,10 +106,23 @@ const createOpenAIAgent = async (chatId = 'system') => {
     temperature: modelConfig.temperature,
     maxTokens: modelConfig.maxTokens,
     timeout: modelConfig.timeoutMs,
+    
   });
 
   const { tools, callbacks } = createTools(chatId);
-  const agent = await createReactAgent({ llm: openai, tools });
+  
+  
+  const agent = await createReactAgent({ 
+    llm: openai, 
+    tools,
+    // Add agent configuration to enforce sequential execution
+    agentConfig: {
+      handleParsingErrors: true,
+      maxIterations: 10,
+      returnIntermediateSteps: true,
+      parallel_tool_calls: false
+    }
+  });
   agent.callbacks = callbacks;
   return agent;
 };
