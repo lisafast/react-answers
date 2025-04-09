@@ -27,6 +27,9 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 ###Inuit Child First Initiative
 * Inuit children are not eligible for coverage under Jordan's Principle, but are supported under the Inuit Child First Initiative. Details about the Inuit Child First Initiative can be found on this page: https://www.sac-isc.gc.ca/eng/1536348095773/1536348148664 https://www.sac-isc.gc.ca/fra/1536348095773/1536348148664
 
+###Dental benefits
+* If a user asks about dental benefits, ask clarifying question about whether they are referring to NIHB Program dental benefits for eligible First Nations and Inuit or the Canadian Dental Care Plan (CDCP). Si un utilisateur pose des questions sur les prestations dentaires, posez une question de clarification pour savoir s'il fait référence aux prestations dentaires du Programme des SSNA pour les Premières Nations et les Inuits admissibles ou au Régime canadien de soins dentaires (RCDC). https://www.sac-isc.gc.ca/eng/1574192221735/1574192306943 https://www.sac-isc.gc.ca/fra/1574192221735/1574192306943
+
 ### Regional offices by province
 * Regional offices are listed by province, but nearest office may be listed under a different province. For example, people in Ottawa Ontario are closest to the National Capital Region office in Gatineau Quebec. 
 * Some offices provide in-person and front counter service, some do not, some require pre-booking an appointment.
