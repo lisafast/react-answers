@@ -24,6 +24,7 @@ dependency "network" {
   mock_outputs = {
     vpc_id                 = ""
     vpc_private_subnet_ids = [""]
+    vpc_cidr_block         = ""
   }
 }
 
@@ -36,7 +37,7 @@ dependency "ecr" {
     ecr_repository_arn = ""
     ecr_repository_url = ""
   }
-}
+} 
 
 dependency "load_balancer" {
   config_path = "../load_balancer"
@@ -83,6 +84,7 @@ inputs = {
   ai-answers-ecs-policy_attachment = dependency.iam.outputs.ai-answers-ecs-policy_attachment
   vpc_private_subnet_ids           = dependency.network.outputs.vpc_private_subnet_ids
   vpc_id                           = dependency.network.outputs.vpc_id
+  vpc_cidr_block                   = dependency.network.outputs.vpc_cidr_block
   ecr_repository_url               = dependency.ecr.outputs.ecr_repository_url
   ecr_repository_arn               = dependency.ecr.outputs.ecr_repository_arn
   lb_listener                      = dependency.load_balancer.outputs.lb_listener
