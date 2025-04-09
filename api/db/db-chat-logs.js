@@ -3,7 +3,6 @@ import { Chat } from '../../models/chat.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 async function chatLogsHandler(req, res) {
-    
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method not allowed' });
     }
@@ -26,10 +25,14 @@ async function chatLogsHandler(req, res) {
                 path: 'interactions',
                 populate: [
                     { 
-                        path: 'context',
+                        path: 'context' ,
                         populate: { path: 'tools' } // Populate tools within context
                     },
-                    { path: 'expertFeedback' },
+                    { 
+                        path: 'expertFeedback',
+                        model: 'ExpertFeedback',
+                        select: '-__v'
+                    },
                     { 
                         path: 'question',
                         select: '-embedding'
@@ -47,8 +50,16 @@ async function chatLogsHandler(req, res) {
                         path: 'autoEval',
                         model: 'Eval',
                         populate: [
-                            { path: 'expertFeedback' },
-                            { path: 'usedExpertFeedbackId' }
+                            { 
+                                path: 'expertFeedback',
+                                model: 'ExpertFeedback',
+                                select: '-__v'
+                            },
+                            { 
+                                path: 'usedExpertFeedback',
+                                model: 'ExpertFeedback',
+                                select: '-__v'
+                            }
                         ]
                     }
                 ]
@@ -68,7 +79,6 @@ async function chatLogsHandler(req, res) {
         });
     }
 }
-
 
 export default function handler(req, res) {
     return withProtection(chatLogsHandler, authMiddleware, adminMiddleware)(req, res);

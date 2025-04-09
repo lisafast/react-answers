@@ -16,7 +16,7 @@ const evalSchema = new Schema({
         ref: 'ExpertFeedback',
         required: false
     },
-    usedExpertFeedbackId: { 
+    usedExpertFeedback: { 
         type: Schema.Types.ObjectId, 
         ref: 'ExpertFeedback',
         required: false

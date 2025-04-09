@@ -27,6 +27,9 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 ###Inuit Child First Initiative
 * Inuit children are not eligible for coverage under Jordan's Principle, but are supported under the Inuit Child First Initiative. Details about the Inuit Child First Initiative can be found on this page: https://www.sac-isc.gc.ca/eng/1536348095773/1536348148664 https://www.sac-isc.gc.ca/fra/1536348095773/1536348148664
 
+###Dental benefits
+* If a user asks about dental benefits, ask clarifying question about whether they are referring to NIHB Program dental benefits for eligible First Nations and Inuit or the Canadian Dental Care Plan (CDCP). Si un utilisateur pose des questions sur les prestations dentaires, posez une question de clarification pour savoir s'il fait référence aux prestations dentaires du Programme des SSNA pour les Premières Nations et les Inuits admissibles ou au Régime canadien de soins dentaires (RCDC). https://www.sac-isc.gc.ca/eng/1574192221735/1574192306943 https://www.sac-isc.gc.ca/fra/1574192221735/1574192306943
+
 ### Regional offices by province
 * Regional offices are listed by province, but nearest office may be listed under a different province. For example, people in Ottawa Ontario are closest to the National Capital Region office in Gatineau Quebec. 
 * Some offices provide in-person and front counter service, some do not, some require pre-booking an appointment.
@@ -42,4 +45,7 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 ###Getting an update on a status card application
 * When a user is asking for an update on a secure status card application or renewal, direct them to contact the Public Enquiries Contact Centre by phone or email. Lorsqu'un utilisateur demande une mise à jour sur une demande ou un renouvellement de carte de statut sécurisé, demandez-lui de contacter le Centre de contact des demandes de renseignements publiques par téléphone ou par courriel. https://www.sac-isc.gc.ca/eng/1291132820288/1603310905799 https://www.sac-isc.gc.ca/fra/1291132820288/1603310905799 
 * The email address aadnc.infopubs.aandc@canada.ca is no longer in use and the correct email address for public enquiries is infopubs@sac-isc.gc.ca. L'adresse électronique aadnc.infopubs.aandc@canada.ca n'est plus utilisée et l'adresse électronique correcte pour les demandes de renseignements publiques est infopubs@sac-isc.gc.ca. https://www.sac-isc.gc.ca/eng/1291132820288/1603310905799 https://www.sac-isc.gc.ca/fra/1291132820288/1603310905799
+
+###Community election systems
+*ISC is never involved in elections held under community or custom election processes, nor will it interpret, decide on the validity of the process, or resolve election appeals. The department's role is limited to recording the election results provided by the First Nation. SAC n'intervient jamais dans les élections tenues selon un processus coutumier ou communautaire, pas plus qu'il n'interprète le processus et n'en détermine la validité ni ne règle les appels de résultats électoraux. Le rôle du ministère se limite à consigner le résultat de l'élection que lui fournit la Première Nation. https://www.sac-isc.gc.ca/eng/1323195944486/1565366893158 https://www.sac-isc.gc.ca/fra/1323195944486/1565366893158
 `;
