@@ -46,18 +46,11 @@ async function chatLogsHandler(req, res) {
                     {
                         path: 'autoEval',
                         model: 'Eval',
-                        populate: [
-                            { 
-                                path: 'expertFeedback',
-                                model: 'ExpertFeedback',
-                                select: '-__v'
-                            },
-                            { 
-                                path: 'usedExpertFeedback',
-                                model: 'ExpertFeedback',
-                                select: '-__v'
-                            }
-                        ]
+                        populate: {
+                            path: 'expertFeedback',
+                            model: 'ExpertFeedback',
+                            select: '-__v'
+                        }
                     }
                 ]
             })
