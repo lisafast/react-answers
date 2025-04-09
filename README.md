@@ -1,4 +1,4 @@
-# React app for learning and ux research for gen AI applications
+# React app for learning and ux research for gen AI applications.
 
 A React-based AI chat application that provides answers designed and sourced exclusively from and for Government of Canada websites. Built to assist users navigating Canada.ca and other government services..
 
