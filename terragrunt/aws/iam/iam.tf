@@ -31,7 +31,9 @@ data "aws_iam_policy_document" "ai-answers-ssm-policy" {
       var.canada_ca_search_api_key_arn,
       var.user_agent_arn,
       var.jwt_secret_key_arn,
-      var.docdb_uri_arn
+      var.docdb_uri_arn,
+      var.google_ai_api_key_arn,
+      var.google_search_engine_id_arn
     ]
   }
 }
