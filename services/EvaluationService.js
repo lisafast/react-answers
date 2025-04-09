@@ -273,7 +273,7 @@ class EvaluationService {
                             matchId: match.embedding.interactionId._id
                         };
                     }
-                earch});
+                });
             });
         });
 
@@ -288,10 +288,18 @@ class EvaluationService {
     }
 
     async findBestCitationMatch(interaction, bestAnswerMatches) {
-        const sourceUrl = interaction.answer?.citation?.url || '';
+        // Ensure the citation is populated from the Answer model
+        await interaction.populate({
+            path: 'answer',
+            populate: {
+                path: 'citation',
+                model: 'Citation'
+            }
+        });
+        const sourceUrl = interaction.answer?.citation?.providedCitationUrl || '';
         const bestCitationMatch = {
-            score: 100,
-            explanation: 'Positive feedback - citation meets requirements',
+            score: null,
+            explanation: '',
             url: '',
             similarity: 0
         };
@@ -299,14 +307,18 @@ class EvaluationService {
         // Look for exact URL matches in best answer matches
         for (const match of bestAnswerMatches) {
             const expertFeedback = match.embedding.interactionId.expertFeedback;
-            const matchUrl = expertFeedback.expertCitationUrl;
+            const matchInteraction = await Interaction.findById(match.embedding.interactionId._id).populate({
+                path: 'answer',
+                populate: {
+                    path: 'citation',
+                    model: 'Citation'
+                }
+            });
             
+            const matchUrl = matchInteraction?.answer?.citation?.providedCitationUrl;
             if (matchUrl && sourceUrl.toLowerCase() === matchUrl.toLowerCase()) {
-                bestCitationMatch.score = expertFeedback.citationScore ?? 100;
-                bestCitationMatch.explanation = expertFeedback.citationExplanation || 
-                    (expertFeedback.citationScore === 100 ? 
-                        'Positive feedback - citation matches expert example' : 
-                        'Citation needs improvement');
+                bestCitationMatch.score = expertFeedback.citationScore;
+                bestCitationMatch.explanation = expertFeedback.citationExplanation;
                 bestCitationMatch.url = matchUrl;
                 bestCitationMatch.similarity = 1;
                 break;
@@ -359,57 +371,79 @@ class EvaluationService {
         return Math.round(totalScore * 100) / 100;
     }
 
-    async createEvaluation(interaction, bestMatch, sentenceMatches, chatId, bestCitationMatch) {
-        // Get the expert feedback from the best match
-        const matchInteraction = bestMatch.embedding.interactionId;
-
-        const expertFeedback = matchInteraction.expertFeedback;
-        if (!expertFeedback) {
-            ServerLoggingService.warn('No expert feedback found for the matched interaction', chatId, {
-                interactionId: matchInteraction._id
+    async createEvaluation(interaction, sentenceMatches, chatId, bestCitationMatch) {
+        // Ensure the source interaction's answer and sentences are populated
+        const sourceInteraction = await Interaction.findById(interaction._id)
+            .populate({
+                path: 'answer',
+                populate: { path: 'sentences' }
             });
-            return null;
-        }
-
-        // Find the chat for the matched interaction
-        const matchedChat = await Chat.findOne({ interactions: matchInteraction._id });
-        if (!matchedChat) {
-            ServerLoggingService.warn('No chat found for the matched interaction', chatId, {
-                interactionId: matchInteraction._id
-            });
-            return null;
-        }
 
         // Create a new feedback object
-        const newExpertFeedback = new ExpertFeedback({
-            totalScore: null, // Will be calculated after setting all scores
+         const newExpertFeedback = new ExpertFeedback({
+            totalScore: null,
             citationScore: bestCitationMatch.score,
             citationExplanation: bestCitationMatch.explanation,
             answerImprovement: '',
             expertCitationUrl: bestCitationMatch.url,
-            feedback: 'Automated evaluation based on similar responses'
+            feedback: ''
         });
 
-        // Sort sentence matches by target index (order in expert feedback)
-        const orderedMatches = [...sentenceMatches].sort((a, b) => a.targetIndex - b.targetIndex);
-        
-        // Map sentence feedback from expert feedback to new feedback object
-        orderedMatches.forEach((match, idx) => {
-            const feedbackIdx = match.targetIndex + 1; // Convert to 1-based index for feedback
-            const newIdx = idx + 1; // Use sequential index for new feedback
+        const sentenceTrace = [];
+        const sentenceSimilarities = [];
 
-            if (feedbackIdx >= 1 && feedbackIdx <= 4) {
-                const score = expertFeedback[`sentence${feedbackIdx}Score`] ?? 100;
+        // Map sentence feedback and build trace with actual sentence text
+        for (const match of sentenceMatches) {
+            const feedbackIdx = match.targetIndex + 1;
+            const newIdx = sentenceTrace.length + 1;
+
+            // Get source sentence text
+            const sourceSentenceText = sourceInteraction?.answer?.sentences[match.sourceIndex];
+            
+            // Get matched sentence text
+            const matchedInteraction = await Interaction.findById(match.matchId)
+                .populate({
+                    path: 'answer',
+                    populate: { path: 'sentences' }
+                });
+            const matchedSentenceText = matchedInteraction?.answer?.sentences[match.targetIndex];
+            
+
+            // Get expert feedback
+            if (match.expertFeedback && feedbackIdx >= 1 && feedbackIdx <= 4) {
+                const score = match.expertFeedback[`sentence${feedbackIdx}Score`] ?? 100;
                 newExpertFeedback[`sentence${newIdx}Score`] = score;
-                newExpertFeedback[`sentence${newIdx}Explanation`] = 
-                    score === 100 ? 'Positive feedback' : 'Needs improvement';
-                newExpertFeedback[`sentence${newIdx}Harmful`] = score < 50;
+                newExpertFeedback[`sentence${newIdx}Explanation`] = match.expertFeedback[`sentence${feedbackIdx}Explanation`];
+                newExpertFeedback[`sentence${newIdx}Harmful`] = match.expertFeedback[`sentence${feedbackIdx}Harmful`] || false;
             }
-        });
 
-        // Recalculate the total score based on the new sentence ordering
-        const recalculatedScore = this.computeTotalScore(newExpertFeedback, orderedMatches.length);
+            // Build trace entry with text
+            sentenceTrace.push({
+                sourceIndex: match.sourceIndex,
+                sourceSentenceText: sourceSentenceText,
+                matchedInteractionId: match.matchId,
+                matchedSentenceIndex: match.targetIndex,
+                matchedSentenceText: matchedSentenceText,
+                matchedExpertFeedbackSentenceScore: match.expertFeedback?.[`sentence${feedbackIdx}Score`] ?? 100,
+                matchedExpertFeedbackSentenceExplanation: match.expertFeedback?.[`sentence${feedbackIdx}Explanation`],
+                similarity: match.similarity
+            });
+
+            sentenceSimilarities.push(match.similarity);
+        }
+
+        
+
+        // Recalculate the total score based on the sentence scores and citation
+        const recalculatedScore = this.computeTotalScore(newExpertFeedback, sentenceMatches.length);
         newExpertFeedback.totalScore = recalculatedScore;
+        
+        // Set feedback based on totalScore
+         if (newExpertFeedback.totalScore === 100) {
+            newExpertFeedback.feedback = "positive";
+        } else if (newExpertFeedback.totalScore < 100) {
+            newExpertFeedback.feedback = "negative";
+        }
 
         const savedFeedback = await newExpertFeedback.save();
 
@@ -419,18 +453,14 @@ class EvaluationService {
             citationScore: bestCitationMatch.score
         });
 
-        // Create new evaluation using the matched chat's ID and interaction ID
+        // Create new evaluation using sentence-level evaluation data
         const newEval = new Eval({
-            chatId: interaction.chatId,
-            interactionId: interaction._id,
             expertFeedback: savedFeedback._id,
             similarityScores: {
-                question: bestMatch.similarity,
-                answer: bestMatch.answerSimilarity,
-                questionAnswer: (bestMatch.similarity + bestMatch.answerSimilarity) / 2,
-                sentences: orderedMatches.map(match => match.similarity),
+                sentences: sentenceSimilarities,
                 citation: bestCitationMatch.similarity || 0
-            }
+            },
+            sentenceMatchTrace: sentenceTrace
         });
 
         const savedEval = await newEval.save();
@@ -446,7 +476,8 @@ class EvaluationService {
             evaluationId: savedEval._id,
             feedbackId: savedFeedback._id,
             totalScore: recalculatedScore,
-            similarityScores: newEval.similarityScores
+            similarityScores: newEval.similarityScores,
+            traceCount: sentenceTrace.length
         });
 
         return savedEval;
@@ -497,7 +528,7 @@ class EvaluationService {
                 bestAnswerMatches
             );
 
-            if (!bestSentenceMatches.length) {
+            if (!bestSentenceMatches.length || bestSentenceMatches.length !== sourceEmbedding.sentenceEmbeddings.length) {
                 ServerLoggingService.info('No good sentence matches found', chatId);
                 return null;
             }
@@ -511,7 +542,6 @@ class EvaluationService {
             // Create evaluation using best matches
             return await this.createEvaluation(
                 interaction,
-                bestAnswerMatches[0], // Use the top answer match for overall similarity
                 bestSentenceMatches,
                 chatId,
                 bestCitationMatch

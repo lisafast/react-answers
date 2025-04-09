@@ -2,32 +2,29 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
+// New sub-schema for sentence match traceability
+const sentenceMatchTraceSchema = new Schema({
+    sourceIndex: { type: Number, required: true }, // Index of the sentence in the current interaction's answer
+    sourceSentenceText: { type: String, required: false, default: '' }, // Added: Actual text of the source sentence
+    matchedInteractionId: { type: Schema.Types.ObjectId, ref: 'Interaction', required: true }, // ID of the interaction providing the expert feedback
+    matchedSentenceIndex: { type: Number, required: true }, // Index of the sentence in the matched interaction's answer
+    matchedSentenceText: { type: String, required: false, default: '' }, // Added: Actual text of the matched sentence
+    matchedExpertFeedbackSentenceScore: { type: Number, required: false, default: null }, // Score given by expert for the matched sentence
+    matchedExpertFeedbackSentenceExplanation: { type: String, required: false, default: '' }, // Explanation given by expert for the matched sentence
+    similarity: { type: Number, required: true } // Similarity score between source and matched sentence
+}, { _id: false });
+
 const evalSchema = new Schema({
-    chatId: { 
-        type: String,
-        required: false 
-    },
-    interactionId: { 
-        type: String,
-        required: false 
-    },
     expertFeedback: { 
         type: Schema.Types.ObjectId, 
         ref: 'ExpertFeedback',
         required: false
     },
-    usedExpertFeedback: { 
-        type: Schema.Types.ObjectId, 
-        ref: 'ExpertFeedback',
-        required: false
-    },
     similarityScores: {
-        question: { type: Number, required: false, default: 0 }, // Similarity score for the question
-        answer: { type: Number, required: false, default: 0 }, // Similarity score for the answer
-        questionAnswer: { type: Number, required: false, default: 0 }, // Combined similarity score for question and answer
-        sentences: [{ type: Number, required: false, default: 0 }] // Array of similarity scores
+        sentences: [{ type: Number, required: false, default: 0 }],
+        citation: { type: Number, required: false, default: 0 } // Added citation similarity
     },
-
+    sentenceMatchTrace: [sentenceMatchTraceSchema] // Added traceability field
 }, { 
     timestamps: true, 
     versionKey: false,
