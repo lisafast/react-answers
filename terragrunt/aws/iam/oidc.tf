@@ -3,44 +3,27 @@ locals {
 }
 
 #
-# Create the OIDC roles used by the GitHub workflows
-# The roles can be assumed by the GitHub workflows according to the `claim`
-# attribute of each role.
-# 
+# Create the OIDC role used by the GitHub workflow
+# This role can be assumed by GitHub workflows based on the claim
+#
 module "github_workflow_roles" {
   count = var.env == "prod" ? 1 : 0
 
   source            = "github.com/cds-snc/terraform-modules//gh_oidc_role?ref=v10.3.2"
   billing_tag_value = var.billing_code
+
   roles = [
     {
       name      = local.ai_answers_release
       repo_name = "ai-answers"
       claim     = "ref:refs/tags/v*"
-    },
-    {
-      name      = local.ai_answers_release
-      repo_name = "ai-answers"
-      claim     = "release"
     }
   ]
 }
 
 #
-# Attach polices to the OIDC roles to grant them permissions.  These
-# attachments are scoped to only the environments that require the role.
+# IAM policy allowing ECR deploy and ECS update
 #
-resource "aws_iam_role_policy_attachment" "ai_answers_release" {
-  count = var.env == "prod" ? 1 : 0
-
-  role       = local.ai_answers_release
-  policy_arn = aws_iam_policy.ecr_deploy_policy[0].arn
-  depends_on = [
-    module.github_workflow_roles[0]
-  ]
-}
-
-# Create a policy for ECR deployment
 resource "aws_iam_policy" "ecr_deploy_policy" {
   count = var.env == "prod" ? 1 : 0
 
@@ -74,4 +57,17 @@ resource "aws_iam_policy" "ecr_deploy_policy" {
       }
     ]
   })
+}
+
+#
+# Attach the IAM policy to the OIDC role
+#
+resource "aws_iam_role_policy_attachment" "ai_answers_release" {
+  count = var.env == "prod" ? 1 : 0
+
+  role       = local.ai_answers_release
+  policy_arn = aws_iam_policy.ecr_deploy_policy[0].arn
+  depends_on = [
+    module.github_workflow_roles[0]
+  ]
 }
