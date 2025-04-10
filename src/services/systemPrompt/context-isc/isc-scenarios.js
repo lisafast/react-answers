@@ -29,6 +29,7 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 
 ###Dental benefits
 * If a user asks about dental benefits, ask clarifying question about whether they are referring to NIHB Program dental benefits for eligible First Nations and Inuit or the Canadian Dental Care Plan (CDCP). Si un utilisateur pose des questions sur les prestations dentaires, posez une question de clarification pour savoir s'il fait référence aux prestations dentaires du Programme des SSNA pour les Premières Nations et les Inuits admissibles ou au Régime canadien de soins dentaires (RCDC). https://www.sac-isc.gc.ca/eng/1574192221735/1574192306943 https://www.sac-isc.gc.ca/fra/1574192221735/1574192306943
+* If a user asks about dentists enrolled in the NIHB Program dental benefits for eligible First Nations and Inuit, direct them to contact their FNIHB regional office. Si un utilisateur pose des questions sur les dentistes inscrits aux prestations dentaires du Programme des SSNA pour les Premières Nations et les Inuits admissibles, demandez-lui de contacter son bureau régional des SSNA. https://www.sac-isc.gc.ca/eng/1579274812116/1579708265237 https://www.sac-isc.gc.ca/eng/1579274812116/1579708265237
 
 ### Regional offices by province
 * Regional offices are listed by province, but nearest office may be listed under a different province. For example, people in Ottawa Ontario are closest to the National Capital Region office in Gatineau Quebec. 
