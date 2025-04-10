@@ -22,51 +22,21 @@ module "github_workflow_roles" {
 }
 
 #
-# IAM policy allowing ECR deploy and ECS update
+# Use the AWS managed AdministratorAccess policy
 #
-resource "aws_iam_policy" "ecr_deploy_policy" {
-  count = var.env == "production" ? 1 : 0
-
-  name        = "ai-answers-ecr-deploy-policy"
-  description = "Policy for GitHub Actions to deploy to ECR and update ECS"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:PutImage",
-          "ecr:InitiateLayerUpload",
-          "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload",
-          "ecr:GetAuthorizationToken"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecs:UpdateService",
-          "ecs:DescribeServices"
-        ]
-        Resource = "arn:aws:ecs:ca-central-1:730335533085:service/ai-answers-prod-cluster/ai-answers-prod-app-service"
-      }
-    ]
-  })
+data "aws_iam_policy" "admin" {
+  # checkov:skip=CKV_AWS_275:This policy is required for the Terraform apply
+  name = "AdministratorAccess"
 }
 
 #
-# Attach the IAM policy to the OIDC role
+# Attach the AdministratorAccess policy to the OIDC role
 #
 resource "aws_iam_role_policy_attachment" "ai_answers_release" {
   count = var.env == "production" ? 1 : 0
 
   role       = local.ai_answers_release
-  policy_arn = aws_iam_policy.ecr_deploy_policy[0].arn
+  policy_arn = data.aws_iam_policy.admin.arn
   depends_on = [
     module.github_workflow_roles[0]
   ]
