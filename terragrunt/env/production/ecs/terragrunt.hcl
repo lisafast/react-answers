@@ -37,7 +37,7 @@ dependency "ecr" {
     ecr_repository_arn = ""
     ecr_repository_url = ""
   }
-} 
+}
 
 dependency "load_balancer" {
   config_path = "../load_balancer"

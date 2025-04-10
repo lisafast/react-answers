@@ -15,7 +15,7 @@ module "github_workflow_roles" {
       claim     = "ref:refs/tags/v*"
     }
   ]
-} 
+}
 
 resource "aws_iam_role_policy_attachment" "ai_answers_release" {
   count = var.env == "production" ? 1 : 0
