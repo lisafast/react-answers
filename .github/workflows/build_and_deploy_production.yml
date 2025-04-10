@@ -32,7 +32,7 @@ jobs:
       - name: Configure aws credentials using OIDC
         uses: aws-actions/configure-aws-credentials@master
         with:
-          role-to-assume: arn:aws:iam::730335533085:role/ai-answers-ecr-deploy-role
+          role-to-assume: arn:aws:iam::730335533085:role/ai_answers_release
           role-session-name: AIAnswersGitHubActions
           aws-region: "ca-central-1"
 
