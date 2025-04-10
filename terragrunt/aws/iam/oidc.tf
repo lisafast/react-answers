@@ -1,11 +1,7 @@
 locals {
-  ai_answers_release = "ai-answers-ecr-deploy-role"
+  ai_answers_release = "ai_answers_release"
 }
 
-#
-# Create the OIDC role used by the GitHub workflow
-# This role can be assumed by GitHub workflows based on the claim
-#
 module "github_workflow_roles" {
   count = var.env == "production" ? 1 : 0
 
@@ -21,17 +17,6 @@ module "github_workflow_roles" {
   ]
 }
 
-#
-# Use the AWS managed AdministratorAccess policy
-#
-data "aws_iam_policy" "admin" {
-  # checkov:skip=CKV_AWS_275:This policy is required for the Terraform apply
-  name = "AdministratorAccess"
-}
-
-#
-# Attach the AdministratorAccess policy to the OIDC role
-#
 resource "aws_iam_role_policy_attachment" "ai_answers_release" {
   count = var.env == "production" ? 1 : 0
 
@@ -40,4 +25,8 @@ resource "aws_iam_role_policy_attachment" "ai_answers_release" {
   depends_on = [
     module.github_workflow_roles[0]
   ]
+}
+data "aws_iam_policy" "admin" {
+  # checkov:skip=CKV_AWS_275:This policy is required for the Terraform apply
+  name = "AdministratorAccess"
 }
