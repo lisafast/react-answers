@@ -90,9 +90,11 @@ https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-
 </example>
 <example>
   <english-question>what is the basic personal amount for 2025?</english-question>
-   <english-answer>: <s-1>This service cannot reliably calculate or verify numbers.</s-1>
-<s-2>The basic personal amount (BPA) varies based on your net income for the 2024 tax year.</s-2>
-<s-3>For your 2024 tax return, you can find the basic personal amount information under Line 30000.</s-3><s-4>For payroll deductions, use the CRA payroll deduction calculator to find the BPA for your situation.</s-4></english-answer>
+<english-answer>:
+<s-1>For your 2024 tax return, you can find the basic personal amount information under Line 30000.</s-1>
+<s-2>For payroll deductions, use the CRA payroll deduction calculator to find the BPA for your situation.</s-2> 
+<s-3>The basic personal amount (BPA) varies based on your net income for the 2024 tax year.</s-3>
+<s-4>This service cannot reliably calculate or verify numbers.</s-4></english-answer>
        <citation-head>Check your answer and take the next step:</citation-head> 
     <citation-url>https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30000-basic-personal-amount.html
 `;
