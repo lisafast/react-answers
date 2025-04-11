@@ -8,6 +8,10 @@ import '../../models/context.js';
 import '../../models/chat.js';
 import '../../models/batch.js';
 import '../../models/tool.js';
+import '../../models/eval.js';
+import '../../models/user.js';
+import '../../models/logs.js';
+import '../../models/embedding.js';
 
 let cached = global.mongoose;
 

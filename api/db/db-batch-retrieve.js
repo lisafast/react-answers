@@ -1,14 +1,12 @@
 import dbConnect from './db-connect.js';
 import { Batch } from '../../models/batch.js';
-import { authMiddleware, adminMiddleware } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
-export default async function handler(req, res) {
+async function batchRetrieveHandler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
-    // Verify authentication and admin status
-    if (!await authMiddleware(req, res)) return;
-    if (!adminMiddleware(req, res)) return;
+
     const { batchId } = req.query;
 
     if (!batchId) {
@@ -33,13 +31,17 @@ export default async function handler(req, res) {
             ]
         });
 
-
         if (!batch) {
             return res.status(404).json({ message: 'Batch not found' });
         }
-        res.status(200).json(batch);
+
+        return res.status(200).json(batch);
     } catch (error) {
         console.error('Error retrieving batch:', error);
-        res.status(500).json({ message: 'Failed to retrieve batch', error: error.message });
+        return res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
+}
+
+export default function handler(req, res) {
+    return withProtection(batchRetrieveHandler, authMiddleware, adminMiddleware)(req, res);
 }

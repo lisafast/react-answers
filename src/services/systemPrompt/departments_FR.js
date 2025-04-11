@@ -564,6 +564,11 @@ export const departments_FR = [
     abbr: 'EFPC',
   },
   {
+    name: 'Educanada',
+    url: 'https://www.educanada.ca/index.aspx?lang=fra',
+    abbr: 'EDU',
+  },
+  {
     name: 'Élections Canada',
     url: 'https://www.elections.ca/accueil.aspx',
     abbr: 'Élections',

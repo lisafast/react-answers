@@ -219,6 +219,7 @@
     }
   },
   "logging": {
+    "title": "Visualiseur de chat",
     "start": "Démarrer",
     "pause": "Pause"
   },
@@ -230,10 +231,22 @@
       "aiAnswers": "Réponses IA",
       "batches": "Lots",
       "users": "Gestion des utilisateurs",
-      "logs": "Journaux de chat"
+      "chatViewer": "Visualiseur de chat",
+      "database": "Gestion de la base de données",
+      "eval": "Outils d'évaluation"
     },
     "chatLogs": {
       "title": "Interactions de chat récentes"
+    },
+    "deleteChat": {
+      "title": "Supprimer la conversation",
+      "idLabel": "ID de la conversation",
+      "button": "Supprimer",
+      "confirm": "Confirmer la suppression",
+      "cancel": "Annuler",
+      "loading": "Suppression en cours...",
+      "success": "Conversation supprimée avec succès",
+      "error": "Échec de la suppression de la conversation : "
     }
   },
   "signup": {

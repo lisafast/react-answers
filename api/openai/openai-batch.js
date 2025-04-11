@@ -5,18 +5,14 @@ import { Interaction } from '../../models/interaction.js';
 import { Context } from '../../models/context.js';
 import { Question } from '../../models/question.js';
 import { createDirectOpenAIClient } from '../../agents/AgentService.js';
-import { authMiddleware, adminMiddleware } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 const MAX_JSONL_SIZE = 50000000; // Set a size limit for JSONL content
 
-export default async function handler(req, res) {
+async function batchHandler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
-
-    // Verify authentication and admin status
-    if (!await authMiddleware(req, res)) return;
-    if (!await adminMiddleware(req, res)) return;
 
     try {
         const openai = createDirectOpenAIClient();
@@ -139,4 +135,8 @@ export default async function handler(req, res) {
             details: error.response?.data || 'No additional details available'
         });
     }
+}
+
+export default function handler(req, res) {
+    return withProtection(batchHandler, authMiddleware, adminMiddleware)(req, res);
 }

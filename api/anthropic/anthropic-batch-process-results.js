@@ -7,7 +7,7 @@ import { Answer } from "../../models/answer.js";
 import ContextService from "../../src/services/ContextService.js";
 import AnswerService from "../../src/services/AnswerService.js";
 import { Citation } from "../../models/citation.js";
-import { authMiddleware, adminMiddleware } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -81,15 +81,11 @@ const handleAnthropic = async (batch) => {
   }
 };
 
-export default async function handler(req, res) {
+async function batchProcessHandler(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', ['GET']);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
-
-  // Verify authentication and admin status
-  if (!await authMiddleware(req, res)) return;
-  if (!await adminMiddleware(req, res)) return;
 
   try {
     const { batchId } = req.query;
@@ -111,4 +107,8 @@ export default async function handler(req, res) {
     console.error('Error handling request:', error);
     return res.status(500).json({ error: 'Error handling request', log: error.message });
   }
+}
+
+export default function handler(req, res) {
+  return withProtection(batchProcessHandler, authMiddleware, adminMiddleware)(req, res);
 }

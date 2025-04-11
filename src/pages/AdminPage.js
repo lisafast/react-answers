@@ -3,6 +3,7 @@ import { useTranslations } from '../hooks/useTranslations.js';
 import { GcdsContainer, GcdsLink } from '@cdssnc/gcds-components-react';
 import { usePageContext } from '../hooks/usePageParam.js';
 import ChatLogsDashboard from '../components/admin/ChatLogsDashboard.js';
+import DeleteChatSection from '../components/admin/DeleteChatSection.js';
 
 const AdminPage = () => {
   const { t } = useTranslations();
@@ -31,12 +32,24 @@ const AdminPage = () => {
             </GcdsLink>
           </li>
           <li className="">
-            <GcdsLink href={`/${language}/logs`}>
-              {t('admin.navigation.logs', 'Chat Logs')}
+            <GcdsLink href={`/${language}/chat-viewer`}>
+              {t('admin.navigation.chatViewer')}
+            </GcdsLink>
+          </li>
+          <li className="">
+            <GcdsLink href={`/${language}/database`}>
+              {t('admin.navigation.database', 'Database Management')}
+            </GcdsLink>
+          </li>
+          <li className="">
+            <GcdsLink href={`/${language}/eval`}>
+              {t('admin.navigation.eval', 'Evaluation Tools')}
             </GcdsLink>
           </li>
         </ul>
       </nav>
+
+      <DeleteChatSection />
 
       <section id="chat-logs" className="mb-600">
         <h2 className="mt-400 mb-400">{t('admin.chatLogs.title', 'Recent Chat Interactions')}</h2>

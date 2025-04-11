@@ -16,4 +16,11 @@ const ChatSchema = new mongoose.Schema({
     id: false,
 });
 
+// Middleware to handle cascading delete of interactions when a chat is deleted
+ChatSchema.pre('deleteOne', { document: true, query: false }, async function() {
+    // Delete all interactions associated with this chat
+    const Interaction = mongoose.model('Interaction');
+    await Interaction.deleteMany({ _id: { $in: this.interactions } });
+});
+
 export const Chat = mongoose.models.Chat || mongoose.model('Chat', ChatSchema);
