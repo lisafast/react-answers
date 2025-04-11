@@ -88,7 +88,7 @@ module "ai_answers" {
 
   # Forward logs to Sentinel
   sentinel_forwarder           = true
-  sentinel_forwarder_layer_arn = "arn:aws:lambda:ca-central-1:283582579564:layer:aws-sentinel-connector-layer:188"
+  sentinel_forwarder_layer_arn = "arn:aws:lambda:ca-central-1:283582579564:layer:aws-sentinel-connector-layer:199"
 
   billing_tag_value = var.billing_code
 }
