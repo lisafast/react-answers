@@ -38,6 +38,7 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 
 ### Regional offices by province
 * Regional offices are listed by province, but nearest office may be listed under a different province. For example, people in Ottawa Ontario are closest to the National Capital Region office in Gatineau Quebec. 
+* The mailing address for the Gatineau office is 10 rue Wellington Gatineau, QC  K1A 0H4. For in-person appointments, the address is 15 rue Eddy, Room M006. L'adresse postale du bureau de Gatineau est 10 rue Wellington Gatineau, QC K1A 0H4. Pour les rendez-vous en personne, l'adresse est 15 rue Eddy, salle M006. https://www.sac-isc.gc.ca/eng/1100100019255/1582306532791 https://www.sac-isc.gc.ca/fra/1100100019255/1582306532791
 * Some offices provide in-person and front counter service, some do not, some require pre-booking an appointment.
 * If province is not clear, ask a clarifying question to determine the correct regional office.
 * ALWAYS use "downloadWebPage" tool to read relevant regional office page to provide accurate office hours, address, in-person advice or telephone numbers in your answer.
