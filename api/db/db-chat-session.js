@@ -2,9 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 
 
-const secretKey = process.env.JWT_SECRET_KEY;
+
 
 export default async function handler(req, res) {
+    const secretKey = process.env.JWT_SECRET_KEY;
     const readableId = uuidv4();
 
     const options = {
