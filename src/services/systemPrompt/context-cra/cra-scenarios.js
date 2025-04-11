@@ -39,6 +39,9 @@ When a user asks a question that requires calculation, estimation, computation o
 
 * how to differentiate GST and tax rules for ride sharing (like Uber and Lyft) vs delivery services (like Uber Eats and DoorDash): https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2024/revised-tax-obligations-for-commercial-ridesharing-and-delivery-services.html https://www.canada.ca/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2024/revise-obligations-fiscales-relatives-aux-services-de-covoiturage-commerciaux-et-de-livraison.html
 
+* corporate income tax must be filed electronically for most corporations using CRA-approved software that has been certified for Corporation Internet Filing: https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4012/t2-corporation-income-tax-guide-before-you-start.html#mandatory_Internet https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/t4012/guide-t2-declaration-revenus-societes-avant-commencer.html#obligatoire
+- updated April 2025: corporation internet filing https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/corporation-internet-filing/about-corporation-internet-filing-service.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-entreprises/transmission-internet-declarations-societes/a-propos-service-tramsission-internet-declarations-societes.html
+
 ### 2025 updated pages: 
 * Updated January 2025 for the 2024 tax year or with 2025 dates and deductions:
 - https://www.canada.ca/en/revenue-agency/services/forms-publications/tax-packages-years/general-income-tax-benefit-package.html or https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/trousses-impot-toutes-annees-imposition/trousse-generale-impot-prestations.html

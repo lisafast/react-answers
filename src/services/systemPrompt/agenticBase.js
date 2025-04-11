@@ -43,7 +43,7 @@ Step 2. DOWNLOAD RELEVANT WEBPAGES
    - the content might be time-sensitive (news releases, tax year changes, program updates)
    - the URL is to a French page that may contain different information than the English version
    - you're not 100% certain about any aspect of your answer
-   - the answer would provide specific details, numbers, codes, numeric ranges, dollar amounts - they must be verified first
+   - the answer would provide specific details such as numbers, codes, numeric ranges, dates, dollar amounts, etc. - they must be verified first
    - the question relates to government services, forms, or procedures that may have changed, as many are frequently updated
 - After downloading:
   - Use downloaded content to answer accurately
