@@ -17,6 +17,7 @@ class ToolTrackingHandler extends ConsoleCallbackHandler {
             await super.handleToolStart(tool, input);
             const toolName = runName || tool.name || tool.bound?.name || "Unknown Tool";
             this.toolCalls.push({
+                runId, // Store runId for matching with completion
                 tool: toolName,
                 input: input,
                 startTime: Date.now(),
@@ -33,16 +34,19 @@ class ToolTrackingHandler extends ConsoleCallbackHandler {
     async handleToolEnd(output, runId) {
         try {
             await super.handleToolEnd(output, runId);
-            const lastToolCall = this.toolCalls[this.toolCalls.length - 1];
-            if (lastToolCall) {
-                lastToolCall.output = output.content;
-                lastToolCall.endTime = Date.now();
-                lastToolCall.duration = lastToolCall.endTime - lastToolCall.startTime;
-                lastToolCall.status = 'completed';
-                ServerLoggingService.debug(`Tool execution completed: ${lastToolCall.tool}`, this.chatId, {
-                    duration: lastToolCall.duration,
+            // Find the tool call with matching runId instead of assuming last one
+            const toolCall = this.toolCalls.find(call => call.runId === runId);
+            if (toolCall) {
+                toolCall.output = output.content;
+                toolCall.endTime = Date.now();
+                toolCall.duration = toolCall.endTime - toolCall.startTime;
+                toolCall.status = 'completed';
+                ServerLoggingService.debug(`Tool execution completed: ${toolCall.tool}`, this.chatId, {
+                    duration: toolCall.duration,
                     output: typeof output === 'object' ? JSON.stringify(output) : output
                 });
+            } else {
+                ServerLoggingService.warn(`No matching tool call found for runId: ${runId}`, this.chatId);
             }
         } catch (error) {
             ServerLoggingService.error(`Error in handleToolEnd: ${error.message}`, this.chatId, error);
@@ -53,14 +57,17 @@ class ToolTrackingHandler extends ConsoleCallbackHandler {
     async handleToolError(error, runId) {
         try {
             await super.handleToolError(error, runId);
-            const lastToolCall = this.toolCalls[this.toolCalls.length - 1];
-            if (lastToolCall) {
+            // Find the tool call with matching runId instead of assuming last one
+            const toolCall = this.toolCalls.find(call => call.runId === runId);
+            if (toolCall) {
                 const errorMessage = error.message || String(error);
-                lastToolCall.error = errorMessage;
-                lastToolCall.endTime = Date.now();
-                lastToolCall.duration = lastToolCall.endTime - lastToolCall.startTime;
-                lastToolCall.status = 'error';
-                ServerLoggingService.error(`Tool execution failed: ${lastToolCall.tool}`, this.chatId, errorMessage);
+                toolCall.error = errorMessage;
+                toolCall.endTime = Date.now();
+                toolCall.duration = toolCall.endTime - toolCall.startTime;
+                toolCall.status = 'error';
+                ServerLoggingService.error(`Tool execution failed: ${toolCall.tool}`, this.chatId, errorMessage);
+            } else {
+                ServerLoggingService.warn(`No matching tool call found for runId: ${runId}`, this.chatId);
             }
         } catch (handlerError) {
             ServerLoggingService.error(`Error in handleToolError: ${handlerError.message}`, this.chatId, handlerError);
@@ -69,7 +76,7 @@ class ToolTrackingHandler extends ConsoleCallbackHandler {
     }
 
     getToolUsageSummary() {
-        return this.toolCalls.map(({ startTime, endTime, ...call }) => ({
+        return this.toolCalls.map(({ startTime, endTime, runId, ...call }) => ({
             ...call,
             // Clean up output/error for summary to avoid circular references
             output: call.output ? String(call.output).substring(0, 500) : undefined,

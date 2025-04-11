@@ -26,7 +26,43 @@ class AuthService {
   static isAuthenticated() {
     const token = this.getToken();
     const user = this.getUser();
-    return !!token && !!user && user.active;
+    
+    // First check if token exists and user is active
+    if (!token || !user || !user.active) {
+      return false;
+    }
+    
+    // Check if token is expired
+    if (this.isTokenExpired()) {
+      this.logout();
+      return false;
+    }
+    
+    return true;
+  }
+
+  static isTokenExpired() {
+    const token = this.getToken();
+    if (!token) {
+      return true;
+    }
+    
+    try {
+      // JWT tokens are in format: header.payload.signature
+      // We need to decode the payload to check expiration
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      
+      // Check if exp field exists and token is expired
+      if (decoded.exp) {
+        const currentTime = Date.now() / 1000;
+        return decoded.exp < currentTime;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking token expiration:', error);
+      return true; // If there's an error parsing, assume token is invalid
+    }
   }
 
   static isAdmin() {
@@ -72,14 +108,48 @@ class AuthService {
     return data;
   }
 
+  static isPublicRoute(pathname) {
+    // Define public routes that do not require authentication
+    const publicRoutes = ['/', '/login', '/signup', '/about', '/contact'];
+    return publicRoutes.some(route => pathname.startsWith(route));
+  }
+
   static logout() {
+    // Clear authentication data
     this.removeToken();
+
+    // Determine the current language from URL or default to English
+    let language = 'en';
+    const pathname = window.location.pathname;
+
+    // Check if current path contains French indicator
+    if (pathname.includes('/fr/')) {
+      language = 'fr';
+    }
+
+    // Redirect to the language-specific login page only if not on a public route
+    if (!this.isPublicRoute(pathname)) {
+      window.location.href = `/${language}/login`;
+    }
   }
 
   static getAuthHeader() {
     const token = this.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
+
+  static async fetchWithAuth(url, options = {}) {
+    const headers = { ...this.getAuthHeader(), ...options.headers };
+    const response = await fetch(url, { ...options, headers });
+
+    if (response.status === 401) {
+      this.logout(); // Redirect to login if token is invalid
+    }
+
+    return response;
+  }
+
+ 
 }
 
 export default AuthService;

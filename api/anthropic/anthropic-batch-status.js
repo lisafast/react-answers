@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import fetch from 'node-fetch';
 import { Batch } from '../../models/batch.js';
-import { authMiddleware, adminMiddleware } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -10,14 +10,10 @@ const anthropic = new Anthropic({
   }
 });
 
-export default async function handler(req, res) {
+async function batchStatusHandler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
-  // Verify authentication and admin status
-  if (!await authMiddleware(req, res)) return;
-  if (!await adminMiddleware(req, res)) return;
 
   try {
     const { batchId } = req.query;
@@ -45,6 +41,10 @@ export default async function handler(req, res) {
     console.error('Error checking batch status:', error);
     return res.status(500).json({ error: 'Error checking batch status', details: error.message });
   }
+}
+
+export default function handler(req, res) {
+  return withProtection(batchStatusHandler, authMiddleware, adminMiddleware)(req, res);
 }
 
 

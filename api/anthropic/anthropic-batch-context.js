@@ -5,7 +5,7 @@ import { Batch } from '../../models/batch.js';
 import { Interaction } from '../../models/interaction.js';
 import { Context } from '../../models/context.js';
 import { Question } from '../../models/question.js';
-import { authMiddleware, adminMiddleware } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 const modelConfig = getModelConfig('anthropic', 'claude-3-5-haiku-20241022');
 const anthropic = new Anthropic({
@@ -15,14 +15,10 @@ const anthropic = new Anthropic({
     }
 });
 
-export default async function handler(req, res) {
+async function batchContextHandler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
-
-    // Verify authentication and admin status
-    if (!await authMiddleware(req, res)) return;
-    if (!await adminMiddleware(req, res)) return;
 
     let logString = '';
 
@@ -101,4 +97,8 @@ export default async function handler(req, res) {
             details: error.message
         });
     }
+}
+
+export default function handler(req, res) {
+    return withProtection(batchContextHandler, authMiddleware, adminMiddleware)(req, res);
 }

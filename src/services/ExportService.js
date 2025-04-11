@@ -288,7 +288,7 @@ class ExportService {
       {
         dataLabel: 'expertFeedback.expertCitationUrl',
         outputLabel: 'expertFeedback.expertCitationUrl',
-      },
+      }
     ];
     const type = filename.endsWith('.csv') ? 'csv' : filename.endsWith('.xlsx') ? 'xlsx' : 'xlsx';
     return ExportService.toSpreadsheet(items, headerOrder, type, filename);

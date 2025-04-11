@@ -1,17 +1,19 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/no-unused-modules */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
 import AdminPage from './pages/AdminPage.js';
-import EvaluationPage from './pages/BatchPage.js';
-import LogPage from './pages/LogPage.js';
+import BatchPage from './pages/BatchPage.js';
+import ChatViewer from './pages/ChatViewer.js';
 import SignupPage from './pages/SignupPage.js';
 import LoginPage from './pages/LoginPage.js';
 import { GcdsHeader, GcdsBreadcrumbs, GcdsFooter } from '@cdssnc/gcds-components-react';
 import AuthService from './services/AuthService.js';
 import './styles/App.css';
 import UsersPage from './pages/UsersPage.js';
+import EvalPage from './pages/EvalPage.js';
+import DatabasePage from './pages/DatabasePage.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -29,10 +31,15 @@ const ProtectedRoute = ({ element }) => {
   const location = useLocation();
   const currentLang = location.pathname.startsWith('/fr') ? 'fr' : 'en';
 
+  // Simple check for authentication status
   if (!AuthService.isAuthenticated()) {
-    // Redirect to login page with return url
+    // At this point, if the token was expired, isAuthenticated() has already
+    // called logout() which will handle the redirect on its own
+    
+    // For all other authentication failures, redirect to login
     return <Navigate to={`/${currentLang}/login`} state={{ from: location }} replace />;
   }
+  
   return element;
 };
 
@@ -40,6 +47,11 @@ const AppLayout = () => {
   const location = useLocation();
   const currentLang = location.pathname.startsWith('/fr') ? 'fr' : 'en';
   const alternateLangHref = getAlternatePath(location.pathname, currentLang);
+
+  // Set up token expiration checker when the app layout mounts
+  useEffect(() => {
+    // Removed the auth expiration checker setup
+  }, []);
 
   return (
     <>
@@ -114,19 +126,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/en/batch",
-        element: <ProtectedRoute element={<EvaluationPage lang="en" />} />,
+        element: <ProtectedRoute element={<BatchPage lang="en" />} />,
       },
       {
         path: "/fr/batch",
-        element: <ProtectedRoute element={<EvaluationPage lang="fr" />} />,
+        element: <ProtectedRoute element={<BatchPage lang="fr" />} />,
       },
       {
-        path: "/en/logs",
-        element: <ProtectedRoute element={<LogPage lang="en" />} />,
+        path: "/:language/chat-viewer",
+        element: <ProtectedRoute element={<ChatViewer lang="en" />} />,
       },
       {
-        path: "/fr/logs",
-        element: <ProtectedRoute element={<LogPage lang="fr" />} />,
+        path: "/:language/chat-viewer",
+        element: <ProtectedRoute element={<ChatViewer lang="fr" />} />,
       },
       {
         path: "/en/users",
@@ -135,6 +147,22 @@ const router = createBrowserRouter([
       {
         path: "/fr/users",
         element: <ProtectedRoute element={<UsersPage lang="fr" />} />,
+      },
+      {
+        path: "/en/eval",
+        element: <ProtectedRoute element={<EvalPage lang="en" />} />,
+      },
+      {
+        path: "/fr/eval",
+        element: <ProtectedRoute element={<EvalPage lang="fr" />} />,
+      },
+      {
+        path: "/en/database",
+        element: <ProtectedRoute element={<DatabasePage lang="en" />} />,
+      },
+      {
+        path: "/fr/database",
+        element: <ProtectedRoute element={<DatabasePage lang="fr" />} />,
       },
     ],
   },

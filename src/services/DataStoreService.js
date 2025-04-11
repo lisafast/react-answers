@@ -88,22 +88,50 @@ class DataStoreService {
     }
   }
 
-  static async persistFeedback(feedbackData) {
+  
+  static async persistFeedback(expertFeedback, chatId, userMessageId) {
+    // Standardize expert feedback format - only accept new format
+    let formattedExpertFeedback = null;
+    if (expertFeedback) {
+      formattedExpertFeedback = {
+        ...expertFeedback,
+        totalScore: expertFeedback.totalScore ?? null,
+        sentence1Score: expertFeedback.sentence1Score ?? null,
+        sentence2Score: expertFeedback.sentence2Score ?? null,
+        sentence3Score: expertFeedback.sentence3Score ?? null,
+        sentence4Score: expertFeedback.sentence4Score ?? null,
+        citationScore: expertFeedback.citationScore ?? null,
+        answerImprovement: expertFeedback.answerImprovement || '',
+        expertCitationUrl: expertFeedback.expertCitationUrl || '',
+        feedback: expertFeedback.isPositive ? 'positive' : 'negative'
+      };
+    }
+    console.log(`User feedback: ${expertFeedback}`);
+
     try {
       const response = await fetch(getApiUrl('db-persist-feedback'), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(feedbackData)
+        body: JSON.stringify({
+          chatId: chatId,
+          interactionId: userMessageId,
+          expertFeedback: formattedExpertFeedback
+        }),
       });
-      
-      if (!response.ok) throw new Error('Failed to persist feedback');
-      return await response.json();
+
+      if (!response.ok) {
+        throw new Error('Failed to log interaction');
+      }
+
+      console.log('Interaction logged successfully to database');
     } catch (error) {
-      console.error('Error persisting feedback:', error);
-      throw error;
+      console.log('Development mode: Interaction logged to console', {
+        ...expertFeedback
+      });
     }
+
   }
 
   static async getChatSession(sessionId) {
@@ -201,6 +229,24 @@ class DataStoreService {
       });
     } catch (error) {
       console.error('Error fetching statuses:', error);
+      throw error;
+    }
+  }
+
+  static async deleteChat(chatId) {
+    try {
+      const response = await fetch(getApiUrl(`db-delete-chat?chatId=${chatId}`), {
+        method: 'DELETE',
+        headers: AuthService.getAuthHeader()
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to delete chat');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error deleting chat:', error);
       throw error;
     }
   }

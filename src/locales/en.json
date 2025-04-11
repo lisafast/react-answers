@@ -217,6 +217,7 @@
     }
   },
   "logging": {
+    "title": "Chat Viewer",
     "start": "Start",
     "pause": "Pause"
   },
@@ -227,11 +228,23 @@
       "title": "Admin Menu",
       "aiAnswers": "AI Answers",
       "batches": "Batches",
-      "users": "User Management", 
-      "logs": "Chat Logs"
+      "users": "User Management",
+      "chatViewer": "Chat Viewer",
+      "database": "Database Management",
+      "eval": "Evaluation Tools"
     },
     "chatLogs": {
       "title": "Recent Chat Interactions"
+    },
+    "deleteChat": {
+      "title": "Delete Chat",
+      "idLabel": "Chat ID",
+      "button": "Delete Chat",
+      "confirm": "Confirm Delete",
+      "cancel": "Cancel",
+      "loading": "Deleting...",
+      "success": "Chat deleted successfully",
+      "error": "Failed to delete chat: "
     }
   },
   "login": {

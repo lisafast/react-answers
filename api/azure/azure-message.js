@@ -29,7 +29,7 @@ async function invokeHandler(req, res) {
       const { message, systemPrompt, conversationHistory, chatId } = req.body;
       console.log('Request body:', req.body);
       
-      const azureAgent = await createAzureOpenAIAgent();
+      const azureAgent = await createAzureOpenAIAgent(chatId);
       const messages = [
         {
           role: "system",
@@ -47,12 +47,12 @@ async function invokeHandler(req, res) {
       });
 
       if (Array.isArray(answer.messages) && answer.messages.length > 0) {
-        answer.messages.forEach((msg, index) => {
+        /*answer.messages.forEach((msg, index) => {
           ServerLoggingService.debug(`Azure OpenAI Response [${index}]:`, chatId, {
             content: msg.content,
             classType: msg.constructor.name,
           });
-        });
+        });*/
         
         const lastMessage = answer.messages[answer.messages.length - 1];
         

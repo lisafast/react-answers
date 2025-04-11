@@ -8,51 +8,47 @@ You are an AI assistant named "AI Answers" located on a Canada.ca page. You spec
 
 // Create a map of department-specific content imports
 const departmentModules = {
+  // English abbreviations
   CRA: {
     getContent: async () => {
-      const [{ CRA_UPDATES }, { CRA_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-cra/cra-updates.js'),
-        import('./systemPrompt/context-cra/cra-scenarios.js'),
-      ]);
-      return { updates: CRA_UPDATES, scenarios: CRA_SCENARIOS };
+      const { CRA_SCENARIOS } = await import('./systemPrompt/context-cra/cra-scenarios.js');
+      return { scenarios: CRA_SCENARIOS };
     },
   },
   ESDC: {
     getContent: async () => {
-      const [{ ESDC_UPDATES }, { ESDC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-esdc/esdc-updates.js'),
-        import('./systemPrompt/context-esdc/esdc-scenarios.js'),
-      ]);
-      return { updates: ESDC_UPDATES, scenarios: ESDC_SCENARIOS };
+      const { ESDC_SCENARIOS } = await import('./systemPrompt/context-esdc/esdc-scenarios.js');
+      return { scenarios: ESDC_SCENARIOS };
     },
   },
   ISC: {
     getContent: async () => {
-      const [{ ISC_UPDATES }, { ISC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-isc/isc-updates.js'),
-        import('./systemPrompt/context-isc/isc-scenarios.js'),
-      ]);
-      return { updates: ISC_UPDATES, scenarios: ISC_SCENARIOS };
+      const { ISC_SCENARIOS } = await import('./systemPrompt/context-isc/isc-scenarios.js');
+      return { scenarios: ISC_SCENARIOS };
     },
   },
-  PSPC: {
+  PSC: {
     getContent: async () => {
-      const [{ PSPC_UPDATES }, { PSPC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-pspc/pspc-updates.js'),
-        import('./systemPrompt/context-pspc/pspc-scenarios.js'),
-      ]);
-      return { updates: PSPC_UPDATES, scenarios: PSPC_SCENARIOS };
+      const { PSC_SCENARIOS } = await import('./systemPrompt/context-psc/psc-scenarios.js');
+      return { scenarios: PSC_SCENARIOS };
     },
   },
   IRCC: {
     getContent: async () => {
-      const [{ IRCC_UPDATES }, { IRCC_SCENARIOS }] = await Promise.all([
-        import('./systemPrompt/context-ircc/ircc-updates.js'),
-        import('./systemPrompt/context-ircc/ircc-scenarios.js'),
-      ]);
-      return { updates: IRCC_UPDATES, scenarios: IRCC_SCENARIOS };
+      const { IRCC_SCENARIOS } = await import('./systemPrompt/context-ircc/ircc-scenarios.js');
+      return { scenarios: IRCC_SCENARIOS };
     },
-  },
+  }
+};
+
+// Create a mapping for French department abbreviations
+const frenchDepartmentMap = {
+  ARC: 'CRA',
+  EDSC: 'ESDC',
+  SAC: 'ISC',
+  CFP: 'PSC',
+  // IRCC stays the same in French
+  IRCC: 'IRCC'
 };
 
 async function loadSystemPrompt(language = 'en', context) {
@@ -63,15 +59,20 @@ async function loadSystemPrompt(language = 'en', context) {
 
   try {
     const { department } = context;
+    
+    // Get the appropriate department key based on language
+    const departmentKey = language === 'fr' && frenchDepartmentMap[department] 
+      ? frenchDepartmentMap[department] 
+      : department;
 
     // Load department content or use defaults
     const content =
-      department && departmentModules[department]
-        ? await departmentModules[department].getContent().catch((error) => {
-            LoggingService.warn('system', `Failed to load content for ${department}:`, error);
-            return { updates: '', scenarios: '' };
+      departmentKey && departmentModules[departmentKey]
+        ? await departmentModules[departmentKey].getContent().catch((error) => {
+            LoggingService.warn('system', `Failed to load content for ${departmentKey}:`, error);
+            return { scenarios: '' };
           })
-        : { updates: '', scenarios: '' };
+        : { scenarios: '' };
 
     const citationInstructions = CITATION_INSTRUCTIONS;
 
@@ -114,13 +115,11 @@ async function loadSystemPrompt(language = 'en', context) {
       ## General Instructions for All Departments
       ${SCENARIOS}
 
-      ${department ? `## Department-Specific Updates\n${content.updates}` : ''}
-
-      ${department ? `## Department-Specific Scenarios\n${content.scenarios}` : ''}
+      ${department ? `## Department-Specific Scenarios and updates:\n${content.scenarios}` : ''}
 
       ${citationInstructions}
 
-    Reminder: the answer should be brief, in plain language, accurate and must be sourced from Canada.ca or gc.ca at all turns in the conversation. If you're unsure about any aspect or lack enough information for more than a a sentence or two, provide only those sentences that you are sure of.
+    Reminder: the answer should be brief, in plain language, accurate and must be sourced from Government of Canada online content at ALL turns in the conversation. If you're unsure about any aspect or lack enough information for more than a a sentence or two, provide only those sentences that you are sure of.
     `;
 
     await LoggingService.info(

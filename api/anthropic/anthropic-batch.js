@@ -3,9 +3,9 @@ import { getModelConfig } from '../../config/ai-models.js';
 import dbConnect from '../../api/db/db-connect.js';
 import { Batch } from '../../models/batch.js';
 import { Question } from '../../models/question.js';
-import { Context  } from '../../models/context.js';
+import { Context } from '../../models/context.js';
 import { Interaction } from '../../models/interaction.js';
-import { authMiddleware, adminMiddleware } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 const modelConfig = getModelConfig('anthropic');
 const anthropic = new Anthropic({
@@ -15,17 +15,12 @@ const anthropic = new Anthropic({
   }
 });
 
-export default async function handler(req, res) {
+async function batchHandler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Verify authentication and admin status
-  if (!await authMiddleware(req, res)) return;
-  if (!await adminMiddleware(req, res)) return;
-
   try {
-
     console.log('Batch API request received:', {
       requestCount: req.body.requests?.length,
       systemPromptPresent: !!req.body.requests?.[0]?.systemPrompt,
@@ -35,7 +30,6 @@ export default async function handler(req, res) {
     if (!req.body.requests || !Array.isArray(req.body.requests)) {
       throw new Error('Invalid requests array in payload');
     }
-
 
     const batch = await anthropic.beta.messages.batches.create({
       requests: req.body.requests.map((request, index) => ({
@@ -57,6 +51,13 @@ export default async function handler(req, res) {
     });
 
     // save the batch id and entries
+    console.log('Batch created successfully:', {
+      batchId: batch.id,
+      status: batch.processing_status,
+      model: modelConfig.name
+    });
+
+    // save the batch id and entries
     await dbConnect();
     const savedBatch = new Batch({
       name: req.body.batchName,
@@ -67,27 +68,25 @@ export default async function handler(req, res) {
       referringUrl: req.body.referringUrl,
     });
     await savedBatch.save();
+
     for (const [index, request] of req.body.requests.entries()) {
       const context = new Context({
         ...request.context,
       });
       await context.save();
 
-      // Create Question document
       const question = new Question({
         redactedQuestion: request.message
       });
       await question.save();
 
-      // Create Interaction with references
-      let interaction = new Interaction({
+      const interaction = new Interaction({
         interactionId: `batch-${index}`,
-        question: question._id,
-        context: context._id
+        context: context._id,
+        question: question._id
       });
       await interaction.save();
 
-      // Add interaction reference to batch
       savedBatch.interactions.push(interaction._id);
     }
     await savedBatch.save();
@@ -95,9 +94,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       batchId: batch.id,
-      status: batch.processing_status
+      status: batch.processing_status,
     });
-
   } catch (error) {
     console.error('Batch API error:', {
       message: error.message,
@@ -109,4 +107,8 @@ export default async function handler(req, res) {
       details: error.message
     });
   }
+}
+
+export default function handler(req, res) {
+  return withProtection(batchHandler, authMiddleware, adminMiddleware)(req, res);
 }

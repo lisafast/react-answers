@@ -9,6 +9,15 @@ const AI_MODELS = {
         timeoutMs: 60000,
       }
 
+    },
+    embeddings: {
+      default: 'text-embedding-ada-002',
+      models: {
+        'text-embedding-ada-002': {
+          dimensions: 1536,
+          timeoutMs: 30000,
+        }
+      }
     }
   },
   openai: {
@@ -30,6 +39,23 @@ const AI_MODELS = {
         timeoutMs: 60000,
     }
 
+    },
+    embeddings: {
+      default: 'text-embedding-3-large',
+      models: {
+        'text-embedding-3-large': {
+          dimensions: 3072,
+          timeoutMs: 30000,
+        },
+        'text-embedding-3-small': {
+          dimensions: 1536,
+          timeoutMs: 30000,
+        },
+        'text-embedding-ada-002': {
+          dimensions: 1536,
+          timeoutMs: 30000,
+        }
+      }
     }
   },
   anthropic: {
@@ -38,7 +64,6 @@ const AI_MODELS = {
       'claude-3-7-sonnet-latest': {
         maxTokens: 1024,
         temperature: 0.0,
-        knowledgeCutoff: '2024-04',
         beta: {
           messageBatches: 'message-batches-2024-09-24'
         }
@@ -68,6 +93,26 @@ export const getModelConfig = (provider, modelName = null) => {
 
   if (!modelConfig) {
     throw new Error(`Unknown model ${selectedModel} for provider ${provider}`);
+  }
+
+  return {
+    name: selectedModel,
+    ...modelConfig
+  };
+};
+
+// Add the getEmbeddingModelConfig function
+export const getEmbeddingModelConfig = (provider, modelName = null) => {
+  const providerConfig = AI_MODELS[provider];
+  if (!providerConfig || !providerConfig.embeddings) {
+    throw new Error(`No embedding models found for provider: ${provider}`);
+  }
+
+  const selectedModel = modelName || providerConfig.embeddings.default;
+  const modelConfig = providerConfig.embeddings.models[selectedModel];
+
+  if (!modelConfig) {
+    throw new Error(`Unknown embedding model ${selectedModel} for provider ${provider}`);
   }
 
   return {

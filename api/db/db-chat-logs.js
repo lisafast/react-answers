@@ -3,11 +3,6 @@ import { Chat } from '../../models/chat.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 async function chatLogsHandler(req, res) {
-    // Handle OPTIONS request for CORS preflight
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-    
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method not allowed' });
     }
@@ -29,16 +24,33 @@ async function chatLogsHandler(req, res) {
             .populate({
                 path: 'interactions',
                 populate: [
-                    { path: 'context'},
-                    { path: 'expertFeedback' },
-                    { path: 'question' },
+                    { path: 'context' },
+                    { 
+                        path: 'expertFeedback',
+                        model: 'ExpertFeedback',
+                        select: '-__v'
+                    },
+                    { 
+                        path: 'question',
+                        select: '-embedding'
+                    },
                     {
                         path: 'answer',
+                        select: '-embedding -sentenceEmbeddings',
                         populate: [
                             { path: 'sentences' },
                             { path: 'citation' },
                             { path: 'tools' },
                         ]
+                    },
+                    {
+                        path: 'autoEval',
+                        model: 'Eval',
+                        populate: {
+                            path: 'expertFeedback',
+                            model: 'ExpertFeedback',
+                            select: '-__v'
+                        }
                     }
                 ]
             })
@@ -58,10 +70,6 @@ async function chatLogsHandler(req, res) {
     }
 }
 
-// Wrap handler with protection but handle OPTIONS requests first
 export default function handler(req, res) {
-    if (req.method === 'OPTIONS') {
-        return chatLogsHandler(req, res);
-    }
     return withProtection(chatLogsHandler, authMiddleware, adminMiddleware)(req, res);
 }

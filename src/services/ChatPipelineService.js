@@ -122,20 +122,20 @@ export const ChatPipelineService = {
       totalResponseTime: `${totalResponseTime} ms`,
     });
 
-    // Log the interaction with both the original and validated URL
+    
     DataStoreService.persistInteraction({
-      selectedAI,
+      selectedAI: selectedAI,
       question: userMessage,
-      userMessageId,
-      referringUrl,
-      answer,
-      finalCitationUrl,
-      confidenceRating,
-      context,
-      chatId,
-      lang,
-      totalResponseTime,
-      searchProvider
+      userMessageId: userMessageId,
+      referringUrl:referringUrl,
+      answer: answer,
+      finalCitationUrl: finalCitationUrl,
+      confidenceRating: confidenceRating,
+      context: context,
+      chatId: chatId,
+      pageLanguage: lang,
+      responseTime: totalResponseTime,
+      searchProvider: searchProvider
     });
 
     onStatusUpdate(PipelineStatus.COMPLETE);

@@ -2,6 +2,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fileUpload from 'express-fileupload';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
@@ -36,7 +37,10 @@ import signupHandler from '../api/db/db-auth-signup.js';
 import loginHandler from '../api/db/db-auth-login.js';
 import dbConnect from '../api/db/db-connect.js';
 import dbUsersHandler from '../api/db/db-users.js';
-
+import deleteChatHandler from '../api/db/db-delete-chat.js';
+import generateEmbeddingsHandler from '../api/db/db-generate-embeddings.js';
+import generateEvalsHandler from '../api/db/db-generate-evals.js';
+import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -46,6 +50,7 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
+app.use(fileUpload());
 app.use(express.static(path.join(__dirname, "../build")));
 
 // Logging middleware
@@ -79,6 +84,10 @@ app.get('/api/db/db-chat-logs', dbChatLogsHandler);
 app.post('/api/db/db-auth-signup', signupHandler);
 app.post('/api/db/db-auth-login', loginHandler);
 app.all('/api/db/db-users', dbUsersHandler);
+app.delete('/api/db/db-delete-chat', deleteChatHandler);
+app.post('/api/db/db-generate-embeddings', generateEmbeddingsHandler);
+app.post('/api/db/db-generate-evals', generateEvalsHandler);
+app.all('/api/db/db-database-management', dbDatabaseManagementHandler);
 
 app.post("/api/openai/openai-message", openAIHandler);
 app.post("/api/openai/openai-context", openAIContextAgentHandler);
