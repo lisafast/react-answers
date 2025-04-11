@@ -3,9 +3,10 @@ import { User } from '../models/user.js';
 import dbConnect from '../api/db/db-connect.js';
 import ServerLoggingService from '../services/ServerLoggingService.js'; // Added for logging in helper
 
-const JWT_SECRET = process.env.JWT_SECRET_KEY; // Using JWT_SECRET_KEY as confirmed
+ 
 
 export const generateToken = (user) => {
+  const JWT_SECRET = process.env.JWT_SECRET_KEY;
   console.log('Generating token for user:', { userId: user._id, email: user.email, role: user.role });
   return jwt.sign(
     { userId: user._id, email: user.email, role: user.role },
@@ -43,6 +44,7 @@ const handleCORS = (req, res) => {
 
 const verifyAuth = async (req, res) => {
   try {
+    const JWT_SECRET = process.env.JWT_SECRET_KEY;
     const authHeader = req.headers.authorization;
     console.log('Verifying auth with headers:', {
       authorization: authHeader,
@@ -139,6 +141,7 @@ export const verifyOptionalToken = (req) => {
 
   const token = authHeader.split(' ')[1];
   try {
+    const JWT_SECRET = process.env.JWT_SECRET_KEY;
     const decoded = jwt.verify(token, JWT_SECRET);
     // Token is valid, return the decoded payload
     ServerLoggingService.debug('Optional token verified successfully', null, { ...logContext, userId: decoded.userId, role: decoded.role });
