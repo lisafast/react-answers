@@ -44,18 +44,18 @@ jobs:
         working-directory: ./
         run: |
           docker build \
-          -t $REGISTRY/ai-answers-prod:$GITHUB_SHA-`date '+%Y-%m-%d'` \
-          -t $REGISTRY/ai-answers-prod:latest .
+          -t $REGISTRY/ai-answers:$GITHUB_SHA-`date '+%Y-%m-%d'` \
+          -t $REGISTRY/ai-answers:latest .
 
       - name: Push containers to Amazon ECR
         working-directory: ./
         run: |
-          docker push $REGISTRY/ai-answers-prod:$GITHUB_SHA-`date '+%Y-%m-%d'`
-          docker push $REGISTRY/ai-answers-prod:latest
+          docker push $REGISTRY/ai-answers:$GITHUB_SHA-`date '+%Y-%m-%d'`
+          docker push $REGISTRY/ai-answers:latest
 
       - name: Restart ECS
         run: |
-          aws ecs update-service --cluster ai-answers-prod-cluster --service ai-answers-prod-app-service --force-new-deployment > /dev/null 2>&1
+          aws ecs update-service --cluster ai-answers-cluster --service ai-answers-app-service --force-new-deployment > /dev/null 2>&1
 
       - name: Wait for ECS Stability
         id: ecs_wait
@@ -64,8 +64,8 @@ jobs:
           echo "Wait for 15 minutes for ECS to stabilize.."
           sleep 300 # Sleep for 5 minutes. The ecs wait command waits for an additional 10 minutes
           aws ecs wait services-stable \
-            --cluster ai-answers-prod-cluster \
-            --services ai-answers-prod-app-service
+            --cluster ai-answers-cluster \
+            --services ai-answers-app-service
 
       - name: Slack Notify Failure
         if: steps.ecs_wait.outcome == 'failure'
@@ -88,7 +88,7 @@ jobs:
         env:
           TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
         with:
-          docker_image: "${{ env.REGISTRY }}/ai-answers-prod:latest"
+          docker_image: "${{ env.REGISTRY }}/ai-answers:latest"
           dockerfile_path: "./Dockerfile"
-          sbom_name: "ai-answers-prod"
+          sbom_name: "ai-answers"
           token: "${{ secrets.GITHUB_TOKEN }}"
