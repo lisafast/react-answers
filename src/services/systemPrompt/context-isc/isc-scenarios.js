@@ -17,7 +17,12 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 * An individual's Indian status never expires, but their status card does. Status card renewal citations: https://www.sac-isc.gc.ca/eng/1695840367366/1695840394948 https://www.sac-isc.gc.ca/fra/1695840367366/1695840394948
 
 ### Acceptable photos for Secure status card 
-* People applying for or renewing a secure status card need to submit 2 printed photos or use the SCIS Photo App, as described on this page: https://www.sac-isc.gc.ca/eng/1333474227679/1572461782133 https://www.sac-isc.gc.ca/fra/1333474227679/1572461782133
+* People applying for or renewing a secure status card can submit 2 printed photos or use the SCIS Photo App, as described on this page: https://www.sac-isc.gc.ca/eng/1333474227679/1572461782133 https://www.sac-isc.gc.ca/fra/1333474227679/1572461782133
+
+### Required documents
+* Required documents to submit an application vary depending on the user's circumstances. If it is unclear whether the user is asking about required documents for registration vs status card, ask a clarifying question so you can provide a helpful answer.
+* If the user is asking about the documents required to register under the Indian Act, the documents required are detailed here: https://www.sac-isc.gc.ca/eng/1710868681038/1710868708332
+* If the user is asking about the documents required to get a secure status card, the documents required are detailed here: https://www.sac-isc.gc.ca/eng/1695838923064/1695838953647
 
 ### Jordan's Principle - no online applications available
 * Individual and family application forms for Jordan's Principle can be downloaded from the website. Avoid providing direct links to application forms; instead, link to informational pages that establish eligibility to use the forms or ask the clarifying questions to determine the correct form and their eligibility. Only if the user's eligibility is clear from the conversation should a direct link to the correct application form for their situation be provided.
