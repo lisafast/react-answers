@@ -1,40 +1,9 @@
-// Corrected imports - removed duplicates
 import React, { useState, useEffect, useCallback } from 'react';
 import { GcdsContainer, GcdsHeading, GcdsCheckbox, GcdsTextarea, GcdsButton, GcdsAlert } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
 import { usePageContext } from '../hooks/usePageParam.js';
 import AuthService from '../services/AuthService.js'; // Needed for auth token
 import { getAbsoluteApiUrl } from '../utils/apiToUrl.js'; // Import the new helper
-
-// Helper for API calls
-const fetchWithAuth = async (url, options = {}) => {
-  const token = AuthService.getToken();
-  const headers = {
-    ...options.headers,
-    'Content-Type': 'application/json', // Default content type
-    ...(token && { 'Authorization': `Bearer ${token}` }), // Add token if exists
-  };
-
-  try {
-    const response = await fetch(url, { ...options, headers });
-    if (!response.ok) {
-      const errorBody = await response.text(); // Read body for more info
-      console.error(`API Error ${response.status}: ${errorBody}`);
-      throw new Error(`HTTP error ${response.status}: ${response.statusText} - ${errorBody}`);
-    }
-    // Handle different content types
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.indexOf("application/json") !== -1) {
-      return response.json();
-    } else {
-      return response.text(); // Assume text for prompt content
-    }
-  } catch (error) {
-    console.error('Fetch error:', error);
-    throw error; // Re-throw to be caught by caller
-  }
-};
-
 
 const PromptsPage = () => {
   const { t } = useTranslations();
@@ -63,13 +32,11 @@ const PromptsPage = () => {
     setIsLoadingList(true);
     setListError(null);
     try {
-      // Update API endpoint for listing prompts
       const apiUrl = getAbsoluteApiUrl('/api/prompts/list');
-      let data = await fetchWithAuth(apiUrl);
+      let data = await AuthService.fetchWithAuth(apiUrl);
       setBasePrompts(data.basePrompts || []);
       setScenarioPrompts(data.scenarioPrompts || []);
 
-      // Fetch content for initially active prompts
       const allPrompts = [...(data.basePrompts || []), ...(data.scenarioPrompts || [])];
       const activePrompts = allPrompts.filter(p => p.isActive);
       await Promise.all(activePrompts.map(p => fetchPromptContent(p.filename)));
@@ -90,13 +57,11 @@ const PromptsPage = () => {
     setLoadingStates(prev => ({ ...prev, [filename]: true }));
     setErrorStates(prev => ({ ...prev, [filename]: null }));
     try {
-      // Update API endpoint for getting prompt content
       const apiUrl = getAbsoluteApiUrl(`/api/prompts/get`);
-      const content= await fetchWithAuth(apiUrl, {
+      const content = await AuthService.fetchWithAuth(apiUrl, {
         method: 'POST',
-        body: JSON.stringify({ filename }), 
+        body: JSON.stringify({ filename }),
       });
-      
       setPromptContents(prev => ({ ...prev, [filename]: content }));
       setDirtyState(prev => ({ ...prev, [filename]: false })); // Mark as clean after fetch
     } catch (error) {
@@ -130,16 +95,14 @@ const PromptsPage = () => {
 
     try {
       // Call API to update status
-      // Update API endpoint for updating status (no filename in path)
       const apiUrl = getAbsoluteApiUrl(`/api/prompts/status`);
-      await fetchWithAuth(apiUrl, {
+      await AuthService.fetchWithAuth(apiUrl, {
         method: 'PATCH',
-        body: JSON.stringify({ filename, isActive: newIsActive }), 
+        body: JSON.stringify({ filename, isActive: newIsActive }),
       });
 
       // If activating and content not loaded, fetch it
-      // Use newIsActive in the condition
-      if (newIsActive && !promptContents[filename]) { 
+      if (newIsActive && !promptContents[filename]) {
         await fetchPromptContent(filename);
       }
       // If deactivating, maybe clear content? Optional.
@@ -190,9 +153,8 @@ const PromptsPage = () => {
       const content = promptContents[filename];
       if (typeof content === 'string') { // Ensure content exists
         try {
-          // Update API endpoint for saving prompt content (no filename in path)
           const apiUrl = getAbsoluteApiUrl(`/api/prompts/save`);
-          await fetchWithAuth(apiUrl, {
+          await AuthService.fetchWithAuth(apiUrl, {
             method: 'PUT',
             body: JSON.stringify({ filename, content }),
           });
@@ -226,9 +188,8 @@ const PromptsPage = () => {
      setLoadingStates(prev => ({ ...prev, [filename]: true })); // Indicate loading
      setErrorStates(prev => ({ ...prev, [filename]: null }));
      try {
-        // Update API endpoint for deleting prompt override (no filename in path)
         const apiUrl = getAbsoluteApiUrl(`/api/prompts/delete`);
-        await fetchWithAuth(apiUrl, { 
+        await AuthService.fetchWithAuth(apiUrl, { 
           method: 'DELETE',
           body: JSON.stringify({ filename }),
         });

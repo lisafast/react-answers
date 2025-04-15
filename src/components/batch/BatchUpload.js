@@ -4,6 +4,8 @@ import { useTranslations } from '../../hooks/useTranslations.js';
 import { GcdsContainer, GcdsHeading, GcdsText } from '@cdssnc/gcds-components-react';
 import '../../styles/App.css';
 import * as XLSX from 'xlsx';
+import { getAbsoluteApiUrl } from '../../utils/apiToUrl.js';
+import AuthService from '../../services/AuthService.js';
 
 const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
   const { t } = useTranslations(lang);
@@ -131,76 +133,47 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
 
   const processBatch = async (entries) => {
     try {
-      console.log(`Starting batch processing for ${entries.length} entries...`);
-
       setProcessing(true);
       setBatchStatus('preparing');
       setError(null);
 
-      if (needsContext(entries)) {
-        console.log('Some entries need context. Deriving context batch processing...');
-        
-        //console.log('Context batch started: ' + result.batchId);
-        return null;
-      } else {
-        try {
-          const data = null;/* await MessageService.sendBatchMessages(
-            selectedAI,
-            entries,
-            selectedLanguage,
-            batchName
-          );*/
+      // Use AuthService.fetchWithAuth for consistent auth and error handling
+      const data = await AuthService.fetchWithAuth(getAbsoluteApiUrl('/api/batch/create'), {
+        method: 'POST',
+        body: JSON.stringify({
+          batchName,
+          aiProvider: selectedAI,
+          searchProvider: selectedSearch,
+          lang: selectedLanguage,
+          applyOverrides: false, // or use a state if you add a checkbox
+          entries
+        })
+      });
 
-          console.log(`${selectedAI} batch response:`, data);
-
-          if (data.batchId) {
-            console.log(`Batch created successfully. Batch ID: ${data.batchId}`);
-          } else {
-            throw new Error('No batch ID received from API');
-          }
-          return data;
-        } catch (error) {
-          if (error.name === 'AbortError') {
-            throw new Error(
-              'Request timed out while creating batch. The operation may still be processing.'
-            );
-          }
-          throw error;
-        }
-      }
+      setBatchId(data.batchId);
+      setBatchStatus('started');
+      setProcessing(false);
+      return data;
     } catch (error) {
-      console.error('Error processing batch:', error);
       setError(`Failed to start batch processing: ${error.message}`);
       setProcessing(false);
       setBatchStatus(null);
+      throw error;
     }
   };
 
   const handleProcessFile = async () => {
     if (!file) return;
 
-    console.log('Starting process, current states:', {
-      processing,
-      batchStatus,
-    });
-
     setProcessing(true);
     setError(null);
-
     try {
-      const text = await file.text();
-      const entries = processCSV(text);
-      console.log('After setting initial states:', {
-        processing: true,
-        entriesLength: entries.length,
-      });
+      const csvText = await file.text();
+      const entries = processCSV(csvText);
       await processBatch(entries);
-      setBatchStatus('started');
-      resetForm();
-    } catch (error) {
-      console.error('Process file error:', error);
-      resetForm();
-      setError(error.message);
+    } catch (err) {
+      setError(err.message);
+      setProcessing(false);
     }
   };
 

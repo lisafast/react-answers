@@ -229,6 +229,7 @@
         "type": "Type",
         "status": "Status",
         "batchName": "Name",
+        "progress": "Progress",
         "action" : "Action"
       },
       "actions": {

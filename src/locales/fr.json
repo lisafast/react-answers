@@ -230,6 +230,7 @@
         "provider": "Fournisseur",
         "type": "Type",
         "status": "Statut",
+        "progress": "Progression",
         "action": "Action"
       },
       "actions": {

@@ -139,14 +139,28 @@ class AuthService {
   }
 
   static async fetchWithAuth(url, options = {}) {
-    const headers = { ...this.getAuthHeader(), ...options.headers };
-    const response = await fetch(url, { ...options, headers });
+    const token = this.getToken();
+    const headers = {
+      ...options.headers,
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+    };
 
-    if (response.status === 401) {
-      this.logout(); // Redirect to login if token is invalid
+    try {
+      const response = await fetch(url, { ...options, headers });
+      if (response.status === 401) {
+        this.logout();
+      }
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        return response.json();
+      } else {
+        return response.text();
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      throw error;
     }
-
-    return response;
   }
 
  

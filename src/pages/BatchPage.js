@@ -1,17 +1,80 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { GcdsContainer, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
 import BatchUpload from '../components/batch/BatchUpload.js';
 import BatchList from '../components/batch/BatchList.js';
-import { getApiUrl, getProviderApiUrl } from '../utils/apiToUrl.js';
+import { getAbsoluteApiUrl } from '../utils/apiToUrl.js';
 import { useTranslations } from '../hooks/useTranslations.js';
 import ExportService from '../services/ExportService.js';
 import AuthService from '../services/AuthService.js';
 
 const BatchPage = ({ lang = 'en' }) => {
   const { t } = useTranslations(lang);
+  const [batches, setBatches] = useState([]);
+  const [error, setError] = useState(null);
+  // Store previous progress and updatedAt for each batch
+  const prevProgressRef = useRef({});
+
+  useEffect(() => {
+    let pollInterval = null;
+    let isProcessingChunk = false;
+    const STUCK_THRESHOLD_MS = 60 * 1000; // 1 minute
+
+    const pollAndMaybeResume = async () => {
+      try {
+        const batchList = await AuthService.fetchWithAuth(getAbsoluteApiUrl('/api/batch/list'));
+        setBatches(batchList);
+        const now = Date.now();
+        for (const batch of batchList) {
+          const prev = prevProgressRef.current[batch._id];
+          const processed = batch.processedItems ?? 0;
+          const updatedAt = batch.updatedAt ? new Date(batch.updatedAt).getTime() : 0;
+          let shouldResume = false;
+
+          if (
+            (batch.status === 'processing' || batch.status === 'queued') &&
+            !isProcessingChunk
+          ) {
+            if (prev) {
+              // If no progress and updatedAt hasn't changed for threshold, consider stuck
+              if (
+                processed === prev.processedItems &&
+                updatedAt === prev.updatedAt &&
+                now - updatedAt > STUCK_THRESHOLD_MS
+              ) {
+                shouldResume = true;
+              }
+            } else {
+              // No previous record, just store and skip stuck check this time
+              prevProgressRef.current[batch._id] = { processedItems: processed, updatedAt };
+              continue;
+            }
+          }
+
+          if (shouldResume) {
+            isProcessingChunk = true;
+            await AuthService.fetchWithAuth(getAbsoluteApiUrl(`/api/batch/process-for-duration`), {
+              method: 'POST',
+              body: JSON.stringify({ batchId: batch._id, duration: 60 })
+            });
+            isProcessingChunk = false;
+          }
+
+          // Always update the ref for next poll (after stuck check and resume attempt)
+          prevProgressRef.current[batch._id] = { processedItems: processed, updatedAt };
+        }
+      } catch (err) {
+        setError('Error polling batches or processing: ' + err.message);
+        isProcessingChunk = false;
+      }
+    };
+
+    pollInterval = setInterval(pollAndMaybeResume, 5000);
+    pollAndMaybeResume();
+    return () => clearInterval(pollInterval);
+  }, []);
+
   const handleDownloadClick = async (batchId, type) => {
-    console.log('Button clicked for batch:', batchId);
-    const response = await fetch(getApiUrl(`db-batch-retrieve?batchId=${batchId}`), {
+    const response = await fetch(getAbsoluteApiUrl(`/api/batch/results?batchId=${batchId}`), {
       headers: AuthService.getAuthHeader()
     });
     const batch = await response.json();
@@ -20,17 +83,18 @@ const BatchPage = ({ lang = 'en' }) => {
     ExportService.export(batches, fileName);
   };
 
-  const handleCompleteCancelClick = async (batchId, action, provider) => {
+  const handleCompleteCancelClick = async (batchId, action) => {
     if (action === 'cancel') {
-      console.log('Button clicked to cancel batch:', batchId);
-      await fetch(getProviderApiUrl(provider, `batch-cancel?batchId=${batchId}`), {
-        headers: AuthService.getAuthHeader()
+      await fetch(getAbsoluteApiUrl('/api/batch/cancel'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...AuthService.getAuthHeader()
+        },
+        body: JSON.stringify({ batchId })
       });
     } else {
-      console.log('Button clicked to complete batch:', batchId);
-      await fetch(getProviderApiUrl(provider, `batch-process-results?batchId=${batchId}`), {
-        headers: AuthService.getAuthHeader()
-      });
+      // Implement process results if needed
     }
   };
 
@@ -71,15 +135,17 @@ const BatchPage = ({ lang = 'en' }) => {
         <h2 className="mt-400 mb-400">{t('batch.sections.running.title')}</h2>
         <BatchList
           buttonAction={handleCompleteCancelClick}
-          batchStatus="validating,failed,in_progress,finalizing,completed,expired"
+          batchStatus={"processing,queued,error"} // Remove 'completed' from running list
           lang={lang}
+          batches={batches}
         />
       </section>
 
       <section id="processed-evaluation" className="mb-600">
         <h2 className="mt-400 mb-400">{t('batch.sections.processed.title')}</h2>
-        <BatchList buttonAction={handleDownloadClick} batchStatus="processed" lang={lang} />
+        <BatchList buttonAction={handleDownloadClick} batchStatus="processed" lang={lang} batches={batches} />
       </section>
+      {error && <div className="error-message red">{error}</div>}
     </GcdsContainer>
   );
 };
