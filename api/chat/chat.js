@@ -130,17 +130,18 @@ async function sseMessageHandler(req, res) {
 
     ServerLoggingService.info('Chat API request received, starting processing', chatId, { requestId });
 
-    // Prepare the single parameters object for ChatProcessingService
+    const originContext = { type: 'chat', id: chatId };
     const processParams = {
-      chatId,
       userMessage,
       lang,
       selectedAI,
       selectedSearch,
       referringUrl,
       requestId, // Pass requestId so service can use it if needed
-      overrideUserId // Pass the admin user ID if overrides are requested
+      overrideUserId, // Pass the admin user ID if overrides are requested
+      originContext // Pass the chat context
     };
+
 
     // Call the service and AWAIT its completion.
     // Events emitted during its execution will still be handled by the listener.
