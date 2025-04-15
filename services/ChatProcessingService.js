@@ -32,12 +32,15 @@ class ChatProcessingService {
  * @param {string} [params.overrideUserId] - Optional ID of an admin user whose prompt overrides should be applied.
  * @returns {Promise<object>} The final response object to be sent to the user.
  */
-   async processMessage(params) {
+  async processMessage(params) {
     // Destructure all potential parameters
     const {
-        chatId, userMessage, lang, selectedAI, selectedSearch, referringUrl,
-        requestId: providedRequestId, user, overrideUserId // Added overrideUserId
+      userMessage, lang, selectedAI, selectedSearch, referringUrl,
+      requestId: providedRequestId, user, overrideUserId, originContext // Remove chatId from destructure
     } = params;
+
+    // Determine chatId for logging/context (from originContext if present)
+    const chatId = originContext?.id || params.chatId;
 
     // Step 0: Initialization
     const { requestId, startTime, statusEmitterHandler, toolTrackingHandler, callbacks } = this._initializeProcessing(providedRequestId, chatId);
@@ -85,8 +88,8 @@ class ChatProcessingService {
         pageLanguage: lang,
         referringUrl: referringUrl
       };
-      const originContext = { type: 'chat', id: chatId };
-      const savedInteraction = await DataStoreService.persistInteraction(interactionData, originContext);
+      const originContextToUse = originContext || { type: 'chat', id: chatId };
+      const savedInteraction = await DataStoreService.persistInteraction(interactionData, originContextToUse);
       ServerLoggingService.info('Interaction persisted successfully', chatId, { requestId, interactionId: savedInteraction._id });
 
 
@@ -94,17 +97,17 @@ class ChatProcessingService {
       const finalResponse = this._formatFinalResponse({
         finalAnswer, finalCitationUrl, confidenceRating, savedInteraction
       });
+      if (originContextToUse.type !== 'batch') {
+        // Step 9: Trigger Background Tasks (Asynchronous - Fire and Forget)
+        this._runBackgroundTasks(savedInteraction, chatId, requestId)
+          .catch(bgError => {
+            // Log errors from the async background task initiation itself, if any
+            ServerLoggingService.error('Error initiating background tasks', chatId, { requestId, interactionId: savedInteraction?._id, error: bgError.message });
+          });
 
-      // Step 9: Trigger Background Tasks (Asynchronous - Fire and Forget)
-      this._runBackgroundTasks(savedInteraction, chatId, requestId)
-        .catch(bgError => {
-          // Log errors from the async background task initiation itself, if any
-          ServerLoggingService.error('Error initiating background tasks', chatId, { requestId, interactionId: savedInteraction?._id, error: bgError.message });
-        });
-
-      // Step 10: Finalize (Logging, Events for main response)
-      this._finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler });
-
+        // Step 10: Finalize (Logging, Events for main response)
+        this._finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler });
+      }
       // Return the response to the user immediately
       return finalResponse;
 

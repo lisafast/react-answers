@@ -164,11 +164,10 @@ class DataStoreService {
         });
       }
     } else if (originType === 'batch') {
-      // Find Batch document (assuming originId is the batchId or _id)
-      // Using batchId which seems to be the identifier in the Batch model
-      parentDoc = await Batch.findOne({ batchId: originId }); 
+      // Find Batch document by MongoDB _id (originId)
+      parentDoc = await Batch.findOne({ _id: originId }); 
       if (!parentDoc) {
-         throw new Error(`BatchRun with batchId ${originId} not found.`);
+         throw new Error(`BatchRun with _id ${originId} not found.`);
       }
     } else {
       throw new Error(`Invalid originContext type: ${originType}`);
@@ -208,18 +207,22 @@ class DataStoreService {
 
   async findBatchRunById(batchRunId) {
     await this.ensureDbConnection();
-    return Batch.findOne({ batchId: batchRunId }).populate('interactions'); // Assuming batchId is unique identifier
+    // Populate 'entries' as a subdocument array (not as refs)
+    // If entries are plain objects, just return the batch as is
+    return Batch.findOne({ _id: batchRunId });
   }
 
   async createBatchRun(batchData) {
     await this.ensureDbConnection();
-    const newBatch = new Batch(batchData); // Or BatchRun model
+    ServerLoggingService.info('Creating new batch run', batchData._id, batchData);
+    const newBatch = new Batch(batchData);
     return newBatch.save();
   }
 
   async updateBatchRunStatus(batchRunId, status, progressInfo) {
     await this.ensureDbConnection();
-    return Batch.updateOne({ batchId: batchRunId }, { status: status, ...progressInfo }); // Example update
+    // Update Batch by _id instead of batchId
+    return Batch.updateOne({ _id: batchRunId }, { status: status, ...progressInfo });
   }
 
   async getChatLogs(filters) {
@@ -402,7 +405,7 @@ class DataStoreService {
    */
   async createBatchRun(batchData) {
     await this.ensureDbConnection();
-    ServerLoggingService.info('Creating new batch run', batchData.batchId, batchData);
+    ServerLoggingService.info('Creating new batch run', batchData._id, batchData);
     
     const newBatch = new Batch(batchData);
     return newBatch.save();
@@ -431,36 +434,7 @@ class DataStoreService {
     return result;
   }
 
-  /**
-   * Finds a batch run by its MongoDB _id
-   * @param {string} batchId The MongoDB _id of the batch
-   * @returns {Promise<Batch>} The batch document
-   */
-  async findBatchRunById(batchId) {
-    await this.ensureDbConnection();
-    return Batch.findById(batchId).populate({
-      path: 'interactions',
-      populate: [
-        { 
-          path: 'question',
-          select: 'redactedQuestion englishQuestion'
-        },
-        {
-          path: 'answer',
-          select: 'englishAnswer content sentences citation',
-          populate: {
-            path: 'citation',
-            select: 'aiCitationUrl citationHead confidenceRating'
-          }
-        },
-        {
-          path: 'context',
-          select: 'topic topicUrl department departmentUrl searchResults'
-        }
-      ]
-    });
-  }
-
+ 
   /**
    * Finds all batches for a user
    * @param {string} userId The user's MongoDB _id
@@ -471,6 +445,58 @@ class DataStoreService {
     return Batch.find({ uploaderUserId: userId })
       .select('name status totalItems processedItems failedItems aiProvider searchProvider pageLanguage createdAt updatedAt')
       .sort({ createdAt: -1 });
+  }
+
+  /**
+   * Finds all batches in the system (admin/global view)
+   * @returns {Promise<Array<Batch>>} Array of all batch documents
+   */
+  async findAllBatches() {
+    await this.ensureDbConnection();
+    return Batch.find()
+      .select('name status totalItems processedItems failedItems aiProvider searchProvider pageLanguage uploaderUserId createdAt updatedAt')
+      .sort({ createdAt: -1 });
+  }
+
+  /**
+   * Finds a batch by ID and deeply populates its interactions and all related fields (for export/results).
+   * @param {string} batchId - The batch document ID
+   * @returns {Promise<Batch|null>} The populated batch document
+   */
+  async findBatchRunWithPopulatedInteractions(batchId) {
+    await this.ensureDbConnection();
+    return Batch.findById(batchId)
+      .populate({
+        path: 'interactions',
+        populate: [
+          {
+            path: 'context',
+            populate: { path: 'tools' }
+          },
+          { path: 'expertFeedback' },
+          {
+            path: 'question',
+            select: '-embedding'
+          },
+          {
+            path: 'answer',
+            select: '-embedding -sentenceEmbeddings',
+            populate: [
+              { path: 'sentences' },
+              { path: 'citation' },
+              { path: 'tools' },
+            ]
+          },
+          {
+            path: 'autoEval',
+            model: 'Eval',
+            populate: [
+              { path: 'expertFeedback' },
+              { path: 'usedExpertFeedbackId' }
+            ]
+          }
+        ]
+      });
   }
 
 }
