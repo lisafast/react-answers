@@ -86,10 +86,10 @@ app.post('/api/batch/cancel', cancelBatchHandler);
 
 // Add new prompt management routes with specific paths (protection applied in handlers)
 app.get('/api/prompts/list', promptListHandler);
-app.get('/api/prompts/get/:filename', promptGetHandler);
-app.put('/api/prompts/save/:filename', promptSaveHandler);
-app.patch('/api/prompts/status/:filename', promptStatusHandler);
-app.delete('/api/prompts/delete/:filename', promptDeleteHandler);
+app.post('/api/prompts/get', promptGetHandler);
+app.put('/api/prompts/save', promptSaveHandler);
+app.patch('/api/prompts/status', promptStatusHandler);
+app.delete('/api/prompts/delete', promptDeleteHandler);
 
 
 const PORT = process.env.PORT || 3001;
