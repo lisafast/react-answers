@@ -10,8 +10,7 @@ import { TRANSLATION_INSTRUCTIONS } from '../prompts/base/translationInstruction
 import { CITATION_INSTRUCTIONS } from '../prompts/base/citationInstructions.js';
 import { FORMAT_VERIFICATION_INSTRUCTIONS } from '../prompts/base/formatVerificationInstructions.js';
 import { KEY_GUIDELINES } from '../prompts/base/keyGuidelines.js';
-// Import individual scenario files instead of the combined one if needed for overrides
-// import { SCENARIOS as GENERAL_SCENARIOS } from '../prompts/scenarios/scenarios-all.js';
+import { SCENARIOS } from '../prompts/base/scenarios-all.js';
 import DataStoreService from './DataStoreService.js'; // Added for DB access
 import PromptDiscoveryService from './PromptDiscoveryService.js'; // Added for path lookup
 import ServerLoggingService from './ServerLoggingService.js'; // Renamed import alias
@@ -22,6 +21,24 @@ import fs from 'fs/promises'; // Needed to read default files
  */
 class PromptBuilderService {
 
+  static getPromptFileOrder() {
+    return [
+      'roleAndGoal.js',
+      'availableTools.js',
+      'workflowSteps.js',
+      'preliminaryChecksInstructions.js',
+      'departmentMatchingInstructions.js',
+      'departmentScenariosInstructions.js',
+      'scenarios-all.js',
+      'answerContextInstructions.js',
+      'answerCraftingInstructions.js',
+      'translationInstructions.js',
+      'citationInstructions.js',
+      'formatVerificationInstructions.js',
+      'keyGuidelines.js'
+    ];
+  }
+
   /**
  * Builds the complete system prompt string, using provided overrides if available.
  * @param {string} [language='en'] - The language code ('en' or 'fr').
@@ -29,7 +46,7 @@ class PromptBuilderService {
  * @param {object} [overrides={}] - Optional map of filename/content overrides.
  * @returns {Promise<string>} The assembled system prompt.
  */
-  async buildPrompt(language = 'en', referringUrl = '', overrides = {}) { // Changed overrideUserId to overrides map
+  async buildPrompt(language = 'en', referringUrl = '', overrides = {}) {
     try {
       // Helper function to get prompt content (override or default)
       const getPromptContent = async (filename, defaultExportedContent) => {
@@ -56,7 +73,6 @@ class PromptBuilderService {
       const languageContext = language === 'fr'
         ? "<page-language>French</page-language>"
         : "<page-language>English</page-language>";
-      // Correctly interpolate the referringUrl variable
       const referringUrlContext = `<referring-url>${referringUrl || 'Not provided'}</referring-url>`;
       const dynamicContext = `
 ## Current date
@@ -68,22 +84,30 @@ ${referringUrlContext}
 `;
 
       // --- Assemble Prompt Modules ---
-      // Fetch content for each section, checking for overrides
+      // Map filenames to their imported content
+      const promptContentMap = {
+        'roleAndGoal.js': ROLE_AND_GOAL,
+        'availableTools.js': AVAILABLE_TOOLS,
+        'workflowSteps.js': WORKFLOW_STEPS,
+        'preliminaryChecksInstructions.js': PRELIMINARY_CHECKS_INSTRUCTIONS,
+        'departmentMatchingInstructions.js': DEPARTMENT_MATCHING_INSTRUCTIONS,
+        'departmentScenariosInstructions.js': DEPARTMENT_SCENARIOS_INSTRUCTIONS,
+        'scenarios-all.js': SCENARIOS,
+        'answerContextInstructions.js': ANSWER_CONTEXT_INSTRUCTIONS,
+        'answerCraftingInstructions.js': ANSWER_CRAFTING_INSTRUCTIONS,
+        'translationInstructions.js': TRANSLATION_INSTRUCTIONS,
+        'citationInstructions.js': CITATION_INSTRUCTIONS,
+        'formatVerificationInstructions.js': FORMAT_VERIFICATION_INSTRUCTIONS,
+        'keyGuidelines.js': KEY_GUIDELINES
+      };
+
+      // Build the sectionsContent array dynamically using the static order
+      const fileOrder = PromptBuilderService.getPromptFileOrder();
       const sectionsContent = await Promise.all([
-        getPromptContent('roleAndGoal.js', ROLE_AND_GOAL),
-        Promise.resolve(dynamicContext), // Dynamic context isn't overridden
-        getPromptContent('availableTools.js', AVAILABLE_TOOLS),
-        getPromptContent('workflowSteps.js', WORKFLOW_STEPS),
-        getPromptContent('preliminaryChecksInstructions.js', PRELIMINARY_CHECKS_INSTRUCTIONS),
-        getPromptContent('departmentMatchingInstructions.js', DEPARTMENT_MATCHING_INSTRUCTIONS),
-        getPromptContent('departmentScenariosInstructions.js', DEPARTMENT_SCENARIOS_INSTRUCTIONS),
-        getPromptContent('answerContextInstructions.js', ANSWER_CONTEXT_INSTRUCTIONS),
-        getPromptContent('answerCraftingInstructions.js', ANSWER_CRAFTING_INSTRUCTIONS),
-        getPromptContent('translationInstructions.js', TRANSLATION_INSTRUCTIONS),
-        getPromptContent('citationInstructions.js', CITATION_INSTRUCTIONS),
-        getPromptContent('formatVerificationInstructions.js', FORMAT_VERIFICATION_INSTRUCTIONS),
-        getPromptContent('keyGuidelines.js', KEY_GUIDELINES),
-        Promise.resolve("\nReminder: Follow all steps and guidelines meticulously. Accuracy, adherence to format, and appropriate tool usage are critical.") // Final reminder isn't overridden
+        getPromptContent(fileOrder[0], promptContentMap[fileOrder[0]]),
+        Promise.resolve(dynamicContext), // Dynamic context always second
+        ...fileOrder.slice(1).map(filename => getPromptContent(filename, promptContentMap[filename])),
+        Promise.resolve("\nReminder: Follow all steps and guidelines meticulously. Accuracy, adherence to format, and appropriate tool usage are critical.")
       ]);
 
       // Filter out any null/undefined sections if fetching failed (though getPromptContent should return default)
@@ -103,5 +127,6 @@ ${referringUrlContext}
   }
 }
 
+export { PromptBuilderService };
 // Export a singleton instance
 export default new PromptBuilderService();

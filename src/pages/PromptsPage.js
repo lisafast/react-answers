@@ -41,7 +41,8 @@ const PromptsPage = () => {
   const { language } = usePageContext();
 
   // State for the list of prompts fetched from API
-  const [promptList, setPromptList] = useState([]); // Array of { filename, hasOverride, isActive }
+  const [basePrompts, setBasePrompts] = useState([]); // Array of { filename, hasOverride, isActive }
+  const [scenarioPrompts, setScenarioPrompts] = useState([]);
   // State for prompt content (filename -> string)
   const [promptContents, setPromptContents] = useState({});
   // State for loading status (global and per-prompt)
@@ -65,23 +66,13 @@ const PromptsPage = () => {
       // Update API endpoint for listing prompts
       const apiUrl = getAbsoluteApiUrl('/api/prompts/list');
       let data = await fetchWithAuth(apiUrl);
-      // Sort prompts alphabetically by filename
-      if (Array.isArray(data)) {
-        data.sort((a, b) => a.filename.localeCompare(b.filename));
-      }
-      setPromptList(data || []);
+      setBasePrompts(data.basePrompts || []);
+      setScenarioPrompts(data.scenarioPrompts || []);
 
-      // --- Added: Fetch content for initially active prompts ---
-      if (Array.isArray(data)) {
-        const activePrompts = data.filter(p => p.isActive);
-        // Use Promise.all to fetch content concurrently for all active prompts
-        // We don't necessarily need to wait for all fetches here,
-        // but it's good practice if subsequent logic depended on it.
-        // Individual fetchPromptContent calls handle their own loading/error states.
-        await Promise.all(activePrompts.map(p => fetchPromptContent(p.filename)));
-      }
-      // --- End Added ---
-
+      // Fetch content for initially active prompts
+      const allPrompts = [...(data.basePrompts || []), ...(data.scenarioPrompts || [])];
+      const activePrompts = allPrompts.filter(p => p.isActive);
+      await Promise.all(activePrompts.map(p => fetchPromptContent(p.filename)));
     } catch (error) {
       setListError(t('prompts.errorList', 'Failed to load prompt list.'));
       console.error("Error fetching prompt list:", error);
@@ -100,8 +91,12 @@ const PromptsPage = () => {
     setErrorStates(prev => ({ ...prev, [filename]: null }));
     try {
       // Update API endpoint for getting prompt content
-      const apiUrl = getAbsoluteApiUrl(`/api/prompts/get/${filename}`);
-      const content = await fetchWithAuth(apiUrl);
+      const apiUrl = getAbsoluteApiUrl(`/api/prompts/get`);
+      const content= await fetchWithAuth(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify({ filename }), 
+      });
+      
       setPromptContents(prev => ({ ...prev, [filename]: content }));
       setDirtyState(prev => ({ ...prev, [filename]: false })); // Mark as clean after fetch
     } catch (error) {
@@ -114,13 +109,13 @@ const PromptsPage = () => {
 
   // Handler for checkbox changes (toggles isActive status)
   const handleCheckboxChange = async (event) => {
-    // Try getting checked state from event.target.checked for GcdsCheckbox
+    // Use event.detail.checked for GcdsCheckbox
     const filename = event.target.name;
-    const newIsActive = event.target.checked; // Changed from event.detail.checked
+    const newIsActive = event.detail;
     let originalPromptState = null;
 
     // Optimistically update UI state for checkbox
-    setPromptList(prevList => {
+    setBasePrompts(prevList => {
       const newList = prevList.map(p => {
         if (p.filename === filename) {
           originalPromptState = { ...p }; // Store original state for potential revert
@@ -135,12 +130,11 @@ const PromptsPage = () => {
 
     try {
       // Call API to update status
-      // Update API endpoint for updating status
-      const apiUrl = getAbsoluteApiUrl(`/api/prompts/status/${filename}`);
+      // Update API endpoint for updating status (no filename in path)
+      const apiUrl = getAbsoluteApiUrl(`/api/prompts/status`);
       await fetchWithAuth(apiUrl, {
         method: 'PATCH',
-        // Use newIsActive in the API call body
-        body: JSON.stringify({ isActive: newIsActive }), 
+        body: JSON.stringify({ filename, isActive: newIsActive }), 
       });
 
       // If activating and content not loaded, fetch it
@@ -158,7 +152,7 @@ const PromptsPage = () => {
       console.error(`Error updating status for ${filename}:`, error);
       // Revert optimistic UI update on error using the stored original state
       if (originalPromptState) {
-        setPromptList(prevList =>
+        setBasePrompts(prevList =>
           prevList.map(p =>
             p.filename === filename ? originalPromptState : p
           )
@@ -196,11 +190,11 @@ const PromptsPage = () => {
       const content = promptContents[filename];
       if (typeof content === 'string') { // Ensure content exists
         try {
-          // Update API endpoint for saving prompt content
-          const apiUrl = getAbsoluteApiUrl(`/api/prompts/save/${filename}`);
+          // Update API endpoint for saving prompt content (no filename in path)
+          const apiUrl = getAbsoluteApiUrl(`/api/prompts/save`);
           await fetchWithAuth(apiUrl, {
             method: 'PUT',
-            body: JSON.stringify({ content }),
+            body: JSON.stringify({ filename, content }),
           });
           setDirtyState(prev => ({ ...prev, [filename]: false })); // Mark as clean after successful save
           successCount++;
@@ -232,9 +226,12 @@ const PromptsPage = () => {
      setLoadingStates(prev => ({ ...prev, [filename]: true })); // Indicate loading
      setErrorStates(prev => ({ ...prev, [filename]: null }));
      try {
-        // Update API endpoint for deleting prompt override
-        const apiUrl = getAbsoluteApiUrl(`/api/prompts/delete/${filename}`);
-        await fetchWithAuth(apiUrl, { method: 'DELETE' });
+        // Update API endpoint for deleting prompt override (no filename in path)
+        const apiUrl = getAbsoluteApiUrl(`/api/prompts/delete`);
+        await fetchWithAuth(apiUrl, { 
+          method: 'DELETE',
+          body: JSON.stringify({ filename }),
+        });
         // Update UI state after successful deletion
         setPromptContents(prev => {
            const newState = { ...prev };
@@ -246,7 +243,7 @@ const PromptsPage = () => {
            delete newState[filename]; // Remove dirty state
            return newState;
         });
-        setPromptList(prevList =>
+        setBasePrompts(prevList =>
            prevList.map(p =>
              p.filename === filename ? { ...p, hasOverride: false, isActive: false } : p
            )
@@ -260,6 +257,51 @@ const PromptsPage = () => {
      }
   };
 
+  // Helper to render a prompt block
+  const renderPromptBlock = ({ filename, hasOverride, isActive }) => (
+    <div key={filename} className="mb-400" style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+         <GcdsCheckbox
+           checkboxId={`checkbox-${filename.replace(/[^a-zA-Z0-9]/g, '-')}`}
+           label={`${filename} ${hasOverride ? '(Override Exists)' : '(Default)'}`}
+           name={filename}
+           checked={isActive}
+           disabled={loadingStates[filename]}
+           onGcdsChange={handleCheckboxChange}
+         />
+         {hasOverride && (
+            <GcdsButton
+               size="small"
+               buttonRole="danger"
+               onClick={() => handleDeleteOverride(filename)}
+               disabled={loadingStates[filename]}
+            >
+               {t('prompts.deleteButton', 'Delete Override')}
+            </GcdsButton>
+         )}
+      </div>
+      {isActive && (
+        <div className="mt-300">
+          {loadingStates[filename] ? (
+            <p>{t('prompts.loading', 'Loading...')}</p>
+          ) : errorStates[filename] ? (
+            <GcdsAlert heading={t('prompts.errorContentTitle', 'Content Error')} alertType="danger" size="small">{errorStates[filename]}</GcdsAlert>
+          ) : (
+            <GcdsTextarea
+              textareaId={`textarea-${filename.replace(/[^a-zA-Z0-9]/g, '-')}`}
+              label={`Edit: ${filename}`}
+              hideLabel
+              name={filename}
+              value={promptContents[filename] ?? ''}
+              onGcdsChange={handleTextareaChange}
+              rows={15}
+              style={{ width: '100%' }}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <GcdsContainer size="xl" centered tag="main" className="mb-600">
@@ -268,7 +310,6 @@ const PromptsPage = () => {
       {listError && <GcdsAlert heading={t('prompts.errorListTitle', 'Error Loading Prompts')} alertType="danger">{listError}</GcdsAlert>}
       {saveSuccess && <GcdsAlert heading={t('prompts.saveSuccessTitle', 'Save Successful')} alertType="success" hideCloseBtn>{saveSuccess}</GcdsAlert>}
       {saveError && <GcdsAlert heading={t('prompts.saveErrorTitle', 'Save Error')} alertType="danger">{saveError}</GcdsAlert>}
-
 
       <div className="mb-400">
         <GcdsButton onClick={handleSaveChanges} disabled={isLoadingList || isSaving}>
@@ -280,61 +321,25 @@ const PromptsPage = () => {
         <p>{t('prompts.loadingList', 'Loading prompt list...')}</p>
       ) : (
         <div>
-          {promptList.map(({ filename, hasOverride, isActive }) => (
-            <div key={filename} className="mb-400" style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '4px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                 <GcdsCheckbox
-                   checkboxId={`checkbox-${filename.replace(/[^a-zA-Z0-9]/g, '-')}`}
-                   label={`${filename} ${hasOverride ? '(Override Exists)' : '(Default)'}`}
-                   name={filename}
-                   checked={isActive} // Checkbox reflects active state of the override
-                   disabled={loadingStates[filename]} // Disable while loading content/status
-                   onGcdsChange={handleCheckboxChange}
-                 />
-                 {hasOverride && (
-                    <GcdsButton
-                       size="small"
-                       buttonRole="danger"
-                       onClick={() => handleDeleteOverride(filename)}
-                       disabled={loadingStates[filename]}
-                    >
-                       {t('prompts.deleteButton', 'Delete Override')}
-                    </GcdsButton>
-                 )}
-              </div>
+          {/* Main prompts in build order */}
+          {basePrompts.map(renderPromptBlock)}
 
-              {/* Conditional rendering for loading/error/textarea */}
-              {isActive && (
-                <div className="mt-300">
-                  {loadingStates[filename] ? (
-                    <p>{t('prompts.loading', 'Loading...')}</p>
-                  ) : errorStates[filename] ? (
-                    <GcdsAlert heading={t('prompts.errorContentTitle', 'Content Error')} alertType="danger" size="small">{errorStates[filename]}</GcdsAlert>
-                  ) : (
-                    <GcdsTextarea
-                      textareaId={`textarea-${filename.replace(/[^a-zA-Z0-9]/g, '-')}`}
-                      label={`Edit: ${filename}`}
-                      hideLabel
-                      name={filename}
-                      value={promptContents[filename] ?? ''} // Use loaded content or empty string
-                      onGcdsChange={handleTextareaChange}
-                      rows={15}
-                      style={{ width: '100%' }}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+          {/* Scenarios section */}
+          {scenarioPrompts.length > 0 && (
+            <>
+              <hr style={{ margin: '2rem 0' }} />
+              <GcdsHeading tag="h2" className="mt-600 mb-400">{t('prompts.scenariosSection', 'Scenarios')}</GcdsHeading>
+              {scenarioPrompts.map(renderPromptBlock)}
+            </>
+          )}
         </div>
       )}
 
-       <div className="mt-400">
-         <GcdsButton onClick={handleSaveChanges} disabled={isLoadingList || isSaving}>
-           {isSaving ? t('prompts.saving', 'Saving...') : t('prompts.saveButton', 'Save Changes')}
-         </GcdsButton>
-       </div>
-
+      <div className="mt-400">
+        <GcdsButton onClick={handleSaveChanges} disabled={isLoadingList || isSaving}>
+          {isSaving ? t('prompts.saving', 'Saving...') : t('prompts.saveButton', 'Save Changes')}
+        </GcdsButton>
+      </div>
     </GcdsContainer>
   );
 };
