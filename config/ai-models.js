@@ -21,9 +21,9 @@ const AI_MODELS = {
     }
   },
   openai: {
-    default: 'gpt-4o-2024-11-20',
+    default: 'gpt-4.1-2025-04-14',
     models: {
-      'gpt-4o-2024-11-20': {
+      'gpt-4.1-2025-04-14': {
         maxTokens: 1024,
         temperature: 0.0,
         timeoutMs: 60000,

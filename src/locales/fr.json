@@ -14,7 +14,7 @@
       "privacyNote": "Pour protéger votre vie privée, les numéros et les adresses ne sont pas envoyés au service d'IA.",
       "aiServices": {
         "claude": "Service d'IA Claude : Claude 3.7 Sonnet d'Anthropic, connaissances jusqu'en février 2025",
-        "chatgpt": "Service d'IA ChatGPT : GPT-4o d'OpenAI, connaissances jusqu'en novembre 2024",
+        "chatgpt": "Service d'IA ChatGPT : GPT-4.1 d'OpenAI, connaissances jusqu'en mai 2025",
         "azure": "Service d'IA Azure : Microsoft Azure OpenAI"
       },
       "systemPrompt": "Lire l'invite système",
