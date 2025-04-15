@@ -344,6 +344,7 @@
     "errorListTitle": "Error Loading Prompts",
     "saveSuccessTitle": "Save Successful",
     "saveErrorTitle": "Save Error",
-    "errorContentTitle": "Content Error"
+    "errorContentTitle": "Content Error",
+    "scenariosSection": "Scenarios"
     }
 }

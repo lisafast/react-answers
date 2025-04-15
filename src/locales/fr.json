@@ -344,6 +344,7 @@
     "errorListTitle": "Erreur de chargement des invites",
     "saveSuccessTitle": "Enregistrement réussi",
     "saveErrorTitle": "Erreur d'enregistrement",
-    "errorContentTitle": "Erreur de contenu"
+    "errorContentTitle": "Erreur de contenu",
+    "scenariosSection": "Scénarios"
   }
 }
