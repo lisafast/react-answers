@@ -15,10 +15,8 @@ const savePromptHandlerLogic = async (req, res) => {
   }
 
   const adminUserId = req.user?._id;
-  // Get filename from params (Express) or query (Vercel)
-  const filename = req.params.filename || req.query.filename;
-  // Content comes from the body (already parsed by global middleware in server.js or by Vercel)
-  const { content } = req.body;
+  // Get filename and content from body (now sent in body, not params/query)
+  const { filename, content } = req.body;
 
   if (!adminUserId) {
     ServerLoggingService.warn('Admin user ID not found in request for PUT /api/prompts/:filename', null, { filename, headers: req.headers });

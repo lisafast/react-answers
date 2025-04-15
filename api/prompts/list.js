@@ -1,11 +1,13 @@
-// Removed express import
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js'; // Import withProtection
+import { PromptBuilderService } from '../../services/PromptBuilderService.js';
 import PromptDiscoveryService from '../../services/PromptDiscoveryService.js';
 import DataStoreService from '../../services/DataStoreService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 
 
-// Define the core handler logic function (not exported directly)
+// Order of main prompt files as used by PromptBuilderService
+const PROMPT_ORDER = PromptBuilderService.getPromptFileOrder();
+
 const listPromptsHandlerLogic = async (req, res) => {
   // Check HTTP Method
   if (req.method !== 'GET') {
@@ -33,24 +35,35 @@ const listPromptsHandlerLogic = async (req, res) => {
     const userOverrides = await DataStoreService.getAllUserOverrides(adminUserId);
     const overridesMap = new Map(userOverrides.map(o => [o.filename, { isActive: o.isActive }]));
 
-    // Combine the information
-    const promptList = Array.from(promptFileMap.entries()).map(([filename, fullPath]) => {
-      const overrideInfo = overridesMap.get(filename);
-      return {
-        filename: filename,
-        // fullPath: fullPath, // Maybe don't expose full server path to client? Optional.
+    // Separate base prompts (in PROMPT_ORDER) and scenarios (everything else)
+    const basePrompts = [];
+    const scenarioPrompts = [];
+
+    for (const [fullRelPath, fullPath] of promptFileMap.entries()) {
+      const filename = fullRelPath.split('/').pop(); // Only the filename
+      const overrideInfo = overridesMap.get(filename); // Use just filename for override logic
+      const promptObj = {
+        filename,
         hasOverride: !!overrideInfo,
-        isActive: overrideInfo ? overrideInfo.isActive : false, // Default to false if no override exists
+        isActive: overrideInfo ? overrideInfo.isActive : false,
       };
-    });
+      if (PROMPT_ORDER.includes(filename)) {
+        basePrompts.push(promptObj);
+      } else {
+        scenarioPrompts.push(promptObj);
+      }
+    }
 
-    // Sort alphabetically by filename for consistent UI
-    promptList.sort((a, b) => a.filename.localeCompare(b.filename));
+    // Order base prompts as in PROMPT_ORDER
+    basePrompts.sort((a, b) => PROMPT_ORDER.indexOf(a.filename) - PROMPT_ORDER.indexOf(b.filename));
+    // Alphabetize scenarios
+    scenarioPrompts.sort((a, b) => a.filename.localeCompare(b.filename));
 
-    res.json(promptList);
+    // Return as a JSON object with two arrays
+    res.json({ basePrompts, scenarioPrompts });
 
   } catch (error) {
-    
+
     ServerLoggingService.error('Error fetching prompt list in GET /api/prompts', null, { adminUserId, error: error.message, stack: error.stack });
     res.status(500).json({ message: 'Error fetching prompt list.' });
   }

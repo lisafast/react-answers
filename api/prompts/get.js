@@ -11,17 +11,14 @@ import ServerLoggingService from '../../services/ServerLoggingService.js';
 // Define the core handler logic function
 const getPromptHandlerLogic = async (req, res) => {
   // Check HTTP Method
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', ['GET']);
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
   const adminUserId = req.user?._id;
-  // Get filename from query parameters for Vercel compatibility
-  // Note: server.js uses path params (:filename), Vercel uses query params
-  // We need to handle both potentially, or standardize. Let's assume query for Vercel.
-  // If using server.js, req.params.filename will be set. If using Vercel, req.query.filename.
-  const filename = req.params.filename || req.query.filename;
+  // Get filename from body (now sent in body, not params/query)
+  const { filename } = req.body;
 
   if (!adminUserId) {
     ServerLoggingService.warn('Admin user ID not found in request for GET /api/prompts/:filename', null, { filename, headers: req.headers });

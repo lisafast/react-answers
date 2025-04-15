@@ -17,10 +17,8 @@ const updateStatusHandlerLogic = async (req, res) => {
   }
 
   const adminUserId = req.user?._id;
-  // Get filename from params (Express) or query (Vercel)
-  const filename = req.params.filename || req.query.filename;
-  // isActive comes from the body (parsed by global middleware or Vercel)
-  const { isActive } = req.body;
+  // Get filename from body (now sent in body, not params/query)
+  const { filename, isActive } = req.body;
   // Removed debugging logs
 
 

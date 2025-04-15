@@ -14,8 +14,8 @@ const deleteOverrideHandlerLogic = async (req, res) => {
   }
 
   const adminUserId = req.user?._id;
-  // Get filename from params (Express) or query (Vercel)
-  const filename = req.params.filename || req.query.filename;
+  // Get filename from body (now sent in body, not params/query)
+  const { filename } = req.body;
 
   if (!adminUserId) {
     ServerLoggingService.warn('Admin user ID not found in request for DELETE /api/prompts/:filename', null, { filename, headers: req.headers });
