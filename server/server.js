@@ -27,6 +27,7 @@ import promptGetHandler from '../api/prompts/get.js';
 import promptSaveHandler from '../api/prompts/save.js';
 import promptStatusHandler from '../api/prompts/status.js';
 import promptDeleteHandler from '../api/prompts/delete.js';
+import processForDurationHandler from '../api/batch/process-for-duration.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -83,6 +84,7 @@ app.get('/api/batch/status', batchStatusHandler);
 app.get('/api/batch/list', listBatchesHandler);
 app.get('/api/batch/results', getBatchResultsHandler);
 app.post('/api/batch/cancel', cancelBatchHandler);
+app.post('/api/batch/process-for-duration', processForDurationHandler); // New route added here
 
 // Add new prompt management routes with specific paths (protection applied in handlers)
 app.get('/api/prompts/list', promptListHandler);
