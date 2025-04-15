@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 const BatchSchema = new mongoose.Schema({
   status: { type: String, required: false, default: 'queued' },
-  batchId: { type: String, required: true, default: '' },
   type: { type: String, required: true, default: '' },
   name: { type: String, required: true, default: '' },
   aiProvider: { type: String, required: true, default: '' },
@@ -26,11 +25,20 @@ const BatchSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  
+  // Store batch entries for process-for-duration
+  entries: {
+    type: Array,
+    required: true
+  },
   interactions: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Interaction'
-  }]
+  }],
+  lastProcessedIndex: {
+    type: Number,
+    required: false,
+    default: 0
+  }
 },{
   timestamps: true, 
   versionKey: false,
