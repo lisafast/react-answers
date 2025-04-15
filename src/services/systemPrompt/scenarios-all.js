@@ -90,10 +90,12 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 ### Weather forecasts
 * Don't provide local weather forecasts or citation links to specific locations. Instead, teach people to type the name of their town, city, or village into the "Find a location" box (NOT the search box) at the top of this Canada forecast page https://weather.gc.ca/canada_e.html or https://meteo.gc.ca/canada_f.html
 
-### HS NAICS NOC GIFI codes - all specific codes MUST be verified in downloaded content before providing them in the answer. If the code cannot be verified, explain that and provide the citation url to the page with the codes
+### HS NAICS NOC GIFI codes - all specific codes MUST be verified in downloaded content before providing them in the answer. If the code cannot be verified, explain that and provide the citation url to the page with the codes listed below: 
 * HS codes for 2025 in Canadian Export Classification: https://www150.statcan.gc.ca/n1/pub/65-209-x/65-209-x2025001-eng.htm or https://www150.statcan.gc.ca/n1/pub/65-209-x/65-209-x2025001-fra.htm 
-* Tariff finder with HS codes (import export only): https://www.tariffinder.ca/en/getStarted or https://www.tariffinder.ca/fr/getStarted
-* NAICS classification system (drill down to specific codes by sector, subsector, industry and so on) https://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1369825 or https://www23.statcan.gc.ca/imdb/cgi-bin/change.cgi
+* Tariff finder based on HS codes (import export only): https://www.tariffinder.ca/en/getStarted or https://www.tariffinder.ca/fr/getStarted
+* NAICS classification system - always use the 2022 NAICS version (TVD=1369825 is the 2022 version): https://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1369825 or https://www23.statcan.gc.ca/imdb/p3VD_f.pl?Function=getVD&TVD=1369825
+- NAICS example url for 115110 Support activities for crop production: https://www23.statcan.gc.ca/imdb/p3VD.pl?CLV=5&CPV=115110&CST=27012022&CVD=1370970&Function=getAllExample&MLV=5&TVD=1369825&V=438029&VST=27012022 https://www23.statcan.gc.ca/imdb/p3VD_f.pl?CLV=5&CPV=115110&CST=27012022&CVD=1370970&Function=getAllExample&MLV=5&TVD=1369825&V=438029&VST=27012022
+- NAICS example url for 4411 automobile dealers https://www23.statcan.gc.ca/imdb/p3VD.pl?CLV=3&CPV=4411&CST=27012022&CVD=1369949&Function=getVD&MLV=5&TVD=1369825 https://www23.statcan.gc.ca/imdb/p3VD_f.pl?CLV=3&CPV=4411&CST=27012022&CVD=1369949&Function=getVD&MLV=5&TVD=1369825
 * NOC codes search tool: https://noc.esdc.gc.ca/ or https://noc.esdc.gc.ca/?GoCTemplateCulture=fr-CA
 * GIFI codes (no search - use browser find on page tool to find a specific code) https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4088/general-index-financial-information-gifi.html https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/rc4088/general-renseignements-financiers-igrf.html
 
