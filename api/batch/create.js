@@ -1,7 +1,7 @@
 // api/batch/create.js - Handles creation of new batch processing runs
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import BatchProcessingService from '../../services/BatchProcessingService.js';
-import { authMiddleware, withProtection } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 async function createBatchHandler(req, res) {
   if (req.method !== 'POST') {
@@ -18,14 +18,14 @@ async function createBatchHandler(req, res) {
       searchProvider,
       lang: pageLanguage,
       applyOverrides,
-      file // CSV file from multipart/form-data
+      entries // Array of parsed batch entries
     } = req.body;
 
     // Basic validation
-    if (!batchName || !aiProvider || !searchProvider || !pageLanguage || !file) {
+    if (!batchName || !aiProvider || !searchProvider || !pageLanguage || !entries || !Array.isArray(entries) || entries.length === 0) {
       ServerLoggingService.warn('Create Batch API request missing required fields', batchIdForLogging, req.body);
       return res.status(400).json({ 
-        message: 'Missing required fields: batchName, aiProvider, searchProvider, lang, file' 
+        message: 'Missing required fields: batchName, aiProvider, searchProvider, lang, entries' 
       });
     }
 
@@ -44,7 +44,7 @@ async function createBatchHandler(req, res) {
       pageLanguage,
       applyOverrides: Boolean(applyOverrides),
       uploaderUserId: req.user._id, // From auth middleware
-      file
+      entries // Pass entries to be saved in the batch
     });
 
     // Send success response with the batchId
@@ -72,4 +72,4 @@ async function createBatchHandler(req, res) {
 }
 
 // Wrap the handler with authentication middleware
-export default withProtection(createBatchHandler);
+export default withProtection(createBatchHandler, authMiddleware, adminMiddleware);

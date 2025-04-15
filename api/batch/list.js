@@ -1,4 +1,4 @@
-import { withProtection } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 import DataStoreService from '../../services/DataStoreService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 
@@ -9,10 +9,9 @@ async function listBatchesHandler(req, res) {
   }
 
   try {
-    const batches = await DataStoreService.findBatchesByUser(req.user._id);
+    const batches = await DataStoreService.findAllBatches();
     
-    ServerLoggingService.info('Batches retrieved successfully', null, { 
-      userId: req.user._id,
+    ServerLoggingService.info('All batches retrieved successfully', null, { 
       count: batches.length 
     });
 
@@ -24,4 +23,4 @@ async function listBatchesHandler(req, res) {
   }
 }
 
-export default withProtection(listBatchesHandler);
+export default withProtection(listBatchesHandler, authMiddleware, adminMiddleware);

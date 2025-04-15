@@ -1,6 +1,6 @@
 import dbConnect from '../../api/db/db-connect.js';
 import { Batch } from '../../models/batch.js';
-import { withProtection } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import DataStoreService from '../../services/DataStoreService.js';
 
@@ -46,4 +46,4 @@ async function cancelBatchHandler(req, res) {
   }
 }
 
-export default withProtection(cancelBatchHandler);
+export default withProtection(cancelBatchHandler, authMiddleware, adminMiddleware);

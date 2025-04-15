@@ -1,5 +1,5 @@
 // api/batch/status.js - Handles requests for batch run status
-import { withProtection } from '../../middleware/auth.js';
+import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 import DataStoreService from '../../services/DataStoreService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import dbConnect from '../../api/db/db-connect.js';
@@ -43,4 +43,4 @@ async function batchStatusHandler(req, res) {
   }
 }
 
-export default withProtection(batchStatusHandler);
+export default withProtection(batchStatusHandler, authMiddleware, adminMiddleware);
