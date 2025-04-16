@@ -73,7 +73,7 @@ export class ChatService {
   ) {
     // Return a new Promise
     return new Promise((resolve, reject) => { // Remove async from executor
-      const startTime = Date.now();
+      
       // Use the single callback for status updates
       onStatusUpdate(PipelineStatus.PROCESSING, { key: 'homepage.chat.status.agent_start', params: {} });
 

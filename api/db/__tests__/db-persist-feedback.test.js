@@ -5,7 +5,7 @@ import dbConnect from '../db-connect.js';
 import handler from '../db-persist-feedback.js';
 import { Chat } from '../../../models/chat.js';
 import { Interaction } from '../../../models/interaction.js';
-import { ExpertFeedback } from '../../../models/expertFeedback.js';
+
 
 describe('db-persist-feedback handler (in-memory MongoDB)', { sequential: true }, () => {
   let mongod;

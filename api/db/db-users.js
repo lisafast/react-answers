@@ -71,3 +71,5 @@ async function usersHandler(req, res) {
 export default function handler(req, res) {
     return withProtection(usersHandler, authMiddleware, adminMiddleware)(req, res);
 }
+
+export { usersHandler };

@@ -60,3 +60,5 @@ vi.mock('./config/ai-models.js', () => {
     }
   };
 });
+
+process.env.JWT_SECRET = 'testsecret';
