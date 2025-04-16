@@ -1,17 +1,16 @@
 // src/components/batch/BatchUpload.js
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from '../../hooks/useTranslations.js';
-import { GcdsContainer, GcdsHeading, GcdsText } from '@cdssnc/gcds-components-react';
+import { GcdsContainer, GcdsText } from '@cdssnc/gcds-components-react';
 import '../../styles/App.css';
 import * as XLSX from 'xlsx';
 import { getAbsoluteApiUrl } from '../../utils/apiToUrl.js';
 import AuthService from '../../services/AuthService.js';
 
-const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
+const BatchUpload = ({ lang }) => {
   const { t } = useTranslations(lang);
   const [file, setFile] = useState(null);
   const [processing, setProcessing] = useState(false);
-  const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [selectedAI, setSelectedAI] = useState('openai');
   const [fileUploaded, setFileUploaded] = useState(false);
@@ -127,10 +126,6 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
     }
   };
 
-  const needsContext = (entries) => {
-    return entries.some((entry) => !entry['CONTEXT.CREATEDAT']);
-  };
-
   const processBatch = async (entries) => {
     try {
       setProcessing(true);
@@ -175,30 +170,6 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
       setError(err.message);
       setProcessing(false);
     }
-  };
-
-  const resetForm = () => {
-    setFile(null);
-    setProcessing(false);
-    setResults(null);
-    setError(null);
-    setFileUploaded(false);
-    setBatchId(null);
-    setBatchStatus(null);
-    document.getElementById('csvFile').value = ''; // Reset file input
-  };
-
-  // Loading indicator component
-  const LoadingIndicator = ({ status }) => {
-    return (
-      <div className="flex flex-col items-center space-y-2">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        <div className="text-sm text-gray-600">
-          {status === 'preparing' && 'Creating batch...'}
-          {status === 'started' && 'Batch started...'}
-        </div>
-      </div>
-    );
   };
 
   useEffect(() => {
@@ -376,18 +347,6 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
                     {t('batch.upload.status.openaiWait')}
                   </div>
                 )}
-              </div>
-            )}
-
-            {results && (
-              <div className="results-section mt-400">
-                <GcdsHeading tag="h3">{t('batch.upload.results.title')}</GcdsHeading>
-                <GcdsText>
-                  {t('batch.upload.results.file')} {results.fileName}
-                </GcdsText>
-                <GcdsText>
-                  {t('batch.upload.results.entriesProcessed')} {results.entriesProcessed}
-                </GcdsText>
               </div>
             )}
 

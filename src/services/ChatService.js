@@ -25,9 +25,6 @@ export const PipelineStatus = {
   STREAMING_CHUNK: 'streaming_chunk', // Status for receiving a text chunk (if re-enabled)
 };
 
-// Define types/callbacks next
-export const StatusUpdateCallback = (status, details) => { };
-
 // Define classes that might be imported elsewhere
 export class RedactionError extends Error {
   constructor(message, redactedText, redactedItems) {
@@ -54,29 +51,25 @@ export class ChatService {
    * Processes the chat request using SSE streaming.
    * @param {string} chatId
    * @param {string} userMessage
-   * @param {string} aiMessageId - Potentially used for logging/tracking
-   * @param {Array<object>} messages - Conversation history
    * @param {string} lang
    * @param {string} selectedDepartment
    * @param {string} referringUrl
    * @param {string} selectedAI
-   * @param {StatusUpdateCallback} onStatusUpdate - Callback function for status updates.
+   * @param {function} onStatusUpdate - Callback function for status updates.
    * @param {string} selectedSearch
    * @param {string|null} [authToken=null] - Optional auth token for admin overrides.
    * @returns {Promise<object>} A promise that resolves with the final answer data.
    */
-  static processChatStream( // Make it return a Promise and accept only onStatusUpdate
+  static processChatStream(
     chatId,
     userMessage,
-    aiMessageId, // Keep for logging consistency if needed
-    messages,
     lang,
-    selectedDepartment, // Keep params even if not directly used in fetch body for future use/logging
+    selectedDepartment,
     referringUrl,
     selectedAI,
-    onStatusUpdate = (status, details) => { }, // Default to no-op callback
+    onStatusUpdate = () => {},
     selectedSearch,
-    authToken = null // Added authToken parameter
+    authToken = null
   ) {
     // Return a new Promise
     return new Promise((resolve, reject) => { // Remove async from executor
@@ -111,7 +104,6 @@ export class ChatService {
             body: JSON.stringify({
               chatId,
               userMessage, // Send original message after client-side redaction check
-              messages,
               lang,
               referringUrl,
               selectedAI,

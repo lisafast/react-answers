@@ -14,28 +14,21 @@ const ChatInterface = ({
   handleSendMessage,
   handleReload,
   handleAIToggle,
-  handleSearchToggle, // Add this prop
-  handleDepartmentChange,
+  handleSearchToggle,
   handleReferringUrlChange,
-  handleFeedback,
   formatAIResponse,
   selectedAI,
-  selectedSearch, // Add this prop
-  selectedDepartment,
+  selectedSearch,
   referringUrl,
   turnCount,
   showFeedback,
   displayStatus,
-  currentDepartment,
-  currentTopic,
   MAX_CONVERSATION_TURNS,
   t,
   lang,
-  // Add new props for override toggle
   isAdmin,
   isOverrideTestingActive,
   handleOverrideToggleChange,
-  parsedResponses,
   chatId,
 }) => {
   const [charCount, setCharCount] = useState(0);

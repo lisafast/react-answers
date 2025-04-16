@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslations } from '../../hooks/useTranslations.js';
-import { GcdsContainer, GcdsLink, GcdsInput, GcdsButton } from '@cdssnc/gcds-components-react';
+import { GcdsButton } from '@cdssnc/gcds-components-react';
 import DataStoreService from '../../services/DataStoreService.js';
 
 const DeleteChatSection = () => {

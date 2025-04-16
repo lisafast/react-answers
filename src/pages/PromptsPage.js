@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GcdsContainer, GcdsHeading, GcdsCheckbox, GcdsTextarea, GcdsButton, GcdsAlert } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
-import { usePageContext } from '../hooks/usePageParam.js';
 import AuthService from '../services/AuthService.js'; // Needed for auth token
 import { getAbsoluteApiUrl } from '../utils/apiToUrl.js'; // Import the new helper
 
 const PromptsPage = () => {
   const { t } = useTranslations();
-  const { language } = usePageContext();
 
   // State for the list of prompts fetched from API
   const [basePrompts, setBasePrompts] = useState([]); // Array of { filename, hasOverride, isActive }
@@ -46,7 +44,7 @@ const PromptsPage = () => {
     } finally {
       setIsLoadingList(false);
     }
-  }, [t]); // Add t to dependency array
+  }, [t, fetchPromptContent]); // Add fetchPromptContent to dependency array
 
   useEffect(() => {
     fetchPromptList();

@@ -3,7 +3,7 @@ import '../../styles/App.css';
 import { useTranslations } from '../../hooks/useTranslations.js';
 import { usePageContext, DEPARTMENT_MAPPINGS } from '../../hooks/usePageParam.js';
 import ChatInterface from './ChatInterface.js';
-import { ChatService, RedactionError, PipelineStatus } from '../../services/ChatService.js';
+import { ChatService, RedactionError } from '../../services/ChatService.js';
 import AuthService from '../../services/AuthService.js'; // Added for admin check and token
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -216,12 +216,10 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         }
 
         // Call the service, passing the single status handler AND the auth token if applicable
-        // **NOTE:** This assumes ChatService.processChatStream will be updated to accept authToken
+        // Updated: ChatService.processChatStream no longer takes aiMessageId or messages
         const finalInteraction = await ChatService.processChatStream(
           chatId,
           userMessage,
-          null, // No aiMessageId needed upfront anymore
-          messages, // Pass previous messages for context
           lang,
           selectedDepartment,
           referringUrl,
@@ -313,16 +311,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     clearInput,
     selectedDepartment,
     isLoading,
-    messages,
     handleStatusUpdate,
-    clearInput,
-    lang,
-    selectedAI,
-    selectedDepartment,
-    selectedSearch,
-    referringUrl,
-    t,
-    chatId
+    isAdmin,
+    isOverrideTestingActive
   ]);
 
   // Effect to set initial referringUrl from page context if not already set or loaded
@@ -368,7 +359,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         // if (selectedDepartment) setSelectedDepartment('');
     }
 
-  }, [pageUrl, urlDepartment, referringUrl]); // Rerun when referringUrl changes too
+  }, [pageUrl, urlDepartment, referringUrl, selectedDepartment]); // Rerun when referringUrl changes too
 
 
   const formatAIResponse = useCallback((aiService, message) => {

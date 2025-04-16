@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GcdsContainer, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
 import BatchUpload from '../components/batch/BatchUpload.js';
 import BatchList from '../components/batch/BatchList.js';

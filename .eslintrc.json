@@ -5,7 +5,8 @@
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
-    }
+    },
+    "requireConfigFile": false
   },
   "env": {
     "browser": true,
@@ -53,5 +54,10 @@
         "extensions": [".js", ".jsx"]
       }
     }
-  }
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "build/",
+    "dist/"
+  ]
 }
