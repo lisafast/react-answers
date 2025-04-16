@@ -28,6 +28,7 @@ import promptSaveHandler from '../api/prompts/save.js';
 import promptStatusHandler from '../api/prompts/status.js';
 import promptDeleteHandler from '../api/prompts/delete.js';
 import processForDurationHandler from '../api/batch/process-for-duration.js';
+import { getSettingsHandler, updateSettingsHandler } from '../api/settings.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -92,6 +93,9 @@ app.post('/api/prompts/get', promptGetHandler);
 app.put('/api/prompts/save', promptSaveHandler);
 app.patch('/api/prompts/status', promptStatusHandler);
 app.delete('/api/prompts/delete', promptDeleteHandler);
+
+app.get('/api/settings', getSettingsHandler);
+app.post('/api/settings', updateSettingsHandler);
 
 
 const PORT = process.env.PORT || 3001;
