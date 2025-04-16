@@ -1,6 +1,7 @@
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 import BatchProcessingService from '../../services/BatchProcessingService.js';
 import DataStoreService from '../../services/DataStoreService.js';
+import SettingsService from '../../services/SettingsService.js';
 import dbConnect from '../db/db-connect.js';
 
 async function processForDurationHandler(req, res) {
@@ -9,9 +10,9 @@ async function processForDurationHandler(req, res) {
     return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
   try {
-    const { batchId, duration } = req.body;
-    if (!batchId || !duration) {
-      return res.status(400).json({ message: 'batchId and duration are required' });
+    const { batchId } = req.body;
+    if (!batchId) {
+      return res.status(400).json({ message: 'batchId is required' });
     }
     await dbConnect();
     // Find the batch and its entries
@@ -25,7 +26,8 @@ async function processForDurationHandler(req, res) {
     }
     // Get the entries from the batch (assume stored in batch.entries or reload from source)
     const entries = batch.entries || [];
-    // If not present, try to fetch from DataStoreService (customize as needed)
+    // Fetch duration from settings
+    const duration = await SettingsService.getBatchDuration();
     // Run the processBatchForDuration method
     const result = await BatchProcessingService.processBatchForDuration(batchId, entries, duration);
     res.status(200).json(result);

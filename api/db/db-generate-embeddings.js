@@ -1,7 +1,7 @@
 import dbConnect from './db-connect.js';
 import { Interaction } from '../../models/interaction.js';
 import EmbeddingService from '../../services/EmbeddingService.js';
-import config from '../../config/eval.js';
+import SettingsService from '../../services/SettingsService.js';
 
 // Updated handler to include regenerate functionality for embeddings
 async function regenerateEmbeddingsHandler(req, res) {
@@ -11,7 +11,7 @@ async function regenerateEmbeddingsHandler(req, res) {
 
     try {
         const { regenerateAll, lastProcessedId } = req.body;
-        const duration = config.embedBatchProcessingDuration;
+        const duration = await SettingsService.getEmbeddingDuration();
         const result = await EmbeddingService.processEmbeddingForDuration(duration, !regenerateAll, lastProcessedId);
 
         return res.status(200).json({

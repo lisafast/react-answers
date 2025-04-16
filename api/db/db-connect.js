@@ -12,6 +12,8 @@ import '../../models/eval.js';
 import '../../models/user.js';
 import '../../models/logs.js';
 import '../../models/embedding.js';
+import '../../models/settings.js';
+import '../../models/promptOverride.js';
 
 let cached = global.mongoose;
 
