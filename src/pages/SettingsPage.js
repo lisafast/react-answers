@@ -58,13 +58,26 @@ const SettingsPage = () => {
       if (["batchDuration", "embeddingDuration", "evalDuration", "rateLimitPoints", "rateLimitDuration"].includes(key)) {
         const num = Number(value);
         if (!value || isNaN(num) || !Number.isInteger(num) || num <= 0) {
-          setError(`${key} must be a positive integer.`);
+          // Use a user-friendly label for the field
+          let label = t(`settings.${key}`);
+          // If the translation is missing, fall back to a default label
+          if (label === `settings.${key}`) {
+            switch (key) {
+              case 'batchDuration': label = t('settings.batchDuration', 'Batch Duration'); break;
+              case 'embeddingDuration': label = t('settings.embeddingDuration', 'Embedding Duration'); break;
+              case 'evalDuration': label = t('settings.evalDuration', 'Eval Duration'); break;
+              case 'rateLimitPoints': label = t('settings.rateLimitPoints', 'Rate Limit Points'); break;
+              case 'rateLimitDuration': label = t('settings.rateLimitDuration', 'Rate Limit Duration'); break;
+              default: label = key;
+            }
+          }
+          setError(`${label}, ${t('settings.validation.positiveInteger')}`);
           return false;
         }
       }
     }
     if (!["memory", "mongodb"].includes(settings.rateLimiterType)) {
-      setError('Invalid rate limiter type.');
+      setError(t('settings.validation.invalidRateLimiter'));
       return false;
     }
     return true;

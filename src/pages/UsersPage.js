@@ -43,6 +43,27 @@ const UsersPage = ({ lang }) => {
     }
   };
 
+  const deleteUser = async (userId) => {
+    if (!window.confirm(t('users.actions.confirmDelete') || 'Are you sure you want to delete this user?')) return;
+    try {
+      const response = await fetch(getApiUrl('db-users'), {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...AuthService.getAuthHeader()
+        },
+        body: JSON.stringify({ userId })
+      });
+      if (response.ok) {
+        setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
+      } else {
+        console.error('Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
   // Memoize the columns configuration
   const columns = useMemo(
     () => [
@@ -94,20 +115,29 @@ const UsersPage = ({ lang }) => {
           paging: true,
           searching: true,
           ordering: true,
-          order: [[3, 'desc']], // Order by createdAt column descending
+          order: [[3, 'desc']],
           createdRow: (row, data) => {
             const actionsCell = row.querySelector('td:last-child');
             actionsCell.innerHTML = '';
             const root = createRoot(actionsCell);
-            
             root.render(
-              <GcdsButton
-                size="small"
-                variant={data.active ? "danger" : "success"}
-                onClick={() => toggleUserStatus(data._id, data.active)}
-              >
-                {data.active ? t('users.actions.deactivate') : t('users.actions.activate')}
-              </GcdsButton>
+              <>
+                <GcdsButton
+                  size="small"
+                  variant={data.active ? "danger" : "success"}
+                  onClick={() => toggleUserStatus(data._id, data.active)}
+                  style={{ marginRight: 8 }}
+                >
+                  {data.active ? t('users.actions.deactivate') : t('users.actions.activate')}
+                </GcdsButton>
+                <GcdsButton
+                  size="small"
+                  variant="secondary"
+                  onClick={() => deleteUser(data._id)}
+                >
+                  {t('users.actions.delete') || 'Delete'}
+                </GcdsButton>
+              </>
             );
           },
         }}

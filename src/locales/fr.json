@@ -320,7 +320,9 @@
     },
     "actions": {
       "activate": "Activer",
-      "deactivate": "Désactiver"
+      "deactivate": "Désactiver",
+      "delete": "Supprimer",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur?"
     }
   },
   "prompts": {
@@ -354,10 +356,17 @@
     "batchDuration": "Durée du lot (secondes)",
     "embeddingDuration": "Durée d'intégration (secondes)",
     "evalDuration": "Durée d'évaluation (secondes)",
+    "rateLimiterType": "Type de limiteur de débit",
+    "rateLimitPoints": "Points de limite de débit (requêtes par fenêtre)",
+    "rateLimitDuration": "Fenêtre de limite de débit (secondes)",
     "save": "Enregistrer les paramètres",
     "saveSuccess": "Paramètres enregistrés avec succès.",
     "saveError": "Échec de l'enregistrement des paramètres.",
     "loadError": "Échec du chargement des paramètres.",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "validation": {
+      "positiveInteger": "doit être un entier positif.",
+      "invalidRateLimiter": "Type de limiteur de débit invalide."
+    }
   }
 }
