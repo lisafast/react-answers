@@ -84,10 +84,7 @@ export class ChatService {
           onStatusUpdate(PipelineStatus.REDACTING, { key: 'homepage.chat.status.tool.redacting', params: {} });
           await this.processRedaction(userMessage);
 
-          await ClientLoggingService.info(chatId, 'Starting chat stream request:', {
-            // Log relevant initial data
-            chatId, userMessage: 'REDACTED_FOR_LOG', lang, selectedAI, selectedSearch
-          });
+         
 
         
           const headers = {
@@ -168,7 +165,7 @@ export class ChatService {
               buffer = eventMessages[eventMessages.length - 1];
             }
           }
-          ClientLoggingService.info(chatId, 'Stream finished reading.');
+          
 
           // Process any remaining data in the buffer after the stream ends
           if (buffer.trim() && !finalData) { // Only process if no final data yet
@@ -184,7 +181,6 @@ export class ChatService {
           if (finalData) {
             // Use locale key for completion status
             onStatusUpdate(PipelineStatus.COMPLETE, { key: 'homepage.chat.status.tool.complete', params: {} });
-            ClientLoggingService.info(chatId, 'Chat stream processing complete.', { elapsedTime: Date.now() - startTime });
             resolve(finalData); // Resolve the promise with the final answer data
           } else {
             // If stream ended but we never got a final_answer or error event through parsing
@@ -247,7 +243,7 @@ export class ChatService {
    * @param {function} storeFinalData - Callback to store final answer data.
     */
   static handleSseEvent(eventType, parsedData, onStatusUpdate, chatId, storeFinalData) {
-    ClientLoggingService.debug(chatId, `Handling SSE Event: ${eventType}`, parsedData);
+   
     let details = {}; // Object to hold { key, params }
 
     switch (eventType) {

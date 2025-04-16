@@ -76,7 +76,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   // --- Define Single Status Update Handler ---
   // Receives status (enum) and details ({ key, params } or { message }) from ChatService
   const handleStatusUpdate = useCallback((status, details) => {
-    console.log("Status Update Received:", status, details); // Debugging
+    
 
     statusQueueRef.current.push(details); // Add to queue
 

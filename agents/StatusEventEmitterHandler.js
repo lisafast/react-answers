@@ -44,10 +44,7 @@ class StatusEventEmitterHandler extends BaseCallbackHandler {
     this._emitEvent('tool_error', { message: `Tool execution failed: ${errorMessage}` /*, name: toolName */ });
   }
 
-  async handleLLMStart(llm, prompts, runId, parentRunId, extraParams, tags, metadata, name) {
-    // Maybe include model name if available in llm object?
-    this._emitEvent('llm_start', { message: 'LLM call started.' });
-  }
+  
 }
 
 export { StatusEventEmitterHandler };
