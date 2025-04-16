@@ -51,6 +51,11 @@ const AdminPage = () => {
               {t('admin.navigation.prompts', 'Manage Prompts')}
             </GcdsLink>
           </li>
+          <li className="">
+            <GcdsLink href={`/${language}/settings`}>
+              {t('admin.navigation.settings', 'System Settings')}
+            </GcdsLink>
+          </li>
         </ul>
       </nav>
 

@@ -13,6 +13,8 @@ const BatchPage = ({ lang = 'en' }) => {
   const [error, setError] = useState(null);
   // Store previous progress and updatedAt for each batch
   const prevProgressRef = useRef({});
+  // Track last resume attempt per batch to avoid repeated resumes
+  const lastResumeAttemptRef = useRef({});
 
   useEffect(() => {
     let pollInterval = null;
@@ -41,7 +43,12 @@ const BatchPage = ({ lang = 'en' }) => {
                 updatedAt === prev.updatedAt &&
                 now - updatedAt > STUCK_THRESHOLD_MS
               ) {
-                shouldResume = true;
+                // Only resume if last attempt was more than threshold ago
+                const lastResume = lastResumeAttemptRef.current[batch._id] || 0;
+                if (now - lastResume > STUCK_THRESHOLD_MS) {
+                  shouldResume = true;
+                  lastResumeAttemptRef.current[batch._id] = now;
+                }
               }
             } else {
               // No previous record, just store and skip stuck check this time
@@ -54,11 +61,10 @@ const BatchPage = ({ lang = 'en' }) => {
             isProcessingChunk = true;
             await AuthService.fetchWithAuth(getAbsoluteApiUrl(`/api/batch/process-for-duration`), {
               method: 'POST',
-              body: JSON.stringify({ batchId: batch._id, duration: 60 })
+              body: JSON.stringify({ batchId: batch._id }) // Removed duration, now set by backend
             });
             isProcessingChunk = false;
           }
-
           // Always update the ref for next poll (after stuck check and resume attempt)
           prevProgressRef.current[batch._id] = { processedItems: processed, updatedAt };
         }
