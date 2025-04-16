@@ -256,7 +256,8 @@
       "chatViewer": "Chat Viewer",
       "database": "Database Management",
       "eval": "Evaluation Tools",
-      "prompts": "Manage Prompts"
+      "prompts": "Manage Prompts",
+      "settings": "System Settings"
     },
     "chatLogs": {
       "title": "Recent Chat Interactions"
@@ -347,5 +348,16 @@
     "saveErrorTitle": "Save Error",
     "errorContentTitle": "Content Error",
     "scenariosSection": "Scenarios"
+    },
+    "settings": {
+      "title": "System Settings",
+      "batchDuration": "Batch Duration (seconds)",
+      "embeddingDuration": "Embedding Duration (seconds)",
+      "evalDuration": "Eval Duration (seconds)",
+      "save": "Save Settings",
+      "saveSuccess": "Settings saved successfully.",
+      "saveError": "Failed to save settings.",
+      "loadError": "Failed to load settings.",
+      "loading": "Loading..."
     }
 }

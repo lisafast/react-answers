@@ -15,6 +15,7 @@ import UsersPage from './pages/UsersPage.js';
 import EvalPage from './pages/EvalPage.js';
 import DatabasePage from './pages/DatabasePage.js';
 import PromptsPage from './pages/PromptsPage.js'; // Added for prompts management
+import SettingsPage from './pages/SettingsPage.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -173,6 +174,14 @@ const router = createBrowserRouter([
       {
         path: "/fr/prompts",
         element: <ProtectedRoute element={<PromptsPage lang="fr" />} />,
+      },
+      {
+        path: "/en/settings",
+        element: <ProtectedRoute element={<SettingsPage />} />,
+      },
+      {
+        path: "/fr/settings",
+        element: <ProtectedRoute element={<SettingsPage />} />,
       },
     ],
   },

@@ -257,7 +257,8 @@
       "chatViewer": "Visualiseur de chat",
       "database": "Gestion de la base de données",
       "eval": "Outils d'évaluation",
-      "prompts": "Gérer les invites"
+      "prompts": "Gérer les invites",
+      "settings": "Paramètres du système"
     },
     "chatLogs": {
       "title": "Interactions de chat récentes"
@@ -347,5 +348,16 @@
     "saveErrorTitle": "Erreur d'enregistrement",
     "errorContentTitle": "Erreur de contenu",
     "scenariosSection": "Scénarios"
+  },
+  "settings": {
+    "title": "Paramètres du système",
+    "batchDuration": "Durée du lot (secondes)",
+    "embeddingDuration": "Durée d'intégration (secondes)",
+    "evalDuration": "Durée d'évaluation (secondes)",
+    "save": "Enregistrer les paramètres",
+    "saveSuccess": "Paramètres enregistrés avec succès.",
+    "saveError": "Échec de l'enregistrement des paramètres.",
+    "loadError": "Échec du chargement des paramètres.",
+    "loading": "Chargement..."
   }
 }
