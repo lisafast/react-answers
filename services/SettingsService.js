@@ -1,4 +1,5 @@
 import DataStoreService from './DataStoreService.js';
+import { refreshRateLimiterSettings } from '../middleware/rateLimitMiddleware.js';
 
 class SettingsService {
   #cache = null;
@@ -30,14 +31,31 @@ class SettingsService {
     return settings.evalDuration;
   }
 
+  async getRateLimiterType() {
+    const settings = await this.getSettings();
+    return settings?.rateLimiterType || 'memory';
+  }
+
+  async getRateLimitPoints() {
+    const settings = await this.getSettings();
+    return settings?.rateLimitPoints || 10;
+  }
+
+  async getRateLimitDuration() {
+    const settings = await this.getSettings();
+    return settings?.rateLimitDuration || 60;
+  }
+
   async updateSettings(updates) {
     const updated = await DataStoreService.updateSettings(updates);
     this.#cache = updated;
+    await refreshRateLimiterSettings();
     return updated;
   }
 
   async refresh() {
     this.#cache = await DataStoreService.getSettings();
+    await refreshRateLimiterSettings();
     return this.#cache;
   }
 }

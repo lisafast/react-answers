@@ -27,6 +27,32 @@ const SettingsSchema = new mongoose.Schema({
       validator: Number.isInteger,
       message: 'Eval Duration must be a positive integer.'
     }
+  },
+  rateLimiterType: {
+    type: String,
+    enum: ['memory', 'mongodb'],
+    default: 'memory',
+    required: true
+  },
+  rateLimitPoints: {
+    type: Number,
+    required: true,
+    min: 1,
+    default: 10,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Rate Limit Points must be a positive integer.'
+    }
+  },
+  rateLimitDuration: {
+    type: Number,
+    required: true,
+    min: 1,
+    default: 60,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Rate Limit Duration must be a positive integer.'
+    }
   }
 }, { timestamps: true });
 
@@ -34,7 +60,14 @@ const SettingsSchema = new mongoose.Schema({
 SettingsSchema.statics.getSingleton = async function() {
   let settings = await this.findOne();
   if (!settings) {
-    settings = await this.create({ batchDuration: 60, embeddingDuration: 60, evalDuration: 60 });
+    settings = await this.create({
+      batchDuration: 60,
+      embeddingDuration: 60,
+      evalDuration: 60,
+      rateLimiterType: 'memory',
+      rateLimitPoints: 10,
+      rateLimitDuration: 60
+    });
   }
   return settings;
 };

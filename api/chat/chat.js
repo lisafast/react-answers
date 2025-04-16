@@ -6,6 +6,7 @@ import { verifyOptionalToken } from '../../middleware/auth.js'; // Import the ne
 import ChatProcessingService from '../../services/ChatProcessingService.js';
 import statusEmitter from '../../utils/statusEmitter.js';
 import { v4 as uuidv4 } from 'uuid';
+import { rateLimitMiddleware } from '../../middleware/rateLimitMiddleware.js';
 
 // Helper to format and send SSE messages
 const sendSseMessage = (res, event, data) => {
@@ -168,4 +169,10 @@ async function sseMessageHandler(req, res) {
    // Cleanup should have happened via events or the catch block.
  }
 
-export default sseMessageHandler;
+export default async function handler(req, res) {
+  // Run the rate limiter first
+  const allowed = await rateLimitMiddleware(req, res);
+  if (!allowed) return; // rateLimitMiddleware already handled the response
+  // Proceed to the main handler
+  return sseMessageHandler(req, res);
+}

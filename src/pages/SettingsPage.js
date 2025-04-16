@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { GcdsContainer, GcdsButton, GcdsInput } from '@cdssnc/gcds-components-react';
+import { GcdsContainer, GcdsButton, GcdsInput, GcdsSelect } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
 import AuthService from '../services/AuthService.js';
 import { getAbsoluteApiUrl } from '../utils/apiToUrl.js';
 
 const SettingsPage = () => {
   const { t } = useTranslations();
-  const [settings, setSettings] = useState({ batchDuration: '', embeddingDuration: '', evalDuration: '' });
+  const [settings, setSettings] = useState({
+    batchDuration: '',
+    embeddingDuration: '',
+    evalDuration: '',
+    rateLimiterType: 'memory',
+    rateLimitPoints: '',
+    rateLimitDuration: ''
+  });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(true);
@@ -17,7 +24,10 @@ const SettingsPage = () => {
         setSettings({
           batchDuration: data.batchDuration || '',
           embeddingDuration: data.embeddingDuration || '',
-          evalDuration: data.evalDuration || ''
+          evalDuration: data.evalDuration || '',
+          rateLimiterType: data.rateLimiterType || 'memory',
+          rateLimitPoints: data.rateLimitPoints !== undefined ? String(data.rateLimitPoints) : '10',
+          rateLimitDuration: data.rateLimitDuration !== undefined ? String(data.rateLimitDuration) : '60'
         });
         setLoading(false);
       })
@@ -28,9 +38,15 @@ const SettingsPage = () => {
   }, [t]);
 
   const handleChange = e => {
-    // Only allow digits (or empty string)
     const { name, value } = e.target;
-    if (value === '' || /^\d+$/.test(value)) {
+    // Only allow digits for numeric fields
+    if (["batchDuration", "embeddingDuration", "evalDuration", "rateLimitPoints", "rateLimitDuration"].includes(name)) {
+      if (value === '' || /^\d+$/.test(value)) {
+        setSettings({ ...settings, [name]: value });
+        setError('');
+        setSuccess('');
+      }
+    } else {
       setSettings({ ...settings, [name]: value });
       setError('');
       setSuccess('');
@@ -39,11 +55,17 @@ const SettingsPage = () => {
 
   const validate = () => {
     for (const [key, value] of Object.entries(settings)) {
-      const num = Number(value);
-      if (!value || isNaN(num) || !Number.isInteger(num) || num <= 0) {
-        setError(`${key} must be a positive integer.`);
-        return false;
+      if (["batchDuration", "embeddingDuration", "evalDuration", "rateLimitPoints", "rateLimitDuration"].includes(key)) {
+        const num = Number(value);
+        if (!value || isNaN(num) || !Number.isInteger(num) || num <= 0) {
+          setError(`${key} must be a positive integer.`);
+          return false;
+        }
       }
+    }
+    if (!["memory", "mongodb"].includes(settings.rateLimiterType)) {
+      setError('Invalid rate limiter type.');
+      return false;
     }
     return true;
   };
@@ -60,7 +82,10 @@ const SettingsPage = () => {
         body: JSON.stringify({
           batchDuration: Number(settings.batchDuration),
           embeddingDuration: Number(settings.embeddingDuration),
-          evalDuration: Number(settings.evalDuration)
+          evalDuration: Number(settings.evalDuration),
+          rateLimiterType: settings.rateLimiterType,
+          rateLimitPoints: Number(settings.rateLimitPoints),
+          rateLimitDuration: Number(settings.rateLimitDuration)
         })
       });
       setSuccess(t('settings.saveSuccess', 'Settings saved successfully.'));
@@ -100,6 +125,34 @@ const SettingsPage = () => {
           min="1"
           required
           value={settings.evalDuration}
+          onGcdsChange={handleChange}
+        />
+        <GcdsSelect
+          label={t('settings.rateLimiterType', 'Rate Limiter Type')}
+          name="rateLimiterType"
+          value={settings.rateLimiterType}
+          onGcdsChange={handleChange}
+          required
+        >
+          <option value="memory">Memory</option>
+          <option value="mongodb">MongoDB</option>
+        </GcdsSelect>
+        <GcdsInput
+          label={t('settings.rateLimitPoints', 'Rate Limit Points (requests per window)')}
+          name="rateLimitPoints"
+          type="number"
+          min="1"
+          required
+          value={settings.rateLimitPoints}
+          onGcdsChange={handleChange}
+        />
+        <GcdsInput
+          label={t('settings.rateLimitDuration', 'Rate Limit Window (seconds)')}
+          name="rateLimitDuration"
+          type="number"
+          min="1"
+          required
+          value={settings.rateLimitDuration}
           onGcdsChange={handleChange}
         />
         {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
