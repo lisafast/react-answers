@@ -1,52 +1,106 @@
 import { tool } from "@langchain/core/tools";
 import { z } from 'zod';
 
-// Standalone function containing the core verification logic
+const REQUIRED_PRELIMINARY_TAGS = [
+    "question-language",
+    "page-language",
+    "english-question",
+    "referring-url",
+    "department",
+    "departmentUrl",
+    "is-gc",
+    "is-pt-muni",
+    "possible-citations"
+];
+
 const verifyOutputFormatLogic = async (response) => {
-    // Implement the verification logic here.
     let isValid = true;
     let errorMessage = "";
 
-    // Basic checks for required tags (expand as needed)
-    if (!response.includes("<preliminary-checks>") || !response.includes("</preliminary-checks>")) {
+    // 1. <preliminary-checks> block and required children
+    const prelimMatch = response.match(/<preliminary-checks>([\s\S]*?)<\/preliminary-checks>/);
+    if (!prelimMatch) {
         isValid = false;
-        errorMessage += "Missing <preliminary-checks> tag. ";
+        errorMessage += "Missing <preliminary-checks> block. ";
+    } else {
+        const prelimContent = prelimMatch[1];
+        for (const tag of REQUIRED_PRELIMINARY_TAGS) {
+            if (!prelimContent.includes(`<${tag}>`) || !prelimContent.includes(`</${tag}>`)) {
+                isValid = false;
+                errorMessage += `Missing <${tag}> in <preliminary-checks>. `;
+            }
+        }
     }
-    if (!response.includes("<english-answer>") || !response.includes("</english-answer>")) {
+
+    // 2. <english-answer> block with at least one <s-N>
+    const englishAnswerMatch = response.match(/<english-answer>([\s\S]*?)<\/english-answer>/);
+    if (!englishAnswerMatch) {
         isValid = false;
-        errorMessage += "Missing <english-answer> tag. ";
+        errorMessage += "Missing <english-answer> block. ";
+    } else {
+        const sTagMatch = englishAnswerMatch[1].match(/<s-\d+>[\s\S]*?<\/s-\d+>/);
+        if (!sTagMatch) {
+            isValid = false;
+            errorMessage += "No <s-N> sentence tags found in <english-answer>. ";
+        }
+        // Check for unclosed special tags if present
+        ["not-gc", "pt-muni", "clarifying-question"].forEach(tag => {
+            if (englishAnswerMatch[1].includes(`<${tag}>`) && !englishAnswerMatch[1].includes(`</${tag}>`)) {
+                isValid = false;
+                errorMessage += `Malformed <${tag}> tag in <english-answer>. `;
+            }
+        });
     }
+
+    // 3. <answer> block (if present, must mirror <english-answer>)
+    const answerMatch = response.match(/<answer>([\s\S]*?)<\/answer>/);
+    if (answerMatch) {
+        const sTagMatch = answerMatch[1].match(/<s-\d+>[\s\S]*?<\/s-\d+>/);
+        if (!sTagMatch) {
+            isValid = false;
+            errorMessage += "No <s-N> sentence tags found in <answer>. ";
+        }
+        ["not-gc", "pt-muni", "clarifying-question"].forEach(tag => {
+            if (answerMatch[1].includes(`<${tag}>`) && !answerMatch[1].includes(`</${tag}>`)) {
+                isValid = false;
+                errorMessage += `Malformed <${tag}> tag in <answer>. `;
+            }
+        });
+    }
+
+    // 4. <citation-url> (always required)
     if (!response.includes("<citation-url>") || !response.includes("</citation-url>")) {
         isValid = false;
         errorMessage += "Missing <citation-url> tag. ";
     }
-    // Add more checks as needed for other tags like <french-answer>, <context>, etc.
+
+    // 5. <citation-head> and <confidence> (if present, must be closed)
+    ["citation-head", "confidence"].forEach(tag => {
+        if (response.includes(`<${tag}>`) && !response.includes(`</${tag}>`)) {
+            isValid = false;
+            errorMessage += `Malformed <${tag}> tag. `;
+        }
+    });
 
     if (isValid) {
-        return "OK: Output format is valid."; // Return a success message
+        return "OK: Output format is valid.";
     } else {
-        // Throw an error when verification fails, as is common for tools
         throw new Error(`Output format verification failed: ${errorMessage.trim()}`);
     }
 };
 
-// Define the LangChain tool using the 'tool' function
 const verifyOutputFormat = tool(
-    // The function the tool will execute. It receives the parsed input based on the schema.
-    async ({ response }) => { // Destructure 'response' from the input object
+    async ({ response }) => {
         return await verifyOutputFormatLogic(response);
     },
-    // Configuration object for the tool
     {
         name: "verifyOutputFormat",
-        description: "Verifies that the agent's response string adheres to the required format, checking for all necessary tags (e.g., <preliminary-checks>, <english-answer>, <citation-url>). Throws an error if the format is invalid.",
-        // Define the input schema using Zod for validation and description
+        description: "Verifies that the agent's response string adheres to the required XML format, checking for all necessary tags and structure. Throws an error if the format is invalid.",
         schema: z.object({
             response: z.string().describe("The complete response string generated by the agent that needs verification.")
         })
     }
 );
 
-// Export the configured tool
 export default verifyOutputFormat;
 
