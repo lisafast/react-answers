@@ -11,6 +11,7 @@ import { Batch } from '../models/batch.js';
 import dbConnect from '../api/db/db-connect.js';
 import PromptOverride from '../models/promptOverride.js'; // Added PromptOverride model
 import ServerLoggingService from './ServerLoggingService.js'; // Added for logging within new methods
+import Settings from '../models/settings.js';
 
 /**
  * Service responsible for all direct interactions with the MongoDB database.
@@ -497,6 +498,30 @@ class DataStoreService {
           }
         ]
       });
+  }
+
+  /**
+   * Gets the singleton settings document.
+   * @returns {Promise<Settings>} The settings document.
+   */
+  async getSettings() {
+    await this.ensureDbConnection();
+    return await Settings.getSingleton();
+  }
+
+  /**
+   * Updates the singleton settings document with new values.
+   * @param {object} updates - { batchDuration, embeddingDuration, evalDuration }
+   * @returns {Promise<Settings>} The updated settings document.
+   */
+  async updateSettings(updates) {
+    await this.ensureDbConnection();
+    const settings = await Settings.getSingleton();
+    if (updates.batchDuration !== undefined) settings.batchDuration = updates.batchDuration;
+    if (updates.embeddingDuration !== undefined) settings.embeddingDuration = updates.embeddingDuration;
+    if (updates.evalDuration !== undefined) settings.evalDuration = updates.evalDuration;
+    await settings.save();
+    return settings;
   }
 
 }
