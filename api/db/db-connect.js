@@ -21,7 +21,7 @@ if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
-async function dbConnect() {
+async function dbConnect(uri) {
   if (cached.conn) {
     return cached.conn;
   }
@@ -40,8 +40,9 @@ async function dbConnect() {
       connectTimeoutMS: 30000 // 30 seconds timeout
     };
 
-    const connectionString = process.env.MONGODB_URI || process.env.DOCDB_URI;
-    const opts = process.env.MONGODB_URI ? mongoDbOpts : docDbOpts;
+    // Use the provided uri if given, otherwise fallback to env
+    const connectionString = uri || process.env.MONGODB_URI || process.env.DOCDB_URI;
+    const opts = uri || process.env.MONGODB_URI ? mongoDbOpts : docDbOpts;
 
     cached.promise = mongoose.connect(connectionString, opts).then((mongoose) => {
       return mongoose;
