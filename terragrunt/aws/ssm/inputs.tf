@@ -60,7 +60,7 @@ variable "google_search_engine_id" {
   description = "The Google Search Engine ID"
   sensitive   = true
   type        = string
-} 
+}
 variable "azure_openai_embedding_api_key" {
   description = "The Azure OpenAI embedding API key"
   sensitive   = true
