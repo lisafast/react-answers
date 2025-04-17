@@ -44,7 +44,7 @@ variable "docdb_uri_arn" {
   type        = string
 }
 
-variable "google_ai_api_key_arn" {
+variable "google_api_key_arn" {
   description = "The ARN of the Google AI API Key SSM parameter"
   type        = string
 }
