@@ -22,6 +22,7 @@ dependency "ssm" {
     jwt_secret_key_arn           = ""
     google_ai_api_key_arn        = ""
     google_search_engine_id_arn  = ""
+    azure_openai_embedding_api_key_arn = ""
   }
 }
 
@@ -47,6 +48,7 @@ inputs = {
   jwt_secret_key_arn           = dependency.ssm.outputs.jwt_secret_key_arn
   google_ai_api_key_arn        = dependency.ssm.outputs.google_ai_api_key_arn
   google_search_engine_id_arn  = dependency.ssm.outputs.google_search_engine_id_arn
+  azure_openai_embedding_api_key_arn = dependency.ssm.outputs.azure_openai_embedding_api_key_arn
 }
 
 include {
