@@ -39,6 +39,10 @@ locals {
     {
       "name"      = "GOOGLE_SEARCH_ENGINE_ID"
       "valueFrom" = var.google_search_engine_id_arn
+    },
+    {
+      "name"      = "AZURE_OPENAI_EMBEDDING_API_KEY"
+      "valueFrom" = var.azure_openai_embedding_api_key_arn
     }
   ]
 }

@@ -61,3 +61,7 @@ output "google_search_engine_id_arn" {
   description = "ARN of the Google Search Engine ID parameter"
   value       = aws_ssm_parameter.google_search_engine_id.arn
 }
+output "azure_openai_embedding_api_key_arn" {
+  description = "ARN of the Azure OpenAI embedding API key parameter"
+  value       = aws_ssm_parameter.azure_openai_embedding_api_key.arn
+}
