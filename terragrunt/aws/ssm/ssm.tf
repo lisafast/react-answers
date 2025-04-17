@@ -96,10 +96,10 @@ resource "aws_ssm_parameter" "jwt_secret_key" {
     Terraform  = true
   }
 }
-resource "aws_ssm_parameter" "google_ai_api_key" {
-  name  = "google_ai_api_key"
+resource "aws_ssm_parameter" "google_api_key" {
+  name  = "google_api_key"
   type  = "SecureString"
-  value = var.google_ai_api_key
+  value = var.google_api_key
 
   tags = {
     CostCentre = var.billing_code

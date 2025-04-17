@@ -20,7 +20,7 @@ dependency "ssm" {
     canada_ca_search_uri_arn           = ""
     user_agent_arn                     = ""
     jwt_secret_key_arn                 = ""
-    google_ai_api_key_arn              = ""
+    google_api_key_arn              = ""
     google_search_engine_id_arn        = ""
     azure_openai_embedding_api_key_arn = ""
   }
@@ -46,7 +46,7 @@ inputs = {
   canada_ca_search_uri_arn           = dependency.ssm.outputs.canada_ca_search_uri_arn
   user_agent_arn                     = dependency.ssm.outputs.user_agent_arn
   jwt_secret_key_arn                 = dependency.ssm.outputs.jwt_secret_key_arn
-  google_ai_api_key_arn              = dependency.ssm.outputs.google_ai_api_key_arn
+  google_api_key_arn              = dependency.ssm.outputs.google_api_key_arn
   google_search_engine_id_arn        = dependency.ssm.outputs.google_search_engine_id_arn
   azure_openai_embedding_api_key_arn = dependency.ssm.outputs.azure_openai_embedding_api_key_arn
 }

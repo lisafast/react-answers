@@ -50,7 +50,7 @@ variable "jwt_secret_key" {
   sensitive   = true
   type        = string
 }
-variable "google_ai_api_key" {
+variable "google_api_key" {
   description = "The Google AI API key"
   sensitive   = true
   type        = string
