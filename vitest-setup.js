@@ -1,20 +1,7 @@
 // vitest-setup.js
-import { vi, beforeAll } from 'vitest';
 
 // This file is executed before each test file
 // Set up global mocks and configurations here
-
-// Mock MongoDB connection
-vi.mock('mongoose', async () => {
-  const actual = await vi.importActual('mongoose');
-  return {
-    ...actual,
-    connect: vi.fn().mockResolvedValue({}),
-    connection: {
-      close: vi.fn().mockResolvedValue({}),
-    },
-  };
-});
 
 // Set up mock MongoDB URI for tests that need it
 beforeAll(() => {
