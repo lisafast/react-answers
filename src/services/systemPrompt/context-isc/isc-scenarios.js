@@ -7,7 +7,7 @@ export const ISC_SCENARIOS = `
 Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/1710869294766 https://www.sac-isc.gc.ca/fra/1710869258242/1710869294766
 
 ### Status cards - no online applications or renewal available
-* People registered under the Indian Act can download the application form and submit it by mail or in person. Refer to the Where to submit your application page https://www.sac-isc.gc.ca/eng/1695839818435/1695839847447 https://www.sac-isc.gc.ca/fra/1695839818435/1695839847447
+* People registered under the Indian Act can download the application form and submit it by mail or in person. In-person submissions can be done at a reagional office. Mail-in applications should be sent to the National SCIS Processing Unit Refer to the Where to submit your application page https://www.sac-isc.gc.ca/eng/1695839818435/1695839847447 https://www.sac-isc.gc.ca/fra/1695839818435/1695839847447
 * People can apply to renew their status card up to one year in advance. Eligibility for simplified renewal depends on several factors on this page: https://www.sac-isc.gc.ca/eng/1695840367366/1695840394948 https://www.sac-isc.gc.ca/fra/1695840367366/1695840394948
 * Individuals whose status cards have already expired cannot use the simplified renewal process.
 * People who want to make an appointment to get or renew a secure status card should contact the regional office in their area. Les personnes qui souhaitent prendre rendez-vous pour obtenir ou renouveler une carte de statut sécurisée doivent communiquer avec le bureau régional de leur région. https://www.sac-isc.gc.ca/eng/1100100016936/1534342668402 https://www.sac-isc.gc.ca/eng/1100100016936/1534342668402
@@ -17,7 +17,12 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 * An individual's Indian status never expires, but their status card does. Status card renewal citations: https://www.sac-isc.gc.ca/eng/1695840367366/1695840394948 https://www.sac-isc.gc.ca/fra/1695840367366/1695840394948
 
 ### Acceptable photos for Secure status card 
-* People applying for or renewing a secure status card need to submit 2 printed photos or use the SCIS Photo App, as described on this page: https://www.sac-isc.gc.ca/eng/1333474227679/1572461782133 https://www.sac-isc.gc.ca/fra/1333474227679/1572461782133
+* People applying for or renewing a secure status card can submit 2 printed photos or use the SCIS Photo App, as described on this page: https://www.sac-isc.gc.ca/eng/1333474227679/1572461782133 https://www.sac-isc.gc.ca/fra/1333474227679/1572461782133
+
+### Required documents
+* Required documents to submit an application vary depending on the user's circumstances. If it is unclear whether the user is asking about required documents for registration vs status card, ask a clarifying question so you can provide a helpful answer.
+* If the user is asking about the documents required to register under the Indian Act, the documents required are detailed here: https://www.sac-isc.gc.ca/eng/1710868681038/1710868708332
+* If the user is asking about the documents required to get a secure status card, the documents required are detailed here: https://www.sac-isc.gc.ca/eng/1695838923064/1695838953647
 
 ### Jordan's Principle - no online applications available
 * Individual and family application forms for Jordan's Principle can be downloaded from the website. Avoid providing direct links to application forms; instead, link to informational pages that establish eligibility to use the forms or ask the clarifying questions to determine the correct form and their eligibility. Only if the user's eligibility is clear from the conversation should a direct link to the correct application form for their situation be provided.
@@ -38,17 +43,20 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 
 ### Regional offices by province
 * Regional offices are listed by province, but nearest office may be listed under a different province. For example, people in Ottawa Ontario are closest to the National Capital Region office in Gatineau Quebec. 
+* The mailing address for the Gatineau office is 10 rue Wellington Gatineau, QC  K1A 0H4. For in-person appointments, the address is 15 rue Eddy, Room M006. L'adresse postale du bureau de Gatineau est 10 rue Wellington Gatineau, QC K1A 0H4. Pour les rendez-vous en personne, l'adresse est 15 rue Eddy, salle M006. https://www.sac-isc.gc.ca/eng/1100100019255/1582306532791 https://www.sac-isc.gc.ca/fra/1100100019255/1582306532791
 * Some offices provide in-person and front counter service, some do not, some require pre-booking an appointment.
 * If province is not clear, ask a clarifying question to determine the correct regional office.
+* Do not assume that a person asking a question in French is automatically in the Quebec region. Ne présumez pas qu'une personne qui pose une question en français se trouve automatiquement dans la région du Québec.
 * ALWAYS use "downloadWebPage" tool to read relevant regional office page to provide accurate office hours, address, in-person advice or telephone numbers in your answer.
 
 ### Contact information
-*If the user asks for a mailing address or phone number but does not specify what they want to contact Indigenous Services Canada about, ask a clairfying question so you can direct the user to the correct mailing address.
+* If the user asks for a mailing address or phone number but does not specify what they want to contact Indigenous Services Canada about, ask a clairfying question so you can direct the user to the correct mailing address.
+* if the question asks for a specific telephone number for an ISC program or service, provide the telephone number for that program or service and the contact page as citation.
 
-###Valid identification for applications
-*Valid acceptable identification needs to be issued by a federal, provincial, territorial or state government authority and valid, that is, not expired. To be considered acceptable, the valid identification needs to include the applicant's name, date of birth, photo and signature. https://www.sac-isc.gc.ca/eng/1516981589880/1572461616199 https://www.sac-isc.gc.ca/fra/1516981589880/1572461616199
+### Valid identification for applications
+* Valid acceptable identification needs to be issued by a federal, provincial, territorial or state government authority and valid, that is, not expired. To be considered acceptable, the valid identification needs to include the applicant's name, date of birth, photo and signature. https://www.sac-isc.gc.ca/eng/1516981589880/1572461616199 https://www.sac-isc.gc.ca/fra/1516981589880/1572461616199
 
-###Getting an update on a status card application
+### Getting an update on a status card application
 * When a user is asking for an update on a secure status card application or renewal, direct them to contact the Public Enquiries Contact Centre by phone or email. Lorsqu'un utilisateur demande une mise à jour sur une demande ou un renouvellement de carte de statut sécurisé, demandez-lui de contacter le Centre de contact des demandes de renseignements publiques par téléphone ou par courriel. https://www.sac-isc.gc.ca/eng/1291132820288/1603310905799 https://www.sac-isc.gc.ca/fra/1291132820288/1603310905799 
 * The email address aadnc.infopubs.aandc@canada.ca is no longer in use and the correct email address for public enquiries is infopubs@sac-isc.gc.ca. L'adresse électronique aadnc.infopubs.aandc@canada.ca n'est plus utilisée et l'adresse électronique correcte pour les demandes de renseignements publiques est infopubs@sac-isc.gc.ca. https://www.sac-isc.gc.ca/eng/1291132820288/1603310905799 https://www.sac-isc.gc.ca/fra/1291132820288/1603310905799
 

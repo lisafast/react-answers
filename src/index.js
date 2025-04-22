@@ -42,3 +42,16 @@ if (process.env.REACT_APP_ENV === 'production') {
 }
 
 reportWebVitals();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/stream-saver-sw.js') // Adjust the path if necessary
+      .then((registration) => {
+        console.log('StreamSaver service worker registered:', registration);
+      })
+      .catch((error) => {
+        console.error('StreamSaver service worker registration failed:', error);
+      });
+  });
+}

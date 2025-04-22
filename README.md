@@ -9,8 +9,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - this is a proof of concept - usability testing is underway
 - Back-end MongoDB database to store conversation history and SME scores to use for evaluation (human and later AI)
 - Evaluation input of csv files generated from user feedback questions to score AI responses
-- Can choose either Claude Sonnet 3.7 or OpenAI GPT-4o API AI service for both shorter Context call (Haiku or Mini) and longer Answer call (Sonnet or GPT-4o)
-- System prompts are built from sets of files, including agentic instructions for the AI service, and contextual scenarios and updates for the answer service pulled in for specific departments, based on the department selected byt the Context AI service
+- Can choose either Claude Sonnet 3.7 or OpenAI gpt-4.1-2025-04-14 API AI service for both shorter Context call (Haiku or Mini) and longer Answer call (Sonnet or GPT-4o)
+- System prompts are built from sets of files, including agentic instructions for the AI service, and contextual scenarios and updates for the answer service pulled in for specific departments, based on the department selected byt the Context AI service 
 - Admin page for access to chatlogs in JSON or CSV format, Batch page to submit csv files of questions for human evaluation, Evaluation page planned later to score AI chatlogs using the set of human-scored question/answer pairs
 
 ## Uses GC Design system for some components, others are html/css
@@ -53,14 +53,12 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - System prompts optimized for 2024 model compatibility
 
 ### Evaluation-driven design to eventually achieve 100% answer accuracy
-
-- Evaluation system to score AI responses and provide feedback for continuous improvement
+- Evaluation system to score AI responses and provide feedback for continuous improvement and underlay automated AI evals
 - Evaluation input of csv files generated from user feedback questions to score AI responses
 - Good source of learning about this methodology is: https://www.ycombinator.com/library/Lg-why-vertical-llm-agents-are-the-new-1-billion-saas-opportunities
 
 ### Accessibility features
-
-- GCDS components - TODO should the input field have focus when page loads? TODO: some components couldn't get inputs to work so are temporarily replaced with plain html
+- GCDS components - some components couldn't get inputs to work so are temporarily replaced with plain html
 - No streaming of responses - response is formatted and complete before it is displayed
 - Get ideas from this accessibility AI application: https://adf-ask-accessibility-daeeafembaazdzfk.z01.azurefd.net/
 

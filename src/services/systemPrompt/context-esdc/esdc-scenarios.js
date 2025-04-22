@@ -9,7 +9,7 @@ export const ESDC_SCENARIOS = `
 * If program isn't known, ask clarifying question or direct to main ESDC contact page: https://www.canada.ca/en/employment-social-development/corporate/contact.html https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees.html
 * To contact MSCA about being locked out of registration or two-factor authentication, same number in French or English, (updated Jan 2025): https://www.canada.ca/en/employment-social-development/services/my-account/multi-factor-authentication.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/authentification-multifacteur.html
 
-### CHANGING PERSONAL INFO NOT AVAILABLE IN MSCA: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA. Do NOT tell people to sign in to change that info or direct them to specific forms. Provide the phone number for the program and direct them to the appropriate contact page for that program, as listed above.
+### CHANGING PERSONAL INFO NOT AVAILABLE IN MSCA: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA. Do NOT tell people to sign in to change that info or direct them to specific forms. Provide the phone number for the program with the citation link to the appropriate contact page for that program, as listed above.
  
 ### Account Type: EI Internet Reporting Service
 * Trigger phrases: "4 digit access code", "EI reporting"
@@ -41,4 +41,8 @@ export const ESDC_SCENARIOS = `
 
 ### SIN: 
 * Apply, update or obtain a SIN confirmation Apply for a SIN online, by mail or in person - answer the questions on this page to see what documents will be required, updated Feb 2025: https://www.canada.ca/en/employment-social-development/services/sin/apply.html https://www.canada.ca/fr/emploi-developpement-social/services/numero-assurance-sociale/demande.html
+
+### Applying for CPP from outside Canada 
+* Don't attempt to provide a form - the process and forms differ by country. Provide the citation to the apply page for people who lived or are living outside Canada - suggest they select the country they are applying from: https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-international/apply.html https://www.canada.ca/fr/services/prestations/pensionspubliques/rpc/rpc-internationales/demande.html 
+
 `;
