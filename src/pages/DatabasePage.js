@@ -29,25 +29,47 @@ const DatabasePage = ({ lang }) => {
         throw new Error('No collections found');
       }
 
-      // Step 2: For each collection, fetch all documents in chunks
+      // Step 2: For each collection, fetch all documents in adaptive chunks
       const backup = {};
-      const chunkSize = 100; // Reduced from 1000 to 100
+      const initialChunkSize = 2000;
+      const minChunkSize = 50;
       for (const collection of collections) {
         let allDocs = [];
         let skip = 0;
         let total = null;
-        do {
-          const url = getApiUrl(`db-database-management?collection=${encodeURIComponent(collection)}&skip=${skip}&limit=${chunkSize}`);
-          const res = await fetch(url, { headers: AuthService.getAuthHeader() });
-          if (!res.ok) {
-            const error = await res.json();
-            throw new Error(error.message || `Failed to export collection ${collection}`);
+        while (total === null || allDocs.length < total) {
+          let chunkSize = initialChunkSize;
+          let success = false;
+          let data = [];
+          let collectionTotal = null;
+          while (!success && chunkSize >= minChunkSize) {
+            try {
+              const url = getApiUrl(`db-database-management?collection=${encodeURIComponent(collection)}&skip=${skip}&limit=${chunkSize}`);
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), 25000); // 25s timeout
+              const res = await fetch(url, { headers: AuthService.getAuthHeader(), signal: controller.signal });
+              clearTimeout(timeout);
+              if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message || `Failed to export collection ${collection}`);
+              }
+              const json = await res.json();
+              data = json.data;
+              collectionTotal = json.total;
+              success = true;
+            } catch (err) {
+              if (err.name === 'AbortError' || err.message.includes('timeout')) {
+                chunkSize = Math.floor(chunkSize / 2);
+                if (chunkSize < minChunkSize) throw new Error(`Export failed for collection ${collection}: chunk too small`);
+              } else {
+                throw err;
+              }
+            }
           }
-          const { data, total: collectionTotal } = await res.json();
           if (total === null) total = collectionTotal;
           allDocs = allDocs.concat(data);
           skip += chunkSize;
-        } while (total === null || allDocs.length < total);
+        }
         backup[collection] = allDocs;
       }
 
