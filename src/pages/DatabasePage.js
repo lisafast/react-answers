@@ -71,14 +71,12 @@ const DatabasePage = ({ lang }) => {
               collectionTotal = json.total;
               success = true;
             } catch (err) {
-              if (err.name === 'AbortError' || err.message.includes('timeout')) {
-                if (chunkSize > minChunkSize) {
-                  chunkSize = Math.floor(chunkSize / 2);
-                  if (chunkSize < minChunkSize) chunkSize = minChunkSize;
-                }
-                // If already at minChunkSize, just continue retrying
+              // Retry on any error until minChunkSize is reached
+              if (chunkSize > minChunkSize) {
+                chunkSize = Math.floor(chunkSize / 2);
+                if (chunkSize < minChunkSize) chunkSize = minChunkSize;
               } else {
-                throw err;
+                throw new Error(`Export failed for collection ${collection} at min chunk size (${minChunkSize}): ${err.message}`);
               }
             }
           }
