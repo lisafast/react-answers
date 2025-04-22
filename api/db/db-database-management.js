@@ -18,17 +18,28 @@ async function databaseManagementHandler(req, res) {
     }, {});
 
     if (req.method === 'GET') {
-      // Export database
-      const backup = {};
-      
-      for (const [name, model] of Object.entries(collections)) {
-        backup[name] = await model.find({}).lean();
+      // Chunked export support
+      const { collection, skip = 0, limit = 1000 } = req.query;
+      if (!collection) {
+        // Return list of available collections
+        return res.status(200).json({
+          collections: Object.keys(collections)
+        });
       }
-
-      res.setHeader('Content-Disposition', `attachment; filename=database-backup-${new Date().toISOString()}.json`);
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(200).json(backup);
-
+      const model = collections[collection.toLowerCase()];
+      if (!model) {
+        return res.status(400).json({ message: `Collection '${collection}' not found` });
+      }
+      // Paginated export for a single collection
+      const docs = await model.find({}).skip(Number(skip)).limit(Number(limit)).lean();
+      const total = await model.countDocuments();
+      return res.status(200).json({
+        collection,
+        total,
+        skip: Number(skip),
+        limit: Number(limit),
+        data: docs
+      });
     } else if (req.method === 'POST') {
       // Import database
       if (!req.files || !req.files.backup) {
