@@ -55,8 +55,16 @@ const DatabasePage = ({ lang }) => {
               const res = await fetch(url, { headers: AuthService.getAuthHeader(), signal: controller.signal });
               clearTimeout(timeout);
               if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.message || `Failed to export collection ${collection}`);
+                let errorMsg = `Failed to export collection ${collection}`;
+                const contentType = res.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                  const error = await res.json();
+                  errorMsg = error.message || errorMsg;
+                } else {
+                  const text = await res.text();
+                  errorMsg = text || errorMsg;
+                }
+                throw new Error(errorMsg);
               }
               const json = await res.json();
               data = json.data;
@@ -64,8 +72,11 @@ const DatabasePage = ({ lang }) => {
               success = true;
             } catch (err) {
               if (err.name === 'AbortError' || err.message.includes('timeout')) {
-                chunkSize = Math.floor(chunkSize / 2);
-                if (chunkSize < minChunkSize) throw new Error(`Export failed for collection ${collection}: chunk too small`);
+                if (chunkSize > minChunkSize) {
+                  chunkSize = Math.floor(chunkSize / 2);
+                  if (chunkSize < minChunkSize) chunkSize = minChunkSize;
+                }
+                // If already at minChunkSize, just continue retrying
               } else {
                 throw err;
               }
