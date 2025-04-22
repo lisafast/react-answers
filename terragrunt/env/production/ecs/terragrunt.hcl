@@ -74,35 +74,33 @@ dependency "ssm" {
     canada_ca_search_api_key_arn = ""
     user_agent_arn               = ""
     jwt_secret_key_arn           = ""
-    google_api_key_arn        = ""
+    google_api_key_arn           = ""
     google_search_engine_id_arn  = ""
-    azure_openai_embedding_api_key_arn = ""
   }
 }
 
 inputs = {
-  iam_role_ai-answers-ecs-role_arn   = dependency.iam.outputs.iam_role_ai-answers-ecs-role_arn
-  ai-answers-ecs-policy_attachment   = dependency.iam.outputs.ai-answers-ecs-policy_attachment
-  vpc_private_subnet_ids             = dependency.network.outputs.vpc_private_subnet_ids
-  vpc_id                             = dependency.network.outputs.vpc_id
-  vpc_cidr_block                     = dependency.network.outputs.vpc_cidr_block
-  ecr_repository_url                 = dependency.ecr.outputs.ecr_repository_url
-  ecr_repository_arn                 = dependency.ecr.outputs.ecr_repository_arn
-  lb_listener                        = dependency.load_balancer.outputs.lb_listener
-  lb_target_group_arn                = dependency.load_balancer.outputs.lb_target_group_arn
-  ai_answers_load_balancer_sg        = dependency.load_balancer.outputs.ai_answers_load_balancer_sg
-  aws_docdb_security_group_id        = dependency.database.outputs.aws_docdb_security_group_id
-  docdb_uri_arn                      = dependency.database.outputs.docdb_uri_arn
-  azure_openai_api_key_arn           = dependency.ssm.outputs.azure_openai_api_key_arn
-  azure_openai_endpoint_arn          = dependency.ssm.outputs.azure_openai_endpoint_arn
-  azure_openai_api_version_arn       = dependency.ssm.outputs.azure_openai_api_version_arn
-  canada_ca_search_uri_arn           = dependency.ssm.outputs.canada_ca_search_uri_arn
-  canada_ca_search_api_key_arn       = dependency.ssm.outputs.canada_ca_search_api_key_arn
-  user_agent_arn                     = dependency.ssm.outputs.user_agent_arn
-  jwt_secret_key_arn                 = dependency.ssm.outputs.jwt_secret_key_arn
-  google_api_key_arn              = dependency.ssm.outputs.google_api_key_arn
-  google_search_engine_id_arn        = dependency.ssm.outputs.google_search_engine_id_arn
-  azure_openai_embedding_api_key_arn = dependency.ssm.outputs.azure_openai_embedding_api_key_arn
+  iam_role_ai-answers-ecs-role_arn = dependency.iam.outputs.iam_role_ai-answers-ecs-role_arn
+  ai-answers-ecs-policy_attachment = dependency.iam.outputs.ai-answers-ecs-policy_attachment
+  vpc_private_subnet_ids           = dependency.network.outputs.vpc_private_subnet_ids
+  vpc_id                           = dependency.network.outputs.vpc_id
+  vpc_cidr_block                   = dependency.network.outputs.vpc_cidr_block
+  ecr_repository_url               = dependency.ecr.outputs.ecr_repository_url
+  ecr_repository_arn               = dependency.ecr.outputs.ecr_repository_arn
+  lb_listener                      = dependency.load_balancer.outputs.lb_listener
+  lb_target_group_arn              = dependency.load_balancer.outputs.lb_target_group_arn
+  ai_answers_load_balancer_sg      = dependency.load_balancer.outputs.ai_answers_load_balancer_sg
+  aws_docdb_security_group_id      = dependency.database.outputs.aws_docdb_security_group_id
+  docdb_uri_arn                    = dependency.database.outputs.docdb_uri_arn
+  azure_openai_api_key_arn         = dependency.ssm.outputs.azure_openai_api_key_arn
+  azure_openai_endpoint_arn        = dependency.ssm.outputs.azure_openai_endpoint_arn
+  azure_openai_api_version_arn     = dependency.ssm.outputs.azure_openai_api_version_arn
+  canada_ca_search_uri_arn         = dependency.ssm.outputs.canada_ca_search_uri_arn
+  canada_ca_search_api_key_arn     = dependency.ssm.outputs.canada_ca_search_api_key_arn
+  user_agent_arn                   = dependency.ssm.outputs.user_agent_arn
+  jwt_secret_key_arn               = dependency.ssm.outputs.jwt_secret_key_arn
+  google_api_key_arn               = dependency.ssm.outputs.google_api_key_arn
+  google_search_engine_id_arn      = dependency.ssm.outputs.google_search_engine_id_arn
 }
 
 include {

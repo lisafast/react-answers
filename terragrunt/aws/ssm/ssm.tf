@@ -117,13 +117,3 @@ resource "aws_ssm_parameter" "google_search_engine_id" {
     Terraform  = true
   }
 }
-resource "aws_ssm_parameter" "azure_openai_embedding_api_key" {
-  name  = "azure_openai_embedding_api_key"
-  type  = "SecureString"
-  value = var.azure_openai_embedding_api_key
-
-  tags = {
-    CostCentre = var.billing_code
-    Terraform  = true
-  }
-}

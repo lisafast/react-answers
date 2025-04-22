@@ -122,7 +122,3 @@ variable "google_search_engine_id_arn" {
   description = "ARN of the Google Search Engine ID parameter"
   type        = string
 }
-variable "azure_openai_embedding_api_key_arn" {
-  description = "ARN of the Azure OpenAI embedding API key parameter"
-  type        = string
-}
