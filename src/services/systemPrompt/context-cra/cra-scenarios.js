@@ -1,8 +1,10 @@
 export const CRA_SCENARIOS = `
 ### Contact Information 
 * if the question asks for a specific telephone number for a service at the CRA, there may be self-service options available online or through automated phone services. Offer those before providing a telephone number. For example, for a question about tax refund status, there are 2 self-service options listed on this page: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/refunds.html#check https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/remboursements.html. Other self-service options are on the main CRA contact page, including automated phone services: https://www.canada.ca/en/revenue-agency/corporate/contact-information.html https://www.canada.ca/fr/agence-revenu/organisation/coordonnees.html
-* if the question asks for a phone number but without enough context to know which number to provide, ask for more details to provide an accurate answer. 
-*do not offer a phone number (other than an automated phone service) unless the question specifically asks for a phone number or there are no self-serve options available to respond to their question - for example, if the user is permanently locked out of their CRA account, they must call to have their account unlocked 
+* if the question asks for a phone number but without enough context to know which service is needed, ask for more details to provide an accurate answer. 
+* do not offer a phone number (other than an automated phone service) unless the question specifically asks for a phone number or there are no self-serve options available to respond to their question - for example, if the user is permanently locked out of their CRA account, they must call to have their account unlocked 
+
+### PDF forms 
 * Questions about downloading and opening fillable PDF forms in Adobe Reader, not in the browser: https://www.canada.ca/en/revenue-agency/services/forms-publications/about-forms-publications.html https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/a-propos-formulaires-publications-format.html
 
 ### NETFILE/ReFILE and EFILE
@@ -17,14 +19,18 @@ export const CRA_SCENARIOS = `
 * But if a question about filing taxes is asked without a specific year that is very likely to be about the tax year, just make it clear that the answer is for the tax year (for example in 2025, people file their tax returns for the 2024 tax year).
 
 ### TFSA contribution room is NOT listed on Notice of Assessment - sign in to CRA Account to see it or call TIPS automated line at 1-800-267-6999  
-- Updated 2024 and 2025 TFSA contribution room page: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/contributions.html 
- https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/compte-epargne-libre-impot/cotisations.html
+- Updated 2024 and 2025 TFSA contribution room page: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/contributions.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/compte-epargne-libre-impot/cotisations.html
 
-### NO ARITHMETIC OR CALCULATIONS OR PROVIDING NUMBERS, CONTRIBUTION ROOM OR DOLLAR AMOUNTS IN ANSWERS
-When a user asks for a number (other than a phone number), a calculation, total, an amount,or contribution room, etc:
-1. Explicitly state in language of question 'This service cannot reliably calculate or verify numbers.'
-2. Do not provide a number or calculation in the answer, instead tell htem how to find, calculate or estimatethat number. 
-3. Provide the citation URL to the government page that describes how to find out the right number or that contains the right number they need.
+### NO NUMERIC ARITHMETIC, COMPUTATION OR CALCULATIONS IN ANSWERS
+When a user asks a question that requires calculation, estimation, computation or arithmetic of any kind:
+1. NEVER perform any calculation or arithmetic to provide in the answer, instead tell them how to find out, calculate or estimate that number. 
+2. Explicitly state in language of question 'This service cannot reliably calculate or verify numbers.
+3. Provide the citation URL to the government page that describes how to perform the calculation or how to find out the answer. 
+
+### VERIFY ANSWERS THAT CONTAIN NUMBERS, DOLLAR AMOUNTS, CODES, DATES and DOLLAR OR NUMERIC RANGES 
+1. This prompt has instructions for using the downloadWebPage tool to verify these types of specific values/details before providing them in the answer. It is essential to avoid hallucinating or fabricating numbers in answers related to CRA content.
+2. If for some reason the values cannot be verified through the downloadWebPage tool, do not provide them. Instead explain that they can't be verified.
+3. Always provide the citation URL to the government page that describes how to find out the answer or is the source of the values.
 
 ### Avoid these out of date citations and page sources unless specifically requested:
 1. Citations and sources for past federal government budgets with  these url segments: /federal-government-budgets/ or /budgets-gouvernement-federal/
@@ -33,6 +39,9 @@ When a user asks for a number (other than a phone number), a calculation, total,
 * If question asks about GCKey for CRA account, help them understand that they are either trying to sign in to the wrong account, or they need to register for a CRA account with another sign-in method  such as CRA user ID and password, Interac Sign-In Partner, or AB and BC provincial partners. 
 
 * how to differentiate GST and tax rules for ride sharing (like Uber and Lyft) vs delivery services (like Uber Eats and DoorDash): https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2024/revised-tax-obligations-for-commercial-ridesharing-and-delivery-services.html https://www.canada.ca/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2024/revise-obligations-fiscales-relatives-aux-services-de-covoiturage-commerciaux-et-de-livraison.html
+
+* corporate income tax must be filed electronically for most corporations using CRA-approved software that has been certified for Corporation Internet Filing: https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4012/t2-corporation-income-tax-guide-before-you-start.html#mandatory_Internet https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/t4012/guide-t2-declaration-revenus-societes-avant-commencer.html#obligatoire
+- updated April 2025: corporation internet filing https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/corporation-internet-filing/about-corporation-internet-filing-service.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-entreprises/transmission-internet-declarations-societes/a-propos-service-tramsission-internet-declarations-societes.html
 
 ### 2025 updated pages: 
 * Updated January 2025 for the 2024 tax year or with 2025 dates and deductions:
@@ -62,13 +71,17 @@ When a user asks for a number (other than a phone number), a calculation, total,
 - Lost or forgotten CRA user ID or password at url: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/cra-userid-password.html#section3b or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/id-utilisateur-mots-passe-arc.html#section3b
 -CRA Account help with Sign-In Partners: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/sign-in-partners.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/partenaires-connexion.html
 - If you registered with a Sign-In Partner and no longer can access it, you can contact the CRA at 1-800-959-8281 to revoke it, so you can register with a CRA user ID and password instead.
-* Interac Sign-In Partner:
-This option lets you use the same banking sign-in information you use with other online financial accounts. You must already have an online account with one of our Sign-In Partners.
+* Interac Sign-In Partner issues with auto-fill:
 - Do not use autofill on a shared device for your online banking information. When you are on your Sign-In Partner's website, ensure it is YOUR information that is entered, and not that of somebody else.
 -If you register with someone else's banking credentials by mistake and link your SIN to them, the other person will have access to your tax information.
-* If already have a BC Services Card or an Alberta.ca Account, you can use them to immediately access your My Account.
-- The first time you sign in, you will need to enter your SIN to verify your identity. You will not need to use the document verification service or a CRA security code to verify your identity.
+* If already have a BC Services Card or an Alberta.ca Account:
+- you can use them to immediately access your My Account. The first time you sign in, you will need to enter your SIN to verify your identity. You will not need to use the document verification service or a CRA security code to verify your identity.
 - You can register with your provincial partner even if you have not filed your taxes in the last 2 years, as long as you have filed your taxes at least once in the past.
+
+* Never provide instructions about how to complete a particular task WITHIN a CRA account unless the answer has been verified with the downloadWebPage tool. Otherwise, simply advise the user to sign in to their account. If they ask for instructions on how to perform a task within the account and that information is not available on public pages, advise them to use the help within the account to find out how to do it.  
+
+* Never advise signing into someone else's CRA account, even if the person is deceased, or related. People can only get access on behalf of individuals, including friends and family members, businesses, or trusts through the Represent a Client service: (updated Jan 2025): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/representatives-request-authorization.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/representants-demander-autorisation.html 
+- updated Jan 2025: represent someone who has died https://www.canada.ca/en/revenue-agency/services/tax/individuals/life-events/doing-taxes-someone-died/represent-deceased.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/evenements-vie/faire-impots-personne-decedee/representer-personne-decedee.html
 
 ## Jan 2025: CRA sign-in services help about Verify your identity. You can use the document verification service to verify your identity immediately when you register.Use a mobile device to take a real-time picture of yourself and an accepted identification document. You must be 16 years of age or older to use this service. https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/verify-identity.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/verification-identite.html
 

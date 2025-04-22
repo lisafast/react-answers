@@ -2,11 +2,13 @@ import React, { useRef, useState } from 'react';
 import { getApiUrl } from '../utils/apiToUrl.js';
 import { GcdsContainer, GcdsText, GcdsButton } from '@cdssnc/gcds-components-react';
 import AuthService from '../services/AuthService.js';
+import streamSaver from 'streamsaver';
 
 const DatabasePage = ({ lang }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);
+  const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
   const [message, setMessage] = useState('');
   const fileInputRef = useRef(null);
 
@@ -15,33 +17,80 @@ const DatabasePage = ({ lang }) => {
       setIsExporting(true);
       setMessage('');
 
-      const response = await fetch(getApiUrl('db-database-management'), {
+      // Step 1: Get list of collections
+      const collectionsRes = await fetch(getApiUrl('db-database-management'), {
         method: 'GET',
         headers: AuthService.getAuthHeader()
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to export database');
+      if (!collectionsRes.ok) {
+        const error = await collectionsRes.json();
+        throw new Error(error.message || 'Failed to get collections');
+      }
+      const { collections } = await collectionsRes.json();
+      if (!collections || !Array.isArray(collections)) {
+        throw new Error('No collections found');
       }
 
-      // Get the filename from the Content-Disposition header
-      const contentDisposition = response.headers.get('Content-Disposition');
-      const filename = contentDisposition
-        ? contentDisposition.split('filename=')[1].replace(/["']/g, '')
-        : 'database-backup.json';
+      // Step 2: Stream each collection as it is fetched (JSONL format)
+      const filename = `database-backup-${new Date().toISOString()}.jsonl`;
+      const fileStream = streamSaver.createWriteStream(filename);
+      const writer = fileStream.getWriter();
+      const encoder = new TextEncoder();
+      const initialChunkSize = 2000;
+      const minChunkSize = 50;
 
-      // Create blob from response and download it
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
+      for (let i = 0; i < collections.length; i++) {
+        const collection = collections[i];
+        let skip = 0;
+        let total = null;
+        let chunkSize = initialChunkSize;
+        while (total === null || skip < total) {
+          let success = false;
+          let data = [];
+          let collectionTotal = null;
+          while (!success && chunkSize >= minChunkSize) {
+            try {
+              const url = getApiUrl(`db-database-management?collection=${encodeURIComponent(collection)}&skip=${skip}&limit=${chunkSize}`);
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), 25000);
+              const res = await fetch(url, { headers: AuthService.getAuthHeader(), signal: controller.signal });
+              clearTimeout(timeout);
+              if (!res.ok) {
+                let errorMsg = `Failed to export collection ${collection}`;
+                const contentType = res.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                  const error = await res.json();
+                  errorMsg = error.message || errorMsg;
+                } else {
+                  const text = await res.text();
+                  errorMsg = text || errorMsg;
+                }
+                throw new Error(errorMsg);
+              }
+              const json = await res.json();
+              data = json.data;
+              collectionTotal = json.total;
+              success = true;
+            } catch (err) {
+              // Retry on any error until minChunkSize is reached
+              if (chunkSize > minChunkSize) {
+                chunkSize = Math.floor(chunkSize / 2);
+                if (chunkSize < minChunkSize) chunkSize = minChunkSize;
+              } else {
+                throw new Error(`Export failed for collection ${collection} at min chunk size (${minChunkSize}): ${err.message}`);
+              }
+            }
+          }
+          if (total === null) total = collectionTotal;
+          // Write each document as a JSONL line: {"collection": "name", "doc": {...}}
+          for (let j = 0; j < data.length; j++) {
+            const docStr = JSON.stringify({ collection, doc: data[j] });
+            await writer.write(encoder.encode(docStr + '\n'));
+          }
+          skip += chunkSize;
+        }
+      }
+      await writer.close();
       setMessage('Database exported successfully');
     } catch (error) {
       setMessage(`Export failed: ${error.message}`);
@@ -63,18 +112,33 @@ const DatabasePage = ({ lang }) => {
       setIsImporting(true);
       setMessage('');
 
-      const formData = new FormData();
-      formData.append('backup', file);
+      const chunkSize = 5 * 1024 * 1024; // 5MB per chunk
+      const totalChunks = Math.ceil(file.size / chunkSize);
+      const fileName = file.name;
 
-      const response = await fetch(getApiUrl('db-database-management'), {
-        method: 'POST',
-        headers: AuthService.getAuthHeader(),
-        body: formData,
-      });
+      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        const start = chunkIndex * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to import database');
+        const formData = new FormData();
+        formData.append('chunk', chunk);
+        formData.append('chunkIndex', chunkIndex);
+        formData.append('totalChunks', totalChunks);
+        formData.append('fileName', fileName);
+
+        const response = await fetch(getApiUrl('db-database-management'), {
+          method: 'POST',
+          headers: AuthService.getAuthHeader(),
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || `Failed to upload chunk ${chunkIndex + 1}`);
+        }
+
+        setMessage(`Uploaded chunk ${chunkIndex + 1} of ${totalChunks}`);
       }
 
       setMessage('Database imported successfully');
@@ -126,6 +190,37 @@ const DatabasePage = ({ lang }) => {
     }
   };
 
+  const handleDeleteSystemLogs = async () => {
+    if (!window.confirm(
+      lang === 'en'
+        ? 'Are you sure you want to delete all logs with chatId = "system"? This cannot be undone.'
+        : 'Êtes-vous sûr de vouloir supprimer tous les journaux avec chatId = "system" ? Cette action est irréversible.'
+    )) return;
+    setIsDeletingSystemLogs(true);
+    setMessage('');
+    try {
+      const response = await fetch(getApiUrl('db-delete-system-logs'), {
+        method: 'DELETE',
+        headers: AuthService.getAuthHeader(),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Failed to delete system logs');
+      setMessage(
+        (lang === 'en'
+          ? `Deleted ${result.deletedCount} system logs.`
+          : `Supprimé ${result.deletedCount} journaux système.`)
+      );
+    } catch (error) {
+      setMessage(
+        lang === 'en'
+          ? `Delete system logs failed: ${error.message}`
+          : `Échec de la suppression des journaux système: ${error.message}`
+      );
+    } finally {
+      setIsDeletingSystemLogs(false);
+    }
+  };
+
   return (
     <GcdsContainer size="xl" centered>
       <h1>{lang === 'en' ? 'Database Management' : 'Gestion de la base de données'}</h1>
@@ -158,7 +253,7 @@ const DatabasePage = ({ lang }) => {
         <form onSubmit={handleImport} className="mb-200">
           <input
             type="file"
-            accept=".json"
+            accept=".jsonl"
             ref={fileInputRef}
             className="mb-200"
             style={{ display: 'block' }}
@@ -191,6 +286,25 @@ const DatabasePage = ({ lang }) => {
           {isDroppingIndexes 
             ? (lang === 'en' ? 'Dropping Indexes...' : 'Suppression des index...')
             : (lang === 'en' ? 'Drop All Indexes' : 'Supprimer tous les index')}
+        </GcdsButton>
+      </div>
+
+      <div className="mb-400">
+        <h2>{lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système'}</h2>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Delete all logs where chatId = "system". This action cannot be undone.'
+            : 'Supprimez tous les journaux où chatId = "system". Cette action est irréversible.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={handleDeleteSystemLogs}
+          disabled={isDeletingSystemLogs}
+          variant="danger"
+          className="mb-200"
+        >
+          {isDeletingSystemLogs
+            ? (lang === 'en' ? 'Deleting...' : 'Suppression...')
+            : (lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système')}
         </GcdsButton>
       </div>
 

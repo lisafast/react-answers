@@ -107,7 +107,7 @@ const HomePage = ({ lang = 'en' }) => {
           <GcdsText>{t('homepage.about.privacyNote')}</GcdsText>
           <GcdsText>{t('homepage.about.aiServices.claude')}</GcdsText>
           <GcdsText>{t('homepage.about.aiServices.chatgpt')}</GcdsText>
-          <GcdsText>{t('homepage.about.aiServices.cohere')}</GcdsText>
+          {/* <GcdsText>{t('homepage.about.aiServices.cohere')}</GcdsText> */}
           <GcdsText>
             <GcdsLink href="https://github.com/lisafast/react-answers/blob/main/src/services/systemPrompt.js">
               {t('homepage.about.systemPrompt')}
