@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { getApiUrl } from '../utils/apiToUrl.js';
 import { GcdsContainer, GcdsText, GcdsButton } from '@cdssnc/gcds-components-react';
 import AuthService from '../services/AuthService.js';
+import streamSaver from 'streamsaver';
 
 const DatabasePage = ({ lang }) => {
   const [isExporting, setIsExporting] = useState(false);
@@ -29,16 +30,27 @@ const DatabasePage = ({ lang }) => {
         throw new Error('No collections found');
       }
 
-      // Step 2: For each collection, fetch all documents in adaptive chunks
-      const backup = {};
+      // Step 2: Stream each collection as it is fetched
+      const filename = `database-backup-${new Date().toISOString()}.json`;
+      const fileStream = streamSaver.createWriteStream(filename);
+      const writer = fileStream.getWriter();
+      const encoder = new TextEncoder();
+
+      // Write opening brace
+      await writer.write(encoder.encode('{' + '\n'));
+
       const initialChunkSize = 2000;
       const minChunkSize = 50;
-      for (const collection of collections) {
-        let allDocs = [];
+      for (let i = 0; i < collections.length; i++) {
+        const collection = collections[i];
         let skip = 0;
         let total = null;
-        let chunkSize = initialChunkSize; // Only reset when starting a new collection
-        while (total === null || allDocs.length < total) {
+        let chunkSize = initialChunkSize;
+        let isFirstChunk = true;
+        // Write collection name and opening array
+        await writer.write(encoder.encode(`  "${collection}": [`));
+        let firstDoc = true;
+        while (total === null || skip < total) {
           let success = false;
           let data = [];
           let collectionTotal = null;
@@ -46,7 +58,7 @@ const DatabasePage = ({ lang }) => {
             try {
               const url = getApiUrl(`db-database-management?collection=${encodeURIComponent(collection)}&skip=${skip}&limit=${chunkSize}`);
               const controller = new AbortController();
-              const timeout = setTimeout(() => controller.abort(), 25000); // 25s timeout
+              const timeout = setTimeout(() => controller.abort(), 25000);
               const res = await fetch(url, { headers: AuthService.getAuthHeader(), signal: controller.signal });
               clearTimeout(timeout);
               if (!res.ok) {
@@ -67,24 +79,27 @@ const DatabasePage = ({ lang }) => {
             }
           }
           if (total === null) total = collectionTotal;
-          allDocs = allDocs.concat(data);
+          // Write each document, comma separated
+          for (let j = 0; j < data.length; j++) {
+            const docStr = JSON.stringify(data[j]);
+            if (!firstDoc) {
+              await writer.write(encoder.encode(','));
+            }
+            await writer.write(encoder.encode('\n    ' + docStr));
+            firstDoc = false;
+          }
           skip += chunkSize;
         }
-        backup[collection] = allDocs;
+        // Close array for this collection
+        await writer.write(encoder.encode('\n  ]'));
+        if (i < collections.length - 1) {
+          await writer.write(encoder.encode(','));
+        }
+        await writer.write(encoder.encode('\n'));
       }
-
-      // Step 3: Download assembled backup as JSON
-      const filename = `database-backup-${new Date().toISOString()}.json`;
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
+      // Write closing brace
+      await writer.write(encoder.encode('}\n'));
+      await writer.close();
       setMessage('Database exported successfully');
     } catch (error) {
       setMessage(`Export failed: ${error.message}`);
