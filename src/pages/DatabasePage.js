@@ -31,7 +31,7 @@ const DatabasePage = ({ lang }) => {
 
       // Step 2: For each collection, fetch all documents in chunks
       const backup = {};
-      const chunkSize = 1000;
+      const chunkSize = 100; // Reduced from 1000 to 100
       for (const collection of collections) {
         let allDocs = [];
         let skip = 0;
