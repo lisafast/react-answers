@@ -27,7 +27,6 @@ env:
   TF_VAR_sentinel_shared_key: ${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}
   TF_VAR_google_api_key: ${{ secrets.GOOGLE_API_KEY}}
   TF_VAR_google_search_engine_id: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID}}
-  TF_VAR_azure_openai_embedding_api_key: ${{ secrets.AZURE_OPENAI_EMBEDDING_API_KEY}}
 
 permissions:
   id-token: write
