@@ -221,7 +221,7 @@ const DatabasePage = ({ lang }) => {
         <form onSubmit={handleImport} className="mb-200">
           <input
             type="file"
-            accept=".json"
+            accept=".jsonl"
             ref={fileInputRef}
             className="mb-200"
             style={{ display: 'block' }}

@@ -64,12 +64,26 @@ async function databaseManagementHandler(req, res) {
         if (parseInt(chunkIndex) + 1 < parseInt(totalChunks)) {
           buffer = lines.pop();
         } else {
+          // On the last chunk, process all lines including the last one
           buffer = '';
         }
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
             const { collection, doc } = JSON.parse(line);
+            const model = collections[collection.toLowerCase()];
+            if (model && doc) {
+              await model.create(doc);
+              stats.inserted++;
+            }
+          } catch (err) {
+            stats.failed++;
+          }
+        }
+        // On the last chunk, if buffer is not empty, try to process it as a line
+        if (parseInt(chunkIndex) + 1 === parseInt(totalChunks) && buffer.trim()) {
+          try {
+            const { collection, doc } = JSON.parse(buffer);
             const model = collections[collection.toLowerCase()];
             if (model && doc) {
               await model.create(doc);
