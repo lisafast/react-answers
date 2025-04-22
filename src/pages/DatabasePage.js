@@ -30,26 +30,19 @@ const DatabasePage = ({ lang }) => {
         throw new Error('No collections found');
       }
 
-      // Step 2: Stream each collection as it is fetched
-      const filename = `database-backup-${new Date().toISOString()}.json`;
+      // Step 2: Stream each collection as it is fetched (JSONL format)
+      const filename = `database-backup-${new Date().toISOString()}.jsonl`;
       const fileStream = streamSaver.createWriteStream(filename);
       const writer = fileStream.getWriter();
       const encoder = new TextEncoder();
-
-      // Write opening brace
-      await writer.write(encoder.encode('{' + '\n'));
-
       const initialChunkSize = 2000;
       const minChunkSize = 50;
+
       for (let i = 0; i < collections.length; i++) {
         const collection = collections[i];
         let skip = 0;
         let total = null;
         let chunkSize = initialChunkSize;
-        let isFirstChunk = true;
-        // Write collection name and opening array
-        await writer.write(encoder.encode(`  "${collection}": [`));
-        let firstDoc = true;
         while (total === null || skip < total) {
           let success = false;
           let data = [];
@@ -79,26 +72,14 @@ const DatabasePage = ({ lang }) => {
             }
           }
           if (total === null) total = collectionTotal;
-          // Write each document, comma separated
+          // Write each document as a JSONL line: {"collection": "name", "doc": {...}}
           for (let j = 0; j < data.length; j++) {
-            const docStr = JSON.stringify(data[j]);
-            if (!firstDoc) {
-              await writer.write(encoder.encode(','));
-            }
-            await writer.write(encoder.encode('\n    ' + docStr));
-            firstDoc = false;
+            const docStr = JSON.stringify({ collection, doc: data[j] });
+            await writer.write(encoder.encode(docStr + '\n'));
           }
           skip += chunkSize;
         }
-        // Close array for this collection
-        await writer.write(encoder.encode('\n  ]'));
-        if (i < collections.length - 1) {
-          await writer.write(encoder.encode(','));
-        }
-        await writer.write(encoder.encode('\n'));
       }
-      // Write closing brace
-      await writer.write(encoder.encode('}\n'));
       await writer.close();
       setMessage('Database exported successfully');
     } catch (error) {
@@ -121,18 +102,33 @@ const DatabasePage = ({ lang }) => {
       setIsImporting(true);
       setMessage('');
 
-      const formData = new FormData();
-      formData.append('backup', file);
+      const chunkSize = 5 * 1024 * 1024; // 5MB per chunk
+      const totalChunks = Math.ceil(file.size / chunkSize);
+      const fileName = file.name;
 
-      const response = await fetch(getApiUrl('db-database-management'), {
-        method: 'POST',
-        headers: AuthService.getAuthHeader(),
-        body: formData,
-      });
+      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        const start = chunkIndex * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to import database');
+        const formData = new FormData();
+        formData.append('chunk', chunk);
+        formData.append('chunkIndex', chunkIndex);
+        formData.append('totalChunks', totalChunks);
+        formData.append('fileName', fileName);
+
+        const response = await fetch(getApiUrl('db-database-management'), {
+          method: 'POST',
+          headers: AuthService.getAuthHeader(),
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || `Failed to upload chunk ${chunkIndex + 1}`);
+        }
+
+        setMessage(`Uploaded chunk ${chunkIndex + 1} of ${totalChunks}`);
       }
 
       setMessage('Database imported successfully');
