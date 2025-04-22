@@ -37,8 +37,8 @@ const DatabasePage = ({ lang }) => {
         let allDocs = [];
         let skip = 0;
         let total = null;
+        let chunkSize = initialChunkSize; // Only reset when starting a new collection
         while (total === null || allDocs.length < total) {
-          let chunkSize = initialChunkSize;
           let success = false;
           let data = [];
           let collectionTotal = null;
