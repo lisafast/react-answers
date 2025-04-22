@@ -97,7 +97,7 @@ export default async function handler(req, res) {
     await chat.save();
 
     // 5. Generate embeddings for the interaction
-    await EmbeddingService.createEmbedding(dbInteraction);
+    await EmbeddingService.createEmbedding(dbInteraction,interaction.selectedAI);
  
 
     // 6. Perform evaluation on the saved interaction
