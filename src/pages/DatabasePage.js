@@ -15,24 +15,45 @@ const DatabasePage = ({ lang }) => {
       setIsExporting(true);
       setMessage('');
 
-      const response = await fetch(getApiUrl('db-database-management'), {
+      // Step 1: Get list of collections
+      const collectionsRes = await fetch(getApiUrl('db-database-management'), {
         method: 'GET',
         headers: AuthService.getAuthHeader()
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to export database');
+      if (!collectionsRes.ok) {
+        const error = await collectionsRes.json();
+        throw new Error(error.message || 'Failed to get collections');
+      }
+      const { collections } = await collectionsRes.json();
+      if (!collections || !Array.isArray(collections)) {
+        throw new Error('No collections found');
       }
 
-      // Get the filename from the Content-Disposition header
-      const contentDisposition = response.headers.get('Content-Disposition');
-      const filename = contentDisposition
-        ? contentDisposition.split('filename=')[1].replace(/["']/g, '')
-        : 'database-backup.json';
+      // Step 2: For each collection, fetch all documents in chunks
+      const backup = {};
+      const chunkSize = 1000;
+      for (const collection of collections) {
+        let allDocs = [];
+        let skip = 0;
+        let total = null;
+        do {
+          const url = getApiUrl(`db-database-management?collection=${encodeURIComponent(collection)}&skip=${skip}&limit=${chunkSize}`);
+          const res = await fetch(url, { headers: AuthService.getAuthHeader() });
+          if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || `Failed to export collection ${collection}`);
+          }
+          const { data, total: collectionTotal } = await res.json();
+          if (total === null) total = collectionTotal;
+          allDocs = allDocs.concat(data);
+          skip += chunkSize;
+        } while (total === null || allDocs.length < total);
+        backup[collection] = allDocs;
+      }
 
-      // Create blob from response and download it
-      const blob = await response.blob();
+      // Step 3: Download assembled backup as JSON
+      const filename = `database-backup-${new Date().toISOString()}.json`;
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
