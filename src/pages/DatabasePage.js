@@ -8,6 +8,7 @@ const DatabasePage = ({ lang }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);
+  const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
   const [message, setMessage] = useState('');
   const fileInputRef = useRef(null);
 
@@ -189,6 +190,37 @@ const DatabasePage = ({ lang }) => {
     }
   };
 
+  const handleDeleteSystemLogs = async () => {
+    if (!window.confirm(
+      lang === 'en'
+        ? 'Are you sure you want to delete all logs with chatId = "system"? This cannot be undone.'
+        : 'Êtes-vous sûr de vouloir supprimer tous les journaux avec chatId = "system" ? Cette action est irréversible.'
+    )) return;
+    setIsDeletingSystemLogs(true);
+    setMessage('');
+    try {
+      const response = await fetch(getApiUrl('db-delete-system-logs'), {
+        method: 'DELETE',
+        headers: AuthService.getAuthHeader(),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Failed to delete system logs');
+      setMessage(
+        (lang === 'en'
+          ? `Deleted ${result.deletedCount} system logs.`
+          : `Supprimé ${result.deletedCount} journaux système.`)
+      );
+    } catch (error) {
+      setMessage(
+        lang === 'en'
+          ? `Delete system logs failed: ${error.message}`
+          : `Échec de la suppression des journaux système: ${error.message}`
+      );
+    } finally {
+      setIsDeletingSystemLogs(false);
+    }
+  };
+
   return (
     <GcdsContainer size="xl" centered>
       <h1>{lang === 'en' ? 'Database Management' : 'Gestion de la base de données'}</h1>
@@ -254,6 +286,25 @@ const DatabasePage = ({ lang }) => {
           {isDroppingIndexes 
             ? (lang === 'en' ? 'Dropping Indexes...' : 'Suppression des index...')
             : (lang === 'en' ? 'Drop All Indexes' : 'Supprimer tous les index')}
+        </GcdsButton>
+      </div>
+
+      <div className="mb-400">
+        <h2>{lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système'}</h2>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Delete all logs where chatId = "system". This action cannot be undone.'
+            : 'Supprimez tous les journaux où chatId = "system". Cette action est irréversible.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={handleDeleteSystemLogs}
+          disabled={isDeletingSystemLogs}
+          variant="danger"
+          className="mb-200"
+        >
+          {isDeletingSystemLogs
+            ? (lang === 'en' ? 'Deleting...' : 'Suppression...')
+            : (lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système')}
         </GcdsButton>
       </div>
 
