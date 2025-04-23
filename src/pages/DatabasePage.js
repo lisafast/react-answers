@@ -10,6 +10,8 @@ const DatabasePage = ({ lang }) => {
   const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);
   const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
   const [message, setMessage] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const fileInputRef = useRef(null);
 
   const handleExport = async () => {
@@ -50,7 +52,11 @@ const DatabasePage = ({ lang }) => {
           let collectionTotal = null;
           while (!success && chunkSize >= minChunkSize) {
             try {
-              const url = getApiUrl(`db-database-management?collection=${encodeURIComponent(collection)}&skip=${skip}&limit=${chunkSize}`);
+              // Add date range and always use updatedAt
+              let url = getApiUrl(`db-database-management?collection=${encodeURIComponent(collection)}&skip=${skip}&limit=${chunkSize}`);
+              if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
+              if (endDate) url += `&endDate=${encodeURIComponent(endDate)}`;
+              url += `&dateField=updatedAt`;
               const controller = new AbortController();
               const timeout = setTimeout(() => controller.abort(), 25000);
               const res = await fetch(url, { headers: AuthService.getAuthHeader(), signal: controller.signal });
@@ -222,27 +228,20 @@ const DatabasePage = ({ lang }) => {
   };
 
   return (
-    <GcdsContainer size="xl" centered>
-      <h1>{lang === 'en' ? 'Database Management' : 'Gestion de la base de données'}</h1>
-
-      <div className="mb-400">
-        <h2>{lang === 'en' ? 'Export Database' : 'Exporter la base de données'}</h2>
-        <GcdsText>
-          {lang === 'en' 
-            ? 'Download a complete backup of the database.'
-            : 'Télécharger une sauvegarde complète de la base de données.'}
-        </GcdsText>
-        <GcdsButton
-          onClick={handleExport}
-          disabled={isExporting}
-          className="mb-200"
-        >
-          {isExporting 
-            ? (lang === 'en' ? 'Exporting...' : 'Exportation...')
-            : (lang === 'en' ? 'Export Database' : 'Exporter la base de données')}
-        </GcdsButton>
+    <GcdsContainer  size="xl" centered>
+      <GcdsText tag="h2">Database Management</GcdsText>
+      <div style={{ marginBottom: 16 }}>
+        <label>Start date:&nbsp;
+          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+        </label>
+        &nbsp;&nbsp;
+        <label>End date:&nbsp;
+          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+        </label>
       </div>
-
+      <GcdsButton onClick={handleExport} disabled={isExporting}>
+        {isExporting ? 'Exporting...' : 'Export Database'}
+      </GcdsButton>
       <div className="mb-400">
         <h2>{lang === 'en' ? 'Import Database' : 'Importer la base de données'}</h2>
         <GcdsText>
@@ -308,11 +307,7 @@ const DatabasePage = ({ lang }) => {
         </GcdsButton>
       </div>
 
-      {message && (
-        <div className={message.includes('failed') ? 'text-danger' : 'text-success'}>
-          {message}
-        </div>
-      )}
+      {message && <div style={{ marginTop: 16, color: 'blue' }}>{message}</div>}
     </GcdsContainer>
   );
 };
