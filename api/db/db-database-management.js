@@ -24,8 +24,10 @@ async function databaseManagementHandler(req, res) {
     }, {});
 
     if (req.method === 'GET') {
-      // Chunked export support
-      const { collection, skip = 0, limit = 1000 } = req.query;
+      // Chunked export support with date range
+      const { collection, skip = 0, limit = 1000, startDate, endDate } = req.query;
+      // Always use 'updatedAt' as the date field
+      const dateField = 'updatedAt';
       if (!collection) {
         // Return list of available collections
         return res.status(200).json({
@@ -36,9 +38,16 @@ async function databaseManagementHandler(req, res) {
       if (!model) {
         return res.status(400).json({ message: `Collection '${collection}' not found` });
       }
-      // Paginated export for a single collection
-      const docs = await model.find({}).skip(Number(skip)).limit(Number(limit)).lean();
-      const total = await model.countDocuments();
+      // Build date filter if provided
+      let dateFilter = {};
+      if (startDate || endDate) {
+        dateFilter[dateField] = {};
+        if (startDate) dateFilter[dateField].$gte = new Date(startDate);
+        if (endDate) dateFilter[dateField].$lte = new Date(endDate);
+      }
+      // Paginated export for a single collection with optional date filter
+      const docs = await model.find(dateFilter).skip(Number(skip)).limit(Number(limit)).lean();
+      const total = await model.countDocuments(dateFilter);
       return res.status(200).json({
         collection,
         total,
@@ -47,7 +56,7 @@ async function databaseManagementHandler(req, res) {
         data: docs
       });
     } else if (req.method === 'POST') {
-      // Chunked upload support
+      // Only support chunked upload
       const { chunkIndex, totalChunks, fileName } = req.body;
       const chunk = req.files?.chunk;
 
@@ -104,98 +113,8 @@ async function databaseManagementHandler(req, res) {
         }
         return res.status(200).json({ message: `Chunk ${parseInt(chunkIndex) + 1} uploaded and processed` });
       }
-      // Import database (non-chunked)
-      if (!req.files || !req.files.backup) {
-        return res.status(400).json({ message: 'No backup file provided' });
-      }
-
-      let backup;
-      try {
-        backup = JSON.parse(req.files.backup.data.toString());
-      } catch (error) {
-        return res.status(400).json({ message: 'Invalid backup file format' });
-      }
-
-      try {
-        // Clear existing data
-        await Promise.all(Object.values(collections).map(model => 
-          model.deleteMany({})
-        ));
-        
-        // Drop all indexes for each collection
-        await Promise.all(Object.values(collections).map(async model => {
-          try {
-            await model.collection.dropIndexes();
-            console.log(`Dropped indexes for ${model.modelName}`);
-          } catch (error) {
-            console.warn(`Error dropping indexes for ${model.modelName}:`, error.message);
-          }
-        }));
-
-        // Multi-pass import to handle dependencies between collections
-        const pendingCollections = { ...backup };
-        const stats = {
-          totalCollections: Object.keys(pendingCollections).length,
-          insertedCollections: 0,
-          maxPasses: 5, // Prevent infinite loops
-          currentPass: 0
-        };
-        
-        let madeProgress = true;
-        
-        // Continue as long as we're making progress and haven't reached the max passes
-        while (madeProgress && stats.currentPass < stats.maxPasses && Object.keys(pendingCollections).length > 0) {
-          stats.currentPass++;
-          madeProgress = false;
-          
-          // Track collections that were successfully processed in this pass
-          const successfulCollections = [];
-          
-          for (const [name, data] of Object.entries(pendingCollections)) {
-            const model = collections[name.toLowerCase()];
-            
-            // Skip if no model found or no data to insert
-            if (!model || !Array.isArray(data) || data.length === 0) {
-              successfulCollections.push(name);
-              continue;
-            }
-            
-            try {
-              // Try to insert the data for this collection
-              await model.insertMany(data);
-              successfulCollections.push(name);
-              stats.insertedCollections++;
-              madeProgress = true;
-            } catch (error) {
-              // If insertion fails, this collection might depend on others
-              // We'll retry it in the next pass
-              console.log(`Pass ${stats.currentPass}: Failed to insert ${name}. Will retry in next pass.`);
-            }
-          }
-          
-          // Remove successfully processed collections from pending
-          for (const name of successfulCollections) {
-            delete pendingCollections[name];
-          }
-        }
-        
-        // Check if any collections couldn't be imported
-        if (Object.keys(pendingCollections).length > 0) {
-          console.warn(`Import incomplete. Could not import: ${Object.keys(pendingCollections).join(', ')}`);
-        }
-        
-        return res.status(200).json({ 
-          message: 'Database restored successfully', 
-          stats: {
-            totalCollections: stats.totalCollections,
-            insertedCollections: stats.insertedCollections,
-            passes: stats.currentPass,
-            failedCollections: Object.keys(pendingCollections)
-          } 
-        });
-      } catch (error) {
-        throw error;
-      }
+      // If not chunked upload, return error
+      return res.status(400).json({ message: 'Chunked upload required. Missing chunk, chunkIndex, totalChunks, or fileName.' });
     } else if (req.method === 'DELETE') {
       // Drop all indexes
       const results = {
