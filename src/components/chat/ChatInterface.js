@@ -192,17 +192,29 @@ const ChatInterface = ({
               aria-label={t('homepage.chat.messages.responseNavigation')}
             >
               <p>{t('homepage.chat.messages.navigationInstructions')}</p>
-              <button 
+              <button
+                type="button"
+                className="sr-only"
                 onClick={() => {
-                  const lastMessage = document.querySelector(`[data-message-id="${messages[messages.length - 1].id}"]`);
-                  if (lastMessage) {
-                    lastMessage.focus();
+                  const lastMessageElement = document.querySelector(`[data-message-id="${messages[messages.length - 1].id}"]`);
+                  if (lastMessageElement) {
+                    lastMessageElement.focus();
+                    lastMessageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   }
                 }}
-                className="sr-only"
-                aria-label={t('homepage.chat.messages.jumpToResponse')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const lastMessageElement = document.querySelector(`[data-message-id="${messages[messages.length - 1].id}"]`);
+                    if (lastMessageElement) {
+                      lastMessageElement.focus();
+                      lastMessageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }
+                }}
+                aria-label="Jump to new response"
               >
-                {t('homepage.chat.messages.jumpToResponse')}
+                Jump to Response
               </button>
             </div>
           </div>
