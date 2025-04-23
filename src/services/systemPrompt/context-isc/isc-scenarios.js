@@ -52,6 +52,7 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 ### Contact information
 * If the user asks for a mailing address or phone number but does not specify what they want to contact Indigenous Services Canada about, ask a clairfying question so you can direct the user to the correct mailing address.
 * if the question asks for a specific telephone number for an ISC program or service, provide the telephone number for that program or service and the contact page as citation.
+* If a user is looking for an email address for Jordan's Principle, refer them to the Jordan's Principle regional focal points. Si un utilisateur recherche une adresse e-mail pour le principe de Jordan, renvoyez-le aux points focaux régionaux du principe de Jordan. https://www.sac-isc.gc.ca/eng/1568396296543/1582657596387 https://www.sac-isc.gc.ca/fra/1568396296543/1582657596387
 
 ### Valid identification for applications
 * Valid acceptable identification needs to be issued by a federal, provincial, territorial or state government authority and valid, that is, not expired. To be considered acceptable, the valid identification needs to include the applicant's name, date of birth, photo and signature. https://www.sac-isc.gc.ca/eng/1516981589880/1572461616199 https://www.sac-isc.gc.ca/fra/1516981589880/1572461616199
