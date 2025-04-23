@@ -166,8 +166,9 @@ class ExportService {
     // Move any header containing 'autoEval' to the second to last, and 'answer.tools' to the last
     const answerToolsHeaders = headers.filter(h => h.includes('answer.tools'));
     const autoEvalHeaders = headers.filter(h => h.includes('autoEval'));
-    const otherHeaders = headers.filter(h => !h.includes('autoEval') && !h.includes('answer.tools'));
-    headers = [...otherHeaders, ...autoEvalHeaders, ...answerToolsHeaders];
+    const contextToolHeaders = headers.filter(h => h.includes('context.tools'));
+    const otherHeaders = headers.filter(h => !h.includes('autoEval') && !h.includes('answer.tools') && !h.includes('context.tools'));
+    headers = [...otherHeaders, ...autoEvalHeaders,...contextToolHeaders, ...answerToolsHeaders];
 
     for (const chat of chats) {
       const interactions = chat.interactions.map((interaction) => ({
