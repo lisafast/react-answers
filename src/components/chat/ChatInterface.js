@@ -163,7 +163,7 @@ const ChatInterface = ({
 
   return (
     <div className="chat-container" tabIndex="0">
-      {/* Add status announcement region */}
+      {/* Add status announcement region - visually hidden */}
       <div 
         aria-live="polite" 
         aria-atomic="true"
@@ -178,16 +178,34 @@ const ChatInterface = ({
         )}
       </div>
 
-      {/* Add message announcement region */}
+      {/* Add message announcement region - visually hidden */}
       <div 
         aria-live="polite" 
         aria-atomic="true"
         className="sr-only"
       >
         {messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !isLoading && (
-          <span>
-            {t('homepage.chat.messages.newResponse')}
-          </span>
+          <div>
+            <span>{t('homepage.chat.messages.newResponse')}</span>
+            <div 
+              role="navigation"
+              aria-label={t('homepage.chat.messages.responseNavigation')}
+            >
+              <p>{t('homepage.chat.messages.navigationInstructions')}</p>
+              <button 
+                onClick={() => {
+                  const lastMessage = document.querySelector(`[data-message-id="${messages[messages.length - 1].id}"]`);
+                  if (lastMessage) {
+                    lastMessage.focus();
+                  }
+                }}
+                className="sr-only"
+                aria-label={t('homepage.chat.messages.jumpToResponse')}
+              >
+                {t('homepage.chat.messages.jumpToResponse')}
+              </button>
+            </div>
+          </div>
         )}
       </div>
 
@@ -198,6 +216,8 @@ const ChatInterface = ({
             className={`message ${message.sender}`}
             role="article"
             aria-label={message.sender === 'user' ? t('homepage.chat.messages.userMessage') : t('homepage.chat.messages.aiResponse')}
+            data-message-id={message.id}
+            tabIndex={message.sender === 'ai' ? 0 : -1}
           >
             {message.sender === 'user' ? (
               <div
@@ -272,7 +292,11 @@ const ChatInterface = ({
                     </p>
                   </div>
                 ) : (
-                  <>
+                  <div 
+                    className="ai-response-content"
+                    role="region"
+                    aria-label={t('homepage.chat.messages.aiResponseContent')}
+                  >
                     {formatAIResponse(message.aiService, message)}
                     {chatId && (
                       <div className="chat-id">
@@ -281,7 +305,7 @@ const ChatInterface = ({
                         </p>
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
                 {message.id === messages[messages.length - 1].id &&
                   showFeedback &&

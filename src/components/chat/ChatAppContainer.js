@@ -286,28 +286,61 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       <div className="ai-message-content">
         {paragraphs.map((paragraph, index) => {
           const sentences = extractSentences(paragraph);
-          return sentences.map((sentence, sentenceIndex) => (
-            <p key={`${messageId}-p${index}-s${sentenceIndex}`} className="ai-sentence">
-              {sentence}
-            </p>
-          ));
+          return (
+            <div 
+              key={`${messageId}-p${index}`}
+              className="ai-paragraph"
+              role="region"
+              aria-label={t('homepage.chat.messages.paragraph', { number: index + 1 })}
+            >
+              {sentences.map((sentence, sentenceIndex) => (
+                <p 
+                  key={`${messageId}-p${index}-s${sentenceIndex}`} 
+                  className="ai-sentence"
+                >
+                  {sentence}
+                </p>
+              ))}
+            </div>
+          );
         })}
-        <div className="mistake-disc">
+        <div className="mistake-disc" role="note" aria-label={t('homepage.chat.input.loadingHint')}>
           <p><FontAwesomeIcon icon="wand-magic-sparkles" />&nbsp;
           {t('homepage.chat.input.loadingHint')}
-        </p>
-       </div>
+          </p>
+        </div>
         {message.interaction.answer.answerType === 'normal' && (message.interaction.answer.citationHead || displayUrl) && (
-          <div className="citation-container">
-            {message.interaction.answer.citationHead && <p key={`${messageId}-head`} className="citation-head">{message.interaction.answer.citationHead}</p>}
+          <div 
+            className="citation-container"
+            role="region"
+            aria-label={t('homepage.chat.messages.citation')}
+          >
+            {message.interaction.answer.citationHead && (
+              <p key={`${messageId}-head`} className="citation-head">
+                {message.interaction.answer.citationHead}
+              </p>
+            )}
             {displayUrl && (
               <p key={`${messageId}-link`} className="citation-link">
-                <a href={displayUrl} target="_blank" rel="noopener noreferrer">
+                <a 
+                  href={displayUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  aria-label={t('homepage.chat.messages.sourceLink')}
+                >
                   {displayUrl}
                 </a>
               </p>
             )}
-            <p key={`${messageId}-confidence`} className="confidence-rating">
+            <p 
+              key={`${messageId}-confidence`} 
+              className="confidence-rating"
+              aria-label={t('homepage.chat.messages.confidenceRating', {
+                rating: finalConfidenceRating,
+                ai: aiService,
+                department: messageDepartment
+              })}
+            >
               {finalConfidenceRating !== undefined && `${t('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
               {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
               {aiService && `${t('homepage.chat.citation.ai')} ${aiService}`}
