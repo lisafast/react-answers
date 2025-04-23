@@ -163,9 +163,42 @@ const ChatInterface = ({
 
   return (
     <div className="chat-container" tabIndex="0">
+      {/* Add status announcement region */}
+      <div 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {isLoading && (
+          <span>
+            {displayStatus === 'thinkingWithContext'
+              ? `${t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment} - ${currentTopic}`
+              : t(`homepage.chat.messages.${displayStatus}`)}
+          </span>
+        )}
+      </div>
+
+      {/* Add message announcement region */}
+      <div 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !isLoading && (
+          <span>
+            {t('homepage.chat.messages.newResponse')}
+          </span>
+        )}
+      </div>
+
       <div className="message-list">
         {messages.map((message) => (
-          <div key={`message-${message.id}`} className={`message ${message.sender}`}>
+          <div 
+            key={`message-${message.id}`} 
+            className={`message ${message.sender}`}
+            role="article"
+            aria-label={message.sender === 'user' ? t('homepage.chat.messages.userMessage') : t('homepage.chat.messages.aiResponse')}
+          >
             {message.sender === 'user' ? (
               <div
                 className={`user-message-box ${
@@ -175,6 +208,12 @@ const ChatInterface = ({
                       ? 'redacted-box'
                       : ''
                 }`}
+                role="region"
+                aria-label={message.redactedText?.includes('XXX') 
+                  ? t('homepage.chat.messages.privacyMessage')
+                  : message.redactedText?.includes('###')
+                    ? t('homepage.chat.messages.blockedMessage')
+                    : t('homepage.chat.messages.userMessage')}
               >
                 <p
                   className={
@@ -293,10 +332,10 @@ const ChatInterface = ({
       {turnCount < MAX_CONVERSATION_TURNS && (
         <div className="input-area mt-200">
           {!isLoading && (
-            <form className="mrgn-tp-xl mrgn-bttm-lg">
+            <form className="mrgn-tp-xl mrgn-bttm-lg" role="form">
               <div className="field-container">
                 <label htmlFor="message">{getLabelForInput()}</label>
-                <span className="hint-text">
+                <span className="hint-text" id="input-hint">
                   <FontAwesomeIcon icon="wand-magic-sparkles" />
                   &nbsp;
                   {t('homepage.chat.input.hint')}
@@ -314,12 +353,22 @@ const ChatInterface = ({
                     onBlur={handleTextareaBlur}
                     required
                     disabled={isLoading}
+                    aria-describedby="input-hint character-count"
+                    aria-label={getLabelForInput()}
                   />
+                  <div 
+                    id="character-count" 
+                    className="sr-only" 
+                    aria-live="polite"
+                  >
+                    {charCount} {t('homepage.chat.messages.characters')}
+                  </div>
                   <button
                     type="submit"
                     onClick={handleSendMessage}
                     className={`btn-primary-send ${inputText.trim().length > 0 && charCount <= MAX_CHARS ? 'visible' : ''}`}
                     disabled={isLoading || charCount > MAX_CHARS || inputText.trim().length === 0}
+                    aria-label={t('homepage.chat.buttons.send')}
                   >
                     <span className="button-text">{t('homepage.chat.buttons.send')}</span>
                     <FontAwesomeIcon className="button-icon" icon="arrow-up" size="md" />
