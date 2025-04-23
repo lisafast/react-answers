@@ -162,7 +162,13 @@ class ExportService {
     const headersSet = new Set(
       chats.flatMap((chat) => ExportService.getHeaders(chat.interactions))
     );
-    const headers = ['uniqueID', ...Array.from(headersSet)];
+    let headers = ['uniqueID', ...Array.from(headersSet)];
+    // Move any header containing 'autoEval' to the second to last, and 'answer.tools' to the last
+    const answerToolsHeaders = headers.filter(h => h.includes('answer.tools'));
+    const autoEvalHeaders = headers.filter(h => h.includes('autoEval'));
+    const otherHeaders = headers.filter(h => !h.includes('autoEval') && !h.includes('answer.tools'));
+    headers = [...otherHeaders, ...autoEvalHeaders, ...answerToolsHeaders];
+
     for (const chat of chats) {
       const interactions = chat.interactions.map((interaction) => ({
         ...interaction,
