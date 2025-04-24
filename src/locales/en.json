@@ -74,7 +74,7 @@
           "label": "Referring Canada.ca URL (optional)"
         },
         "overrideToggle": {
-          "label": "Test with my prompt overrides"
+          "label": "Apply Prompt Overrides"
         }
       },
       "messages": {
@@ -230,7 +230,12 @@
         "status": "Status",
         "batchName": "Name",
         "progress": "Progress",
-        "action" : "Action"
+        "action" : "Action",
+        "overrides": "Overrides"
+      },
+      "overrides": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
       },
       "actions": {
         "csv": "CSV",

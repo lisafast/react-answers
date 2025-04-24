@@ -221,7 +221,6 @@
       }
     },
     "list": {
-
       "title": "title",
       "columns": {
         "batchName": "Nom",
@@ -231,7 +230,12 @@
         "type": "Type",
         "status": "Statut",
         "progress": "Progression",
-        "action": "Action"
+        "action": "Action",
+        "overrides": "Modifications"
+      },
+      "overrides": {
+        "enabled": "Activées",
+        "disabled": "Désactivées"
       },
       "actions": {
         "csv": "CSV",
