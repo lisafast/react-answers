@@ -117,7 +117,7 @@ const ChatInterface = ({
             role="status"
             className="sr-only"
           >
-            {messages[messages.length - 1].text}
+            {messages[messages.length - 1].interaction?.answer?.paragraphs?.join(' ') || ''}
           </div>
         )}
         {messages.map((message) => (

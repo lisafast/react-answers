@@ -1224,7 +1224,7 @@ textarea.form-control {
   height: auto;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
+@media screen (-webkit-min-device-pixel-ratio: 0) {
   input[type='date'].form-control,
   input[type='datetime-local'].form-control,
   input[type='month'].form-control,
@@ -1816,4 +1816,16 @@ fieldset.gc-chckbxrdio {
   padding: 16px;
   background: #f8f9fa;
   border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
