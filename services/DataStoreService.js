@@ -28,20 +28,17 @@ class DataStoreService {
 
   /**
    * Persists a complete interaction, including related documents,
-   * and links it to the appropriate parent (Chat or Batch).
+   * and links it to the appropriate Chat by chatId.
    *
    * @param {object} interactionData - The structured data for the interaction,
    *                                   containing details for Answer, Question, Context etc.
-   * @param {object} originContext - Object indicating the source:
-   *                                 { type: 'chat' | 'batch', id: string }
+   * @param {string} chatId - The chatId of the parent Chat document.
    * @returns {Promise<Interaction>} The saved Interaction document.
    */
-  async persistInteraction(interactionData, originContext) {
+  async persistInteraction(interactionData) {
     await this.ensureDbConnection();
 
-    // Renamed interactionData to interaction for consistency with original logic
-    const interaction = interactionData; 
-    const { type: originType, id: originId } = originContext;
+    const interaction = interactionData;
 
     // Create all MongoDB document objects without saving them yet
     const dbInteraction = new Interaction();
@@ -50,7 +47,6 @@ class DataStoreService {
     dbInteraction.referringUrl = interaction.referringUrl;
 
     const context = new Context();
-    // Explicitly assign fields from interaction.context based on Context schema
     context.topic = interaction.context?.topic;
     context.topicUrl = interaction.context?.topicUrl;
     context.department = interaction.context?.department;
@@ -60,31 +56,26 @@ class DataStoreService {
     context.outputTokens = interaction.context?.outputTokens;
     context.model = interaction.context?.model;
     context.searchProvider = interaction.context?.searchProvider;
-    // Note: context.tools are handled later
     dbInteraction.context = context._id;
 
     const citation = new Citation();
-    // Use optional chaining for safety
     citation.aiCitationUrl = interaction.answer?.citationUrl;
-    citation.providedCitationUrl = interaction.finalCitationUrl; // Provided separately in interactionData
-    citation.confidenceRating = interaction.confidenceRating; // Provided separately in interactionData
+    citation.providedCitationUrl = interaction.finalCitationUrl;
+    citation.confidenceRating = interaction.confidenceRating;
     citation.citationHead = interaction.answer?.citationHead;
 
     const answer = new Answer();
     answer.citation = citation._id;
-    // Explicitly assign fields from interaction.answer based on Answer schema
     answer.englishAnswer = interaction.answer?.englishAnswer;
-    answer.content = interaction.answer?.content; // Parsed content
+    answer.content = interaction.answer?.content;
     answer.inputTokens = interaction.answer?.inputTokens;
     answer.outputTokens = interaction.answer?.outputTokens;
     answer.model = interaction.answer?.model;
     answer.answerType = interaction.answer?.answerType;
-    // Ensure sentences array is correctly assigned
     answer.sentences = Array.isArray(interaction.answer?.sentences) ? interaction.answer.sentences : [];
-    // Note: answer.tools and answer.citation are handled separately
 
     const question = new Question();
-    question.redactedQuestion = interaction.question; // Provided separately in interactionData
+    question.redactedQuestion = interaction.question;
     question.language = interaction.answer?.questionLanguage;
     question.englishQuestion = interaction.answer?.englishQuestion;
 
@@ -93,7 +84,6 @@ class DataStoreService {
     const answerToolObjects = answerToolsData.map(toolData => new Tool({
       tool: toolData.tool,
       input: toolData.input,
-      // output: toolData.output, // Add if needed
       startTime: toolData.startTime,
       endTime: toolData.endTime,
       duration: toolData.duration,
@@ -115,13 +105,11 @@ class DataStoreService {
                 error: toolData.error
             }));
         } else {
-            // Consider logging this error via a proper logging service instance if needed
-            console.warn('Malformed tool data found in context during persistence', { originId, toolData });
+            console.warn('Malformed tool data found in context during persistence', { chatId, toolData });
         }
     }
 
-    // Now save everything to MongoDB in a more optimized way
-    // 1. Save the tools first
+    // Save tools first
     let savedAnswerTools = [];
     let savedContextTools = [];
 
@@ -139,46 +127,31 @@ class DataStoreService {
       context.tools = [];
     }
 
-    // 2. Save other entities
+    // Save other entities
     await context.save();
     await citation.save();
     await answer.save();
     await question.save();
 
-    // 3. Complete the interaction references and save
+    // Complete the interaction references and save
     dbInteraction.answer = answer._id;
     dbInteraction.question = question._id;
     await dbInteraction.save();
 
-    // 4. Update and save the parent document (Chat or Batch)
-    let parentDoc = null;
-    if (originType === 'chat') {
-      // Find or create Chat document
-      parentDoc = await Chat.findOne({ chatId: originId });
-      if (!parentDoc) {
-        parentDoc = new Chat({ 
-          chatId: originId,
-          // Populate other fields if available in interactionData
-          aiProvider: interaction.selectedAI, 
-          searchProvider: interaction.searchProvider,
-          pageLanguage: interaction.pageLanguage 
-        });
-      }
-    } else if (originType === 'batch') {
-      // Find Batch document by MongoDB _id (originId)
-      parentDoc = await Batch.findOne({ _id: originId }); 
-      if (!parentDoc) {
-         throw new Error(`BatchRun with _id ${originId} not found.`);
-      }
-    } else {
-      throw new Error(`Invalid originContext type: ${originType}`);
+    // Update and save the parent Chat document
+    let parentDoc = await Chat.findOne({ chatId: interactionData.chatId });
+    if (!parentDoc) {
+      parentDoc = new Chat({ 
+        chatId: interactionData.chatId,
+        aiProvider: interaction.selectedAI, 
+        searchProvider: interaction.searchProvider,
+        pageLanguage: interaction.pageLanguage 
+      });
     }
-
     parentDoc.interactions.push(dbInteraction._id);
     await parentDoc.save();
 
-    // 5. Return the saved Interaction document (potentially populated)
-    // Returning the basic saved interaction for now. Can populate later if needed.
+    // Return the saved Interaction document
     return dbInteraction; 
   }
 
@@ -208,8 +181,6 @@ class DataStoreService {
 
   async findBatchRunById(batchRunId) {
     await this.ensureDbConnection();
-    // Populate 'entries' as a subdocument array (not as refs)
-    // If entries are plain objects, just return the batch as is
     return Batch.findOne({ _id: batchRunId });
   }
 
@@ -444,7 +415,7 @@ class DataStoreService {
   async findBatchesByUser(userId) {
     await this.ensureDbConnection();
     return Batch.find({ uploaderUserId: userId })
-      .select('name status totalItems processedItems failedItems aiProvider searchProvider pageLanguage createdAt updatedAt')
+      // Select all fields by default (removed explicit select)
       .sort({ createdAt: -1 });
   }
 
@@ -455,12 +426,12 @@ class DataStoreService {
   async findAllBatches() {
     await this.ensureDbConnection();
     return Batch.find()
-      .select('name status totalItems processedItems failedItems aiProvider searchProvider pageLanguage uploaderUserId createdAt updatedAt')
+      // Select all fields by default (removed explicit select)
       .sort({ createdAt: -1 });
   }
 
   /**
-   * Finds a batch by ID and deeply populates its interactions and all related fields (for export/results).
+   * Finds a batch by ID and deeply populates its chats and all related interactions/fields (for export/results).
    * @param {string} batchId - The batch document ID
    * @returns {Promise<Batch|null>} The populated batch document
    */
@@ -468,35 +439,17 @@ class DataStoreService {
     await this.ensureDbConnection();
     return Batch.findById(batchId)
       .populate({
-        path: 'interactions',
-        populate: [
-          {
-            path: 'context',
-            populate: { path: 'tools' }
-          },
-          { path: 'expertFeedback' },
-          {
-            path: 'question',
-            select: '-embedding'
-          },
-          {
-            path: 'answer',
-            select: '-embedding -sentenceEmbeddings',
-            populate: [
-              { path: 'sentences' },
-              { path: 'citation' },
-              { path: 'tools' },
-            ]
-          },
-          {
-            path: 'autoEval',
-            model: 'Eval',
-            populate: [
-              { path: 'expertFeedback' },
-              { path: 'usedExpertFeedbackId' }
-            ]
-          }
-        ]
+        path: 'chats',
+        populate: {
+          path: 'interactions',
+          populate: [
+            { path: 'answer', populate: ['citation', 'tools', 'sentences'] },
+            { path: 'question' },
+            { path: 'context', populate: 'tools' },
+            { path: 'expertFeedback' },
+            { path: 'autoEval', populate: ['expertFeedback', 'usedExpertFeedbackId'] }
+          ]
+        }
       });
   }
 
