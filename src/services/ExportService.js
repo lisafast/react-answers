@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { flatten } from 'flat';
-import { getApiUrl } from '../utils/apiToUrl.js';
+import { getAbsoluteApiUrl, getApiUrl } from '../utils/apiToUrl.js';
 import AuthService from './AuthService.js';
 
 class ExportService {
@@ -35,26 +35,21 @@ class ExportService {
     }
   }
 
-  static async exportBatchResults(batchId, format = 'json') {
+  static async exportBatchResults(batchId, format = 'xlsx') {
     try {
-      const response = await fetch(getApiUrl(`db-batch-retrieve/export?batchId=${batchId}&format=${format}`), {
+      // 1. Fetch the batch by ID to get the chats array (already deeply populated)
+      const batchRes = await fetch(getAbsoluteApiUrl(`/api/batch/results?batchId=${batchId}`), {
         headers: AuthService.getAuthHeader()
       });
-      
-      if (!response.ok) throw new Error('Failed to export batch results');
-      
-      const blob = await response.blob();
-      const filename = `batch-${batchId}-${new Date().toISOString()}.${format}`;
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      if (!batchRes.ok) throw new Error('Failed to fetch batch');
+      const batch = await batchRes.json();
+      if (!batch || !Array.isArray(batch.chats) || batch.chats.length === 0) {
+        throw new Error('No chats found in batch');
+      }
+
+      // 2. Use the local export logic to generate and download the file
+      const filename = `batch-${batchId}-${new Date().toISOString()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      await ExportService.export(batch.chats, filename);
     } catch (error) {
       console.error('Error exporting batch results:', error);
       throw error;
