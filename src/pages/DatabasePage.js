@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { getApiUrl } from '../utils/apiToUrl.js';
+import { getApiUrl, getAbsoluteApiUrl } from '../utils/apiToUrl.js';
 import { GcdsContainer, GcdsText, GcdsButton } from '@cdssnc/gcds-components-react';
 import AuthService from '../services/AuthService.js';
 
@@ -191,6 +191,42 @@ const DatabasePage = ({ lang }) => {
           {isDroppingIndexes 
             ? (lang === 'en' ? 'Dropping Indexes...' : 'Suppression des index...')
             : (lang === 'en' ? 'Drop All Indexes' : 'Supprimer tous les index')}
+        </GcdsButton>
+      </div>
+
+      <div className="mb-400">
+        <h2>{lang === 'en' ? 'Delete All Batches' : 'Supprimer tous les lots'}</h2>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Delete all batches and their related chats (cascading delete). This action cannot be undone.'
+            : 'Supprimez tous les lots et leurs discussions associées (suppression en cascade). Cette action est irréversible.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={async () => {
+            if (!window.confirm(lang === 'en' ? 'Are you sure you want to delete ALL batches and their related chats? This cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer TOUS les lots et leurs discussions associées ? Cette action est irréversible.')) return;
+            setMessage('');
+            setIsExporting(true);
+            try {
+              const response = await fetch(getAbsoluteApiUrl('/api/batch/delete-all'), {
+                method: 'DELETE',
+                headers: AuthService.getAuthHeader(),
+              });
+              const result = await response.json();
+              if (!response.ok) throw new Error(result.error || result.message || 'Failed to delete batches');
+              setMessage(result.message || (lang === 'en' ? 'All batches deleted.' : 'Tous les lots ont été supprimés.'));
+            } catch (error) {
+              setMessage((lang === 'en' ? 'Delete batches failed: ' : 'Échec de la suppression des lots : ') + error.message);
+            } finally {
+              setIsExporting(false);
+            }
+          }}
+          disabled={isExporting}
+          variant="danger"
+          className="mb-200"
+        >
+          {isExporting
+            ? (lang === 'en' ? 'Deleting...' : 'Suppression...')
+            : (lang === 'en' ? 'Delete All Batches' : 'Supprimer tous les lots')}
         </GcdsButton>
       </div>
 

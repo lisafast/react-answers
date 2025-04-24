@@ -25,31 +25,6 @@ const PromptsPage = () => {
   // State to track which textareas have unsaved changes
   const [dirtyState, setDirtyState] = useState({}); // filename -> boolean
 
-  // Fetch the list of prompts on mount
-  const fetchPromptList = useCallback(async () => {
-    setIsLoadingList(true);
-    setListError(null);
-    try {
-      const apiUrl = getAbsoluteApiUrl('/api/prompts/list');
-      let data = await AuthService.fetchWithAuth(apiUrl);
-      setBasePrompts(data.basePrompts || []);
-      setScenarioPrompts(data.scenarioPrompts || []);
-
-      const allPrompts = [...(data.basePrompts || []), ...(data.scenarioPrompts || [])];
-      const activePrompts = allPrompts.filter(p => p.isActive);
-      await Promise.all(activePrompts.map(p => fetchPromptContent(p.filename)));
-    } catch (error) {
-      setListError(t('prompts.errorList', 'Failed to load prompt list.'));
-      console.error("Error fetching prompt list:", error);
-    } finally {
-      setIsLoadingList(false);
-    }
-  }, [t, fetchPromptContent]); // Add fetchPromptContent to dependency array
-
-  useEffect(() => {
-    fetchPromptList();
-  }, [fetchPromptList]); // Run fetchPromptList on mount
-
   // Fetch content for a specific prompt
   const fetchPromptContent = useCallback(async (filename) => {
     setLoadingStates(prev => ({ ...prev, [filename]: true }));
@@ -69,6 +44,32 @@ const PromptsPage = () => {
       setLoadingStates(prev => ({ ...prev, [filename]: false }));
     }
   }, [t]); // Add t to dependency array
+
+  // Fetch the list of prompts on mount
+  const fetchPromptList = useCallback(async () => {
+    setIsLoadingList(true);
+    setListError(null);
+    try {
+      const apiUrl = getAbsoluteApiUrl('/api/prompts/list');
+      let data = await AuthService.fetchWithAuth(apiUrl);
+      setBasePrompts(data.basePrompts || []);
+      setScenarioPrompts(data.scenarioPrompts || []);
+
+      const allPrompts = [...(data.basePrompts || []), ...(data.scenarioPrompts || [])];
+      const activePrompts = allPrompts.filter(p => p.isActive);
+      // Use Promise.all directly with the map function
+      await Promise.all(activePrompts.map(p => fetchPromptContent(p.filename)));
+    } catch (error) {
+      setListError(t('prompts.errorList', 'Failed to load prompt list.'));
+      console.error("Error fetching prompt list:", error);
+    } finally {
+      setIsLoadingList(false);
+    }
+  }, [t, fetchPromptContent]); // Add fetchPromptContent to dependency array
+
+  useEffect(() => {
+    fetchPromptList();
+  }, [fetchPromptList]); // Run fetchPromptList on mount
 
   // Handler for checkbox changes (toggles isActive status)
   const handleCheckboxChange = async (event) => {

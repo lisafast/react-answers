@@ -19,53 +19,58 @@ const BatchPage = ({ lang = 'en' }) => {
   useEffect(() => {
     let pollInterval = null;
     let isProcessingChunk = false;
-    const STUCK_THRESHOLD_MS = 60 * 1000; // 1 minute
+    const STUCK_THRESHOLD_MS = 120 * 1000; // 2 minutes
 
     const pollAndMaybeResume = async () => {
       try {
         const batchList = await AuthService.fetchWithAuth(getAbsoluteApiUrl('/api/batch/list'));
         setBatches(batchList);
         const now = Date.now();
+        
+
         for (const batch of batchList) {
           const prev = prevProgressRef.current[batch._id];
           const processed = batch.processedItems ?? 0;
           const updatedAt = batch.updatedAt ? new Date(batch.updatedAt).getTime() : 0;
           let shouldResume = false;
 
-          if (
-            (batch.status === 'processing' || batch.status === 'queued') &&
-            !isProcessingChunk
-          ) {
-            if (prev) {
-              // If no progress and updatedAt hasn't changed for threshold, consider stuck
-              if (
-                processed === prev.processedItems &&
-                updatedAt === prev.updatedAt &&
-                now - updatedAt > STUCK_THRESHOLD_MS
-              ) {
-                // Only resume if last attempt was more than threshold ago
-                const lastResume = lastResumeAttemptRef.current[batch._id] || 0;
-                if (now - lastResume > STUCK_THRESHOLD_MS) {
+          if (!isProcessingChunk) {
+            if (batch.status === 'queued') {
+              // Immediately try to start queued batches if not already attempted recently
+              const lastResume = lastResumeAttemptRef.current[batch._id] || 0;
+              // Use a shorter threshold (e.g., 10s) to prevent rapid retries on failed starts
+              if (now - lastResume > 10000) { 
+                shouldResume = true;
+                lastResumeAttemptRef.current[batch._id] = now;
+              }
+            } else if (batch.status === 'processing') {
+              // Apply stuck logic only to processing batches
+              if (prev) {
+                // If no progress and updatedAt hasn't changed for threshold, consider stuck
+                if (
+                  processed === prev.processed &&
+                  updatedAt === prev.updatedAt &&
+                  now - updatedAt > STUCK_THRESHOLD_MS
+                ) {
                   shouldResume = true;
                   lastResumeAttemptRef.current[batch._id] = now;
                 }
               }
-            } else {
-              // No previous record, just store and skip stuck check this time
-              prevProgressRef.current[batch._id] = { processedItems: processed, updatedAt };
-              continue;
+            }
+            if (shouldResume) {
+              isProcessingChunk = true;
+              // Send lastProcessedIndex to the API
+              await AuthService.fetchWithAuth(getAbsoluteApiUrl('/api/batch/process-for-duration'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...AuthService.getAuthHeader() },
+                body: JSON.stringify({ batchId: batch._id, lastProcessedIndex: batch.lastProcessedIndex })
+              });
+              isProcessingChunk = false;
             }
           }
-
-          if (shouldResume) {
-            isProcessingChunk = true;
-            await AuthService.fetchWithAuth(getAbsoluteApiUrl(`/api/batch/process-for-duration`), {
-              method: 'POST',
-              body: JSON.stringify({ batchId: batch._id }) // Removed duration, now set by backend
-            });
-            isProcessingChunk = false;
-          }
           // Always update the ref for next poll (after stuck check and resume attempt)
+          // Only update if it wasn't a queued batch we just tried to start?
+          // Let's update regardless for now, simplifies logic.
           prevProgressRef.current[batch._id] = { processedItems: processed, updatedAt };
         }
       } catch (err) {
@@ -74,19 +79,14 @@ const BatchPage = ({ lang = 'en' }) => {
       }
     };
 
-    pollInterval = setInterval(pollAndMaybeResume, 5000);
+    pollInterval = setInterval(pollAndMaybeResume, 5000); // Keep polling at 5 seconds
     pollAndMaybeResume();
     return () => clearInterval(pollInterval);
   }, []);
 
   const handleDownloadClick = async (batchId, type) => {
-    const response = await fetch(getAbsoluteApiUrl(`/api/batch/results?batchId=${batchId}`), {
-      headers: AuthService.getAuthHeader()
-    });
-    const batch = await response.json();
-    const batches = [batch];
-    const fileName = `${batch.name}-${batch.type}.${type === 'excel' ? 'xlsx' : 'csv'}`;
-    ExportService.export(batches, fileName);
+    // Use the new ExportService method for batch export
+    await ExportService.exportBatchResults(batchId, type === 'excel' ? 'xlsx' : 'csv');
   };
 
   const handleCompleteCancelClick = async (batchId, action) => {
