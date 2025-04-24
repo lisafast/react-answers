@@ -98,7 +98,8 @@
         "updatingDatastore": "Mise à jour du datastore...",
         "moderatingAnswer": "Modération de la réponse...",
         "moderatingQuestion": "Modération de la question...",
-        "needClarification" : "Nécessite des précisions..."
+        "needClarification" : "Nécessite des précisions...",
+        "navigationHint": "Naviguez vers la zone de texte si vous souhaitez poser une question de suivi"
       },
       "citation": {
         "confidence": "Niveau de confiance :",

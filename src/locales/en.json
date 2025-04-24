@@ -98,7 +98,8 @@
         "updatingDatastore": "Updating datastore...",
         "moderatingAnswer": "Moderating answer...",
         "moderatingQuestion": "Moderating question...",
-        "needClarification" : "Requires clarification..."
+        "needClarification" : "Requires clarification...",
+        "navigationHint": "Navigate to the text area if you wish to ask a follow-up question"
       },
       "citation": {
         "confidence": "Confidence:",
