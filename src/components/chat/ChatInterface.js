@@ -14,13 +14,13 @@ const ChatInterface = ({
   handleSendMessage,
   handleReload,
   handleAIToggle,
-  handleSearchToggle, // Add this prop
+  handleSearchToggle,
   handleDepartmentChange,
   handleReferringUrlChange,
   handleFeedback,
   formatAIResponse,
   selectedAI,
-  selectedSearch, // Add this prop
+  selectedSearch,
   selectedDepartment,
   referringUrl,
   turnCount,
@@ -48,61 +48,6 @@ const ChatInterface = ({
 
     return () => clearTimeout(timeoutId);
   }, []);
-
-  useEffect(() => {
-    const handleCitationAppearance = () => {
-      if (textareaRef.current && !userHasClickedTextarea) {
-        textareaRef.current.blur();
-      }
-    };
-
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.addedNodes.length) {
-          for (const node of mutation.addedNodes) {
-            if (node.classList && node.classList.contains('citation-container')) {
-              handleCitationAppearance();
-              break;
-            }
-          }
-        }
-      }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => observer.disconnect();
-  }, [userHasClickedTextarea]);
-
-  useEffect(() => {
-    const textarea = document.querySelector('#message');
-    const button = document.querySelector('.btn-primary-send');
-
-    // Create loading hint
-    const placeholderHint = document.createElement('div');
-    placeholderHint.id = 'temp-hint';
-    placeholderHint.innerHTML = `<p><FontAwesomeIcon icon="wand-magic-sparkles" />${t('homepage.chat.input.loadingHint')}</p>`;
-
-    if (isLoading) {
-      if (textarea) {
-        textarea.style.display = 'none';
-        textarea.parentNode.insertBefore(placeholderHint, textarea);
-      }
-      if (button) button.style.display = 'none';
-    } else {
-      if (textarea) textarea.style.display = 'block';
-      const tempHint = document.getElementById('temp-hint');
-      if (tempHint) tempHint.remove();
-    }
-
-    return () => {
-      const tempHint = document.getElementById('temp-hint');
-      if (tempHint) tempHint.remove();
-    };
-  }, [isLoading, t]);
 
   const getLabelForInput = () => {
     if (turnCount >= 1) {
@@ -237,8 +182,9 @@ const ChatInterface = ({
                     {formatAIResponse(message.aiService, message)}
                     {/* AI response announcement for screen readers */}
                     <div 
-                      aria-live="polite" 
+                      aria-live="assertive" 
                       aria-atomic="true"
+                      role="status"
                       className="sr-only"
                     >
                       {message.text}
@@ -272,8 +218,9 @@ const ChatInterface = ({
           <>
             {/* Status announcement region for screen readers */}
             <div 
-              aria-live="polite" 
+              aria-live="assertive" 
               aria-atomic="true"
+              role="status"
               className="sr-only"
             >
               {displayStatus === 'thinkingWithContext'
