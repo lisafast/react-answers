@@ -49,6 +49,7 @@ const loginHandler = async (req, res) => {
       message: 'Login successful',
       token,
       user: {
+        _id: user._id, // Add the user ID here
         email: user.email,
         role: user.role,
         active: user.active,
