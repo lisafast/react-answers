@@ -50,26 +50,26 @@ const ChatInterface = ({
   //   return () => clearTimeout(timeoutId);
   // }, []);
 
-  // Add new effect to handle focus after AI response
-  useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !messages[messages.length - 1].error) {
-      // Wait for screen reader to announce the response before moving focus
-      const focusTimeout = setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-        }
-      }, 2000); // Give screen reader time to announce the response
+  // Commented out auto-focus after AI response for accessibility reasons
+  // useEffect(() => {
+  //   if (messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !messages[messages.length - 1].error) {
+  //     // Wait for screen reader to announce the response before moving focus
+  //     const focusTimeout = setTimeout(() => {
+  //       if (textareaRef.current) {
+  //         textareaRef.current.focus();
+  //       }
+  //     }, 2000); // Give screen reader time to announce the response
 
-      return () => clearTimeout(focusTimeout);
-    }
-  }, [messages]);
+  //     return () => clearTimeout(focusTimeout);
+  //   }
+  // }, [messages]);
 
   // Add new effect to handle screen reader announcement after AI response
   useEffect(() => {
     if (messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !messages[messages.length - 1].error) {
       // Announce to screen readers that they can navigate to the text area
       const announcement = document.createElement('div');
-      announcement.setAttribute('aria-live', 'polite');
+      announcement.setAttribute('aria-live', 'assertive');
       announcement.setAttribute('role', 'status');
       announcement.className = 'sr-only';
       announcement.textContent = t('homepage.chat.navigationHint');
@@ -253,7 +253,7 @@ const ChatInterface = ({
           <>
             {/* Status announcement region for screen readers */}
             <div 
-              aria-live="polite" 
+              aria-live="assertive" 
               aria-atomic="true"
               role="status"
               className="sr-only"
