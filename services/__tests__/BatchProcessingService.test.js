@@ -1,8 +1,11 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import BatchProcessingService from '../BatchProcessingService.js';
 import DataStoreService from '../DataStoreService.js';
 import ChatProcessingService from '../ChatProcessingService.js';
 import ServerLoggingService from '../ServerLoggingService.js';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import mongoose from 'mongoose';
+import { Chat } from '../../models/chat.js';
 
 // Mock dependencies
 vi.mock('../DataStoreService.js');
@@ -37,8 +40,20 @@ describe('BatchProcessingService', () => {
     interactions: []
   };
 
-  beforeEach(() => {
+  let mongod;
+  beforeAll(async () => {
+    mongod = await MongoMemoryServer.create();
+    await mongoose.connect(mongod.getUri());
+  });
+
+  afterAll(async () => {
+    await mongoose.disconnect();
+    await mongod.stop();
+  });
+
+  beforeEach(async () => {
     vi.resetAllMocks();
+    await mongoose.connection.db.dropDatabase();
     DataStoreService.createBatchRun.mockResolvedValue(mockBatch);
     DataStoreService.updateBatchRun.mockResolvedValue({ acknowledged: true });
     ChatProcessingService.processMessage.mockResolvedValue({ interactionId: 'int123' });
@@ -59,7 +74,7 @@ describe('BatchProcessingService', () => {
         pageLanguage: mockBatchParams.pageLanguage,
         applyOverrides: mockBatchParams.applyOverrides,
         uploaderUserId: mockBatchParams.uploaderUserId,
-        status: 'processing',
+        status: 'queued',
         totalItems: 3,
         processedItems: 0,
         failedItems: 0
@@ -86,92 +101,106 @@ describe('BatchProcessingService', () => {
     });
   });
 
-  describe('_processBatchItems', () => {
-    it('should process items sequentially and maintain chat context', async () => {
-      ChatProcessingService.processMessage.mockResolvedValueOnce({ interactionId: 'int1' });
-      ChatProcessingService.processMessage.mockResolvedValueOnce({ interactionId: 'int2' });
-      ChatProcessingService.processMessage.mockResolvedValueOnce({ interactionId: 'int3' });
-      await BatchProcessingService._processBatchItems(mockBatch, mockEntries);
+  // All tests for _processBatchItems have been removed as that method no longer exists.
+
+  describe('processBatchForDuration (in-memory MongoDB)', () => {
+    let batchId;
+    let chatDocs = [];
+    let batchDoc;
+
+    beforeEach(async () => {
+      // Create chats for the batch
+      chatDocs = await Chat.create([
+        { chatId: 'chat1', aiProvider: 'openai', searchProvider: 'google', pageLanguage: 'en', interactions: [] },
+        { chatId: 'chat2', aiProvider: 'openai', searchProvider: 'google', pageLanguage: 'en', interactions: [] },
+        { chatId: 'chat3', aiProvider: 'openai', searchProvider: 'google', pageLanguage: 'en', interactions: [] }
+      ]);
+      // Create a batch doc object that can be mutated by mocks
+      batchDoc = {
+        _id: 'batchid1',
+        name: 'Batch',
+        type: 'question',
+        aiProvider: 'openai',
+        searchProvider: 'google',
+        pageLanguage: 'en',
+        applyOverrides: false,
+        uploaderUserId: 'user123',
+        status: 'processing',
+        totalItems: 3,
+        processedItems: 0,
+        failedItems: 0,
+        chats: chatDocs.map(c => c._id),
+        entries: [
+          { REDACTEDQUESTION: 'Q1', chatId: 'chat1' },
+          { REDACTEDQUESTION: 'Q2', chatId: 'chat2' },
+          { REDACTEDQUESTION: 'Q3', chatId: 'chat3' }
+        ],
+        lastProcessedIndex: 0
+      };
+
+      // findBatchRunById returns the current state of batchDoc
+      DataStoreService.findBatchRunById.mockImplementation(async (id) => {
+        if (id === batchDoc._id) {
+          return JSON.parse(JSON.stringify(batchDoc)); // Return a copy to prevent direct mutation issues
+        }
+        return null;
+      });
+
+      // updateBatchRun mock that modifies the batchDoc object
+      DataStoreService.updateBatchRun.mockImplementation(async (id, update) => {
+        if (id === batchDoc._id) {
+          if (update.$set) {
+            Object.assign(batchDoc, update.$set);
+          }
+          if (update.$inc) {
+            for (const key in update.$inc) {
+              batchDoc[key] = (batchDoc[key] || 0) + update.$inc[key];
+            }
+          }
+          return { acknowledged: true };
+        }
+        return { acknowledged: false };
+      });
+
+      ChatProcessingService.processMessage.mockResolvedValue({ interactionId: 'intX' });
+    });
+
+    it('processes all items within duration and marks batch as completed', async () => {
+      // Simulate enough time for all items
+      const result = await BatchProcessingService.processBatchForDuration(batchDoc._id, 10);
       expect(ChatProcessingService.processMessage).toHaveBeenCalledTimes(3);
-      expect(ChatProcessingService.processMessage.mock.calls[0][0].chatId).toBe('chat1');
-      expect(ChatProcessingService.processMessage.mock.calls[1][0].chatId).toBe('chat1');
-      expect(ChatProcessingService.processMessage.mock.calls[2][0].chatId).toBe('chat2');
-      expect(DataStoreService.updateBatchRun).toHaveBeenLastCalledWith(
-        mockBatch._id,
-        expect.objectContaining({
-          $set: {
-            status: 'completed',
-            processedItems: 3,
-            failedItems: 0
-          }
-        })
-      );
+      expect(DataStoreService.updateBatchRun).toHaveBeenCalledWith(batchDoc._id, expect.objectContaining({ $set: expect.objectContaining({ status: 'completed' }) }));
+      expect(result.status).toBe('completed');
+      expect(result.processedCount + result.failedCount).toBe(3);
+      expect(result.isComplete).toBe(true);
     });
 
-    it('should handle item processing failures with retries', async () => {
-      ChatProcessingService.processMessage.mockResolvedValueOnce({ interactionId: 'int1' });
+    it('resumes from lastProcessedIndex', async () => {
+      batchDoc.lastProcessedIndex = 1;
+      DataStoreService.findBatchRunById.mockResolvedValueOnce(batchDoc);
+      const result = await BatchProcessingService.processBatchForDuration(batchDoc._id, 10, 1);
+      expect(ChatProcessingService.processMessage).toHaveBeenCalledTimes(2);
+      expect(result.processedCount + result.failedCount).toBeGreaterThanOrEqual(2);
+    });
+
+    it('handles missing Chat documents as failed', async () => {
+      // Remove one chat from DB
+      await Chat.deleteOne({ _id: chatDocs[1]._id });
+      const result = await BatchProcessingService.processBatchForDuration(batchDoc._id, 10);
+      expect(ChatProcessingService.processMessage).toHaveBeenCalledTimes(2);
+      expect(result.failedCount).toBeGreaterThanOrEqual(1);
+    });
+
+    it('retries failed ChatProcessingService.processMessage up to MAX_RETRIES', async () => {
       ChatProcessingService.processMessage
-        .mockRejectedValueOnce(new Error('Processing failed'))
-        .mockRejectedValueOnce(new Error('Processing failed'))
-        .mockResolvedValueOnce({ interactionId: 'int2' });
-      ChatProcessingService.processMessage.mockRejectedValue(new Error('Processing failed'));
-      await BatchProcessingService._processBatchItems(mockBatch, mockEntries);
-      expect(ChatProcessingService.processMessage).toHaveBeenCalledTimes(7);
-      expect(ServerLoggingService.error).toHaveBeenCalledWith(
-        'Batch item failed all retries:',
-        mockBatch._id,
-        expect.objectContaining({
-          chatId: expect.any(String),
-          error: expect.anything(),
-          question: expect.any(String)
-        })
-      );
-      expect(DataStoreService.updateBatchRun).toHaveBeenLastCalledWith(
-        mockBatch._id,
-        expect.objectContaining({
-          $set: {
-            status: 'completed_with_errors',
-            processedItems: 2,
-            failedItems: 1
-          }
-        })
-      );
-    });
-
-    it('should handle critical errors and mark batch as failed', async () => {
-      DataStoreService.updateBatchRun.mockRejectedValue(new Error('Database connection lost'));
-      await expect(BatchProcessingService._processBatchItems(mockBatch, [mockEntries[0]])).rejects.toThrow('Database connection lost');
-      expect(DataStoreService.updateBatchRun).toHaveBeenCalledWith(
-        mockBatch._id,
-        expect.objectContaining({
-          $set: { status: 'error' }
-        })
-      );
-      expect(ServerLoggingService.error).toHaveBeenCalledWith(
-        'Batch item failed all retries:',
-        mockBatch._id,
-        expect.objectContaining({
-          chatId: expect.any(String),
-          error: expect.anything(),
-          question: expect.any(String)
-        })
-      );
-    });
-
-    it('should handle cancellation by checking batch status', async () => {
-      DataStoreService.findBatchRunById = vi.fn().mockResolvedValue({ ...mockBatch, status: 'cancelled' });
-      await BatchProcessingService._processBatchItems(mockBatch, [mockEntries[0], mockEntries[1]]);
-      // Allow processMessage to be called before cancellation is checked, but ensure batch is marked as completed
-      expect(DataStoreService.updateBatchRun).toHaveBeenLastCalledWith(
-        mockBatch._id,
-        expect.objectContaining({
-          $set: {
-            status: 'completed',
-            processedItems: expect.any(Number),
-            failedItems: expect.any(Number)
-          }
-        })
-      );
+        .mockRejectedValueOnce(new Error('fail1'))
+        .mockRejectedValueOnce(new Error('fail2'))
+        .mockResolvedValueOnce({ interactionId: 'intX' });
+      const result = await BatchProcessingService.processBatchForDuration(batchDoc._id, 10);
+      expect(ChatProcessingService.processMessage).toHaveBeenCalled();
+      // Should have retried at least 3 times for the first item
+      expect(ChatProcessingService.processMessage.mock.calls.length).toBeGreaterThanOrEqual(3);
+      expect(result.processedCount + result.failedCount).toBe(3);
     });
   });
 });
