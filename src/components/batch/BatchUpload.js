@@ -19,6 +19,8 @@ const BatchUpload = ({ lang }) => {
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [batchName, setBatchName] = useState('');
   const [selectedSearch, setSelectedSearch] = useState('google');
+  // Add state for override toggle
+  const [applyOverrides, setApplyOverrides] = useState(false);
 
   const handleFileChange = (event) => {
     setError(null);
@@ -53,6 +55,10 @@ const BatchUpload = ({ lang }) => {
 
   const handleBatchNameChange = (e) => {
     setBatchName(e.target.value);
+  };
+
+  const handleOverrideToggle = (e) => {
+    setApplyOverrides(e.target.checked);
   };
 
   const handleUpload = async (e) => {
@@ -132,6 +138,13 @@ const BatchUpload = ({ lang }) => {
       setBatchStatus('preparing');
       setError(null);
 
+      // Get uploaderUserId if overrides are enabled and user is logged in
+      let uploaderUserId = null;
+      if (applyOverrides) {
+        const user = AuthService.getUser && AuthService.getUser();
+        uploaderUserId = user && user._id ? user._id : null;
+      }
+
       // Use AuthService.fetchWithAuth for consistent auth and error handling
       const data = await AuthService.fetchWithAuth(getAbsoluteApiUrl('/api/batch/create'), {
         method: 'POST',
@@ -140,7 +153,8 @@ const BatchUpload = ({ lang }) => {
           aiProvider: selectedAI,
           searchProvider: selectedSearch,
           lang: selectedLanguage,
-          applyOverrides: false, // or use a state if you add a checkbox
+          applyOverrides,
+          uploaderUserId,
           entries
         })
       });
@@ -312,6 +326,19 @@ const BatchUpload = ({ lang }) => {
                   </div>
                 </div>
               </fieldset>
+            </div>
+            {/* Override toggle placed directly after language toggle */}
+            <div className="mrgn-bttm-20">
+              <input
+                type="checkbox"
+                id="overrideToggle"
+                checked={applyOverrides}
+                onChange={handleOverrideToggle}
+                className="mrgn-rght-10"
+              />
+              <label htmlFor="overrideToggle">
+                {t('homepage.chat.options.overrideToggle.label')}
+              </label>
             </div>
 
             <div className="file-input-container mrgn-bttm-20">

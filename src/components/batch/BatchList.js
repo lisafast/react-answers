@@ -25,6 +25,13 @@ const BatchList = ({ buttonAction, batchStatus, lang, batches }) => {
         data: null,
         render: (data, type, row) => `${row.processedItems ?? 0} / ${row.totalItems ?? 0}`,
       },
+      // Add new column for overrides
+      {
+        title: t('batch.list.columns.overrides'),
+        data: 'applyOverrides',
+        render: (data, type, row) =>
+          row.applyOverrides ? t('batch.list.overrides.enabled') : t('batch.list.overrides.disabled'),
+      },
       { title: t('batch.list.columns.status'), data: 'status' },
       {
         title: t('batch.list.columns.action'),
