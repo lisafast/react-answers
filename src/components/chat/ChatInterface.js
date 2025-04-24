@@ -49,6 +49,20 @@ const ChatInterface = ({
     return () => clearTimeout(timeoutId);
   }, []);
 
+  // Add new effect to handle focus after AI response
+  useEffect(() => {
+    if (messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !messages[messages.length - 1].error) {
+      // Wait for screen reader to announce the response before moving focus
+      const focusTimeout = setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+        }
+      }, 2000); // Give screen reader time to announce the response
+
+      return () => clearTimeout(focusTimeout);
+    }
+  }, [messages]);
+
   const getLabelForInput = () => {
     if (turnCount >= 1) {
       return t('homepage.chat.input.followUp');
