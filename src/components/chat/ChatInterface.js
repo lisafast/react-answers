@@ -64,24 +64,6 @@ const ChatInterface = ({
   //   }
   // }, [messages]);
 
-  // Add new effect to handle screen reader announcement after AI response
-  useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !messages[messages.length - 1].error) {
-      // Announce to screen readers that they can navigate to the text area
-      const announcement = document.createElement('div');
-      announcement.setAttribute('aria-live', 'assertive');
-      announcement.setAttribute('role', 'status');
-      announcement.className = 'sr-only';
-      announcement.textContent = t('homepage.chat.navigationHint');
-      document.body.appendChild(announcement);
-      
-      // Remove the announcement after a short delay
-      setTimeout(() => {
-        document.body.removeChild(announcement);
-      }, 1000);
-    }
-  }, [messages, t]);
-
   const getLabelForInput = () => {
     if (turnCount >= 1) {
       return t('homepage.chat.input.followUp');
@@ -223,6 +205,14 @@ const ChatInterface = ({
                   </div>
                 ) : (
                   <>
+                    <div 
+                      aria-live="assertive" 
+                      aria-atomic="true"
+                      role="status"
+                      className="sr-only"
+                    >
+                      {message.interaction?.answer?.paragraphs?.join(' ') || ''}
+                    </div>
                     {formatAIResponse(message.aiService, message)}
                     {chatId && (
                       <div className="chat-id">
