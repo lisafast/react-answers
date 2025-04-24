@@ -140,10 +140,11 @@ async function sseMessageHandler(req, res) {
       selectedAI,
       selectedSearch,
       user,
-      overrideUserId
+      overrideUserId,
+      requestId 
     };
     // Call ChatProcessingService.processMessage without originContext
-    const response = await ChatProcessingService.processMessage(processParams);
+    await ChatProcessingService.processMessage(processParams);
 
     // If processMessage completes without throwing, the 'processing_complete' event
     // should have triggered cleanupAndEnd via handleStatusUpdate.
