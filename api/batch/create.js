@@ -38,7 +38,7 @@ async function createBatchHandler(req, res) {
     // Call the BatchProcessingService to create and queue the batch
     const batchResult = await BatchProcessingService.createBatch({
       name: batchName,
-      type: 'question',
+      type: 'question', // Assuming 'question' is the intended type
       aiProvider,
       searchProvider,
       pageLanguage,
@@ -51,7 +51,7 @@ async function createBatchHandler(req, res) {
     res.status(202).json({
       message: 'Batch successfully queued.',
       batchId: batchResult._id,
-      status: batchResult.status,
+      status: batchResult.status, // Should be 'queued' initially
       totalItems: batchResult.totalItems
     });
     
