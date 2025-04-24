@@ -131,22 +131,19 @@ async function sseMessageHandler(req, res) {
 
     ServerLoggingService.info('Chat API request received, starting processing', chatId, { requestId });
 
-    const originContext = { type: 'chat', id: chatId };
+    // Remove originContext from processParams
     const processParams = {
+      chatId,
       userMessage,
       lang,
+      referringUrl,
       selectedAI,
       selectedSearch,
-      referringUrl,
-      requestId, // Pass requestId so service can use it if needed
-      overrideUserId, // Pass the admin user ID if overrides are requested
-      originContext // Pass the chat context
+      user,
+      overrideUserId
     };
-
-
-    // Call the service and AWAIT its completion.
-    // Events emitted during its execution will still be handled by the listener.
-    await ChatProcessingService.processMessage(processParams);
+    // Call ChatProcessingService.processMessage without originContext
+    const response = await ChatProcessingService.processMessage(processParams);
 
     // If processMessage completes without throwing, the 'processing_complete' event
     // should have triggered cleanupAndEnd via handleStatusUpdate.
