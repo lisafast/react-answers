@@ -109,6 +109,17 @@ const ChatInterface = ({
   return (
     <div className="chat-container" tabIndex="0">
       <div className="message-list">
+        {/* AI response announcement for screen readers */}
+        {messages.length > 0 && messages[messages.length - 1].sender === 'ai' && !messages[messages.length - 1].error && (
+          <div 
+            aria-live="assertive" 
+            aria-atomic="true"
+            role="status"
+            className="sr-only"
+          >
+            {messages[messages.length - 1].text}
+          </div>
+        )}
         {messages.map((message) => (
           <div key={`message-${message.id}`} className={`message ${message.sender}`}>
             {message.sender === 'user' ? (
@@ -180,15 +191,6 @@ const ChatInterface = ({
                 ) : (
                   <>
                     {formatAIResponse(message.aiService, message)}
-                    {/* AI response announcement for screen readers */}
-                    <div 
-                      aria-live="assertive" 
-                      aria-atomic="true"
-                      role="status"
-                      className="sr-only"
-                    >
-                      {message.text}
-                    </div>
                     {chatId && (
                       <div className="chat-id">
                         <p>
@@ -218,7 +220,7 @@ const ChatInterface = ({
           <>
             {/* Status announcement region for screen readers */}
             <div 
-              aria-live="assertive" 
+              aria-live="polite" 
               aria-atomic="true"
               role="status"
               className="sr-only"
