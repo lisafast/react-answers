@@ -235,6 +235,14 @@ const ChatInterface = ({
                 ) : (
                   <>
                     {formatAIResponse(message.aiService, message)}
+                    {/* AI response announcement for screen readers */}
+                    <div 
+                      aria-live="polite" 
+                      aria-atomic="true"
+                      className="sr-only"
+                    >
+                      {message.text}
+                    </div>
                     {chatId && (
                       <div className="chat-id">
                         <p>
@@ -262,6 +270,16 @@ const ChatInterface = ({
 
         {isLoading && (
           <>
+            {/* Status announcement region for screen readers */}
+            <div 
+              aria-live="polite" 
+              aria-atomic="true"
+              className="sr-only"
+            >
+              {displayStatus === 'thinkingWithContext'
+                ? `${t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment} - ${currentTopic}`
+                : t(`homepage.chat.messages.${displayStatus}`)}
+            </div>
             <div key="loading" className="loading-container">
               <div className="loading-animation"></div>
               <div className="loading-text">
