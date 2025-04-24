@@ -39,15 +39,16 @@ const ChatInterface = ({
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
   const textareaRef = useRef(null);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-      }
-    }, 100);
+  // Commented out initial auto-focus for accessibility reasons
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     if (textareaRef.current) {
+  //       textareaRef.current.focus();
+  //     }
+  //   }, 100);
 
-    return () => clearTimeout(timeoutId);
-  }, []);
+  //   return () => clearTimeout(timeoutId);
+  // }, []);
 
   // Add new effect to handle focus after AI response
   useEffect(() => {
