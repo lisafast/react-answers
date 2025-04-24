@@ -36,11 +36,10 @@ class ChatProcessingService {
     // Destructure all potential parameters
     const {
       userMessage, lang, selectedAI, selectedSearch, referringUrl,
-      requestId: providedRequestId, user, overrideUserId, originContext // Remove chatId from destructure
+      requestId: providedRequestId, user, overrideUserId, chatId // Removed originContext
     } = params;
 
-    // Determine chatId for logging/context (from originContext if present)
-    const chatId = originContext?.id || params.chatId;
+    // Use chatId directly
 
     // Step 0: Initialization
     const { requestId, startTime, statusEmitterHandler, toolTrackingHandler, callbacks } = this._initializeProcessing(providedRequestId, chatId);
@@ -59,7 +58,7 @@ class ChatProcessingService {
       // Step 4: Invoke Agent Layer - Pass overrideUserId and user context
       const agentResult = await this._invokeAgentLayer({
         selectedAI, selectedSearch, chatId, requestId, lang, referringUrl,
-        agentHistory, processedMessage, callbacks, user, overrideUserId, systemPrompt // Pass new params + systemPrompt
+        agentHistory, processedMessage, callbacks, user, overrideUserId, systemPrompt
       });
 
       // Step 5: Process Agent Result
@@ -88,8 +87,8 @@ class ChatProcessingService {
         pageLanguage: lang,
         referringUrl: referringUrl
       };
-      const originContextToUse = originContext || { type: 'chat', id: chatId };
-      const savedInteraction = await DataStoreService.persistInteraction(interactionData, originContextToUse);
+
+      const savedInteraction = await DataStoreService.persistInteraction(interactionData);
       ServerLoggingService.info('Interaction persisted successfully', chatId, { requestId, interactionId: savedInteraction._id });
 
 
@@ -97,17 +96,15 @@ class ChatProcessingService {
       const finalResponse = this._formatFinalResponse({
         finalAnswer, finalCitationUrl, confidenceRating, savedInteraction
       });
-      if (originContextToUse.type !== 'batch') {
-        // Step 9: Trigger Background Tasks (Asynchronous - Fire and Forget)
-        this._runBackgroundTasks(savedInteraction, chatId, requestId)
-          .catch(bgError => {
-            // Log errors from the async background task initiation itself, if any
-            ServerLoggingService.error('Error initiating background tasks', chatId, { requestId, interactionId: savedInteraction?._id, error: bgError.message });
-          });
+      // Always run background tasks and finalize (no originContext check)
+      this._runBackgroundTasks(savedInteraction, chatId, requestId)
+        .catch(bgError => {
+          // Log errors from the async background task initiation itself, if any
+          ServerLoggingService.error('Error initiating background tasks', chatId, { requestId, interactionId: savedInteraction?._id, error: bgError.message });
+        });
 
-        // Step 10: Finalize (Logging, Events for main response)
-        this._finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler });
-      }
+      // Step 10: Finalize (Logging, Events for main response)
+      this._finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler });
       // Return the response to the user immediately
       return finalResponse;
 
