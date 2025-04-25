@@ -320,6 +320,7 @@ const ChatInterface = ({
                     onClick={handleSendMessage}
                     className={`btn-primary-send ${inputText.trim().length > 0 && charCount <= MAX_CHARS ? 'visible' : ''}`}
                     disabled={isLoading || charCount > MAX_CHARS || inputText.trim().length === 0}
+                    aria-label={t('homepage.chat.buttons.send') || 'Send message'}
                   >
                     <span className="button-text">{t('homepage.chat.buttons.send')}</span>
                     <FontAwesomeIcon className="button-icon" icon="arrow-up" size="md" />
@@ -452,6 +453,7 @@ const ChatInterface = ({
           </GcdsDetails>
         </div>
       )}
+      
     </div>
   );
 };

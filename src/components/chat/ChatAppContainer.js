@@ -41,6 +41,33 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const statusQueueRef = useRef([]);
   // Add a ref to track if we're currently typing
   const isTyping = useRef(false);
+  const [ariaLiveMessage, setAriaLiveMessage] = useState('');
+
+  useEffect(() => {
+    if (isLoading) {
+      setAriaLiveMessage(
+        displayStatus === 'thinkingWithContext'
+          ? `${t('homepage.chat.messages.thinkingWithContext')}`
+          : t(`homepage.chat.messages.${displayStatus}`)
+      );
+    } else {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage) {
+        if (lastMessage.sender === 'ai') {
+          const paragraphs = lastMessage.interaction?.answer?.paragraphs || [];
+          const sentences = paragraphs.flatMap(paragraph => extractSentences(paragraph));
+          const plainText = sentences.join(' ');
+          const citation = lastMessage.interaction?.answer?.citationHead || '';
+          const displayUrl = lastMessage.interaction?.citationUrl || '';
+          setAriaLiveMessage(`${plainText} ${citation} ${displayUrl}`.trim());
+        } else if (lastMessage.sender === 'user') {
+          setAriaLiveMessage(lastMessage.text || '');
+        } else if (lastMessage.error) {
+          setAriaLiveMessage(lastMessage.errorMessage || 'An error occurred');
+        }
+      }
+    }
+  }, [isLoading, displayStatus, messages, t, selectedDepartment]);
 
   const processNextStatus = useCallback(() => {
     if (statusQueueRef.current.length === 0) {
@@ -325,34 +352,43 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   };
 
   return (
-    <ChatInterface
-      messages={messages}
-      inputText={inputText}
-      isLoading={isLoading}
-      textareaKey={textareaKey}
-      handleInputChange={handleInputChange}
-      handleSendMessage={handleSendMessage}
-      handleReload={handleReload}
-      handleAIToggle={handleAIToggle}
-      handleSearchToggle={handleSearchToggle} // Add this line
-      handleDepartmentChange={handleDepartmentChange}
-      handleReferringUrlChange={handleReferringUrlChange}
-      formatAIResponse={formatAIResponse}
-      selectedAI={selectedAI}
-      selectedSearch={selectedSearch} // Add this line
-      selectedDepartment={selectedDepartment}
-      referringUrl={referringUrl}
-      turnCount={turnCount}
-      showFeedback={showFeedback}
-      displayStatus={displayStatus}
-      MAX_CONVERSATION_TURNS={MAX_CONVERSATION_TURNS}
-      t={t}
-      lang={lang}
-      privacyMessage={t('homepage.chat.messages.privacy')}
-      getLabelForInput={() => turnCount >= 1 ? t('homepage.chat.input.followUp') : t('homepage.chat.input.initial')}
-      extractSentences={extractSentences}
-      chatId={chatId}
-    />
+    <>
+      <ChatInterface
+        messages={messages}
+        inputText={inputText}
+        isLoading={isLoading}
+        textareaKey={textareaKey}
+        handleInputChange={handleInputChange}
+        handleSendMessage={handleSendMessage}
+        handleReload={handleReload}
+        handleAIToggle={handleAIToggle}
+        handleSearchToggle={handleSearchToggle} // Add this line
+        handleDepartmentChange={handleDepartmentChange}
+        handleReferringUrlChange={handleReferringUrlChange}
+        formatAIResponse={formatAIResponse}
+        selectedAI={selectedAI}
+        selectedSearch={selectedSearch} // Add this line
+        selectedDepartment={selectedDepartment}
+        referringUrl={referringUrl}
+        turnCount={turnCount}
+        showFeedback={showFeedback}
+        displayStatus={displayStatus}
+        MAX_CONVERSATION_TURNS={MAX_CONVERSATION_TURNS}
+        t={t}
+        lang={lang}
+        privacyMessage={t('homepage.chat.messages.privacy')}
+        getLabelForInput={() => turnCount >= 1 ? t('homepage.chat.input.followUp') : t('homepage.chat.input.initial')}
+        extractSentences={extractSentences}
+        chatId={chatId}
+      />
+      <div
+        aria-live="polite"
+        role="status"
+        style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
+      >
+        {ariaLiveMessage}
+      </div>
+    </>
   );
 };
 
