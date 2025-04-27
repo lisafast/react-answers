@@ -7,7 +7,8 @@ export const ESDC_SCENARIOS = `
 - SIN (updated Feb 2025): https://www.canada.ca/en/employment-social-development/corporate/contact/sin.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/nas.html
 - Canadian Dental Care plan contact page (updated Feb 2025): https://www.canada.ca/en/services/benefits/dental/dental-care-plan/contact.html or https://www.canada.ca/fr/services/prestations/dentaire/regime-soins-dentaires/contactez.html
 * If program isn't known, ask clarifying question or direct to main ESDC contact page: https://www.canada.ca/en/employment-social-development/corporate/contact.html https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees.html
-* For questions about contacting MSCA (My Service Canada Account, provide the contact page and number for the program that they are using on MSCA. There is no single contact number for MSCA. Ask a clarifying question to find out which program to direct them to. 
+* To contact MSCA about being locked out of registration or two-factor authentication, same number in French or English, (updated Jan 2025): https://www.canada.ca/en/employment-social-development/services/my-account/multi-factor-authentication.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/authentification-multifacteur.html
+* For other questiona about MSCA, provide the contact page and number for the program that they are using on MSCA. If needed, ask a clarifying question to find out which program to direct them to. 
 
 ### CHANGING PERSONAL INFO NOT AVAILABLE IN MSCA: it's NOT currently possible to change mailing address, or phone or bank/direct deposit info in MSCA. Do NOT tell people to sign in to change that info or direct them to specific forms. Provide the phone number for the program and direct them to the appropriate contact page for that program, as listed above.
  
@@ -24,6 +25,7 @@ export const ESDC_SCENARIOS = `
  * Applying for EI is not done through MSCA, separate application process starts here: https://www.canada.ca/en/services/benefits/ei/ei-regular-benefit/eligibility.html or https://www.canada.ca/fr/services/prestations/ae/assurance-emploi-reguliere/admissibilite.html
  * For EI applicants, provide the MSCA sign-in page as the citation to see their ROE, NOT the Employer page of ROE web where they submit for their employees. 
  * Updated March 2025 - Special measures for the EI Work-Sharing Program in response to the threat or potential realization of U.S. tariffs are in effect from March 7, 2025 until March 6, 2026 https://www.canada.ca/en/employment-social-development/services/work-sharing.html#h2.1 https://www.canada.ca/fr/emploi-developpement-social/services/travail-partage.html#h2.1
+ *  Updated April 2025 - waiving waiting period, adjusting unemployment rate, suspending allocation of separation of earnings: https://www.canada.ca/en/services/benefits/ei/temporary-measures-for-major-economic-conditions.html https://www.canada.ca/fr/services/prestations/ae/mesures-temporaires-pour-conditions-economiques-majeures.html
 
  ### Canadian Dental Care Plan (CDCP)- all pages updated March 2025
  * Apply online, 1 application per family for all children under 18, https://www.canada.ca/en/services/benefits/dental/dental-care-plan/apply.html https://www.canada.ca/fr/services/prestations/dentaire/regime-soins-dentaires/demande.html
@@ -37,4 +39,11 @@ export const ESDC_SCENARIOS = `
 
 ### T4 slips for EI, CPP/OAS, and other ESDC programs
 - For questions about how to get T4 slips for benefit payments, suggest they can get them in their MSCA account, or in their CRA account. Provide the main sign-in page link so can choose the account they already have or prefer to use: https://www.canada.ca/en/government/sign-in-online-account.html https://www.canada.ca/fr/gouvernement/ouvrir-session-dossier-compte-en-ligne.html
+
+### SIN: 
+* Apply, update or obtain a SIN confirmation Apply for a SIN online, by mail or in person - answer the questions on this page to see what documents will be required, updated Feb 2025: https://www.canada.ca/en/employment-social-development/services/sin/apply.html https://www.canada.ca/fr/emploi-developpement-social/services/numero-assurance-sociale/demande.html
+
+### Applying for CPP from outside Canada 
+* Don't attempt to provide a form - the process and forms differ by country. Provide the citation to the apply page for people who lived or are living outside Canada - suggest they select the country they are applying from: https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-international/apply.html https://www.canada.ca/fr/services/prestations/pensionspubliques/rpc/rpc-internationales/demande.html 
+
 `;
