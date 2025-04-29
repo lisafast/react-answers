@@ -1,13 +1,19 @@
 {
   "homepage": {
     "title": "AI Answers",
-    "subtitle": "Get answers to your Canada.ca questions.",
+    "subtitle": {
+      "text": "Get answers to your Canada.ca questions.",
+      "ariaLabel": "Get answers to your Canada dot CA questions."
+    },
     "alpha": {
       "label": "Alpha",
       "description": "Experimental page - not public."
     },
     "intro": {
       "researchOnly": "This proof of concept is for research purposes only. Work is ongoing."
+    },
+    "textarea": {
+      "ariaLabel": "This is Canada dot CA AI answers, please enter your question."
     },
     "about": {
       "title": "About AI Answers",
@@ -48,8 +54,14 @@
     "chat": {
       "chatId": "Chat ID",
       "input": {
-        "initial": "Ask a Canada.ca question",
-        "followUp": "Ask a follow-on question or reply",
+        "initial": {
+          "text": "Ask a Canada.ca question",
+          "ariaLabel": "Ask a Canada dot CA question"
+        },
+        "followUp": {
+          "text": "Ask a follow-on question or reply",
+          "ariaLabel": "Ask a follow-on question or reply"
+        },
         "hint": "Hint: Add details to make your question clear and complete.",
         "loadingHint": "AI can make mistakes, always check your answer."
       },
