@@ -63,7 +63,15 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         } else if (lastMessage.sender === 'user') {
           setAriaLiveMessage(lastMessage.text || '');
         } else if (lastMessage.error) {
-          setAriaLiveMessage(lastMessage.errorMessage || 'An error occurred');
+          // Handle redaction messages
+          if (lastMessage.redactedText) {
+            const redactionType = lastMessage.redactedText.includes('XXX') 
+              ? t('homepage.chat.messages.privateContent')
+              : t('homepage.chat.messages.blockedContent');
+            setAriaLiveMessage(`${redactionType}. ${lastMessage.redactedText}`);
+          } else {
+            setAriaLiveMessage(lastMessage.errorMessage || t('homepage.chat.messages.error'));
+          }
         }
       }
     }
