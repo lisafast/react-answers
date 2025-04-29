@@ -351,6 +351,8 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     setSelectedDepartment(department);
   };
 
+  const initialInput = t('homepage.chat.input.initial');
+
   return (
     <>
       <ChatInterface
@@ -377,7 +379,16 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         t={t}
         lang={lang}
         privacyMessage={t('homepage.chat.messages.privacy')}
-        getLabelForInput={() => turnCount >= 1 ? t('homepage.chat.input.followUp') : t('homepage.chat.input.initial')}
+        getLabelForInput={() =>
+          turnCount === 0
+            ? initialInput.text
+            : t('homepage.chat.input.followUp')
+        }
+        ariaLabelForInput={
+          turnCount === 0
+            ? initialInput.ariaLabel
+            : undefined
+        }
         extractSentences={extractSentences}
         chatId={chatId}
       />

@@ -108,7 +108,8 @@ const ChatInterface = ({
     if (turnCount >= 1) {
       return t('homepage.chat.input.followUp');
     }
-    return t('homepage.chat.input.initial');
+    const initial = t('homepage.chat.input.initial');
+    return typeof initial === 'object' ? initial.text : initial;
   };
 
   // TOOD is there a difference between paragraphs and sentrences?
