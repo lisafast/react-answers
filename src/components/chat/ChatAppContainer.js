@@ -52,6 +52,8 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       );
     } else {
       const lastMessage = messages[messages.length - 1];
+      const secondToLastMessage = messages[messages.length - 2];
+      
       if (lastMessage) {
         if (lastMessage.sender === 'ai') {
           const paragraphs = lastMessage.interaction?.answer?.paragraphs || [];
@@ -63,12 +65,12 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         } else if (lastMessage.sender === 'user') {
           setAriaLiveMessage(lastMessage.text || '');
         } else if (lastMessage.error) {
-          // Handle redaction messages
-          if (lastMessage.redactedText) {
-            const redactionType = lastMessage.redactedText.includes('XXX') 
+          // Check if this is a redaction case by looking at the second-to-last message
+          if (secondToLastMessage?.redactedText) {
+            const redactionType = secondToLastMessage.redactedText.includes('XXX') 
               ? t('homepage.chat.messages.privateContent')
               : t('homepage.chat.messages.blockedContent');
-            setAriaLiveMessage(`${redactionType}. ${lastMessage.redactedText}`);
+            setAriaLiveMessage(`${redactionType}. ${secondToLastMessage.redactedText}`);
           } else {
             setAriaLiveMessage(lastMessage.errorMessage || t('homepage.chat.messages.error'));
           }
