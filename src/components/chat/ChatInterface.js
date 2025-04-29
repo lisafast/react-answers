@@ -312,6 +312,7 @@ const ChatInterface = ({
                     onKeyDown={handleKeyPress}
                     onClick={handleTextareaClick}
                     onBlur={handleTextareaBlur}
+                    aria-label="This is Canada dot CA AI answers, please enter your question."
                     required
                     disabled={isLoading}
                   />
