@@ -1,7 +1,10 @@
 {
   "homepage": {
     "title": "Réponses IA",
-    "subtitle": "Obtenez des réponses à vos questions sur Canada.ca.",
+    "subtitle": {
+      "text": "Obtenez des réponses à vos questions sur Canada.ca.",
+      "ariaLabel": "Voici les réponses de Canada point CA, veuillez entrer votre question."
+    },
     "alpha": {
       "label": "Alpha",
       "description": "Page expérimentale — non publique."
