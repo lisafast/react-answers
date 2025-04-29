@@ -3,7 +3,7 @@
     "title": "Réponses IA",
     "subtitle": {
       "text": "Obtenez des réponses à vos questions sur Canada.ca.",
-      "ariaLabel": "Voici les réponses de Canada point CA, veuillez entrer votre question."
+      "ariaLabel": "Obtenez des réponses à vos questions sur Canada point CA."
     },
     "alpha": {
       "label": "Alpha",
@@ -11,6 +11,9 @@
     },
     "intro": {
       "researchOnly": "Cette preuve de concept est uniquement destinée à la recherche. Elle fait l'objet de travaux continus."
+    },
+    "textarea": {
+      "ariaLabel": "Voici les réponses de Canada point CA, veuillez entrer votre question."
     },
     "about": {
       "title": "À propos de Réponses IA",

@@ -3,7 +3,7 @@
     "title": "AI Answers",
     "subtitle": {
       "text": "Get answers to your Canada.ca questions.",
-      "ariaLabel": "This is Canada dot CA AI answers, please enter your question."
+      "ariaLabel": "Get answers to your Canada dot CA questions."
     },
     "alpha": {
       "label": "Alpha",
@@ -11,6 +11,9 @@
     },
     "intro": {
       "researchOnly": "This proof of concept is for research purposes only. Work is ongoing."
+    },
+    "textarea": {
+      "ariaLabel": "This is Canada dot CA AI answers, please enter your question."
     },
     "about": {
       "title": "About AI Answers",
