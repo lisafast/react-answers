@@ -382,12 +382,16 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         getLabelForInput={() =>
           turnCount === 0
             ? initialInput.text
-            : t('homepage.chat.input.followUp')
+            : (typeof t('homepage.chat.input.followUp') === 'object' 
+               ? t('homepage.chat.input.followUp').text 
+               : t('homepage.chat.input.followUp'))
         }
         ariaLabelForInput={
           turnCount === 0
             ? initialInput.ariaLabel
-            : undefined
+            : (typeof t('homepage.chat.input.followUp') === 'object'
+               ? t('homepage.chat.input.followUp').ariaLabel
+               : undefined)
         }
         extractSentences={extractSentences}
         chatId={chatId}
