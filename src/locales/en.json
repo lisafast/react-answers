@@ -58,7 +58,10 @@
           "text": "Ask a Canada.ca question",
           "ariaLabel": "Ask a Canada dot CA question"
         },
-        "followUp": "Ask a follow-on question or reply",
+        "followUp": {
+          "text": "Ask a follow-on question or reply",
+          "ariaLabel": "Ask a follow-on question or reply"
+        },
         "hint": "Hint: Add details to make your question clear and complete.",
         "loadingHint": "AI can make mistakes, always check your answer."
       },

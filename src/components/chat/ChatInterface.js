@@ -296,7 +296,14 @@ const ChatInterface = ({
           {!isLoading && (
             <form className="mrgn-tp-xl mrgn-bttm-lg">
               <div className="field-container">
-                <label htmlFor="message">{getLabelForInput()}</label>
+              <label 
+                    htmlFor="message" 
+                    aria-label={turnCount === 0 
+                      ? t('homepage.chat.input.initial.ariaLabel') 
+                      : t('homepage.chat.input.followUp.ariaLabel')}
+                  >
+                <span className="aria-hidden">{getLabelForInput()}</span>
+              </label>
                 <span className="hint-text">
                   <FontAwesomeIcon icon="wand-magic-sparkles" />
                   &nbsp;
