@@ -47,8 +47,12 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     if (isLoading) {
       setAriaLiveMessage(
         displayStatus === 'thinkingWithContext'
-          ? `${t('homepage.chat.messages.thinkingWithContext')}`
-          : t(`homepage.chat.messages.${displayStatus}`)
+          ? `${typeof t('homepage.chat.messages.thinkingWithContext') === 'object'
+              ? t('homepage.chat.messages.thinkingWithContext').text
+              : t('homepage.chat.messages.thinkingWithContext')}`
+          : typeof t(`homepage.chat.messages.${displayStatus}`) === 'object'
+            ? t(`homepage.chat.messages.${displayStatus}`).text
+            : t(`homepage.chat.messages.${displayStatus}`)
       );
     } else {
       const lastMessage = messages[messages.length - 1];
@@ -245,7 +249,13 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
               id: blockedMessageId,
               text: <div dangerouslySetInnerHTML={{
                 __html:
-                  (error.redactedText.includes('XXX') ? t('homepage.chat.messages.privateContent') : t('homepage.chat.messages.blockedContent'))
+                  (error.redactedText.includes('XXX') 
+                    ? (typeof t('homepage.chat.messages.privateContent') === 'object'
+                       ? t('homepage.chat.messages.privateContent').text
+                       : t('homepage.chat.messages.privateContent')) 
+                    : (typeof t('homepage.chat.messages.blockedContent') === 'object'
+                       ? t('homepage.chat.messages.blockedContent').text
+                       : t('homepage.chat.messages.blockedContent')))
               }} />,
               sender: 'system',
               error: true
@@ -261,7 +271,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             ...prevMessages,
             {
               id: errorMessageId,
-              text: t('homepage.chat.messages.error'),
+              text: typeof t('homepage.chat.messages.error') === 'object' 
+              ? t('homepage.chat.messages.error').text 
+              : t('homepage.chat.messages.error'),
               sender: 'system',
               error: true
             }
