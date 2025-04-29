@@ -267,20 +267,14 @@ const ChatInterface = ({
               <div className="loading-animation"></div>
               <div className="loading-text">
                 {displayStatus === 'thinkingWithContext'
-                  ? `${typeof t('homepage.chat.messages.thinkingWithContext') === 'object' 
-                      ? t('homepage.chat.messages.thinkingWithContext').text 
-                      : t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment || ''} - ${currentTopic || ''}`
-                  : typeof t(`homepage.chat.messages.${displayStatus}`) === 'object'
-                    ? t(`homepage.chat.messages.${displayStatus}`).text
-                    : t(`homepage.chat.messages.${displayStatus}`)}
+                  ? `${t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment} - ${currentTopic}`
+                  : t(`homepage.chat.messages.${displayStatus}`)}
               </div>
             </div>
             <div className="loading-hint-text">
               <FontAwesomeIcon icon="wand-magic-sparkles" />
               &nbsp;
-              {typeof t('homepage.chat.input.loadingHint') === 'object' 
-                ? t('homepage.chat.input.loadingHint').text 
-                : t('homepage.chat.input.loadingHint')}
+              {t('homepage.chat.input.loadingHint')}
             </div>
           </>
         )}
