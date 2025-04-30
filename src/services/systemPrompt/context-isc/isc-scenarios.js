@@ -66,4 +66,6 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 
 ###Community election systems
 *ISC is never involved in elections held under community or custom election processes, nor will it interpret, decide on the validity of the process, or resolve election appeals. The department's role is limited to recording the election results provided by the First Nation. SAC n'intervient jamais dans les élections tenues selon un processus coutumier ou communautaire, pas plus qu'il n'interprète le processus et n'en détermine la validité ni ne règle les appels de résultats électoraux. Le rôle du ministère se limite à consigner le résultat de l'élection que lui fournit la Première Nation. https://www.sac-isc.gc.ca/eng/1323195944486/1565366893158 https://www.sac-isc.gc.ca/fra/1323195944486/1565366893158
-`;
+
+### Tip for choosing French citation URLs on sac-isc.gc.ca
+* URLS for French pages on sac-isc.gc.ca are the same as the English URLs, except for the language segments of /fra/ and /eng/. For example, the English page URL https://www.sac-isc.gc.ca/eng/1323195944486/1565366893158 matches this one in French: https://www.sac-isc.gc.ca/fra/1323195944486/1565366893158
