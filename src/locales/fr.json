@@ -1,13 +1,19 @@
 {
   "homepage": {
     "title": "Réponses IA",
-    "subtitle": "Obtenez des réponses à vos questions sur Canada.ca.",
+    "subtitle": {
+      "text": "Obtenez des réponses à vos questions sur Canada.ca.",
+      "ariaLabel": "Obtenez des réponses à vos questions sur Canada point CA."
+    },
     "alpha": {
       "label": "Alpha",
       "description": "Page expérimentale — non publique."
     },
     "intro": {
       "researchOnly": "Cette preuve de concept est uniquement destinée à la recherche. Elle fait l'objet de travaux continus."
+    },
+    "textarea": {
+      "ariaLabel": "Voici les réponses de Canada point CA, veuillez entrer votre question."
     },
     "about": {
       "title": "À propos de Réponses IA",
@@ -48,8 +54,14 @@
     "chat": {
       "chatId": "ID de chat",
       "input": {
-        "initial": "Posez une question sur Canada.ca",
-        "followUp": "Posez une question de suivi ou répondez",
+        "initial": {
+          "text": "Posez une question sur Canada.ca",
+          "ariaLabel": "Posez une question sur Canada point ca"
+        },
+        "followUp": {
+          "text": "Posez une question de suivi ou répondez",
+          "ariaLabel": "Posez une question de suivi ou répondez"
+        },
         "hint": "Conseil : Ajoutez des détails pour que votre question soit claire et complète.",
         "loadingHint": "L'IA peut faire des erreurs, vérifiez toujours la réponse."
       },
