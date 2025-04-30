@@ -110,7 +110,8 @@
         "updatingDatastore": "Updating datastore...",
         "moderatingAnswer": "Moderating answer...",
         "moderatingQuestion": "Moderating question...",
-        "needClarification" : "Requires clarification..."
+        "needClarification" : "Requires clarification...",
+        "yourQuestionWas": "Your question was:"
       },
       "citation": {
         "confidence": "Confidence:",

@@ -74,7 +74,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             const redactionType = secondToLastMessage.redactedText.includes('XXX') 
               ? t('homepage.chat.messages.privateContent')
               : t('homepage.chat.messages.blockedContent');
-            setAriaLiveMessage(`${redactionType}. ${secondToLastMessage.redactedText}`);
+            setAriaLiveMessage(`${redactionType}. ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondToLastMessage.redactedText}`);
           } else {
             setAriaLiveMessage(lastMessage.errorMessage || t('homepage.chat.messages.error'));
           }
