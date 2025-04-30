@@ -65,7 +65,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           const plainText = sentences.join(' ');
           const citation = lastMessage.interaction?.answer?.citationHead || '';
           const displayUrl = lastMessage.interaction?.citationUrl || '';
-          setAriaLiveMessage(`${plainText} ${citation} ${displayUrl}`.trim());
+          setAriaLiveMessage(`${safeT('homepage.chat.messages.yourAnswerIs')} ${plainText} ${citation} ${displayUrl}`.trim());
         } else if (lastMessage.sender === 'user') {
           setAriaLiveMessage(lastMessage.text || '');
         } else if (lastMessage.error) {
