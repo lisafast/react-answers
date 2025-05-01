@@ -297,8 +297,8 @@ class RedactionService {
         description: 'Passport Numbers'
       },
       {
-        pattern: /\b(?<!\$)(?=[A-Z0-9-]*[0-9])(?=[A-Z0-9-]*[A-Z])(?!GST\d{3}\b)[A-Z0-9-]{6,}\b/gi,
-        description: 'Alphanumeric sequences of 6+ chars that contain both letters and numbers (excluding GST forms)'
+        pattern: /\b(?<!\$)(?=[A-Z0-9-]*[0-9])(?=[A-Z0-9-]*[A-Z])(?!GST\d{3}\b)(?!\$\d+)[A-Z0-9-]{6,}\b/gi,
+        description: 'Alphanumeric sequences of 6+ chars that contain both letters and numbers (excluding GST forms and dollar amounts)'
       },
       {
         pattern: /(?<=\b(name\s+is|nom\s+est|name:|nom:)\s+)([A-Za-z]+(?:\s+[A-Za-z]+)?)\b/gi,
