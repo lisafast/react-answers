@@ -329,7 +329,7 @@ class RedactionService {
         description: 'URLs'
       },
       {
-        pattern: /(?<![$\d])\b\d{5,}\b/g,
+        pattern: /\b(?!\$)\d{5,}\b/g,
         description: 'Long number sequences'
       },
       {
