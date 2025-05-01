@@ -56,6 +56,8 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       );
     } else {
       const lastMessage = messages[messages.length - 1];
+      const secondToLastMessage = messages[messages.length - 2];
+      
       if (lastMessage) {
         if (lastMessage.sender === 'ai') {
           const paragraphs = lastMessage.interaction?.answer?.paragraphs || [];
@@ -63,11 +65,19 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           const plainText = sentences.join(' ');
           const citation = lastMessage.interaction?.answer?.citationHead || '';
           const displayUrl = lastMessage.interaction?.citationUrl || '';
-          setAriaLiveMessage(`${plainText} ${citation} ${displayUrl}`.trim());
+          setAriaLiveMessage(`${safeT('homepage.chat.messages.yourAnswerIs')} ${plainText} ${citation} ${displayUrl}`.trim());
         } else if (lastMessage.sender === 'user') {
           setAriaLiveMessage(lastMessage.text || '');
         } else if (lastMessage.error) {
-          setAriaLiveMessage(lastMessage.errorMessage || 'An error occurred');
+          // Check if this is a redaction case by looking at the second-to-last message
+          if (secondToLastMessage?.redactedText) {
+            const redactionType = secondToLastMessage.redactedText.includes('XXX') 
+              ? t('homepage.chat.messages.privateContent')
+              : t('homepage.chat.messages.blockedContent');
+            setAriaLiveMessage(`${redactionType}. ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondToLastMessage.redactedText}`);
+          } else {
+            setAriaLiveMessage(lastMessage.errorMessage || t('homepage.chat.messages.error'));
+          }
         }
       }
     }

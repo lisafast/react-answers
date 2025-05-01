@@ -110,7 +110,9 @@
         "updatingDatastore": "Mise à jour du datastore...",
         "moderatingAnswer": "Modération de la réponse...",
         "moderatingQuestion": "Modération de la question...",
-        "needClarification" : "Nécessite des précisions..."
+        "needClarification" : "Nécessite des précisions...",
+        "yourQuestionWas": "Votre question était :",
+        "yourAnswerIs": "Votre réponse est :"
       },
       "citation": {
         "confidence": "Niveau de confiance :",
