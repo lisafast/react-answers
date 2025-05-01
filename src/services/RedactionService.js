@@ -329,12 +329,8 @@ class RedactionService {
         description: 'URLs'
       },
       {
-        pattern: /\b\d{5,}\b/g,
-        description: 'Long number sequences',
-        filter: (match, text, index) => {
-          // Skip if the number is preceded by a dollar sign
-          return index === 0 || text[index - 1] !== '$';
-        }
+        pattern: /\b(?!\$)\d{5,}\b/g,
+        description: 'Long number sequences'
       },
       {
         pattern: /\b\d{3}[-\s]?\d{3}[-\s]?\d{3}\b/g,
@@ -434,13 +430,8 @@ class RedactionService {
     // Filter out patterns with null RegExp (in case initialization failed)
     const validPatterns = this.redactionPatterns.filter(({ pattern }) => pattern !== null);
 
-    validPatterns.forEach(({ pattern, type, filter }, index) => {
-      redactedText = redactedText.replace(pattern, (match, ...args) => {
-        // If there's a filter function, check if we should skip this match
-        if (filter && !filter(match, redactedText, args[args.length - 2])) {
-          return match; // Return the original match without redaction
-        }
-        
+    validPatterns.forEach(({ pattern, type }, index) => {
+      redactedText = redactedText.replace(pattern, (match) => {
         console.log(`Pattern ${index} matched: "${match}"`);
         redactedItems.push({ value: match, type });
         return type === 'private' ? 'XXX' : '#'.repeat(match.length);
