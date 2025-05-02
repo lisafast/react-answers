@@ -313,8 +313,8 @@ class RedactionService {
         description: 'Street addresses'
       },
       {
-        pattern: /\b\d{5}(?:-\d{4})?\b/g,
-        description: 'US ZIP codes'
+        pattern: /\b(?<!\$)\d{5}(?:-\d{4})?\b/g,
+        description: 'US ZIP codes of 5 digits (excluding dollar amounts)'
       },
       {
         pattern: /\b(apt|bldg|dept|fl|hngr|lot|pier|rm|ste|slip|trlr|unit|#)\.? *\d+[a-z]?\b/gi,
