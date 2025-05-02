@@ -170,7 +170,7 @@ const ChatInterface = ({
   };
 
   return (
-    <div className="chat-container" tabIndex="0">
+    <div className="chat-container">
       <div className="message-list">
         {messages.map((message) => (
           <div key={`message-${message.id}`} className={`message ${message.sender}`}>
