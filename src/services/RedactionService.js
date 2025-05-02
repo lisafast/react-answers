@@ -301,6 +301,10 @@ class RedactionService {
         description: 'Alphanumeric sequences of 6+ chars that contain both letters and numbers (excluding GST forms)'
       },
       {
+        pattern: /\b(?<!\$)\d{6,}\b/g,
+        description: 'Long number sequences like credit card numbers with negative lookbehind to exclude dollar amounts'
+      },
+      {
         pattern: /(?<=\b(name\s+is|nom\s+est|name:|nom:)\s+)([A-Za-z]+(?:\s+[A-Za-z]+)?)\b/gi,
         description: 'Name patterns in EN/FR'
       },
@@ -327,10 +331,6 @@ class RedactionService {
       {
         pattern: /([^\s:/?#]+):\/\/([^/?#\s]*)([^?#\s]*)(\?([^#\s]*))?(#([^\s]*))?/g,
         description: 'URLs'
-      },
-      {
-        pattern: /\b(?!\$)\d{6,}\b/g,
-        description: 'Long number sequences'
       },
       {
         pattern: /\b\d{3}[-\s]?\d{3}[-\s]?\d{3}\b/g,
