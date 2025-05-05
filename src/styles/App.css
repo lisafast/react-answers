@@ -508,20 +508,6 @@ code {
   transition: none; 
   animation: none; 
 }
-
-/* Additional recommended styles for optimal positioning */
-.message.ai {
-  position: relative;
-}
-
-.wb-inv {
-  /* Ensure it appears early in the tab order when rendered */
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 8px;
-}
-
 /* modifications of GCDS-tokens to Canada.ca design where appropriate */
 :root {
   --gcds-header-margin: 0 0 1.55rem !important;
