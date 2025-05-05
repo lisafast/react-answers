@@ -13,7 +13,11 @@
       "researchOnly": "Answers provided by this AI service are information, not official advice.  Improvements are ongoing."
     },
     "textarea": {
-      "ariaLabel": "This is Canada dot CA AI answers, please enter your question."
+      "ariaLabel": {
+        "first": "This is Canada dot CA AI answers, please enter your question.",
+        "followon": "Ask a follow-on question or reply.",
+        "skipfo": "Skip answer review and ask a follow-on question."
+      }
     },
     "about": {
       "title": "About AI Answers",

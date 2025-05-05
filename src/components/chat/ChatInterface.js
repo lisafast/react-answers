@@ -327,7 +327,9 @@ const ChatInterface = ({
                     onKeyDown={handleKeyPress}
                     onClick={handleTextareaClick}
                     onBlur={handleTextareaBlur}
-                    aria-label={safeT('homepage.textarea.ariaLabel')}
+                    aria-label={turnCount === 0 
+                      ? safeT('homepage.textarea.ariaLabel.first')
+                      : safeT('homepage.textarea.ariaLabel.followon')}
                     required
                     disabled={isLoading}
                   />
