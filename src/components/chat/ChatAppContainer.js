@@ -46,15 +46,22 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   // Add a ref to track if we're currently typing
   const isTyping = useRef(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState('');
+  // Add this new state to prevent multiple loading announcements
+  const [loadingAnnounced, setLoadingAnnounced] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
-      setAriaLiveMessage(
-        displayStatus === 'thinkingWithContext'
-          ? `${safeT('homepage.chat.messages.thinkingWithContext')}`
-          : safeT(`homepage.chat.messages.${displayStatus}`)
-      );
+      // Only announce the loading state once per loading cycle
+      if (!loadingAnnounced) {
+        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer'));
+        setLoadingAnnounced(true);
+      }
+      // Note: we don't update ariaLiveMessage when displayStatus changes
+      // This prevents multiple announcements while still letting the visual UI update
     } else {
+      // Reset the flag when loading completes
+      setLoadingAnnounced(false);
+      
       const lastMessage = messages[messages.length - 1];
       const secondToLastMessage = messages[messages.length - 2];
       
@@ -81,7 +88,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         }
       }
     }
-  }, [isLoading, displayStatus, messages, t, selectedDepartment, safeT]);
+  }, [isLoading, displayStatus, messages, t, selectedDepartment, safeT, loadingAnnounced]);
 
   const processNextStatus = useCallback(() => {
     if (statusQueueRef.current.length === 0) {
@@ -411,6 +418,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       />
       <div
         aria-live="polite"
+        aria-atomic="true"
         role="status"
         style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
       >
