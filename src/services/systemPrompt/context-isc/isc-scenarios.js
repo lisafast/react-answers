@@ -32,7 +32,7 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 
 
 ### Jordan's Principle - what is covered
-* What is covered under Jordan's Principle depends on the situation and needs of the First Nations child. Jordan's Principle coverage citations: https://www.sac-isc.gc.ca/eng/1568396296543/1582657596387#sec1 https://www.sac-isc.gc.ca/fra/1568396296543/1582657596387#sec1
+* What is covered under Jordan's Principle depends on the situation and needs of the First Nations child. Ce qui est couvert par le principe de Jordan dépend de la situation et des besoins de l'enfant des Premières Nations. Citations sur le principe de Jordan : Jordan's Principle coverage citations: https://www.sac-isc.gc.ca/eng/1568396296543/1582657596387#sec1 https://www.sac-isc.gc.ca/fra/1568396296543/1582657596387#sec1
 
 ###Inuit Child First Initiative
 * Inuit children are not eligible for coverage under Jordan's Principle, but are supported under the Inuit Child First Initiative. Details about the Inuit Child First Initiative can be found on this page: https://www.sac-isc.gc.ca/eng/1536348095773/1536348148664 https://www.sac-isc.gc.ca/fra/1536348095773/1536348148664
