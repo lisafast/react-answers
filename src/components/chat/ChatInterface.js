@@ -251,18 +251,6 @@ const ChatInterface = ({
                   <>
                     {formatAIResponse(message.aiService, message)}
                     
-                    {/* Add skip button for the latest AI message when follow-on input is available */}
-                    {turnCount < MAX_CONVERSATION_TURNS && !isLoading && 
-                     message.id === messages[messages.length - 1].id && (
-                      <button 
-                        className="wb-inv" 
-                        onClick={focusTextarea}
-                        aria-label={safeT('homepage.textarea.ariaLabel.skipfo')}
-                      >
-                        {safeT('homepage.textarea.ariaLabel.skipfo')}
-                      </button>
-                    )}
-                    
                     {chatId && (
                       <div className="chat-id">
                         <p>
@@ -272,6 +260,8 @@ const ChatInterface = ({
                     )}
                   </>
                 )}
+                
+                {/* First add feedback component */}
                 {message.id === messages[messages.length - 1].id &&
                   showFeedback &&
                   !message.error &&
@@ -282,6 +272,20 @@ const ChatInterface = ({
                       chatId={chatId}
                       userMessageId={message.id}
                     />
+                  )}
+                
+                {/* Then add skip button AFTER feedback component */}
+                {message.id === messages[messages.length - 1].id &&
+                  !message.error &&
+                  turnCount < MAX_CONVERSATION_TURNS && 
+                  !isLoading && (
+                    <button 
+                      className="wb-inv" 
+                      onClick={focusTextarea}
+                      aria-label={safeT('homepage.textarea.ariaLabel.skipfo')}
+                    >
+                      {safeT('homepage.textarea.ariaLabel.skipfo')}
+                    </button>
                   )}
               </>
             )}
