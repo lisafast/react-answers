@@ -14,13 +14,13 @@ const ChatInterface = ({
   handleSendMessage,
   handleReload,
   handleAIToggle,
-  handleSearchToggle, // Add this prop
+  handleSearchToggle,
   handleDepartmentChange,
   handleReferringUrlChange,
   handleFeedback,
   formatAIResponse,
   selectedAI,
-  selectedSearch, // Add this prop
+  selectedSearch,
   selectedDepartment,
   referringUrl,
   turnCount,
@@ -44,6 +44,13 @@ const ChatInterface = ({
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
   const textareaRef = useRef(null);
+
+  // Function to focus textarea when skip button is clicked
+  const focusTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -243,6 +250,19 @@ const ChatInterface = ({
                 ) : (
                   <>
                     {formatAIResponse(message.aiService, message)}
+                    
+                    {/* Add skip button for the latest AI message when follow-on input is available */}
+                    {turnCount < MAX_CONVERSATION_TURNS && !isLoading && 
+                     message.id === messages[messages.length - 1].id && (
+                      <button 
+                        className="wb-inv" 
+                        onClick={focusTextarea}
+                        aria-label={safeT('homepage.textarea.ariaLabel.skipfo')}
+                      >
+                        {safeT('homepage.textarea.ariaLabel.skipfo')}
+                      </button>
+                    )}
+                    
                     {chatId && (
                       <div className="chat-id">
                         <p>
