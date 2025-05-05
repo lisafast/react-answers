@@ -443,7 +443,10 @@ code {
 
 .feedback-link {
   color: var(--gcds-color-blue-850);
+  margin-right: 4px;
+  margin-left: 4px;
 }
+
 .feedback-link:hover {
   text-decoration: underline;
 }
@@ -459,10 +462,17 @@ code {
   font-family: inherit;
   font-size: inherit;
 }
+
 .button-as-link:focus {
-  outline: 2px solid #2b4382;
-  outline-offset: 2px;
+  background-color: var(--gcds-details-focus-background);
+  border-radius: var(--gcds-details-focus-border-radius);
+  box-shadow: var(--gcds-details-focus-box-shadow);
+  color: var(--gcds-details-focus-text);
+  outline: var(--gcds-details-focus-outline);
+  outline-offset: var(--gcds-details-focus-outline-offset);
+  text-decoration: none;
 }
+
 /* modifications of GCDS-tokens to Canada.ca design where appropriate */
 :root {
   --gcds-header-margin: 0 0 1.55rem !important;
