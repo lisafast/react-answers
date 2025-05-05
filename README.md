@@ -1,35 +1,25 @@
-# React app for learning and ux research for gen AI applications.
+# Ai Answers application for canada.ca 
 
-A React-based AI chat application that provides answers designed and sourced exclusively from and for Government of Canada websites. Built to assist users navigating Canada.ca and other government services..
+A React-based AI chat application that provides answers designed and sourced exclusively from and for Government of Canada websites. Built to assist users navigating Canada.ca and other government services.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Status - proof of concept - deployed on Vercel in French and English- contact Lisa for link
+## Status 
 
-- this is a proof of concept - usability testing is underway
-- Back-end MongoDB database to store conversation history and SME scores to use for evaluation (human and later AI)
-- Evaluation input of csv files generated from user feedback questions to score AI responses
-- Can choose either Claude Sonnet 3.7 or OpenAI gpt-4.1-2025-04-14 API AI service for both shorter Context call (Haiku or Mini) and longer Answer call (Sonnet or GPT-4o)
-- System prompts are built from sets of files, including agentic instructions for the AI service, and contextual scenarios and updates for the answer service pulled in for specific departments, based on the department selected byt the Context AI service 
-- Admin page for access to chatlogs in JSON or CSV format, Batch page to submit csv files of questions for human evaluation, Evaluation page planned later to score AI chatlogs using the set of human-scored question/answer pairs
+- preparing for public pilot 
 
-## Uses GC Design system for some components, others are html/css
-
-- https://design-system.alpha.canada.ca/
 
 ## 🌟 Key Features
 
 ### Tuned for Canada.ca user needs
 
-- AI response is tagged so sentences in answer can be displayed in accessible canada.ca format and citation urls can be displayed in a single url for next step of task, with clickable link available for clickthrough rate measurement
+- AI response is tagged so sentences in answer can be displayed in accessible canada.ca format and single citation url can be displayed for next step of task, with clickable link 
 - assumes the AI service will be called from a specific canada.ca page, and uses the referral url to pass that information to the AI service. The referral url is either passed to the AI service from the chat interface for testing purposes, or from the query tag on the call of the application. The query tag is the url of the page that AI Answers is called from - it must be encoded properly.
 - system prompt forces short answers of a maximum of 4 sentences to improve clarity, use plain language, and reduce risk of hallucinations.
-- scenarios address top user issues and general instructions for the AI service to use the context service, answer service and tools to answer the question and provide a citation url for all answers sourced from canada.ca or gc.ca sites.
-- uses canada.ca search to provide a set of search results to help the AI service derive the departmental context, and helps the AI answer service answer the question and provide a citation url
+- scenarios address top user issues, top task issues and general GC instructions for the AI service to answer the question accurately and provide a citation url for all answers sourced from canada.ca or gc.ca sites.
 - takes advantage of canada.ca interaction patterns and support - e.g. if a wizard is already in place, direct the user to answer those questions rather than having the AI service attempt to answer. AI services aren't optimized for layers of question logic and aren't effective for that purpose.
-- since pages are added and updated frequently, the AI answer service calls a tool to read the page if it identifies a new, updated or unfamiliar url (from the search results, the contextual scenario and update files, or the referral url)
-- PII is redacted programmatically in the code, no PII is sent to the AI service or logged into the database. When PII is detected in the user question, the user is alerted that the question will not be sent to the AI service to protect their privacy, and that they should ask the question without private personal details.
-- Threats,manipulation and obscenity redaction is also in place. Similar to PII, the user is alerted that the question will not be sent to the AI service, and that they should ask the question differently. Usability testing of this feature showed users were successful at understanding the instructions and asking the question without specific threat words.
+- since GC pages are added and updated frequently, the AI agent uses the downloadWebPage tool to read the page if it identifies a new, updated or unfamiliar url (from the search results, the contextual scenario and update files, or the referral url)
+- PI is redacted programmatically in the code, no PI is sent to the AI service or logged into the database. When PII is detected in the user question, the user is alerted that the question will not be sent to the AI service to protect their privacy, and that they should ask the question without private personal details.
+- Threats,manipulation and obscenity redaction is also in place. Similar to PI, the user is alerted that the question will not be sent to the AI service, and that they should ask the question differently. Usability testing of this feature showed users were successful at understanding the instructions and asking the question without specific threat words.
 
 ### Official languages support
 
@@ -38,29 +28,28 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - Language selector also available in batch process
 - Context service loads Canada.ca French menu structure and FR department and agency names and urls
 - System prompt scenarios and updates all include English and French citation urls pairs when a scenario or example suggests a specific url be used for related questions
-- All text displayed to users in JSON language files for easy updates and translations - view the [fr.json file](src/locales/fr.json).
+- All text displayed to users in JSON language files for easy updates and translations in the locales folder
 
-### Multi-model design - independent of AI service provider
+### Independent of AI service provider
 
-- Multiple AI service providers enables testing and exploration of strengths and weaknesses of different models
-- Anthropic Claude Sonnet and OpenAI GPT latest models are currently supported - Cohere was in progress but has been put on hold
-- Failover in place, to switch to the other AI service if one fails
+- original design was tested with two AI service providers for exploration of strengths and weaknesses of different models
+- On this repo, only OpenAI GPT latest model is currently supported 
+- Failover was in place, to switch to the other AI service if one fails - with only one service, will need to pull product out of service when ai performance is degraded or down
 - Prompt caching implemented to improve response quality and speed
-- Confidence rating system for citation urls
 - Temperature set to 0 for more deterministic responses for both models
 - Conversation history management - pass conversation history to AI service for context in 'message' field
-- Enhanced citation handling - the AI calls a tool to check if the citation url is valid and if not
-- System prompts optimized for 2024 model compatibility
+- Enhanced citation handling - the AI calls a tool to check if the citation url is valid and if not, finds another url, finally failing to a search link if no url is found
+- System prompts optimized for 2025 model compatibility
 
 ### Evaluation-driven design to eventually achieve 100% answer accuracy
-- Evaluation system to score AI responses and provide feedback for continuous improvement and underlay automated AI evals
+- Evaluation system to score AI responses and provide feedback for continuous improvement and underlay automated AI evals from embeddings of previous ratings
 - Evaluation input of csv files generated from user feedback questions to score AI responses
 - Good source of learning about this methodology is: https://www.ycombinator.com/library/Lg-why-vertical-llm-agents-are-the-new-1-billion-saas-opportunities
 
-### Accessibility features
-- GCDS components - some components couldn't get inputs to work so are temporarily replaced with plain html
-- No streaming of responses - response is formatted and complete before it is displayed
-- Get ideas from this accessibility AI application: https://adf-ask-accessibility-daeeafembaazdzfk.z01.azurefd.net/
+### Accessibility features tested with screenreader users
+- usability sessions were held with people who rely on a range of screenreader assistive technologies to identify improvements that met their needs
+- Note that the response is formatted and complete before it is displayed or announced - no streaming
+- Aria-labels for helpful context, use of Aria-live to announce answers and error messages
 
 ## Microservices prompt-chaining architecture and Chain of Thought
 
