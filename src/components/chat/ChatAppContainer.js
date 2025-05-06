@@ -354,12 +354,12 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
                 </a>
               </p>
             )}
-            {/* <p key={`${messageId}-confidence`} className="confidence-rating">
+            <p key={`${messageId}-confidence`} className="confidence-rating">
               {finalConfidenceRating !== undefined && `${safeT('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
               {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
               {aiService && `${safeT('homepage.chat.citation.ai')} ${aiService}`}
               {messageDepartment && ` | ${messageDepartment}`}
-            </p> */}
+            </p>
           </div>
         )}
       </div>
