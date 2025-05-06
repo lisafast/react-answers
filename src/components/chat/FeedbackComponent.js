@@ -73,16 +73,19 @@ const FeedbackComponent = ({
         {t('homepage.feedback.notUseful')}
       </button>
       
-      {/* Add the skip button with tabIndex="0" */}
-      {showSkipButton && (
-        <button 
-          className="wb-inv" 
-          onClick={onSkip}
-          aria-label={skipButtonLabel}
-          tabIndex="0"
-        >
-          {skipButtonLabel}
-        </button>
+       {/* Skip button positioned absolutely on the right */}
+       {showSkipButton && (
+        <div style={{ position: 'absolute', top: 0, right: 0 }}>
+          <button 
+            className="wb-inv" 
+            onClick={onSkip}
+            aria-label={skipButtonLabel}
+            tabIndex="0"
+            style={{ position: 'relative' }} /* This will help it appear correctly when focused */
+          >
+            {skipButtonLabel}
+          </button>
+        </div>
       )}
     </div>
   );
