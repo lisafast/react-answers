@@ -19,7 +19,8 @@ function extractSearchResults(results, numResults = 3) {
         });
     }
 
-    return extractedResults || "No results found.";
+    const output = extractedResults || "No results found.";
+    return `<searchResults>${output}</searchResults>`;
 }
 
 /**
@@ -77,20 +78,20 @@ const contextSearchTool = tool(
             const results = await contextSearch(query, lang);
 
             if (!results) {
-                return `Failed to retrieve search results for query: ${query}`;
+                return `<searchResults>Failed to retrieve search results for query: ${query}</searchResults>`;
             }
 
             const extractedResults = extractSearchResults(results);
             console.log(`Results returned for query: ${query}`);
-            return extractedResults || `No meaningful results extracted for query: ${query}`;
+            return extractedResults || `<searchResults>No meaningful results extracted for query: ${query}</searchResults>`;
         } catch (error) {
             console.error(`Error processing search query: ${query}. Details: ${error.message}`);
-            return `An error occurred while processing the search query: ${query}`;
+            return `<searchResults>An error occurred while processing the search query: ${query}</searchResults>`;
         }
     },
     {
         name: "contextSearch",
-        description: "Perform a search using Coveo or Google. Provide the 'query' as the search term and lang as the language of the search query.",
+        description: "Perform a search using Coveo Canada.ca search. Provide the 'query' as the search term and lang as the language of the search query.",
         schema: {
             type: "object",
             properties: {

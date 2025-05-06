@@ -26,7 +26,7 @@ function extractSearchResults(results, numResults = 3) {
         `Title: ${result.linkText}\nLink: ${result.link}\nSummary: ${result.summary}\n`
     ).join("\n");
     console.info("Extracted search results:", extractedResults);
-    return extractedResults;
+    return `<searchResults>${extractedResults}</searchResults>`;
 }
 
 /**
@@ -74,7 +74,11 @@ const contextSearch = async (query, lang) => {
 
 const googleContextSearch = tool(
     async ({ query, lang }) => {
-        return await contextSearch(query, lang);
+        const result = await contextSearch(query, lang);
+        if (!result || !result.results) {
+            return { results: `<searchResults>No results found.</searchResults>`, provider: "google" };
+        }
+        return result;
     },
     {
         name: "contextSearch",

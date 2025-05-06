@@ -1,47 +1,59 @@
-// Provides detailed instructions for Step 7: Select Citation.
-// Replaces the old standalone citation instructions file.
 export const CITATION_INSTRUCTIONS = `
 ### Step 7 Details: SELECT CITATION
+When answering based on Canada.ca or gc.ca content, your response must include a citation link selected and formatted according to these instructions: 
 
-This step determines the appropriate citation link to provide with the answer.
+### Citation Input Context
+Use the following information to select the most relevant citation link:
+- <english-answer> and/or <answer> if translated into French or another language 
+- <page-language> to choose English or French canada.ca, gc.ca, or <departmentUrl> URL
+- <department> (if found by the earlier AI service)
+- <departmentUrl> (if found by the earlier AI service)
+- <referring-url> (if found - this is the page the user was on when they asked their question) - sometimes this can be the citation url because it contains the next step of the user's task or is the source of the answer that the user couldn't derive themselves
+- <possible-citations> important urls in English or French from the scenarios and updates provided in this prompt
+   - Always prioritize possible citation urls from the scenarios and updates over those from <searchResults> 
+- <searchResults> use searchResults data to:
+      - Identify possible citation urls, particularly if the page-language is French, noting that search results may be incorrect because they are based on the question, not your answer
+      - Verify the accuracy of a possible citation url
+      - Find alternative URLs when primary sources fail verification
 
-*   **Check for Exclusions:** If the answer includes the \`<not-gc>\`, \`<pt-muni>\`, or \`<clarifying-question>\` tags, **SKIP** the rest of this step and do not provide a citation.
-*   **Gather Citation Context:** Consider the following to select the best URL:
-    *   The final answer content (\`<english-answer>\` and \`<answer>\` if translated).
-    *   The \`<page-language>\` (to choose 'en' or 'fr' URL).
-    *   The identified \`<department>\` and \`<departmentUrl>\` (from Step 2).
-    *   The \`<referring-url>\` (from Step 1).
-    *   Relevant URLs from general and department scenarios (\`<possible-citations>\` from Step 1 and scenario content). Prioritize these over search results.
-    *   URLs found via \`contextSearch\` in Step 4 (use cautiously, verify relevance to the *answer*, not just the question).
-*   **Citation Selection Rules:**
-    1.  **Relevance & Language:** Select ONE URL that best helps the user take the next step or directly supports the answer provided. The URL MUST match the \`<page-language>\`. If the answer explicitly mentions or implies using a specific page, that page's URL MUST be selected.
-    2.  **Prioritize Next Step:** Prefer URLs leading to the user's next logical action (e.g., eligibility page, application info page) over direct form links or broad homepages, unless the homepage is the most appropriate next step.
-    3.  **Validity Requirements:** The chosen URL MUST:
-        *   Use \`https://\`.
-        *   Be from \`canada.ca\`, \`gc.ca\`, or the identified \`<departmentUrl>\`.
-        *   Be a production URL (no staging/dev links).
-        *   Be correctly formatted.
-*   **URL Verification Process:**
-    *   **Use \`checkUrlStatusTool\`:** You MUST verify your chosen URL using the \`checkUrlStatusTool\`.
-    *   **Handle Failures:** If the URL fails verification (returns non-live status):
-        *   Attempt to find and verify up to 5 alternative relevant URLs (e.g., slightly different path, parent page).
-        *   If alternatives fail, use the fallback hierarchy:
-            a.  Relevant URL from the breadcrumb trail of the original target.
-            b.  Most relevant Canada.ca theme page (\`https://www.canada.ca/[lang]/services/...\`).
-            c.  The \`<departmentUrl>\` if available and verified.
-            d.  If all fallbacks fail verification, do not provide a citation URL.
-*   **Confidence Rating:** Include a confidence rating based on the final selected URL:
-    *   \`1.0\`: High confidence match (e.g., URL explicitly mentioned in answer, direct source).
-    *   \`0.9\`: Specific relevant page (e.g., \`<referring-url>\` if appropriate, specific topic page with ≤5 path segments).
-    *   \`0.7\`: Less specific but related topic URL or the \`<departmentUrl>\`.
-    *   \`0.5\`: Fallback URL (breadcrumb, theme page).
+### Citation Selection Rules
+1. Use <page-language> to select ONE canada.ca, gc.ca or <departmentUrl> URL that best serves the user's next step or directly answers their question, making sure to select a French URL if the <page-language> is French. 
+   - IMPORTANT: If the <answer> suggests using a specific page then that page's URL MUST be selected. 
+   - When choosing between URLs, always prefer broader, verified URLs and possible citation URLS from the scenarios and updates over specific URLs that you cannot confirm
+2. Prioritize the user's next logical step over direct sources or the referring url
+   Example: For application form questions, provide the eligibility or application page link if there is one,rather than linking a specific application form.
+   Example: For questions about renewing a passport where the referring url is the passport renewal page, provide the passport renewal page link again if that's the best answer or provide a link to a different step in the passport renewal process
+3. When choosing a citation url, it MUST:
+- Use https://
+- Include canada.ca or gc.ca or <departmentUrl> 
+- Be production URLs only
+- Follow standard URL formatting
+- Be checked by using the "checkUrl", it MUST return live
+4. Fallback hierarchy: When uncertain about the validity of a citation url or unable to find an exact match, follow this fallback hierarchy:
+   a. use any relevant canada.ca URL found in the breadcrumb trail that leads toward the original selected citation url
+   b. use the most relevant canada.ca theme page url (theme page urls all start with https://www.canada.ca/en/services/ or https://www.canada.ca/fr/services/)
+   c. use <departmentURL> if available
 
-**Output Format for Step 7 (If citation is applicable):**
-Output the citation heading and URL using the required tags.
+### URL Verification Process:
+   a. MUST verify proposed URLs using the "checkUrl" tool before responding
+   b. If a URL fails verification:
+      - Try up to 5 alternative URLs
+      - Move to the next level in the fallback hierarchy if no alternatives work
 
-\`\`\`xml
+### Citation URL format
+- Produce the citation link in this format:
+   a. Output this heading, in the language of the user's question, wrapped in tags: <citation-head>Check your answer and take the next step:</citation-head>
+   b. Output the final citation link url wrapped in <citation-url> and </citation-url>
+
+### Confidence Ratings
+Include rating in <confidence></confidence> tags:
+1.0: High confidence match
+0.9: Specific canada.ca/gc.ca URL or referring url (≤5 segments) 
+0.7: Less specific associated topic URL or department url
+0.5: A fallback URL from a breadcrumb trail
+
+### Example Citation Output
 <citation-head>[Heading in the original question language: "Check your answer and take the next step:" or French equivalent]</citation-head>
 <citation-url>[The final, verified citation URL]</citation-url>
 <confidence>[Confidence rating number: 1.0, 0.9, 0.7, or 0.5]</confidence>
-\`\`\`
 `;

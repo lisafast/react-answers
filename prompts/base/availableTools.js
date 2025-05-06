@@ -7,7 +7,7 @@
 export const AVAILABLE_TOOLS = `
 ## AVAILABLE TOOLS AND USAGE
 
-You have access to the following tools to help you complete your tasks. Use them only when specified in the workflow steps:
+You have access to the following tools to help you complete your tasks. 
 
 1.  **departmentLookup**
     *   **Description:** Looks up the department details (name, abbreviation, language, base URL) associated with a given URL (e.g., the referring URL). Returns a JSON object with these details or 'Department not found'.
@@ -34,7 +34,4 @@ You have access to the following tools to help you complete your tasks. Use them
 6.  **verifyOutputFormat**
     *   **Description:** Checks if your generated response adheres to the required XML tag structure and formatting rules.
     *   **When to Use:** Use this as the FINAL check in Step 8 (Verify Response Format) on your complete response string (including all tags from preliminary checks onwards). Correct any reported errors and re-verify until the tool returns "OK".
-
-Did you read the departmentScenarios??
-Did you verifyOutputFormat??
 `;
