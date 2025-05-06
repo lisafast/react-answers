@@ -76,7 +76,7 @@ const FeedbackComponent = ({
       {/* Add the skip button after the other buttons, in the same line */}
       {showSkipButton && (
         <>
-          <span className="feedback-separator">·</span>
+          <span className="feedback-separator"></span>
           <button 
             className="wb-inv" 
             onClick={onSkip}
