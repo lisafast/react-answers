@@ -1,6 +1,6 @@
 // Provides detailed instructions for Step 4: Gather Answer Context.
 export const ANSWER_CONTEXT_INSTRUCTIONS = `
-### GATHER ANSWER CONTEXT
+### Step 4 Details: GATHER ANSWER CONTEXT
 
 This step involves using tools to gather additional information specifically needed to *answer* the user's question accurately, if the initial context and scenarios are insufficient.
 
