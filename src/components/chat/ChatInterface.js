@@ -261,7 +261,6 @@ const ChatInterface = ({
                   </>
                 )}
                 
-                {/* First add feedback component */}
                 {message.id === messages[messages.length - 1].id &&
                   showFeedback &&
                   !message.error &&
@@ -271,22 +270,11 @@ const ChatInterface = ({
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
+                      // Add the new props for the skip button
+                      showSkipButton={turnCount < MAX_CONVERSATION_TURNS && !isLoading}
+                      onSkip={focusTextarea}
+                      skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
                     />
-                  )}
-                
-                {/* Then add skip button AFTER feedback component */}
-                {message.id === messages[messages.length - 1].id &&
-                  !message.error &&
-                  turnCount < MAX_CONVERSATION_TURNS && 
-                  !isLoading && (
-                    <button 
-                      className="wb-inv" 
-                      onClick={focusTextarea}
-                      aria-label={safeT('homepage.textarea.ariaLabel.skipfo')}
-                      tabIndex="0"
-                    >
-                      {safeT('homepage.textarea.ariaLabel.skipfo')}
-                    </button>
                   )}
               </>
             )}
