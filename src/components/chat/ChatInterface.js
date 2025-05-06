@@ -283,6 +283,7 @@ const ChatInterface = ({
                       className="wb-inv" 
                       onClick={focusTextarea}
                       aria-label={safeT('homepage.textarea.ariaLabel.skipfo')}
+                      tabIndex="0"
                     >
                       {safeT('homepage.textarea.ariaLabel.skipfo')}
                     </button>

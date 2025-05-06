@@ -482,7 +482,8 @@ code {
   overflow: hidden; 
   clip: rect(0, 0, 0, 0); 
   border: 0; 
-  white-space: nowrap; 
+  white-space: nowrap;
+  font-size: .9em; 
 } 
 
 /* When focused, make it visible for keyboard users */
@@ -1720,9 +1721,6 @@ fieldset.gc-chckbxrdio {
     outline-offset: -20px;
   }
 }
-.chat-id p {
-  margin-left: 0px !important;
-}
 
 .chat-id {
   padding: 10px 10px;
@@ -1733,12 +1731,12 @@ fieldset.gc-chckbxrdio {
   margin-top: -6px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
+  text-align: center;
 }
 
 .chat-id p {
   font-size: 85%;
   color: #555;
-  text-align: center;
 }
 
 .expert-rating-container .explanation-field {

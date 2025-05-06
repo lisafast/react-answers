@@ -326,9 +326,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     }
     const displayUrl = message.interaction.citationUrl;
     const finalConfidenceRating = message.interaction.confidenceRating ? message.interaction.confidenceRating : '0.1';
-
+  
     const messageDepartment = message?.department || selectedDepartment;
-
+  
     return (
       <div className="ai-message-content">
         {paragraphs.map((paragraph, index) => {
@@ -349,17 +349,17 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             {message.interaction.answer.citationHead && <p key={`${messageId}-head`} className="citation-head">{message.interaction.answer.citationHead}</p>}
             {displayUrl && (
               <p key={`${messageId}-link`} className="citation-link">
-                <a href={displayUrl} target="_blank" rel="noopener noreferrer">
+                <a href={displayUrl} target="_blank" rel="noopener noreferrer" tabIndex="0">
                   {displayUrl}
                 </a>
               </p>
             )}
-            <p key={`${messageId}-confidence`} className="confidence-rating">
+            {/* <p key={`${messageId}-confidence`} className="confidence-rating">
               {finalConfidenceRating !== undefined && `${safeT('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
               {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
               {aiService && `${safeT('homepage.chat.citation.ai')} ${aiService}`}
               {messageDepartment && ` | ${messageDepartment}`}
-            </p>
+            </p> */}
           </div>
         )}
       </div>
