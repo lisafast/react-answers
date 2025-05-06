@@ -1074,9 +1074,9 @@ textarea:focus {
   outline-offset: 0 !important;
 }
 
-/* .button-text {
+.button-icon {
   display: none !important;
-} */
+}
 
 /* Media query for mobile */
 @media screen and (max-width: 600px) {
