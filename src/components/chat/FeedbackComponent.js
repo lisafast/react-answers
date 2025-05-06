@@ -59,13 +59,13 @@ const FeedbackComponent = ({
   return (
     <div className="feedback-container">
       <span className="feedback-text">{t('homepage.feedback.question')} </span>
-      <button className="feedback-link button-as-link" onClick={() => handleFeedback(true)}>
+      <button className="feedback-link button-as-link" onClick={() => handleFeedback(true)} tabIndex="0">
         {t('homepage.feedback.useful')}
       </button>
       <span className="feedback-separator">·</span>
       <span className="feedback-text">{t('homepage.feedback.or')}</span>
       <span className="feedback-separator">·</span>
-      <button className="feedback-link button-as-link" onClick={() => handleFeedback(false)}>
+      <button className="feedback-link button-as-link" onClick={() => handleFeedback(false)} tabIndex="0">
         {t('homepage.feedback.notUseful')}
       </button>
     </div>
