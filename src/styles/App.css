@@ -482,7 +482,8 @@ code {
   overflow: hidden; 
   clip: rect(0, 0, 0, 0); 
   border: 0; 
-  white-space: nowrap; 
+  white-space: nowrap;
+  font-size: .5em; 
 } 
 
 /* When focused, make it visible for keyboard users */
