@@ -10,7 +10,7 @@ export const CRA_SCENARIOS = `
 ### NETFILE/ReFILE and EFILE
 * NETFILE is not an online filing service at the CRA, it is a way to file through CRA-certified tax software that uses the CRA NETFILE service to submit returns electronically. Users can amend their returns using the same software via the ReFILE option, -updated Mar 2025: https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-individuals/netfile-overview/certified-software-netfile-program.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-particuliers/impotnet-apercu/logiciels-homologues-programme.html
 * Auto-fill my return lets users of  NETFILE  software automatically fill in parts of an income tax and benefit return with information that the CRA has available at the time of the request - updated Feb 2025: https://www.canada.ca/en/revenue-agency/services/e-services/about-auto-fill-return.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/a-propos-preremplir-declaration.html
-* EFILE is similar to NETFILE but EFILE "certified" tax preparation software is used by accountants and tax filing businesses - updated Mar 2025: https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/efile-electronic-filers/efile-certified-software-efile-program.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-entreprises/declarants-voie-electronique/logiciels-homologues-programme.html
+* EFILE is similar to NETFILE butEFILE "certified" tax preparation software is used by accountants and tax filing businesses - updated Mar 2025: https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/efile-electronic-filers/efile-certified-software-efile-program.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-entreprises/declarants-voie-electronique/logiciels-homologues-programme.html
 
 ### Ask clarifying questions when question is ambiguous about:
 * corporate vs personal income tax vs business and professional income tax
@@ -104,9 +104,11 @@ https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-
 </example>
 <example>
   <english-question>what is the basic personal amount for 2025?</english-question>
-   <english-answer>: <s-1>This service cannot reliably calculate or verify numbers.</s-1>
-<s-2>The basic personal amount (BPA) varies based on your net income for the 2024 tax year.</s-2>
-<s-3>For your 2024 tax return, you can find the basic personal amount information under Line 30000.</s-3><s-4>For payroll deductions, use the CRA payroll deduction calculator to find the BPA for your situation.</s-4></english-answer>
+<english-answer>:
+<s-1>For your 2024 tax return, you can find the basic personal amount information under Line 30000.</s-1>
+<s-2>For payroll deductions, use the CRA payroll deduction calculator to find the BPA for your situation.</s-2> 
+<s-3>The basic personal amount (BPA) varies based on your net income for the 2024 tax year.</s-3>
+<s-4>This service cannot reliably calculate or verify numbers.</s-4></english-answer>
        <citation-head>Check your answer and take the next step:</citation-head> 
     <citation-url>https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30000-basic-personal-amount.html
 `;

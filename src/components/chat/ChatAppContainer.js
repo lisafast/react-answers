@@ -13,6 +13,13 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const MAX_CONVERSATION_TURNS = 3;
   const MAX_CHAR_LIMIT = 400;
   const { t } = useTranslations(lang);
+  
+  // Add safeT helper function
+  const safeT = useCallback((key) => {
+    const result = t(key);
+    return typeof result === 'object' && result !== null ? result.text : result;
+  }, [t]);
+  
   const { url: pageUrl, department: urlDepartment } = usePageContext();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -34,6 +41,53 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const statusTimeoutRef = useRef(null); // Ref for the active display timeout
   const isProcessingQueue = useRef(false); // Ref to prevent concurrent processing
   const isTyping = useRef(false);
+const [ariaLiveMessage, setAriaLiveMessage] = useState('');
+  // Add this new state to prevent multiple loading announcements
+  const [loadingAnnounced, setLoadingAnnounced] = useState(false);
+
+ // This effect monitors displayStatus changes to update screen reader announcements
+  useEffect(() => {
+    if (isLoading) {
+      // Update aria-live message whenever displayStatus changes to one of our key statuses
+      if (displayStatus === 'moderatingQuestion') {
+        setAriaLiveMessage(safeT('homepage.chat.messages.moderatingQuestion')); // Will say "Assessing question"
+        setLoadingAnnounced(true); // Mark as announced so we don't repeat unnecessarily
+      } else if (displayStatus === 'generatingAnswer') {
+        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer')); // Will say "Thinking..."
+        setLoadingAnnounced(true); // Mark as announced so we don't repeat unnecessarily
+      }
+      // We don't announce other status changes to avoid too many announcements
+    } else {
+      // Reset the flag when loading completes
+      setLoadingAnnounced(false);
+      
+      const lastMessage = messages[messages.length - 1];
+      const secondToLastMessage = messages[messages.length - 2];
+      
+      if (lastMessage) {
+        if (lastMessage.sender === 'ai') {
+          const paragraphs = lastMessage.interaction?.answer?.paragraphs || [];
+          const sentences = paragraphs.flatMap(paragraph => extractSentences(paragraph));
+          const plainText = sentences.join(' ');
+          const citation = lastMessage.interaction?.answer?.citationHead || '';
+          const displayUrl = lastMessage.interaction?.citationUrl || '';
+          setAriaLiveMessage(`${safeT('homepage.chat.messages.yourAnswerIs')} ${plainText} ${citation} ${displayUrl}`.trim());
+        } else if (lastMessage.sender === 'user') {
+          setAriaLiveMessage(lastMessage.text || '');
+        } else if (lastMessage.error) {
+          // Check if this is a redaction case by looking at the second-to-last message
+          if (secondToLastMessage?.redactedText) {
+            const redactionType = secondToLastMessage.redactedText.includes('XXX') 
+              ? t('homepage.chat.messages.privateContent')
+              : t('homepage.chat.messages.blockedContent');
+            setAriaLiveMessage(`${redactionType}. ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondToLastMessage.redactedText}`);
+          } else {
+            setAriaLiveMessage(lastMessage.errorMessage || t('homepage.chat.messages.error'));
+          }
+        }
+      }
+    }
+  }, [isLoading, displayStatus, messages, t, selectedDepartment, safeT, loadingAnnounced]);
 
   // --- Save state changes to localStorage ---
   useEffect(() => {
@@ -126,8 +180,6 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     setTextareaKey(prevKey => prevKey + 1);
   }, []);
 
-
-
   const handleReferringUrlChange = (e) => {
     const newUrl = e.target.value.trim();
     console.log('Referring URL changed:', newUrl);
@@ -170,7 +222,6 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     window.location.reload();
   };
 
-
   const handleSendMessage = useCallback(async () => {
     if (inputText.trim() !== '' && !isLoading) {
 
@@ -184,7 +235,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           ...prevMessages,
           {
             id: errorMessageId,
-            text: t('homepage.chat.messages.characterLimit'),
+            text: safeT('homepage.chat.messages.characterLimit'),
             sender: 'system',
             error: true
           }
@@ -278,8 +329,13 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
               error: true
             },
             {
-              id: redactionBlockedMsgId,
-              text: <div dangerouslySetInnerHTML={{ __html: (error.redactedText.includes('XXX') ? t('homepage.chat.messages.privateContent') : t('homepage.chat.messages.blockedContent')) }} />,
+              id: blockedMessageId,
+              text: <div dangerouslySetInnerHTML={{
+                __html:
+                  (error.redactedText.includes('XXX') 
+                    ? safeT('homepage.chat.messages.privateContent')
+                    : safeT('homepage.chat.messages.blockedContent'))
+              }} />,
               sender: 'system',
               error: true
             }
@@ -291,8 +347,8 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           setMessages(prevMessages => [
             ...prevMessages,
             {
-              id: systemErrorMsgId,
-              text: t('homepage.chat.messages.error'),
+              id: errorMessageId,
+              text: safeT('homepage.chat.messages.error'),
               sender: 'system',
               error: true
             }
@@ -368,9 +424,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     let sentences = message.interaction.sentences;
     const displayUrl = message.interaction.citationUrl;
     const finalConfidenceRating = message.interaction.confidenceRating ? message.interaction.confidenceRating : '0.1';
-
+  
     const messageDepartment = message?.department || selectedDepartment;
-
+  
     return (
       <div className="ai-message-content">
         {sentences.map((sentence, sentenceIndex) => (
@@ -381,7 +437,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         
         <div className="mistake-disc">
           <p><FontAwesomeIcon icon="wand-magic-sparkles" />&nbsp;
-          {t('homepage.chat.input.loadingHint')}
+          {safeT('homepage.chat.input.loadingHint')}
         </p>
        </div>
         {/* Use the static translation key for the citation head */}
@@ -391,60 +447,85 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             {t('homepage.chat.citation.head') && <p key={`${messageId}-head`} className="citation-head">{t('homepage.chat.citation.head')}</p>}
             {displayUrl && (
               <p key={`${messageId}-link`} className="citation-link">
-                <a href={displayUrl} target="_blank" rel="noopener noreferrer">
+                <a href={displayUrl} target="_blank" rel="noopener noreferrer" tabIndex="0">
                   {displayUrl}
                 </a>
               </p>
             )}
-            <p key={`${messageId}-confidence`} className="confidence-rating">
-              {finalConfidenceRating !== undefined && `${t('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
+            {/* <p key={`${messageId}-confidence`} className="confidence-rating">
+              {finalConfidenceRating !== undefined && `${safeT('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
               {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
-              {aiService && `${t('homepage.chat.citation.ai')} ${aiService}`}
+              {aiService && `${safeT('homepage.chat.citation.ai')} ${aiService}`}
               {messageDepartment && ` | ${messageDepartment}`}
-            </p>
+            </p> */}
           </div>
         )}
       </div>
     );
-  }, [t, selectedDepartment]);
+  }, [t, selectedDepartment, safeT]);
 
   // Add handler for department changes
   const handleDepartmentChange = (department) => {
     setSelectedDepartment(department);
   };
 
+  const initialInput = t('homepage.chat.input.initial');
+
   return (
-    <ChatInterface
-      messages={messages}
-      inputText={inputText}
-      isLoading={isLoading}
-      textareaKey={textareaKey}
-      handleInputChange={handleInputChange}
-      handleSendMessage={handleSendMessage}
-      handleReload={handleReload}
-      handleAIToggle={handleAIToggle}
-      handleSearchToggle={handleSearchToggle} // Add this line
-      handleDepartmentChange={handleDepartmentChange}
-      handleReferringUrlChange={handleReferringUrlChange}
-      formatAIResponse={formatAIResponse}
-      selectedAI={selectedAI}
-      selectedSearch={selectedSearch} // Add this line
-      selectedDepartment={selectedDepartment}
-      referringUrl={referringUrl}
-      turnCount={turnCount}
-      showFeedback={showFeedback}
-      displayStatus={displayStatus}
-      MAX_CONVERSATION_TURNS={MAX_CONVERSATION_TURNS}
-      t={t}
-      lang={lang}
+    <>
+      <ChatInterface
+        messages={messages}
+        inputText={inputText}
+        isLoading={isLoading}
+        textareaKey={textareaKey}
+        handleInputChange={handleInputChange}
+        handleSendMessage={handleSendMessage}
+        handleReload={handleReload}
+        handleAIToggle={handleAIToggle}
+        handleSearchToggle={handleSearchToggle} // Add this line
+        handleDepartmentChange={handleDepartmentChange}
+        handleReferringUrlChange={handleReferringUrlChange}
+        formatAIResponse={formatAIResponse}
+        selectedAI={selectedAI}
+        selectedSearch={selectedSearch} // Add this line
+        selectedDepartment={selectedDepartment}
+        referringUrl={referringUrl}
+        turnCount={turnCount}
+        showFeedback={showFeedback}
+        displayStatus={displayStatus}
+        MAX_CONVERSATION_TURNS={MAX_CONVERSATION_TURNS}
+        t={t}
+        lang={lang}
       // Pass admin status and override toggle state/handler to ChatInterface
       isAdmin={isAdmin}
       isOverrideTestingActive={isOverrideTestingActive}
       handleOverrideToggleChange={handleOverrideToggleChange}
-      privacyMessage={t('homepage.chat.messages.privacy')}
-      getLabelForInput={() => turnCount >= 1 ? t('homepage.chat.input.followUp') : t('homepage.chat.input.initial')}
-      chatId={chatId}
-    />
+        privacyMessage={safeT('homepage.chat.messages.privacy')}
+        getLabelForInput={() =>
+          turnCount === 0
+            ? (typeof initialInput === 'object' ? initialInput.text : initialInput)
+            : (typeof t('homepage.chat.input.followUp') === 'object' 
+               ? t('homepage.chat.input.followUp').text 
+               : t('homepage.chat.input.followUp'))
+        }
+        ariaLabelForInput={
+          turnCount === 0
+            ? (typeof initialInput === 'object' ? initialInput.ariaLabel : undefined)
+            : (typeof t('homepage.chat.input.followUp') === 'object'
+               ? t('homepage.chat.input.followUp').ariaLabel
+               : undefined)
+        }
+          chatId={chatId}
+      />
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        role="status"
+        style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
+      >
+        {ariaLiveMessage}
+      </div>
+    </>
   );
 };
 

@@ -232,7 +232,20 @@ class EmbeddingService {
 
       for (const interaction of interactions) {
         if ((Date.now() - startTime) / 1000 >= duration) {
+          ServerLoggingService.info(`Processing duration limit (${duration}s) reached.`, 'embedding-service');
           break;
+        }
+
+        // Check if the interaction belongs to a chat
+        const chatExists = await Chat.exists({ interactions: interaction._id });
+
+        if (!chatExists) {
+          ServerLoggingService.warn(`Skipping embedding for interaction ${interaction._id} as it does not belong to a chat.`, 'embedding-service');
+          // Update lastId even if skipped, to ensure progress
+          lastId = interaction._id.toString();
+          // Add the skipped ID to our existing IDs list to prevent reprocessing attempts
+          existingEmbeddingIds.push(interaction._id.toString());
+          continue; // Skip to the next interaction
         }
 
         try {

@@ -119,6 +119,7 @@ const ChatViewer = () => {
         ],
         order: [[0, 'desc']],
         scrollX: true, // Enable horizontal scrolling for the whole table
+        pageLength: 50, // Set number of items per page to 50
         // Add styling options for the table
         drawCallback: function () {
           Prism.highlightAll();

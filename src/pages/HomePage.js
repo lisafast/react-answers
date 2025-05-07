@@ -100,14 +100,14 @@ const HomePage = ({ lang = 'en' }) => {
             {serviceStatus.message}
           </div>
         )}
-        <h2 className="mt-400 mb-400">{t('homepage.subtitle')}</h2>
+        <h2 className="mt-400 mb-400" aria-label={t('homepage.subtitle.ariaLabel')}><span className="aria-hidden">{t('homepage.subtitle.text')}</span></h2>
         <GcdsText className="mb-200">{t('homepage.intro.researchOnly')}</GcdsText>
 
-        <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400">
+        <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex="0">
           <GcdsText>{t('homepage.about.privacyNote')}</GcdsText>
           <GcdsText>{t('homepage.about.aiServices.claude')}</GcdsText>
           <GcdsText>{t('homepage.about.aiServices.chatgpt')}</GcdsText>
-          <GcdsText>{t('homepage.about.aiServices.cohere')}</GcdsText>
+          {/* <GcdsText>{t('homepage.about.aiServices.cohere')}</GcdsText> */}
           <GcdsText>
             <GcdsLink href="https://github.com/lisafast/react-answers/blob/main/prompts/systemPrompt.js">
               {t('homepage.about.systemPrompt')}
@@ -119,7 +119,7 @@ const HomePage = ({ lang = 'en' }) => {
         <ChatAppContainer lang={lang} chatId={chatId} />
       </GcdsContainer>
 
-      <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600">
+      <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600" tabIndex="0">
         {/* TODO: make this only show up after an ai response was successfully displayed */}
         <GcdsText>
           <a
@@ -132,7 +132,7 @@ const HomePage = ({ lang = 'en' }) => {
           </a>
         </GcdsText>
 
-        <GcdsDetails detailsTitle={t('homepage.privacy.title')} className="mb-400">
+        <GcdsDetails detailsTitle={t('homepage.privacy.title')} className="mb-400" tabIndex="0">
           <GcdsText>{t('homepage.privacy.storage')}</GcdsText>
           <GcdsText>{t('homepage.privacy.disclaimer')}</GcdsText>
           <GcdsText>

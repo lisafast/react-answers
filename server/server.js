@@ -19,6 +19,7 @@ import deleteChatHandler from '../api/db/db-delete-chat.js';
 import generateEmbeddingsHandler from '../api/db/db-generate-embeddings.js';
 import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
+import dbDeleteSystemLogsHandler from '../api/db/db-delete-system-logs.js';
 import chatHandler from '../api/chat/chat.js';
 import { createBatchHandler, listBatchesHandler, getBatchResultsHandler, batchStatusHandler, cancelBatchHandler } from '../api/batch/index.js';
 // Import prompt API handlers
@@ -76,7 +77,7 @@ app.delete('/api/db/db-delete-chat', deleteChatHandler);
 app.post('/api/db/db-generate-embeddings', generateEmbeddingsHandler);
 app.post('/api/db/db-generate-evals', generateEvalsHandler);
 app.all('/api/db/db-database-management', dbDatabaseManagementHandler);
-
+app.delete('/api/db/db-delete-system-logs', dbDeleteSystemLogsHandler);
 
 
 app.post('/api/chat/chat', chatHandler); // Keep existing chat handler (now refactored)
