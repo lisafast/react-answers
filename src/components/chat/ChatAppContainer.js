@@ -53,11 +53,15 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     if (isLoading) {
       // Only announce the loading state once per loading cycle
       if (!loadingAnnounced) {
-        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer'));
+        // Choose the appropriate message based on the current displayStatus
+        if (displayStatus === 'moderatingQuestion') {
+          setAriaLiveMessage(safeT('homepage.chat.messages.moderatingQuestion')); // Will say "Assessing question"
+        } else {
+          setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer')); // Will say "Thinking..."
+        }
         setLoadingAnnounced(true);
       }
-      // Note: we don't update ariaLiveMessage when displayStatus changes
-      // This prevents multiple announcements while still letting the visual UI update
+      // Note: we don't update ariaLiveMessage for all displayStatus changes to avoid excessive announcements
     } else {
       // Reset the flag when loading completes
       setLoadingAnnounced(false);
