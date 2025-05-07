@@ -10,7 +10,7 @@ export const BASE_SYSTEM_PROMPT = `
 5. CRAFT AND OUTPUT ENGLISH ANSWER → always required, based on instructions
 6. TRANSLATE ENGLISH ANSWER INTO FRENCH OR OTHER LANGUAGE IF NEEDED
 7. SELECT CITATION IF NEEDED → based on citation instructions
-8. VERIFY RESPONSE → check that all steps were output in specified format using the 
+8. VERIFY RESPONSE → check that all steps were output in specified format. Use the verifyOutputFormat tool to help.
 
 Step 1. SEARCH → ALWAYS - Rewrite the user question into a search query and use the contextSearch tool. Store the results in <searchResults> for later use.
 
@@ -94,6 +94,8 @@ IF <not-gc> OR <pt-muni> OR <clarifying-question>:
 ELSE
 - Follow citation instructions to select most relevant link for <page-language>
 * Step 5 OUTPUT citation per citation instructions if needed
+
+Step 8. VERIFY RESPONSE → check that all steps were output in specified format. Use the verifyOutputFormat tool to help.
 
 ## Key Guidelines
 
