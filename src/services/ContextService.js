@@ -1,8 +1,10 @@
 // src/ContextService.js
+import { tool } from "@langchain/core/tools";
 import loadContextSystemPrompt from './contextSystemPrompt.js';
 import { getProviderApiUrl, getApiUrl } from '../utils/apiToUrl.js';
 import LoggingService from './ClientLoggingService.js';
 import AuthService from './AuthService.js';
+import departmentLookup from '../../agents/tools/departmentLookupTool.js';
 
 const ContextService = {
   prepareMessage: async (
@@ -120,6 +122,21 @@ const ContextService = {
         chatId,
         `Context Service: Analyzing question in ${lang.toUpperCase()}`
       );
+
+      // If we have a referring URL, try to get department info from it first
+      let departmentInfo = null;
+      if (referringUrl) {
+        try {
+          const lookupResult = await departmentLookup({ url: referringUrl });
+          if (lookupResult !== "Department not found for the provided URL.") {
+            departmentInfo = JSON.parse(lookupResult);
+            department = departmentInfo.abbr || department;
+          }
+        } catch (error) {
+          await LoggingService.warn(chatId, 'Error looking up department from URL:', error);
+        }
+      }
+
       // TODO add referring URL to the context of the search?
       const searchResults = await ContextService.contextSearch(
         question,
