@@ -1,14 +1,11 @@
 export const CONTEXT_PROMPT = `
-Step 0: DETERMINE CONTEXT
-1. If <referring-url> is present:
-   - Use departmentLookupTool with the <referring-url>.
-   - If a department is found, use its abbreviation and URL.
-   - If not found, proceed to step 2.
-2. If no <referring-url> or no department found:
-   - Generate a search query from the user's question.
-   - Use contextSearch tool with the query and language.
-   - Analyze the top results to identify the most likely department or, if appropriate, a cross-departmental canada.ca page.
-3. DO NOT match to programs, benefits, or services directly—only to their administering department or a generic government page.
+Step 2: DETERMINE CONTEXT
+## Matching Algorithm:
+1. Extract key topics and entities from the user's question and context
+- Prioritize your analysis of the question and context, including referring-url (the page the user was on when they asked the question) over the <searchResults> 
+- <referring-url> often identifies the department in a segment but occasionally may betray a misunderstanding. For example, the user may be on the MSCA sign in page but their question is how to sign in to get their Notice of Assessment, which is done through their CRA account.
+2. Compare and select ONLY if there is a match from the departmentLookup tool or from the list of generic canada.ca pages
+3. DO NOT match to programs, benefits, or services - only match to their administering department from the departmentLookup tool.
 4. If multiple departments could be responsible:
    - Select the department that most likely directly administers and delivers web content for the program/service
    - OR leave department empty and if relevant, select one of the cross-department canada.ca urls from this set as the departmentUrl in the matching page-language:
@@ -21,9 +18,7 @@ Step 0: DETERMINE CONTEXT
      All Government of Canada departments and agencies: https://www.canada.ca/en/government/dept.html or fr:  https://www.canada.ca/fr/gouvernement/min.html
      All Government of Canada services (updated Feb 2025): https://www.canada.ca/en/services.html or fr: https://www.canada.ca/fr/services.html
 
-5. If no clear department match exists and no cross-department canada.ca url is relevant then ask a clarifying question to the user.
-6. Store the department name and department URL in the <department> and <departmentUrl> tags respectively.
-7. Use the departmentScenarios tool to load department-specific scenarios and instructions for the identified department. This will help you provide more accurate and relevant information in the next steps.
+5. If no clear department match exists and no cross-department canada.ca url is relevant, return empty values  
 
 ## Examples of Program-to-Department Mapping:
 - Canada Pension Plan (CPP), OAS, Disability pension, EI, Canadian Dental Care Plan → ESDC (administering department)
@@ -41,7 +36,38 @@ Step 0: DETERMINE CONTEXT
 - International students study permits and visas → IRCC (administering department)
 - International students find schools and apply for scholarships on Educanada → EDU (separate official website administered by GAC)
 
+## Response Format:
+<analysis>
+<department>[EXACT department abbreviation from departments_list> OR empty string]</department>
+<departmentUrl>[EXACT departmentmatching URL from departments_list> OR empty string]</departmentUrl>
+</analysis>
 
+## Examples:
+<examples>
+<example>
+* A question about the weather forecast would match:
+<analysis>
+<department>ECCC</department>
+<departmentUrl>https://www.canada.ca/en/environment-climate-change.html</departmentUrl>
+</analysis>
+</example>
+
+<example>
+* A question about recipe ideas doesn't match any government departments:
+<analysis>
+<department></department>
+<departmentUrl></departmentUrl>
+</analysis>
+</example>
+
+<example>
+* A question about renewing a passport (asked on the French page) would match IRCC:
+<analysis>
+<department>IRCC</department>
+<departmentUrl>https://www.canada.ca/fr/immigration-refugies-citoyennete.html</departmentUrl>
+</analysis>
+</example>
+</examples>
 `;
 
  
