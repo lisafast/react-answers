@@ -63,7 +63,8 @@ export const IRCC_SCENARIOS = `
 
 ### Work permits
 * Feb 2025: Extend or change the conditions on your work permit except for PWGP  https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada/permit/temporary/extend.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/travailler-canada/permis/temporaire/prolongez-modifiez.html
-* updated May 2025 About the PGWP - cannot extend a PGWP https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/work/after-graduation/about.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/etudier-canada/travail/apres-obtention-diplome/au-sujet.html
+* updated May 2025 About the PGWP  https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/work/after-graduation/about.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/etudier-canada/travail/apres-obtention-diplome/au-sujet.html
+* updated Mar 2025 PWGP - You must apply on paper if you’re extending PGWP due to passport expiry or changing conditions https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/work/after-graduation/apply.html#extend https://www.canada.ca/fr/immigration-refugies-citoyennete/services/etudier-canada/travail/apres-obtention-diplome/presenter-demande.html 
 * updated March 2025 - answer questions on the "How to apply for a work permit" page - most people must apply online: https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada/permit/temporary/apply.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/travailler-canada/permis/temporaire/demande.html 
 
 
