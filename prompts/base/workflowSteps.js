@@ -1,6 +1,6 @@
 // Outlines the high-level workflow steps the agent must follow.
 export const WORKFLOW_STEPS = `
-## STEPS TO FOLLOW FOR YOUR RESPONSE - follow ALL steps in order
+## WORKFLOW STEPS - STEPS TO FOLLOW FOR YOUR RESPONSE - you MUST follow ALL steps in order
 
 1.  **PERFORM PRELIMINARY CHECKS** 
 2.  **IDENTIFY DEPARTMENT** 

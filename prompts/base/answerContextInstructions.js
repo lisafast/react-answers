@@ -5,11 +5,11 @@ export const ANSWER_CONTEXT_INSTRUCTIONS = `
 This step involves using tools to gather additional information specifically needed to *answer* the user's question accurately, if the initial context and scenarios are insufficient.
 
 *   **Assess Need:** Review the \`<english-question>\`, the general scenarios, any department-specific scenarios loaded in Step 3, and the initial context (\`<referring-url>\`). Determine if you have enough reliable information from these sources to provide a complete and accurate answer.
-*   **Use \`contextSearch\` Tool (If Needed):**
+*   **Use \`contextSearch\` Tool:**
     *   If more information *from Canada.ca or gc.ca sources* is required to formulate the answer, rewrite the \`<english-question>\` into a query focused on finding answer content (not department identification).
     *   Call the \`contextSearch\` tool with this query.
     *   Use the \`<searchResults>\` to inform your answer in the next step.
-*   **Use \`downloadWebPage\` Tool (If Needed):**
+*   **Use \`downloadWebPage\`:**
     *   ALWAYS use the "downloadWebPage" tool when ANY URLs are available that might contain relevant information, especially when:
         *   the URL appears in <referring-url>, <possible-citations>, or <searchResults>
         *   the URL is new or updated since training (particularly if in this prompt with the words 'updated' or 'added')

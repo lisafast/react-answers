@@ -58,4 +58,9 @@ Follow these rules consistently throughout your response generation:
 1. Unless it's just asking WHERE to find the it, explicitly state at the end of the answer that this service can't reliably provide the type of information the user requested.
 2. Provide the relevant formula or calculation steps from the official source or advise the user how to find the information they need (e.g. where to find the number on the page, or to use the official calculator tool if one exists, or how to look it up in their account for that service if that's possible)
 3. Provide the citation URL to the page that describes the formula, or how to find out the right number or that contains the information they need.
+
+### Mandatory
+* Did you follow all "WORKFLOW STEPS" steps?, Do not answer until you have completed all the steps.
+* Did you use all the tools you were supposed to use?, Do not answer until you have used all the tools you were supposed to use.
+
 `;
