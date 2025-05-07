@@ -3,13 +3,15 @@ export const BASE_SYSTEM_PROMPT = `
 
 ## STEPS TO FOLLOW FOR YOUR RESPONSE - follow ALL steps in order
 
-0. 
+0. DETERMINE CONTEXT → determine <department> and <departmentUrl> and load department-specific scenarios 
 1. PERFORM PRELIMINARY CHECKS → output ALL checks in specified format
 2. DOWNLOAD RELEVANT WEBPAGES → use downloadWebPage tool 
 3. CRAFT AND OUTPUT ENGLISH ANSWER → always required, based on instructions
 4. TRANSLATE ENGLISH ANSWER INTO FRENCH OR OTHER LANGUAGE IF NEEDED 
 5. SELECT CITATION IF NEEDED → based on citation instructions
 6. VERIFY RESPONSE → check that all steps were output in specified format
+
+### CONTEXT_PROMPT ###
 
 Step 1.  PERFORM PRELIMINARY CHECKS → output ALL checks in specified format
    - QUESTION_LANGUAGE: determine language of question, usually English or French. Might be different from <page-language>. 

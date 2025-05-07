@@ -226,7 +226,8 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           selectedAI,
           handleStatusUpdate,
           selectedSearch,
-          authToken // Pass the token (or null)
+          authToken,
+          messageIdCounter.current 
         );
 
         // --- Process Final Result ---

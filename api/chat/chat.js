@@ -117,7 +117,7 @@ async function sseMessageHandler(req, res) {
       referringUrl,
       selectedAI,
       selectedSearch,
-      // Extract user context if provided by authenticated requests (might be needed elsewhere)
+      interactionId,
       user // Assuming middleware might attach user info if standard auth applied
     } = req.body;
 
@@ -141,7 +141,8 @@ async function sseMessageHandler(req, res) {
       selectedSearch,
       user,
       overrideUserId,
-      requestId 
+      requestId ,
+      interactionId,
     };
     // Call ChatProcessingService.processMessage without originContext
     await ChatProcessingService.processMessage(processParams);

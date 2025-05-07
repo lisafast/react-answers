@@ -96,6 +96,7 @@ class DataStoreService {
     let formattedExpertFeedback = null;
     if (expertFeedback) {
       formattedExpertFeedback = {
+        ...expertFeedback,
         totalScore: expertFeedback.totalScore ?? null,
         sentence1Score: expertFeedback.sentence1Score ?? null,
         sentence2Score: expertFeedback.sentence2Score ?? null,

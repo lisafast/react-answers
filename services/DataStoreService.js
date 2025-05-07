@@ -42,7 +42,7 @@ class DataStoreService {
 
     // Create all MongoDB document objects without saving them yet
     const dbInteraction = new Interaction();
-    dbInteraction.interactionId = interaction.userMessageId; // Assuming userMessageId maps to interactionId
+    dbInteraction.interactionId = interaction.interactionId; 
     dbInteraction.responseTime = interaction.responseTime;
     dbInteraction.referringUrl = interaction.referringUrl;
 

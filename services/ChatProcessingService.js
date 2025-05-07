@@ -5,7 +5,7 @@ import { getAgent } from '../agents/agentFactory.js'; // Import the actual agent
 import { StatusEventEmitterHandler } from '../agents/StatusEventEmitterHandler.js'; // Import new handler
 import { ToolTrackingHandler } from '../agents/ToolTrackingHandler.js'; // Import tool tracking handler
 import { parseResponse } from '../utils/responseParser.js';
-import PromptBuilderService from './PromptBuilderService.js'; // ADDED new prompt builder service
+import PromptBuilderService from './OldPromptBuilderService.js'; // ADDED new prompt builder service
 import CitationVerificationService from './CitationVerificationService.js'; // Import the new service
 import EmbeddingService from './EmbeddingService.js'; // Import EmbeddingService
 import EvaluationService from './EvaluationService.js'; // Import EvaluationService
@@ -36,7 +36,7 @@ class ChatProcessingService {
     // Destructure all potential parameters
     const {
       userMessage, lang, selectedAI, selectedSearch, referringUrl,
-      requestId: providedRequestId, user, overrideUserId, chatId // Removed originContext
+      requestId: providedRequestId, user, overrideUserId, chatId, interactionId
     } = params;
 
     // Use chatId directly
@@ -85,7 +85,8 @@ class ChatProcessingService {
         selectedAI: selectedAI,
         searchProvider: selectedSearch,
         pageLanguage: lang,
-        referringUrl: referringUrl
+        referringUrl: referringUrl,
+        interactionId: interactionId, 
       };
 
       const savedInteraction = await DataStoreService.persistInteraction(interactionData);
@@ -438,43 +439,7 @@ class ChatProcessingService {
     return { finalCitationUrl, confidenceRating };
   }
 
-  /**
-   * Persists the interaction details to the database.
-   * @param {object} params - Persistence parameters.
-   * @param {string} params.finalQuestion - The question asked.
-   * @param {object} params.finalAnswer - The final answer object.
-   * @param {object} params.finalContext - The context used.
-   * @param {string|null} params.finalCitationUrl - The verified citation URL.
-   * @param {number|null} params.confidenceRating - The final confidence rating.
-   * @param {number} params.responseTime - Total processing time.
-   * @param {string} params.chatId - The chat ID.
-   * @param {string} params.selectedAI - The AI model used.
-   * @param {string} params.selectedSearch - The search provider used.
-   * @param {string} params.lang - The language code.
-   * @param {string} [params.referringUrl] - Optional referring URL.
-   * @param {string} params.requestId - The unique ID for tracking.
-   * @returns {Promise<object>} The saved interaction document.
-   */
-  async _persistInteractionData({ finalQuestion, finalAnswer, finalContext, finalCitationUrl, confidenceRating, responseTime, chatId, selectedAI, selectedSearch, lang, referringUrl, requestId }) {
-    const interactionData = {
-      question: finalQuestion,
-      answer: finalAnswer,
-      context: finalContext,
-      finalCitationUrl: finalCitationUrl,
-      confidenceRating: confidenceRating,
-      responseTime: responseTime,
-      chatId: chatId,
-      selectedAI: selectedAI,
-      searchProvider: selectedSearch,
-      pageLanguage: lang,
-      referringUrl: referringUrl
-    };
-
-    const originContext = { type: 'chat', id: chatId };
-    const savedInteraction = await DataStoreService.persistInteraction(interactionData, originContext);
-    ServerLoggingService.info('Interaction persisted successfully', chatId, { requestId, interactionId: savedInteraction._id });
-    return savedInteraction; // Return the saved interaction
-  }
+ 
 
   /**
    * Formats the final response object to be sent to the frontend.

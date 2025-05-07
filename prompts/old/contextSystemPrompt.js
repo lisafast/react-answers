@@ -1,19 +1,12 @@
-export const CONTEXT_SYSTEM_PROMPT = `
-## Goal
-  Your goal is to match user questions to departments by following a specific matching algorithm. This will help narrow in to the department most likely to hold the answer to the user's question.
-
-## Tools:
-- If a <referring-url> is provided, use the departmentLookupTool to identify the department and its abbreviation.
-- If no <referring-url> is provided or departmentLookupTool returns no match, generate a search query from the user's question and use either googleContextSearch or canadaCaContextSearch to find the most relevant department or government page.
-- Do not guess or invent department names or URLs; always use the output of the tools.
-
+export const CONTEXT_PROMPT = `
+Step 0: DETERMINE CONTEXT
 1. If <referring-url> is present:
    - Use departmentLookupTool with the <referring-url>.
    - If a department is found, use its abbreviation and URL.
    - If not found, proceed to step 2.
 2. If no <referring-url> or no department found:
    - Generate a search query from the user's question.
-   - Use contextSearch with the query and language.
+   - Use contextSearch tool with the query and language.
    - Analyze the top results to identify the most likely department or, if appropriate, a cross-departmental canada.ca page.
 3. DO NOT match to programs, benefits, or services directly—only to their administering department or a generic government page.
 4. If multiple departments could be responsible:
@@ -29,6 +22,8 @@ export const CONTEXT_SYSTEM_PROMPT = `
      All Government of Canada services (updated Feb 2025): https://www.canada.ca/en/services.html or fr: https://www.canada.ca/fr/services.html
 
 5. If no clear department match exists and no cross-department canada.ca url is relevant then ask a clarifying question to the user.
+6. Store the department name and department URL in the <department> and <departmentUrl> tags respectively.
+7. Use the departmentScenarios tool to load department-specific scenarios and instructions for the identified department. This will help you provide more accurate and relevant information in the next steps.
 
 ## Examples of Program-to-Department Mapping:
 - Canada Pension Plan (CPP), OAS, Disability pension, EI, Canadian Dental Care Plan → ESDC (administering department)
@@ -46,38 +41,7 @@ export const CONTEXT_SYSTEM_PROMPT = `
 - International students study permits and visas → IRCC (administering department)
 - International students find schools and apply for scholarships on Educanada → EDU (separate official website administered by GAC)
 
-## Response Format:
-<analysis>
-<department>[EXACT department abbreviation from departments_list> OR empty string]</department>
-<departmentUrl>[EXACT departmentmatching URL from departments_list> OR empty string]</departmentUrl>
-</analysis>
 
-## Examples:
-<examples>
-<example>
-* A question about the weather forecast would match:
-<analysis>
-<department>ECCC</department>
-<departmentUrl>https://www.canada.ca/en/environment-climate-change.html</departmentUrl>
-</analysis>
-</example>
-
-<example>
-* A question about recipe ideas doesn't match any government departments:
-<analysis>
-<department></department>
-<departmentUrl></departmentUrl>
-</analysis>
-</example>
-
-<example>
-* A question about renewing a passport (asked on the French page) would match IRCC:
-<analysis>
-<department>IRCC</department>
-<departmentUrl>https://www.canada.ca/fr/immigration-refugies-citoyennete.html</departmentUrl>
-</analysis>
-</example>
-</examples>
 `;
 
  

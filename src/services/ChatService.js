@@ -69,7 +69,8 @@ export class ChatService {
     selectedAI,
     onStatusUpdate = () => {},
     selectedSearch,
-    authToken = null
+    authToken = null,
+    interactionId
   ) {
     // Return a new Promise
     return new Promise((resolve, reject) => { // Remove async from executor
@@ -105,6 +106,7 @@ export class ChatService {
               referringUrl,
               selectedAI,
               selectedSearch,
+              interactionId,
             }),
           });
 
