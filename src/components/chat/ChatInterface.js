@@ -14,13 +14,13 @@ const ChatInterface = ({
   handleSendMessage,
   handleReload,
   handleAIToggle,
-  handleSearchToggle, // Add this prop
+  handleSearchToggle,
   handleDepartmentChange,
   handleReferringUrlChange,
   handleFeedback,
   formatAIResponse,
   selectedAI,
-  selectedSearch, // Add this prop
+  selectedSearch,
   selectedDepartment,
   referringUrl,
   turnCount,
@@ -44,6 +44,13 @@ const ChatInterface = ({
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
   const textareaRef = useRef(null);
+
+  // Function to focus textarea when skip button is clicked
+  const focusTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -243,6 +250,7 @@ const ChatInterface = ({
                 ) : (
                   <>
                     {formatAIResponse(message.aiService, message)}
+                    
                     {chatId && (
                       <div className="chat-id">
                         <p>
@@ -252,6 +260,7 @@ const ChatInterface = ({
                     )}
                   </>
                 )}
+                
                 {message.id === messages[messages.length - 1].id &&
                   showFeedback &&
                   !message.error &&
@@ -261,6 +270,10 @@ const ChatInterface = ({
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
+                      // Add the new props for the skip button
+                      showSkipButton={turnCount < MAX_CONVERSATION_TURNS && !isLoading}
+                      onSkip={focusTextarea}
+                      skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
                     />
                   )}
               </>
@@ -327,7 +340,9 @@ const ChatInterface = ({
                     onKeyDown={handleKeyPress}
                     onClick={handleTextareaClick}
                     onBlur={handleTextareaBlur}
-                    aria-label={safeT('homepage.textarea.ariaLabel')}
+                    aria-label={turnCount === 0 
+                      ? safeT('homepage.textarea.ariaLabel.first')
+                      : safeT('homepage.textarea.ariaLabel.followon')}
                     required
                     disabled={isLoading}
                   />
@@ -369,7 +384,7 @@ const ChatInterface = ({
               </div>
             </form>
           )}
-          <GcdsDetails className="hr" detailsTitle={safeT('homepage.chat.options.title')}>
+          <GcdsDetails className="hr" detailsTitle={safeT('homepage.chat.options.title')} tabIndex="0">
             <div className="ai-toggle">
               <fieldset className="ai-toggle_fieldset">
                 <div className="ai-toggle_container">

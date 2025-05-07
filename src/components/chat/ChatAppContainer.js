@@ -46,15 +46,22 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   // Add a ref to track if we're currently typing
   const isTyping = useRef(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState('');
+  // Add this new state to prevent multiple loading announcements
+  const [loadingAnnounced, setLoadingAnnounced] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
-      setAriaLiveMessage(
-        displayStatus === 'thinkingWithContext'
-          ? `${safeT('homepage.chat.messages.thinkingWithContext')}`
-          : safeT(`homepage.chat.messages.${displayStatus}`)
-      );
+      // Only announce the loading state once per loading cycle
+      if (!loadingAnnounced) {
+        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer'));
+        setLoadingAnnounced(true);
+      }
+      // Note: we don't update ariaLiveMessage when displayStatus changes
+      // This prevents multiple announcements while still letting the visual UI update
     } else {
+      // Reset the flag when loading completes
+      setLoadingAnnounced(false);
+      
       const lastMessage = messages[messages.length - 1];
       const secondToLastMessage = messages[messages.length - 2];
       
@@ -81,7 +88,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         }
       }
     }
-  }, [isLoading, displayStatus, messages, t, selectedDepartment, safeT]);
+  }, [isLoading, displayStatus, messages, t, selectedDepartment, safeT, loadingAnnounced]);
 
   const processNextStatus = useCallback(() => {
     if (statusQueueRef.current.length === 0) {
@@ -319,9 +326,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     }
     const displayUrl = message.interaction.citationUrl;
     const finalConfidenceRating = message.interaction.confidenceRating ? message.interaction.confidenceRating : '0.1';
-
+  
     const messageDepartment = message?.department || selectedDepartment;
-
+  
     return (
       <div className="ai-message-content">
         {paragraphs.map((paragraph, index) => {
@@ -342,17 +349,17 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             {message.interaction.answer.citationHead && <p key={`${messageId}-head`} className="citation-head">{message.interaction.answer.citationHead}</p>}
             {displayUrl && (
               <p key={`${messageId}-link`} className="citation-link">
-                <a href={displayUrl} target="_blank" rel="noopener noreferrer">
+                <a href={displayUrl} target="_blank" rel="noopener noreferrer" tabIndex="0">
                   {displayUrl}
                 </a>
               </p>
             )}
-            <p key={`${messageId}-confidence`} className="confidence-rating">
+            {/* <p key={`${messageId}-confidence`} className="confidence-rating">
               {finalConfidenceRating !== undefined && `${safeT('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
               {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
               {aiService && `${safeT('homepage.chat.citation.ai')} ${aiService}`}
               {messageDepartment && ` | ${messageDepartment}`}
-            </p>
+            </p> */}
           </div>
         )}
       </div>
@@ -411,6 +418,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       />
       <div
         aria-live="polite"
+        aria-atomic="true"
         role="status"
         style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
       >
