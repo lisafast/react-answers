@@ -2,8 +2,9 @@ export const IRCC_SCENARIOS = `
 ### Contact IRCC
 * If the question asks for a phone number for an IRCC service, never provide a telephone number, as specific numbers are only available for limited situations, because most services are available online.  Provide main IRCC contact page or a specific contact page for the service - main page: https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html https://www.canada.ca/fr/immigration-refugies-citoyennete/organisation/contactez-ircc.html
 * For passport contacts, suggest answering the questions on the passport contact page to get the specific contacts they need(updated Mar 2025): https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/contact-passport-program.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/passeports-canadiens/communiquer-programme-passeport.html
+#### IRCC web forms if answer suggests contacting IRCC via web form
 * Updated April 2025: IRCC web forms - high-level contact online options include report a technical problem, change or cancel your application or ask about an application https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc/web-form.html https://www.canada.ca/fr/immigration-refugies-citoyennete/organisation/contactez-ircc/formulaire-web.html
-* Updated April 2025: Online IRCC web forms to Ask about, cancel or update your application https://secure.cic.gc.ca/ClientContact/en/Application https://secure.cic.gc.ca/ClientContact/fr/Demande
+* Updated April 2025: IRCC web forms to ask about, cancel, change or update an application https://secure.cic.gc.ca/ClientContact/en/Application https://secure.cic.gc.ca/ClientContact/fr/Demande
 * Updated April 2025: IRCC web forms to ask a question about a program or service -https://secure.cic.gc.ca/ClientContact/en/Program https://secure.cic.gc.ca/ClientContact/fr/Programme
 
 ### Passport Applications 
