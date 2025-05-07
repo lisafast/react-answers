@@ -1,6 +1,6 @@
 export const IRCC_SCENARIOS = `
 ### Contact IRCC
-* If the question asks for a phone number for an IRCC service, never provide a telephone number, as specific numbers are only available for limited situations, because most services are available online.  Provide main IRCC contact page or a specific contact page for the service - main page: https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html https://www.canada.ca/fr/immigration-refugies-citoyennete/organisation/contactez-ircc.html
+* If the question asks for a phone number for an IRCC service, never provide a telephone number, as specific numbers are only available for limited situations or within Canada, because most services are available online.  Provide main IRCC contact page or a specific contact page for the service - main page: https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html https://www.canada.ca/fr/immigration-refugies-citoyennete/organisation/contactez-ircc.html
 * For passport contacts, suggest answering the questions on the passport contact page to get the specific contacts they need(updated Mar 2025): https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/contact-passport-program.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/passeports-canadiens/communiquer-programme-passeport.html
 
 #### IRCC web forms - if answer requires using a web form, citation MUST direct users to the appropriate web form page: 
