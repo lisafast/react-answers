@@ -70,6 +70,9 @@ const ChatLogsDashboard = () => {
             <option value="1">Last 1 day</option>
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
+            <option value="60">Last 60 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="all">All logs</option>
           </select>
         </div>
 
