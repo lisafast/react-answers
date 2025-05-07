@@ -8,7 +8,7 @@ async function chatLogsHandler(req, res) {
     }
 
     try {
-        await dbConnect();
+        await dbConnect();    
         console.log('DB Connected in chat-logs endpoint');
 
         const totalCount = await Chat.countDocuments();
