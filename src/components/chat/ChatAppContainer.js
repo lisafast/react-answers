@@ -49,15 +49,18 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   // Add this new state to prevent multiple loading announcements
   const [loadingAnnounced, setLoadingAnnounced] = useState(false);
 
+ // This effect monitors displayStatus changes to update screen reader announcements
   useEffect(() => {
     if (isLoading) {
-      // Only announce the loading state once per loading cycle
-      if (!loadingAnnounced) {
-        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer'));
-        setLoadingAnnounced(true);
+      // Update aria-live message whenever displayStatus changes to one of our key statuses
+      if (displayStatus === 'moderatingQuestion') {
+        setAriaLiveMessage(safeT('homepage.chat.messages.moderatingQuestion')); // Will say "Assessing question"
+        setLoadingAnnounced(true); // Mark as announced so we don't repeat unnecessarily
+      } else if (displayStatus === 'generatingAnswer') {
+        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer')); // Will say "Thinking..."
+        setLoadingAnnounced(true); // Mark as announced so we don't repeat unnecessarily
       }
-      // Note: we don't update ariaLiveMessage when displayStatus changes
-      // This prevents multiple announcements while still letting the visual UI update
+      // We don't announce other status changes to avoid too many announcements
     } else {
       // Reset the flag when loading completes
       setLoadingAnnounced(false);

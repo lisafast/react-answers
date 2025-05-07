@@ -18,6 +18,25 @@ export const PipelineStatus = {
   ERROR: 'error',
   NEED_CLARIFICATION: 'needClarification',
 };
+
+// Helper function to control which status updates are actually sent to the UI
+const sendStatusUpdate = (onStatusUpdate, status) => {
+  // Only send status updates for the statuses we want to display
+  const displayableStatuses = [
+    PipelineStatus.MODERATING_QUESTION,
+    PipelineStatus.SEARCHING,
+    PipelineStatus.GENERATING_ANSWER,
+    PipelineStatus.VERIFYING_CITATION,
+    PipelineStatus.MODERATING_ANSWER,
+    PipelineStatus.ERROR,
+    PipelineStatus.NEED_CLARIFICATION
+  ];
+  
+  if (displayableStatuses.includes(status)) {
+    onStatusUpdate(status);
+  }
+};
+
 export const ChatPipelineService = {
   processResponse: async (
     chatId,
@@ -33,9 +52,11 @@ export const ChatPipelineService = {
     searchProvider
   ) => {
     const startTime = Date.now();
-    onStatusUpdate(PipelineStatus.MODERATING_QUESTION);
+    
+    // Send updated status (displaying "Assessing question")
+    sendStatusUpdate(onStatusUpdate, PipelineStatus.MODERATING_QUESTION);
 
-    onStatusUpdate(PipelineStatus.REDACTING);
+    // Do redaction but don't display status
     await ChatPipelineService.processRedaction(userMessage);
     await LoggingService.info(chatId, 'Starting pipeline with data:', {
       userMessage,
@@ -58,7 +79,7 @@ export const ChatPipelineService = {
       context = lastMessage.interaction.context;
     } else {
       // if initial questions or last response type was a question
-      onStatusUpdate(PipelineStatus.GETTING_CONTEXT);
+      // Get context but don't display status
       context = await ContextService.deriveContext(
         selectedAI,
         userMessage,
@@ -72,7 +93,8 @@ export const ChatPipelineService = {
     }
     await LoggingService.info(chatId, 'Derived context:', { context });
 
-    onStatusUpdate(PipelineStatus.GENERATING_ANSWER);
+    // Send updated status (displaying "Thinking...")
+    sendStatusUpdate(onStatusUpdate, PipelineStatus.GENERATING_ANSWER);
 
     // TOOD check about evaluation
     const answer = await AnswerService.sendMessage(
@@ -90,7 +112,9 @@ export const ChatPipelineService = {
       confidenceRating = null;
 
     if (answer.answerType === 'normal') {
-      onStatusUpdate(PipelineStatus.VERIFYING_CITATION);
+      // Send updated status (displaying "Testing citation link")
+      sendStatusUpdate(onStatusUpdate, PipelineStatus.VERIFYING_CITATION);
+      
       // Use answer.citationUrl directly
       const citationResult = await ChatPipelineService.verifyCitation(
         answer.citationUrl,
@@ -111,18 +135,16 @@ export const ChatPipelineService = {
     }
 
     if (answer.answerType === 'question') {
-      onStatusUpdate(PipelineStatus.NEED_CLARIFICATION);
+      sendStatusUpdate(onStatusUpdate, PipelineStatus.NEED_CLARIFICATION);
     }
 
-    onStatusUpdate(PipelineStatus.UPDATING_DATASTORE);
-
+    // Update datastore but don't display status
     const endTime = Date.now();
     const totalResponseTime = endTime - startTime;
     await LoggingService.info(chatId, 'Total response time:', {
       totalResponseTime: `${totalResponseTime} ms`,
     });
 
-    
     DataStoreService.persistInteraction({
       selectedAI: selectedAI,
       question: userMessage,
@@ -138,7 +160,7 @@ export const ChatPipelineService = {
       searchProvider: searchProvider
     });
 
-    onStatusUpdate(PipelineStatus.COMPLETE);
+    // Don't display complete status
     await LoggingService.info(chatId, 'pipeline complete');
     return {
       answer: answer,
