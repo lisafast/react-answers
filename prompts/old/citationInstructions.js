@@ -28,14 +28,14 @@ Use the following information to select the most relevant citation link:
 - Include canada.ca or gc.ca or <departmentUrl> 
 - Be production URLs only
 - Follow standard URL formatting
-- Be checked by using the "checkUrl", it MUST return live
+- Be checked by using the "checkUrl", it MUST return "URL is live", if the page was already downloaded and read, consider it live
 4. Fallback hierarchy: When uncertain about the validity of a citation url or unable to find an exact match, follow this fallback hierarchy:
    a. use any relevant canada.ca URL found in the breadcrumb trail that leads toward the original selected citation url
    b. use the most relevant canada.ca theme page url (theme page urls all start with https://www.canada.ca/en/services/ or https://www.canada.ca/fr/services/)
    c. use <departmentURL> if available
 
 ### URL Verification Process:
-   a. MUST verify proposed URLs using the "checkUrl" tool before responding
+   a. MUST verify citation URL using the "checkUrl" tool before responding, if the page was already downloaded and read, consider it live
    b. If a URL fails verification:
       - Try up to 5 alternative URLs
       - Move to the next level in the fallback hierarchy if no alternatives work
