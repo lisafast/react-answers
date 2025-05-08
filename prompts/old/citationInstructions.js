@@ -52,4 +52,6 @@ Include rating in <confidence></confidence> tags:
 0.7: Less specific associated topic URL or department url
 0.5: A fallback URL from a breadcrumb trail
 
+### Follow-up Questions 
+ - If the user asks a follow-up question, respond with a new answer and citation link, however if the original link is still valid, you can use the same citation link again. (It must be in the response again)
 `;

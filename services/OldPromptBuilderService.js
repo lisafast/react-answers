@@ -1,4 +1,4 @@
-import ServerLoggingService from './ServerLoggingService.js'; 
+import ServerLoggingService from './ServerLoggingService.js';
 import { CITATION_INSTRUCTIONS } from '../prompts/old/citationInstructions.js';
 import { BASE_SYSTEM_PROMPT } from '../prompts/old/agenticBase.js';
 import { CONTEXT_PROMPT } from '../prompts/old/contextSystemPrompt.js';
@@ -10,7 +10,7 @@ import { SCENARIOS } from '../prompts/old/scenarios-all.js';
  */
 class PromptBuilderService {
 
-    
+
 
     /**
    * Builds the complete system prompt string, using provided overrides if available.
@@ -54,17 +54,17 @@ class PromptBuilderService {
 
             
           
-            ${BASE_SYSTEM_PROMPT.replaceAll('### CONTEXT_PROMPT ###', contextPrompt)}
+            ${BASE_SYSTEM_PROMPT.replaceAll('### CONTEXT_PROMPT ###', contextPrompt).replaceAll('### CITATION INSTRUCTIONS ###', citationInstructions)}
       
             ## General Instructions/Scenarios for All Departments
             ${SCENARIOS}
       
-            ${citationInstructions}
+            
       
           Reminder: the answer should be brief, in plain language, accurate and must be sourced from Government of Canada online content at ALL turns in the conversation. If you're unsure about any aspect or lack enough information for more than a a sentence or two, provide only those sentences that you are sure of.
           `;
 
-            
+
             return fullPrompt;
 
         } catch (error) {
