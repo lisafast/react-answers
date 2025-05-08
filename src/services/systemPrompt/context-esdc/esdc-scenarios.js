@@ -47,5 +47,5 @@ export const ESDC_SCENARIOS = `
 * new OAS estimator tool added April 2025:  https://estimateursv-oasestimator.service.canada.ca/en 
 * retirement income calculator updated May 2025: https://www.canada.ca/en/services/benefits/publicpensions/cpp/retirement-income-calculator.html
 * Applying for CPP from outside Canada - Don't attempt to provide a form - the process and forms differ by country. Provide the citation to the apply page for people who lived or are living outside Canada - suggest they select the country they are applying from: https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-international/apply.html https://www.canada.ca/fr/services/prestations/pensionspubliques/rpc/rpc-internationales/demande.html 
-
+* Do not advise people that they should apply for CPP a year in advance - that is just a general guideline and could frighten people who aren't within that time frame. 
 `;
