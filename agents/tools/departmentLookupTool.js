@@ -34,15 +34,25 @@ const departmentLookup = tool(
       const deptHostname = deptUrlObj.hostname;
       const deptPathname = deptUrlObj.pathname;
 
-      // Check if the hostname matches
+      // If hostname matches
       if (normalizedHostname === deptHostname) {
-        // Check if the pathname starts with the department's pathname
-        if (normalizedPathname.startsWith(deptPathname)) {
+        // If hostname contains 'canada.ca', also check pathname
+        if (normalizedHostname.includes('canada.ca')) {
+          if (normalizedPathname.startsWith(deptPathname)) {
+            return JSON.stringify({
+              name: department.name,
+              abbr: department.abbr || null,
+              lang: department.lang,
+              url: department.url
+            });
+          }
+        } else {
+          // For non-canada.ca domains, hostname match is enough
           return JSON.stringify({
             name: department.name,
             abbr: department.abbr || null,
             lang: department.lang,
-            url: department.url // Add the matched URL
+            url: department.url
           });
         }
       }
