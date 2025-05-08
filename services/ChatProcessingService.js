@@ -368,7 +368,9 @@ class ChatProcessingService {
       finalAnswer.content = parsedData.content || 'No content found after parsing agent response.';
       const metadata = lastMessage.metadata || {};
       const responseMetadata = lastMessage.response_metadata || {};
-      finalContext = metadata.context || {}; // Context might be separate
+      finalContext.department = parsedData.department;
+      finalContext.departmentUrl = parsedData.departmentUrl;
+      finalContext.searchResults = parsedData.searchResults;
 
       // Extract fields from PARSED data
       finalAnswer.answerType = parsedData.answerType || 'unknown';

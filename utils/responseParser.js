@@ -129,6 +129,9 @@ const parseResponse = (text) => {
   const department = departmentMatch ? departmentMatch[1] : null;
   const departmentUrl = departmentUrlMatch ? departmentUrlMatch[1] : null;
 
+  const searchResultsMatch = text.match(/<searchResults>([\s\S]*?)<\/searchResults>/);
+  const searchResults = searchResultsMatch ? searchResultsMatch[1] : null;
+
   return {
     answerType,
     content,
@@ -138,6 +141,7 @@ const parseResponse = (text) => {
     citationUrl,
     paragraphs,
     confidenceRating,
+    searchResults,
     sentences,
     questionLanguage,
     englishQuestion,
