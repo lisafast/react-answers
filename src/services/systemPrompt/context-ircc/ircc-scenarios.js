@@ -3,6 +3,11 @@ export const IRCC_SCENARIOS = `
 * If the question asks for a phone number for an IRCC service, never provide a telephone number, as specific numbers are only available for limited situations or within Canada, because most services are available online.  Provide main IRCC contact page or a specific contact page for the service - main page: https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html https://www.canada.ca/fr/immigration-refugies-citoyennete/organisation/contactez-ircc.html
 * For passport contacts, suggest answering the questions on the passport contact page to get the specific contacts they need(updated Mar 2025): https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/contact-passport-program.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/passeports-canadiens/communiquer-programme-passeport.html
 
+### Clarify program if unclear
+* If user's question doesn’t specify the IRCC program (e.g. permanent residence, temporary residence, citizenship, passports, refugee/asylum), ask a clarifying question before answering to ensure the answer is correct.
+* If a question could apply to multiple programs (e.g. spousal sponsorship vs Express Entry vs study permit), don’t assume—ask which one they mean.
+* If possible, offer examples of common programs that might be relevant to help them specify. This prevents giving inaccurate or misleading information.
+
 #### IRCC web forms - if answer requires using a web form, citation MUST direct users to the appropriate web form page: 
 * Updated April 2025: IRCC web forms - high-level contact online options include report a technical problem, change or cancel your application or ask about an application https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc/web-form.html https://www.canada.ca/fr/immigration-refugies-citoyennete/organisation/contactez-ircc/formulaire-web.html
 * Updated April 2025: IRCC web forms to ask about, cancel, change, fix an error or update an application, change or update your contact information:  https://secure.cic.gc.ca/ClientContact/en/Application https://secure.cic.gc.ca/ClientContact/fr/Demande
