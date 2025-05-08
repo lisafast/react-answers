@@ -30,8 +30,9 @@ const ChatInterface = ({
   isOverrideTestingActive,
   handleOverrideToggleChange,
   chatId,
+  extractSentences
 }) => {
-  // Add safeT helper function
+    // Add safeT helper function
   const safeT = (key) => {
     const result = t(key);
     return typeof result === 'object' && result !== null ? result.text : result;
@@ -40,7 +41,7 @@ const ChatInterface = ({
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
   const textareaRef = useRef(null);
-
+  
   // Function to focus textarea when skip button is clicked
   const focusTextarea = () => {
     if (textareaRef.current) {
@@ -112,7 +113,7 @@ const ChatInterface = ({
       if (tempHint) tempHint.remove();
     };
   }, [isLoading, t]);
-
+   
   const getLabelForInput = () => {
     if (turnCount >= 1) {
       const followUp = t('homepage.chat.input.followUp');
@@ -123,7 +124,7 @@ const ChatInterface = ({
   };
 
   
-  const getLastMessageSentenceCount = () => {
+    const getLastMessageSentenceCount = () => {
     const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
     if (lastAiMessage && lastAiMessage.interaction && lastAiMessage.interaction.answer && lastAiMessage.interaction.answer.paragraphs && lastAiMessage.interaction.answer.paragraphs.length > 0) {
       return lastAiMessage.interaction.answer.paragraphs.reduce(
@@ -281,16 +282,18 @@ const ChatInterface = ({
           <>
             <div key="loading" className="loading-container">
               <div className="loading-animation"></div>
-              <div className="loading-text">
-                {displayStatus === 'thinkingWithContext'
-                  ? `${safeT('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment || ''} - ${currentTopic || ''}`
-                  : safeT(`homepage.chat.messages.${displayStatus}`)}
+                <div className="loading-text">
+                  {/* Translate using key/params if key exists, otherwise display direct message */}
+                  {displayStatus.key
+                    ? safeT(displayStatus.key, displayStatus.params || {})
+                    : displayStatus.message
+                  }
+                </div>
               </div>
-            </div>
-            <div className="loading-hint-text">
+              <div className="loading-hint-text">
               <FontAwesomeIcon icon="wand-magic-sparkles" />
               &nbsp;
-              {safeT('homepage.chat.input.loadingHint')}
+             {safeT('homepage.chat.input.loadingHint')}
             </div>
           </>
         )}
@@ -336,7 +339,7 @@ const ChatInterface = ({
                     onKeyDown={handleKeyPress}
                     onClick={handleTextareaClick}
                     onBlur={handleTextareaBlur}
-                    aria-label={turnCount === 0 
+                     aria-label={turnCount === 0 
                       ? safeT('homepage.textarea.ariaLabel.first')
                       : safeT('homepage.textarea.ariaLabel.followon')}
                     required
@@ -497,7 +500,7 @@ const ChatInterface = ({
           </GcdsDetails>
         </div>
       )}
-      
+
     </div>
   );
 };

@@ -7,19 +7,28 @@ import { ChatService, RedactionError } from '../../services/ChatService.js';
 import AuthService from '../../services/AuthService.js'; // Added for admin check and token
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-
+// Utility functions go here, before the component
+const extractSentences = (paragraph) => {
+  const sentenceRegex = /<s-?\d+>(.*?)<\/s-?\d+>/g;
+  const sentences = [];
+  let match;
+  while ((match = sentenceRegex.exec(paragraph)) !== null) {
+    sentences.push(match[1].trim());
+  }
+  return sentences.length > 0 ? sentences : [paragraph];
+};
 
 const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const MAX_CONVERSATION_TURNS = 3;
   const MAX_CHAR_LIMIT = 400;
-  const { t } = useTranslations(lang);
+  const { t } = useTranslations(lang); 
   
   // Add safeT helper function
   const safeT = useCallback((key) => {
     const result = t(key);
     return typeof result === 'object' && result !== null ? result.text : result;
   }, [t]);
-  
+
   const { url: pageUrl, department: urlDepartment } = usePageContext();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -41,11 +50,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const statusTimeoutRef = useRef(null); // Ref for the active display timeout
   const isProcessingQueue = useRef(false); // Ref to prevent concurrent processing
   const isTyping = useRef(false);
-const [ariaLiveMessage, setAriaLiveMessage] = useState('');
-  // Add this new state to prevent multiple loading announcements
-  const [loadingAnnounced, setLoadingAnnounced] = useState(false);
-
- // This effect monitors displayStatus changes to update screen reader announcements
+  const [ariaLiveMessage, setAriaLiveMessage] = useState('');
+   const [loadingAnnounced, setLoadingAnnounced] = useState(false);
+// This effect monitors displayStatus changes to update screen reader announcements
   useEffect(() => {
     if (isLoading) {
       // Update aria-live message whenever displayStatus changes to one of our key statuses
@@ -88,7 +95,7 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
       }
     }
   }, [isLoading, displayStatus, messages, t, selectedDepartment, safeT, loadingAnnounced]);
-
+  
   // --- Save state changes to localStorage ---
   useEffect(() => {
     localStorage.setItem('selectedAI', selectedAI);
@@ -235,7 +242,7 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
           ...prevMessages,
           {
             id: errorMessageId,
-            text: safeT('homepage.chat.messages.characterLimit'),
+           text: safeT('homepage.chat.messages.characterLimit'),
             sender: 'system',
             error: true
           }
@@ -329,13 +336,13 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
               error: true
             },
             {
-              id: blockedMessageId,
+              id: redactionBlockedMsgId,
               text: <div dangerouslySetInnerHTML={{
                 __html:
-                  (error.redactedText.includes('XXX') 
-                    ? safeT('homepage.chat.messages.privateContent')
-                    : safeT('homepage.chat.messages.blockedContent'))
-              }} />,
+                  (error.redactedText.includes('XXX')
+                     ? safeT('homepage.chat.messages.privateContent')
+                     : safeT('homepage.chat.messages.blockedContent'))
+                     }} />,
               sender: 'system',
               error: true
             }
@@ -347,7 +354,7 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
           setMessages(prevMessages => [
             ...prevMessages,
             {
-              id: errorMessageId,
+              id: systemErrorMsgId,
               text: safeT('homepage.chat.messages.error'),
               sender: 'system',
               error: true
@@ -424,9 +431,9 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
     let sentences = message.interaction.sentences;
     const displayUrl = message.interaction.citationUrl;
     const finalConfidenceRating = message.interaction.confidenceRating ? message.interaction.confidenceRating : '0.1';
-  
+
     const messageDepartment = message?.department || selectedDepartment;
-  
+
     return (
       <div className="ai-message-content">
         {sentences.map((sentence, sentenceIndex) => (
@@ -452,10 +459,10 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
                 </a>
               </p>
             )}
-            {/* <p key={`${messageId}-confidence`} className="confidence-rating">
-              {finalConfidenceRating !== undefined && `${safeT('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
+            {/*<p key={`${messageId}-confidence`} className="confidence-rating">
+              {finalConfidenceRating !== undefined && `${t('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
               {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
-              {aiService && `${safeT('homepage.chat.citation.ai')} ${aiService}`}
+              {aiService && `${t('homepage.chat.citation.ai')} ${aiService}`}
               {messageDepartment && ` | ${messageDepartment}`}
             </p> */}
           </div>
@@ -468,9 +475,9 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
   const handleDepartmentChange = (department) => {
     setSelectedDepartment(department);
   };
-
+  
   const initialInput = t('homepage.chat.input.initial');
-
+  
   return (
     <>
       <ChatInterface
@@ -496,10 +503,9 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
         MAX_CONVERSATION_TURNS={MAX_CONVERSATION_TURNS}
         t={t}
         lang={lang}
-      // Pass admin status and override toggle state/handler to ChatInterface
-      isAdmin={isAdmin}
-      isOverrideTestingActive={isOverrideTestingActive}
-      handleOverrideToggleChange={handleOverrideToggleChange}
+        isAdmin={isAdmin}
+        isOverrideTestingActive={isOverrideTestingActive}
+        handleOverrideToggleChange={handleOverrideToggleChange}
         privacyMessage={safeT('homepage.chat.messages.privacy')}
         getLabelForInput={() =>
           turnCount === 0
@@ -515,7 +521,8 @@ const [ariaLiveMessage, setAriaLiveMessage] = useState('');
                ? t('homepage.chat.input.followUp').ariaLabel
                : undefined)
         }
-          chatId={chatId}
+        extractSentences={extractSentences}
+        chatId={chatId}
       />
       <div
         aria-live="polite"
