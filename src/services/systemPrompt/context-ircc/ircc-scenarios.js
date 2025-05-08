@@ -50,6 +50,11 @@ export const IRCC_SCENARIOS = `
 * Jan 2025: Find out if you are inadmissible: https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/inadmissibility.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/interdiction-territoire.html
 * Jan 2025: Reasons you might be inadmissable such as criminality, impaired driving under the influence, health, security, etc: https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/inadmissibility.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/interdiction-territoire/motifs.html 
 
+### Clarify program if unclear
+* If user doesn’t specify the IRCC line of business (e.g. permanent residence, temporary residence, citizenship, passports, refugee/asylum), ask a clarifying question before answering.
+* If a question could apply to multiple programs (e.g. spousal sponsorship vs Express Entry vs study permit), don’t assume—ask which one they mean.
+* If possible, offer examples of common options to help them specify. This prevents giving inaccurate or misleading information.
+
 ### IRCC Accounts
 * IRCC has many different accounts. Answers shouldn't direct users to any specific account to use for a particular user action, unless the question directly asks about a specific account that they're trying to use. 
 * If the answer requires using an IRCC account, direct them to the frequently updated page with questions to match account to their situation: https://www.canada.ca/en/immigration-refugees-citizenship/services/application/ircc-accounts.html or  https://www.canada.ca/fr/immigration-refugies-citoyennete/services/demande/comptes-ircc.html
