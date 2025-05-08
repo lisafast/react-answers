@@ -14,11 +14,10 @@ const ChatViewer = () => {
   const { language } = usePageContext();
   const [chatId, setChatId] = useState('');
   const [logs, setLogs] = useState([]);
-  const [isPolling, setIsPolling] = useState(false);
-  const [pollingInterval, setPollingInterval] = useState(null);
   const tableRef = useRef(null);
   const dataTableRef = useRef(null);
   const [expandedMetadata, setExpandedMetadata] = useState(null);
+  const [logLevelFilter, setLogLevelFilter] = useState('info'); // Default to info (lowercase)
 
   // Auto-refresh once on initial mount
   useEffect(() => {
@@ -30,16 +29,17 @@ const ChatViewer = () => {
 
   // DataTable initialization and update
   useEffect(() => {
-    if (logs?.length > 0 && tableRef.current) {
-      // Ensure we clean up any existing DataTable before creating a new one
+    // Filter logs by logLevelFilter before passing to DataTable
+    const filteredLogs = logLevelFilter
+      ? logs.filter((log) => (log.logLevel || '').toLowerCase() === logLevelFilter)
+      : logs;
+    if (filteredLogs?.length > 0 && tableRef.current) {
       if (dataTableRef.current) {
         dataTableRef.current.destroy();
         dataTableRef.current = null;
       }
-
-      // Initialize DataTable
       dataTableRef.current = $(tableRef.current).DataTable({
-        data: logs, // Directly provide data during initialization
+        data: filteredLogs,
         columns: [
           {
             title: 'Created At',
@@ -118,12 +118,10 @@ const ChatViewer = () => {
           },
         ],
         order: [[0, 'desc']],
-        scrollX: true, // Enable horizontal scrolling for the whole table
-        pageLength: 50, // Set number of items per page to 50
-        // Add styling options for the table
+        scrollX: true,
+        pageLength: 50,
         drawCallback: function () {
           Prism.highlightAll();
-
           // Update styling for metadata containers
           $('.metadata-wrapper').css({
             position: 'relative',
@@ -180,10 +178,7 @@ const ChatViewer = () => {
             });
         },
       });
-
-      // No need to add rows here as we're providing the data during initialization
     }
-
     return () => {
       if (dataTableRef.current) {
         dataTableRef.current.destroy();
@@ -194,85 +189,32 @@ const ChatViewer = () => {
 
   const handleChatIdChange = (e) => {
     const newValue = e.target ? e.target.value : e;
-
-    // If chat ID changes, stop polling and clear the data table
     if (newValue !== chatId) {
-      if (isPolling && pollingInterval) {
-        console.log('Stopping polling due to chat ID change');
-        clearInterval(pollingInterval);
-        setIsPolling(false);
-        setPollingInterval(null);
-      }
-
-      // Properly cleanup DataTable before clearing logs
       if (dataTableRef.current) {
-        console.log('Destroying DataTable instance before changing chat ID');
         dataTableRef.current.destroy();
         dataTableRef.current = null;
       }
-
-      // Clear logs when chat ID changes
       setLogs([]);
     }
-
     setChatId(newValue);
   };
 
-  // Explicitly refresh the chat ID from localStorage when button is clicked
   const handleRefreshChatId = () => {
-    console.log('Refreshing chat ID from localStorage');
     const storedChatId = localStorage.getItem('chatId');
     if (storedChatId) {
-      console.log('Found chat ID in localStorage:', storedChatId);
       setChatId(storedChatId);
-    } else {
-      console.log('No chat ID found in localStorage');
     }
   };
 
   const fetchLogs = async () => {
-    if (!chatId) {
-      console.log('No chat ID available, cannot fetch logs');
-      return;
-    }
-
-    console.log('Fetching logs for chat ID:', chatId);
+    if (!chatId) return;
     try {
       const data = await DataStoreService.getLogs(chatId);
-      console.log('Logs fetched successfully:', data.logs?.length || 0, 'entries');
       setLogs(data.logs || []);
     } catch (error) {
-      console.error('Error fetching logs:', error);
       setLogs([]);
     }
   };
-
-  const handleStartStopLogging = () => {
-    const newIsPolling = !isPolling;
-    console.log(newIsPolling ? 'Starting' : 'Stopping', 'logging with chat ID:', chatId);
-    setIsPolling(newIsPolling);
-
-    if (!newIsPolling && pollingInterval) {
-      clearInterval(pollingInterval);
-      setPollingInterval(null);
-      return;
-    }
-
-    // Initial fetch if we're starting polling - uses whatever ID is currently in the input
-    if (newIsPolling) {
-      fetchLogs(); // Uses current chatId state value
-      const interval = setInterval(fetchLogs, 5000);
-      setPollingInterval(interval);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-      }
-    };
-  }, [pollingInterval]);
 
   useEffect(() => {
     // Control body scroll when modal is open
@@ -281,7 +223,6 @@ const ChatViewer = () => {
     } else {
       document.body.style.overflow = 'auto';
     }
-
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -319,20 +260,27 @@ const ChatViewer = () => {
           </div>
 
           <div className="space-y-6">
-            <div className="flex gap-4 items-center">
-              <GcdsButton
-                type="button"
-                disabled={!chatId}
-                onClick={handleStartStopLogging}
-              >
-                {isPolling ? t('logging.pause') : t('logging.start')}
-              </GcdsButton>
-              {isPolling && (
-                <div className="text-green-600 font-medium">
-                  Polling active for chat ID: {chatId}
-                </div>
-              )}
-            </div>
+
+          <div className="flex gap-4 items-center">
+            <GcdsButton
+              type="button"
+              disabled={!chatId}
+              onClick={fetchLogs}
+            >
+              Pull Logs
+            </GcdsButton>
+            <select
+              value={logLevelFilter}
+              onChange={(e) => setLogLevelFilter(e.target.value)}
+              className="form-control p-2 border rounded"
+              style={{ minWidth: 120, fontSize: '14px', height: '36px' }}
+            >
+              <option value="info">INFO</option>
+              <option value="warn">WARN</option>
+              <option value="error">ERROR</option>
+              <option value="">All Levels</option>
+            </select>
+          </div>
 
             {chatId && logs && (
               <div className="bg-white shadow rounded-lg">
