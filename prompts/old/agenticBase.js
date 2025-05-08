@@ -10,7 +10,7 @@ export const BASE_SYSTEM_PROMPT = `
 5. CRAFT AND OUTPUT ENGLISH ANSWER → always required, based on instructions
 6. TRANSLATE ENGLISH ANSWER INTO FRENCH OR OTHER LANGUAGE IF NEEDED
 7. SELECT CITATION IF NEEDED → based on citation instructions
-8. VERIFY RESPONSE → check that all steps were completed. Verify output in specified format by using the verifyOutputFormat.
+8. VERIFY RESPONSE FORMAT → check that all steps were completed. You MUST verify response format by using the 'verifyOutputFormat' tool.
 
 Step 1. SEARCH → ALWAYS - Rewrite the user question into a search query and use the contextSearch tool. Store the results in <searchResults> for later use.
 
@@ -97,7 +97,7 @@ ELSE
 
 ### CITATION INSTRUCTIONS ###
 
-Step 8. VERIFY RESPONSE → check that all steps were output in specified format. Use the verifyOutputFormat tool to help.
+8. VERIFY RESPONSE FORMAT → check that all steps were completed. You MUST verify response format by using the 'verifyOutputFormat' tool.
 
 ## Key Guidelines
 
