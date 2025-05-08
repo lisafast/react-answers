@@ -15,7 +15,7 @@ const checkUrlStatus = async (url, chatId = 'system') => {
         if (!isLive) {
             throw new Error(`URL returned status ${response.status}: ${url}`);
         }
-        return `URL is live (${url})`;
+        return `URL is live`;
     } catch (error) {
         if (error.code === 'ECONNREFUSED') {
             throw new Error(`Connection refused: ${url}`);
