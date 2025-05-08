@@ -444,6 +444,11 @@ export const departments_EN = [
     abbr: 'CIRNAC',
   },
   {
+    name: 'Crown-Indigenous Relations and Northern Affairs Canada',
+    url: 'https://www.cirnac-rcaanc.gc.ca/',
+    abbr: 'CIRNAC',
+  },
+  {
     name: 'Bank of Canada Museum',
     url: 'https://www.bankofcanadamuseum.ca/',
     abbr: null,
@@ -631,6 +636,11 @@ export const departments_EN = [
   {
     name: 'Indigenous Services Canada',
     url: 'https://www.canada.ca/en/indigenous-services-canada.html',
+    abbr: 'ISC',
+  },
+  {
+    name: 'Indigenous Services Canada',
+    url: 'https://www.sac-isc.gc.ca',
     abbr: 'ISC',
   },
   {

@@ -476,7 +476,7 @@ class ChatProcessingService {
   _finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler }) {
     const endTime = Date.now();
     const totalResponseTime = endTime - startTime;
-    ServerLoggingService.info('Finished ChatProcessingService.processMessage', chatId, { requestId, totalResponseTime });
+    ServerLoggingService.info('Finished ChatProcessingService.processMessage', chatId, { finalResponse, totalResponseTime });
     statusEmitterHandler._emitEvent('processing_complete', { finalResponse });
   }
 

@@ -24,7 +24,7 @@ class ToolTrackingHandler extends ConsoleCallbackHandler {
                 status: 'started',
                 error: 'none'
             });
-            ServerLoggingService.debug(`Tool execution started: ${this.chatId}`, this.chatId, { input });
+            ServerLoggingService.info(`Tool execution started: ${toolName}`, this.chatId, { input });
         } catch (error) {
             ServerLoggingService.error(`Error in handleToolStart: ${error.message}`, this.chatId, error);
             // Don't throw, just log the error
@@ -41,7 +41,7 @@ class ToolTrackingHandler extends ConsoleCallbackHandler {
                 toolCall.endTime = Date.now();
                 toolCall.duration = toolCall.endTime - toolCall.startTime;
                 toolCall.status = 'completed';
-                ServerLoggingService.debug(`Tool execution completed: ${toolCall.tool}`, this.chatId, {
+                ServerLoggingService.info(`Tool execution completed: ${toolCall.tool}`, this.chatId, {
                     duration: toolCall.duration,
                     output: typeof output === 'object' ? JSON.stringify(output) : output
                 });

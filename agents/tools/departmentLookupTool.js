@@ -48,7 +48,7 @@ const departmentLookup = tool(
       }
     }
 
-    return "Department not found for the provided URL.";
+    return "Department not found for the provided URL: " + url;
   }, // <-- Correct placement of closing brace and removal of duplicate return
   {
     name: "departmentLookup",

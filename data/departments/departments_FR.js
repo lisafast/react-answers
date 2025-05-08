@@ -889,6 +889,11 @@ export const departments_FR = [
     abbr: 'RCAANC',
   },
   {
+    name: 'Relations Couronne-Autochtones et Affaires du Nord Canada',
+    url: 'https://www.rcaanc-cirnac.gc.ca/',
+    abbr: 'RCAANC',
+  },
+  {
     name: 'Régime de pensions du Canada',
     url: 'https://www.canada.ca/fr/services/prestations/pensionspubliques.html',
     abbr: 'RPC',
@@ -951,6 +956,11 @@ export const departments_FR = [
   {
     name: 'Services aux Autochtones Canada',
     url: 'https://www.canada.ca/fr/services-autochtones-canada.html',
+    abbr: 'SAC',
+  },
+  {
+    name: 'Services aux Autochtones Canada',
+    url: 'https://www.sac-isc.gc.ca/',
     abbr: 'SAC',
   },
   {

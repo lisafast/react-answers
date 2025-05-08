@@ -16,6 +16,10 @@ const verifyOutputFormatLogic = async (response) => {
     let isValid = true;
     let errorMessage = "";
 
+    if (!response) {
+        throw new Error("Response is empty or undefined. You must provide your complete response to the user as a string for verification.");
+    }
+
     // 1. <preliminary-checks> block and required children
     const prelimMatch = response.match(/<preliminary-checks>([\s\S]*?)<\/preliminary-checks>/);
     if (!prelimMatch) {
@@ -96,6 +100,7 @@ const verifyOutputFormat = tool(
         name: "verifyOutputFormat",
         description: "Verifies that the agent's response string adheres to the required XML format, checking for all necessary tags and structure. Throws an error if the format is invalid.",
         schema: {
+            
             type: "object",
             properties: {
                 response: {

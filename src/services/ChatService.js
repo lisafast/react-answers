@@ -261,13 +261,6 @@ export class ChatService {
         onStatusUpdate(PipelineStatus.TOOL_START, details);
         break;
       }
-      case 'tool_error': {
-        const toolName = parsedData.toolName || 'unknown';
-        const message = parsedData.message || 'An unknown tool error occurred.';
-        details = { key: 'homepage.chat.status.tool_error', params: { toolName, message } };
-        onStatusUpdate(PipelineStatus.TOOL_ERROR, details);
-        break;
-      }
       case 'agent_error': {
         details = { key: 'homepage.chat.messages.error', params: {} };
         onStatusUpdate(PipelineStatus.AGENT_ERROR, details);

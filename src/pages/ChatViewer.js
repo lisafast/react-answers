@@ -9,6 +9,8 @@ import 'prismjs/components/prism-json.js';
 import 'prismjs/components/prism-xml-doc.js';
 import DataStoreService from '../services/DataStoreService.js';
 
+const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
+
 const ChatViewer = () => {
   const { t } = useTranslations();
   const { language } = usePageContext();
@@ -29,9 +31,13 @@ const ChatViewer = () => {
 
   // DataTable initialization and update
   useEffect(() => {
-    // Filter logs by logLevelFilter before passing to DataTable
+    // Inclusive log level filtering
     const filteredLogs = logLevelFilter
-      ? logs.filter((log) => (log.logLevel || '').toLowerCase() === logLevelFilter)
+      ? logs.filter((log) => {
+          const logLevelIndex = LOG_LEVELS.indexOf((log.logLevel || '').toLowerCase());
+          const filterLevelIndex = LOG_LEVELS.indexOf(logLevelFilter);
+          return logLevelIndex >= filterLevelIndex && logLevelIndex !== -1;
+        })
       : logs;
     if (filteredLogs?.length > 0 && tableRef.current) {
       if (dataTableRef.current) {
@@ -185,7 +191,7 @@ const ChatViewer = () => {
         dataTableRef.current = null;
       }
     };
-  }, [logs]);
+  }, [logs, logLevelFilter]); // <-- add logLevelFilter as a dependency
 
   const handleChatIdChange = (e) => {
     const newValue = e.target ? e.target.value : e;
@@ -275,6 +281,7 @@ const ChatViewer = () => {
               className="form-control p-2 border rounded"
               style={{ minWidth: 120, fontSize: '14px', height: '36px' }}
             >
+              <option value="debug">DEBUG</option>
               <option value="info">INFO</option>
               <option value="warn">WARN</option>
               <option value="error">ERROR</option>

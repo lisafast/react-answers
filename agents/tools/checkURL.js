@@ -2,7 +2,7 @@ import { tool } from "@langchain/core/tools";
 import axios from 'axios';
 import { Agent } from 'https';
 
-const checkUrlStatus = async (url, chatId = 'system') => {
+const checkUrlStatus = async (url) => {
     const httpsAgent = new Agent({ rejectUnauthorized: false });
 
     try {
@@ -32,8 +32,8 @@ const checkUrlStatus = async (url, chatId = 'system') => {
 };
 
 const checkUrlStatusTool = tool(
-    async ({ url, chatId = 'system' }) => {
-        return await checkUrlStatus(url, chatId);
+    async ({ url }) => {
+        return await checkUrlStatus(url);
     },
     {
         name: "checkUrl",
