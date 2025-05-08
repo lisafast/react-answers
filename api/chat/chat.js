@@ -82,11 +82,11 @@ async function sseMessageHandler(req, res) {
 
   // Subscribe to events for this specific request
   statusEmitter.on(eventName, handleStatusUpdate);
-  ServerLoggingService.info(`SSE Listener attached for request ${requestId}`, chatId);
+  ServerLoggingService.debug(`SSE Listener attached for request ${requestId}`, chatId);
 
   // Handle client disconnect
   res.on('close', () => {
-    ServerLoggingService.info(`SSE connection closed by client for request ${requestId}`, chatId);
+    ServerLoggingService.debug(`SSE connection closed by client for request ${requestId}`, chatId);
     cleanupAndEnd('res.on(close)'); // Uncommented to ensure cleanup on client disconnect
   });
 
@@ -129,7 +129,7 @@ async function sseMessageHandler(req, res) {
        return;
     }
 
-    ServerLoggingService.info('Chat API request received, starting processing', chatId, { requestId });
+    ServerLoggingService.debug('Chat API request received, starting processing', chatId, { requestId });
 
     // Remove originContext from processParams
     const processParams = {
@@ -149,7 +149,7 @@ async function sseMessageHandler(req, res) {
 
     // If processMessage completes without throwing, the 'processing_complete' event
     // should have triggered cleanupAndEnd via handleStatusUpdate.
-    ServerLoggingService.info(`ChatProcessingService awaited successfully for request ${requestId}`, chatId);
+    ServerLoggingService.debug(`ChatProcessingService awaited successfully for request ${requestId}`, chatId);
     // We might need a final check here in case the complete event didn't fire cleanup somehow
     if (!isClosed) {
         ServerLoggingService.warn(`Handler finished but cleanup not triggered for request ${requestId}. Forcing cleanup.`, chatId);
