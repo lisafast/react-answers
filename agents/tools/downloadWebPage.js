@@ -15,7 +15,7 @@ const tokenizer = getEncoding("cl100k_base"); // OpenAI's default tokenizer
  */
 function extractBodyContentWithLinks($, maxTokens = 8000) {
     const bodyContent = [];
-    const blockTags = new Set(['p', 'div', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'ul', 'ol', 'hr']);
+    const blockTags = new Set(['p', 'div', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'ul', 'ol', 'hr', 'details', 'summary']);
     const mainTag = $('main');
     let totalTokens = 0;
 
@@ -34,6 +34,12 @@ function extractBodyContentWithLinks($, maxTokens = 8000) {
                 if (text) content = text;
             } else if (element.tagName === 'a') {
                 content = $.html(element).trim();
+            } else if (element.tagName === 'details') {
+                // Special handling for details element
+                const summary = tag.find('summary').text().trim();
+                const detailsContent = tag.find('*:not(summary)').text().trim();
+                if (summary) content = `Summary: ${summary}\n`;
+                if (detailsContent) content += `Details: ${detailsContent}\n`;
             } else if (blockTags.has(element.tagName)) {
                 const text = tag.text().trim();
                 if (text) content = text + '\n';
