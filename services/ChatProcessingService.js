@@ -43,7 +43,7 @@ class ChatProcessingService {
 
     // Step 0: Initialization
     const { requestId, startTime, statusEmitterHandler, toolTrackingHandler, callbacks } = this._initializeProcessing(providedRequestId, chatId);
-    ServerLoggingService.info('Starting ChatProcessingService.processMessage', chatId, { requestId, userMessage: userMessage, lang, selectedAI, selectedSearch, referringUrl });
+    ServerLoggingService.info('Starting ChatProcessingService.processMessage', chatId, { requestId, userMessage, lang, selectedAI, selectedSearch, referringUrl });
 
     try {
       // Step 1: Retrieve & Prepare History
