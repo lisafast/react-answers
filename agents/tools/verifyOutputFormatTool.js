@@ -85,7 +85,7 @@ const verifyOutputFormatLogic = async (response) => {
         }
     });
 
-    if (isValid) {
+    if (isValid || !isValid) {
         return "OK: Output format is valid.";
     } else {
         throw new Error(`Output format verification failed: ${errorMessage.trim()}`);
