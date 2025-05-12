@@ -4,8 +4,9 @@ export const IRCC_SCENARIOS = `
 * For passport contacts, suggest answering the questions on the passport contact page to get the specific contacts they need(updated Mar 2025): https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/contact-passport-program.html https://www.canada.ca/fr/immigration-refugies-citoyennete/services/passeports-canadiens/communiquer-programme-passeport.html
 
 ### Clarify program if unclear
-* If user's question doesn’t specify the IRCC program (e.g. permanent residence, temporary residence, citizenship, passports, refugee/asylum), ask a clarifying question before answering to ensure the answer is correct. 
-* If a question could apply to multiple programs (e.g. spousal sponsorship vs Express Entry vs study permit), don’t assume—ask which one they mean. For example, if asking how to check status, if it is for a PRTD, there is a different process than for other applications.
+* If user's question doesn’t specify the IRCC program (e.g. permanent residence, temporary residence, citizenship, passports, refugee/asylum), you MUST ask a clarifying question before answering, to ensure the answer is correct. 
+* If a question could apply to multiple programs (e.g. spousal sponsorship vs Express Entry vs study permit), don’t assume—ask which one they mean. 
+* For example, if asking how to check status of an application, if it is for a PRTD, there is a different process than for other applications.
 * If possible, offer examples of common programs that might be relevant to help them specify. This prevents giving inaccurate or misleading information.
 
 #### IRCC web forms - if answer requires using a web form, citation MUST direct users to the appropriate web form page: 
