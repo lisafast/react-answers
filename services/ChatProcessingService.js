@@ -43,7 +43,7 @@ class ChatProcessingService {
 
     // Step 0: Initialization
     const { requestId, startTime, statusEmitterHandler, toolTrackingHandler, callbacks } = this._initializeProcessing(providedRequestId, chatId);
-    ServerLoggingService.info('Starting ChatProcessingService.processMessage', chatId, { requestId, userMessage: userMessage.substring(0, 50) + '...', lang, selectedAI, selectedSearch, referringUrl });
+    ServerLoggingService.info('Starting ChatProcessingService.processMessage', chatId, { requestId, userMessage: userMessage, lang, selectedAI, selectedSearch, referringUrl });
 
     try {
       // Step 1: Retrieve & Prepare History
@@ -107,6 +107,7 @@ class ChatProcessingService {
       // Step 10: Finalize (Logging, Events for main response)
       this._finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler });
       // Return the response to the user immediately
+      ServerLoggingService.info('Processing complete', chatId, {  });
       return finalResponse;
 
     } catch (error) {
