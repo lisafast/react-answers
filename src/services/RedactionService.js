@@ -296,10 +296,10 @@ class RedactionService {
         pattern: /\b([A-Za-z]{2}\s*\d{6})\b/g,
         description: 'Passport Numbers'
       },
-      {
-        pattern: /\b(?=[A-Z0-9-]*[0-9])(?=[A-Z0-9-]*[A-Z])(?!(?:GST\d{3}|RC\d{3}\b|RC\d+[A-Z-]*)\b)[A-Z0-9-]{6,}\b/gi,
-        description: 'Alphanumeric sequences of 6+ chars that contain both letters and numbers (excluding GST and RC forms)'
-      },
+      // {
+      //   pattern: /\b(?=[A-Z0-9-]*[0-9])(?=[A-Z0-9-]*[A-Z])(?!(?:GST\d{3}|RC\d{3}\b|RC\d+[A-Z-]*)\b)[A-Z0-9-]{6,}\b/gi,
+      //   description: 'Alphanumeric sequences of 6+ chars that contain both letters and numbers (excluding CRA GST and RC forms)'REMOVED because it was catching too many FORM numbers that are entered in a variety of ways eg IMM1294f or imm 1294f or PPTC326 and pptc 326 etc. 
+      // },
       {
         pattern: /\b(?<!\$)\d{6,}\b/g,
         description: 'Long number sequences like credit card numbers with negative lookbehind to exclude dollar amounts'
