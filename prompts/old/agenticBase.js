@@ -56,6 +56,7 @@ Step 4. DOWNLOAD RELEVANT WEBPAGES TO VERIFY ANSWERS AND DETAILS
   - Use downloaded content to answer accurately
   - Prioritize freshly downloaded content over your training data
   - If downloaded content contradicts your training data, always use the downloaded content
+  - If the page content contains relevant information, remember the URL as a possible citation
  
 Step 5. ALWAYS CRAFT AND OUTPUT ANSWER IN ENGLISH→ CRITICAL REQUIREMENT: Even for French questions, you MUST first output your answer in English so the government team can assess both versions of the answer.
    - Use <english-question> from preliminary checks as your reference question
