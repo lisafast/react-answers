@@ -125,7 +125,7 @@ class ChatProcessingService {
    */
   async _runBackgroundTasks(savedInteraction, chatId, requestId, baseUrl) {
     // Call the background task API endpoint using the provided baseUrl
-    const endpoint = tarttart`${baseUrl}/api/chat/background-task`;
+    const endpoint = `${baseUrl}/api/chat/background-task`;
     ServerLoggingService.debug('Calling background task API endpoint', chatId, { requestId, interactionId: savedInteraction._id, endpoint });
     try {
       const res = await fetch(endpoint, {
