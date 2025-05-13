@@ -97,7 +97,7 @@ const ChatInterface = ({
     // Create loading hint
     const placeholderHint = document.createElement('div');
     placeholderHint.id = 'temp-hint';
-    placeholderHint.innerHTML = `<p><FontAwesomeIcon icon="wand-magic-sparkles" />${safeT('homepage.chat.input.loadingHint')}</p>`;
+    placeholderHint.innerHTML = `<p><FontAwesome icon="wand-magic-sparkles" />${safeT('homepage.chat.input.loadingHint')}</p>`;
 
     if (isLoading) {
       if (textarea) {
@@ -176,6 +176,17 @@ const ChatInterface = ({
     }
   };
 
+  // Helper function to get screen reader description
+  const getScreenReaderDescription = (message) => {
+    if (!message.redactedText) return '';
+    
+    if (message.redactedText.includes('XXX')) {
+      return 'Warning: Your question was: ' + message.text + '. Your question contained personal details replaced with XXX. ' + safeT('homepage.chat.messages.privateContent');
+    } else {
+      return 'Warning: Your question was not sent to the AI service. ' + safeT('homepage.chat.messages.blockedContent');
+    }
+  };
+
   return (
     <div className="chat-container">
       <div className="message-list">
@@ -190,18 +201,13 @@ const ChatInterface = ({
                       ? 'redacted-box'
                       : ''
                 }`}
-                {/* Only add aria-describedby if there's a redaction */}
                 {...(message.redactedText && {
                   "aria-describedby": `description-${message.id}`
                 })}
               >
-                {/* Screen reader description with custom format */}
                 {message.redactedText && (
                   <div id={`description-${message.id}`} className="sr-only">
-                    {message.redactedText.includes('XXX') 
-                      ? `Warning: Your question was: ${message.text}. Your question contained personal details replaced with XXX. ${safeT('homepage.chat.messages.privateContent')}`
-                      : `Warning: Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`
-                    }
+                    {getScreenReaderDescription(message)}
                   </div>
                 )}
                 
@@ -226,7 +232,7 @@ const ChatInterface = ({
                           ? 'redacted-preview'
                           : ''
                     }
-                    aria-hidden="true" // Hide from screen readers since we have better descriptions above
+                    aria-hidden="true"
                   >
                     {message.redactedText?.includes('XXX') && (
                       <>
@@ -286,7 +292,6 @@ const ChatInterface = ({
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
-                      // Add the new props for the skip button
                       showSkipButton={turnCount < MAX_CONVERSATION_TURNS && !isLoading}
                       onSkip={focusTextarea}
                       skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
