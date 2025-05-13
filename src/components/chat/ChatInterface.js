@@ -181,13 +181,11 @@ const ChatInterface = ({
     if (!message.redactedText) return '';
     
     if (message.redactedText.includes('XXX')) {
-      // For privacy/redacted messages - read the original question
-      const warningMsg = `Warning: Your question was: ${message.text}. Your question contained personal details replaced with XXX. ${safeT('homepage.chat.messages.privateContent')}`;
-      return warningMsg;
+      // For privacy messages - read the original question with XXX explanation
+      return `Warning: Your question was ${message.text}. Personal information in your question was identified as XXX. ${safeT('homepage.chat.messages.privateContent')}`;
     } else {
-      // For blocked messages - do NOT read the ##### symbols
-      const warningMsg = `Warning: Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`;
-      return warningMsg;
+      // For blocked messages - no question text, just the warning
+      return `Warning: Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`;
     }
   };
 
@@ -223,8 +221,9 @@ const ChatInterface = ({
                         ? 'redacted-message'
                         : ''
                   }
+                  aria-hidden={message.redactedText?.includes('###') ? 'true' : undefined}
                 >
-                  {message.text}
+                  {message.redactedText?.includes('###') ? '' : message.text}
                 </p>
                 
                 {message.redactedItems?.length > 0 && message.redactedText && (
