@@ -5,7 +5,7 @@ import { getAgent } from '../agents/agentFactory.js'; // Import the actual agent
 import { StatusEventEmitterHandler } from '../agents/StatusEventEmitterHandler.js'; // Import new handler
 import { ToolTrackingHandler } from '../agents/ToolTrackingHandler.js'; // Import tool tracking handler
 import { parseResponse } from '../utils/responseParser.js';
-import PromptBuilderService from './OldPromptBuilderService.js'; // ADDED new prompt builder service
+import PromptBuilderService from './PromptBuilderService.js'; // ADDED new prompt builder service
 import CitationVerificationService from './CitationVerificationService.js'; // Import the new service
 import EmbeddingService from './EmbeddingService.js'; // Import EmbeddingService
 import EvaluationService from './EvaluationService.js'; // Import EvaluationService
@@ -296,7 +296,7 @@ class ChatProcessingService {
       }).lean(); // Use .lean() for plain JS objects
 
       if (overrides && overrides.length > 0) {
-        ServerLoggingService.debug(`Found ${overrides.length} active overrides for user`, chatId, { requestId, overrideUserId });
+        ServerLoggingService.info(`Found ${overrides.length} active overrides for user`, chatId, { requestId, overrideUserId });
         overrides.forEach(override => {
           // Use a consistent key format (e.g., relative path from prompts dir)
           // Assuming override.filename stores something like 'base/availableTools.js' or 'scenarios/context-specific/cra/cra-scenarios.js'

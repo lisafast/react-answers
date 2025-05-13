@@ -1,130 +1,108 @@
-import { ROLE_AND_GOAL } from '../prompts/base/roleAndGoal.js';
-import { AVAILABLE_TOOLS } from '../prompts/base/availableTools.js';
-import { WORKFLOW_STEPS } from '../prompts/base/workflowSteps.js';
-import { PRELIMINARY_CHECKS_INSTRUCTIONS } from '../prompts/base/preliminaryChecksInstructions.js';
-import { DEPARTMENT_MATCHING_INSTRUCTIONS } from '../prompts/base/departmentMatchingInstructions.js';
-import { DEPARTMENT_SCENARIOS_INSTRUCTIONS } from '../prompts/base/departmentScenariosInstructions.js';
-import { ANSWER_CONTEXT_INSTRUCTIONS } from '../prompts/base/answerContextInstructions.js';
-import { ANSWER_CRAFTING_INSTRUCTIONS } from '../prompts/base/answerCraftingInstructions.js';
-import { TRANSLATION_INSTRUCTIONS } from '../prompts/base/translationInstructions.js';
+import ServerLoggingService from './ServerLoggingService.js';
+import { ROLE } from '../prompts/base/roleAndGoal.js';
+import { BASE_SYSTEM_PROMPT } from '../prompts/base/agenticBase.js';
+import { CONTEXT_PROMPT } from '../prompts/base/contextSystemPrompt.js';
 import { CITATION_INSTRUCTIONS } from '../prompts/base/citationInstructions.js';
-import { FORMAT_VERIFICATION_INSTRUCTIONS } from '../prompts/base/formatVerificationInstructions.js';
 import { KEY_GUIDELINES } from '../prompts/base/keyGuidelines.js';
 import { SCENARIOS } from '../prompts/base/scenarios-all.js';
-import DataStoreService from './DataStoreService.js'; // Added for DB access
-import PromptDiscoveryService from './PromptDiscoveryService.js'; // Added for path lookup
-import ServerLoggingService from './ServerLoggingService.js'; // Renamed import alias
-import fs from 'fs/promises'; // Needed to read default files
+import { REMINDERS } from '../prompts/base/reminders.js';
+
 
 /**
  * Assembles the complete system prompt from modular components.
  */
 class PromptBuilderService {
 
-  static getPromptFileOrder() {
-    return [
-      'roleAndGoal.js',
-      'availableTools.js',
-      'workflowSteps.js',
-      'preliminaryChecksInstructions.js',
-      'departmentMatchingInstructions.js',
-      'departmentScenariosInstructions.js',
-      'scenarios-all.js',
-      'answerContextInstructions.js',
-      'answerCraftingInstructions.js',
-      'translationInstructions.js',
-      'citationInstructions.js',
-      'formatVerificationInstructions.js',
-      'keyGuidelines.js'
-    ];
-  }
+    static getPromptFileOrder() {
+        return [
+            'roleAndGoal.js',
+            'agenticBase.js',
+            'workflowSteps.js',
+            'contextSystemPrompt.js',
+            'citationInstructions.js',
+            'keyGuidelines.js',
+            'scenarios-all.js',
+            'reminders.js',
+        ];
+    }
 
-  /**
- * Builds the complete system prompt string, using provided overrides if available.
- * @param {string} [language='en'] - The language code ('en' or 'fr').
- * @param {string} [referringUrl=''] - The referring URL from the user's context.
- * @param {object} [overrides={}] - Optional map of filename/content overrides.
- * @returns {Promise<string>} The assembled system prompt.
- */
-  async buildPrompt(language = 'en', referringUrl = '', overrides = {}) {
-    try {
-      // Helper function to get prompt content (override or default)
-      const getPromptContent = async (filename, defaultExportedContent) => {
-        // Check if an override exists in the provided map
+
+    /**
+   * Builds the complete system prompt string, using provided overrides if available.
+   * @param {string} [language='en'] - The language code ('en' or 'fr').
+   * @param {string} [referringUrl=''] - The referring URL from the user's context.
+   * @param {object} [overrides={}] - Optional map of filename/content overrides.
+   * @returns {Promise<string>} The assembled system prompt.
+   */
+
+    static promptContentMap = {
+        'roleAndGoal.js': ROLE,
+        'agenticBase.js': BASE_SYSTEM_PROMPT,
+        'contextSystemPrompt.js': CONTEXT_PROMPT,
+        'citationInstructions.js': CITATION_INSTRUCTIONS,
+        'keyGuidelines.js': KEY_GUIDELINES,
+        'scenarios-all.js': SCENARIOS,
+        'reminders.js': REMINDERS
+    };
+
+    /**
+     * Returns the prompt content for a given filename, using overrides if provided, otherwise the default from promptContentMap.
+     * @param {string} filename
+     * @param {object} overrides
+     * @returns {string}
+     */
+    static getPromptContent(filename, overrides = {}) {
         if (overrides && overrides[filename]) {
-            ServerLoggingService.debug(`Using provided override for prompt: ${filename}`);
+            if (ServerLoggingService?.debug) ServerLoggingService.debug(`Using provided override for prompt: ${filename}`);
             return overrides[filename];
         }
+        return PromptBuilderService.promptContentMap[filename] || '';
+    }
 
-        // No override provided, use the default content
-        // This assumes the defaultExportedContent is the actual content string.
-        // If it's an object/module, adjust logic.
-        // A more robust way might be to read from file path if defaultExportedContent isn't the raw string.
-        // For now, assume the import gives the string content directly.
-        // ServerLoggingService.debug(`Using default content for prompt: ${filename}`);
-        return defaultExportedContent; // Return the imported default
-      };
+    async buildPrompt(language = 'en', referringUrl = '', overrides = {}) {
+        try {
+            
 
+            // Inform LLM about the current page language
+            const languageContext = language === 'fr'
+                ? "<page-language>French</page-language>"
+                : "<page-language>English</page-language>";
 
-      // --- Dynamic Context ---
-      const currentDate = new Date().toLocaleDateString(language === 'fr' ? 'fr-CA' : 'en-CA', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      });
-      const languageContext = language === 'fr'
-        ? "<page-language>French</page-language>"
-        : "<page-language>English</page-language>";
-      const referringUrlContext = `<referring-url>${referringUrl || 'Not provided'}</referring-url>`;
-      const dynamicContext = `
+            const referringUrlContext = referringUrl ? `### Referring URL: <referring-url>${referringUrl}</referring-url>` : '';
+
+            // Add current date information
+            const currentDate = new Date().toLocaleDateString(language === 'fr' ? 'fr-CA' : 'en-CA', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+
+            // Compose the BASE_SYSTEM_PROMPT with possible overrides for its placeholders
+            const baseSystemPrompt = PromptBuilderService.getPromptContent('agenticBase.js', overrides)
+                .replaceAll('### CONTEXT_PROMPT ###', PromptBuilderService.getPromptContent('contextSystemPrompt.js', overrides))
+                .replaceAll('### CITATION INSTRUCTIONS ###', PromptBuilderService.getPromptContent('citationInstructions.js', overrides))
+                .replaceAll('### KEY GUIDELINES ###', PromptBuilderService.getPromptContent('keyGuidelines.js', overrides));
+
+            // Compose the full prompt
+            const fullPrompt = `
+${PromptBuilderService.getPromptContent('roleAndGoal.js', overrides)}
 ## Current date
 Today is ${currentDate}.
-
-## Context for this request
+## Official language context:
 ${languageContext}
 ${referringUrlContext}
+${baseSystemPrompt}
+${PromptBuilderService.getPromptContent('scenarios-all.js', overrides)}
+${PromptBuilderService.getPromptContent('reminders.js', overrides)}
 `;
 
-      // --- Assemble Prompt Modules ---
-      // Map filenames to their imported content
-      const promptContentMap = {
-        'roleAndGoal.js': ROLE_AND_GOAL,
-        'availableTools.js': AVAILABLE_TOOLS,
-        'workflowSteps.js': WORKFLOW_STEPS,
-        'preliminaryChecksInstructions.js': PRELIMINARY_CHECKS_INSTRUCTIONS,
-        'departmentMatchingInstructions.js': DEPARTMENT_MATCHING_INSTRUCTIONS,
-        'departmentScenariosInstructions.js': DEPARTMENT_SCENARIOS_INSTRUCTIONS,
-        'scenarios-all.js': SCENARIOS,
-        'answerContextInstructions.js': ANSWER_CONTEXT_INSTRUCTIONS,
-        'answerCraftingInstructions.js': ANSWER_CRAFTING_INSTRUCTIONS,
-        'translationInstructions.js': TRANSLATION_INSTRUCTIONS,
-        'citationInstructions.js': CITATION_INSTRUCTIONS,
-        'formatVerificationInstructions.js': FORMAT_VERIFICATION_INSTRUCTIONS,
-        'keyGuidelines.js': KEY_GUIDELINES
-      };
-
-      // Build the sectionsContent array dynamically using the static order
-      const fileOrder = PromptBuilderService.getPromptFileOrder();
-      const sectionsContent = await Promise.all([
-        getPromptContent(fileOrder[0], promptContentMap[fileOrder[0]]),
-        Promise.resolve(dynamicContext), // Dynamic context always second
-        ...fileOrder.slice(1).map(filename => getPromptContent(filename, promptContentMap[filename])),
-        Promise.resolve("\nReminder: Follow all steps and guidelines meticulously. Accuracy, adherence to format, and appropriate tool usage are critical.")
-      ]);
-
-      // Filter out any null/undefined sections if fetching failed (though getPromptContent should return default)
-      const validSectionsContent = sectionsContent.filter(content => typeof content === 'string');
-
-      const fullPrompt = validSectionsContent.join('\n\n'); // Join sections with double newline
-
-      ServerLoggingService.info('System prompt assembled successfully', null, { language, overrideProvided: Object.keys(overrides).length > 0, promptLength: fullPrompt.length });
-      return fullPrompt.trim();
-
-    } catch (error) {
-      await ServerLoggingService.error('system', 'PROMPT BUILDER SERVICE ERROR:', error);
-      // Fallback to a minimal prompt structure in case of error
-      // Consider if a more robust fallback is needed
-      return `${ROLE_AND_GOAL}\n${KEY_GUIDELINES}\nError assembling full prompt. Proceed with caution.`;
+            return fullPrompt.trim();
+        } catch (error) {
+            await ServerLoggingService.error('system', 'PROMPT BUILDER SERVICE ERROR:', error);
+            return `Error assembling full prompt. Proceed with caution.`;
+        }
     }
-  }
 }
 
 export { PromptBuilderService };
