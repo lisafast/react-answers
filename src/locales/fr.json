@@ -100,7 +100,7 @@
         "blockedContent": "Votre question contenait des mots qui ne sont pas acceptés.\nVeuillez la reformuler différemment.",
         "blockedMessage": "Votre question n'a pas été envoyée au service d'IA.",
         "privateContent": "Pour protéger votre vie privée, votre question n'a pas été envoyée au service d'intelligence artificielle. Veuillez reposer votre question ci-dessous sans ces informations personnelles.",
-        "privacyMessage": "Les informations personnelles contenues dans votre question ont été identifiées comme XXX.",
+        "privacyMessage": "Les informations personnelles que vous ne pouvez pas inclure dans votre question ont été identifiées comme XXX.",
         "characterWarning": "{count} {unit} restants",
         "characterLimit": "Votre message est trop long de {count} {unit}. Veuillez simplifier votre question.",
         "character": "caractère",
