@@ -181,11 +181,11 @@ const ChatInterface = ({
     if (!message.redactedText) return '';
     
     if (message.redactedText.includes('XXX')) {
-      // For privacy messages - read the original question with XXX explanation
-      return `Warning: Your question was ${message.text}. Personal information in your question was identified as XXX. ${safeT('homepage.chat.messages.privateContent')}`;
+      // For privacy messages - add warning prefix to existing message
+      return `${safeT('homepage.chat.messages.warning')} Your question was ${message.text}. Personal information in your question was identified as XXX. ${safeT('homepage.chat.messages.privateContent')}`;
     } else {
-      // For blocked messages - no question text, just the warning
-      return `Warning: Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`;
+      // For blocked messages - add warning prefix to existing message
+      return `${safeT('homepage.chat.messages.warning')} Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`;
     }
   };
 
@@ -211,10 +211,6 @@ const ChatInterface = ({
                   <>
                     {/* Hidden description linked via aria-describedby */}
                     <div id={`description-${message.id}`} className="sr-only">
-                      {getScreenReaderDescription(message)}
-                    </div>
-                    {/* Live announcement for immediate feedback */}
-                    <div aria-live="polite" className="sr-only">
                       {getScreenReaderDescription(message)}
                     </div>
                   </>
@@ -311,6 +307,13 @@ const ChatInterface = ({
             )}
           </div>
         ))}
+
+        {/* Live announcement region for screen readers */}
+        <div aria-live="polite" className="sr-only" key="announcements">
+          {messages.length > 0 && messages[messages.length - 1].redactedText && (
+            getScreenReaderDescription(messages[messages.length - 1])
+          )}
+        </div>
 
         {isLoading && (
           <>
