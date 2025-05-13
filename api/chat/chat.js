@@ -131,7 +131,7 @@ async function sseMessageHandler(req, res) {
 
     ServerLoggingService.debug('Chat API request received, starting processing', chatId, { requestId });
 
-    // Remove originContext from processParams
+    
     // Extract base URL from request headers (works on Vercel, local, etc.)
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const host = req.headers['x-forwarded-host'] || req.headers.host;

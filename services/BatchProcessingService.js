@@ -69,7 +69,7 @@ class BatchProcessingService {
    * @param {number} [lastProcessedIndex=0] - Index to resume from
    * @returns {Object} Progress info and lastProcessedIndex
    */
-  async processBatchForDuration(batchId, duration, lastProcessedIndex = null) {
+  async processBatchForDuration(batchId, duration, lastProcessedIndex = null, baseUrl) {
     const startTime = Date.now();
     let processedCount = 0;
     let failedCount = 0;
@@ -95,16 +95,17 @@ class BatchProcessingService {
       while (!success && retryCount < MAX_RETRIES) {
         try {
           ServerLoggingService.info('Processing batch chat (timed)', batchId, { chatObjectId, index, attempt: retryCount + 1 });
-          await ChatProcessingService.processMessage({
-            chatId: chatDoc.chatId, // Pass the UUID string
-            userMessage: record.REDACTEDQUESTION,
-            lang: batch.pageLanguage,
-            selectedAI: batch.aiProvider,
-            selectedSearch: batch.searchProvider,
-            referringUrl: record.REFERRINGURL,
-            user: { _id: batch.uploaderUserId },
-            overrideUserId: batch.applyOverrides ? batch.uploaderUserId : null
-          });
+      await ChatProcessingService.processMessage({
+        chatId: chatDoc.chatId, // Pass the UUID string
+        userMessage: record.REDACTEDQUESTION,
+        lang: batch.pageLanguage,
+        selectedAI: batch.aiProvider,
+        selectedSearch: batch.searchProvider,
+        referringUrl: record.REFERRINGURL,
+        user: { _id: batch.uploaderUserId },
+        overrideUserId: batch.applyOverrides ? batch.uploaderUserId : null,
+        baseUrl // Pass baseUrl through
+      });
           processedCount++;
           success = true;
         } catch (error) {

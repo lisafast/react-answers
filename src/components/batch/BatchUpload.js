@@ -180,6 +180,16 @@ const BatchUpload = ({ lang }) => {
       const csvText = await file.text();
       const entries = processCSV(csvText);
       await processBatch(entries);
+      // Reset form state after successful processing
+      setFile(null);
+      setFileUploaded(false);
+      setBatchName('');
+      setSelectedAI('openai');
+      setSelectedSearch('google');
+      setSelectedLanguage('en');
+      setApplyOverrides(false);
+      setBatchId(null);
+      setBatchStatus(null);
     } catch (err) {
       setError(err.message);
       setProcessing(false);

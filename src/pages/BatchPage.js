@@ -59,7 +59,7 @@ const BatchPage = ({ lang = 'en' }) => {
             }
             if (shouldResume) {
               isProcessingChunk = true;
-              // Send lastProcessedIndex to the API
+              // Send lastProcessedIndex to the API (no baseUrl, server will determine it)
               await AuthService.fetchWithAuth(getAbsoluteApiUrl('/api/batch/process-for-duration'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...AuthService.getAuthHeader() },

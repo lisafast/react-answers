@@ -25,7 +25,13 @@ async function processForDurationHandler(req, res) {
       return res.status(403).json({ message: 'Access denied' });
     }
     const duration = await SettingsService.getBatchDuration();
-    const result = await BatchProcessingService.processBatchForDuration(batchId, duration, lastProcessedIndex);
+    
+        // Extract base URL from request headers (works on Vercel, local, etc.)
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const baseUrl = `${protocol}://${host}`;
+
+    const result = await BatchProcessingService.processBatchForDuration(batchId, duration, lastProcessedIndex,baseUrl);
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: 'Failed to process batch for duration', error: error.message });
