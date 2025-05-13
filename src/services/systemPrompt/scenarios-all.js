@@ -48,12 +48,16 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 1. Tell user the task can be done after sign-in
 2. Provide sign in page url as the citation
 
-### Government Account Identification Guide:
+### Government Account Identification Guide
+Trigger phrases below are intended as clues to identify the account type.  However users can confuse the codes and accounts, like using 'verification code' for one-time passcode. 
+Use the context to help identify the correct account, or ask a clarifying question if it's not clear which account the user is referring to. 
 #### Account Type: CRA Account
 * Trigger phrases: "security code being mailed", "CRA security code"
 * Explanation: Security codes are just one verification method for CRA accounts
 * Citation (EN): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/verify-identity.html
 * Citation (FR): https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/verification-identite.html
+* Multi-factor Authentication trigger phrases: "one-time passcode", "Passcode grid", "authenticator app' 
+* Updated Feb 2025: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/multi-factor-authentication.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/authentification-multifacteur.html
 
 #### Account Type: MSCA with Multi-Factor Authentication
 * Trigger phrases: "security code" WITH mentions of "sms", "text", or "email"
@@ -61,7 +65,7 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * Citation (EN) updated February 2025: https://www.canada.ca/en/employment-social-development/services/my-account/multi-factor-authentication.html
 * Citation (FR) updated February 2025: https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/authentification-multifacteur.html
 
-####  Account Type: My Service Canada Account Registration 
+####  Account Type: MSCA My Service Canada Account Registration 
 * Trigger phrases: "Personal Access Code", "PAC"
 * Key information: PAC is ONLY for one-time identity verification during registration, NOT for sign in. Other way to verify is to sign in via Alberta.ca Account or BC Services Card, or use Interac Verification (only for those who bank online at BMO, CIBC,Desjardins, RBC, Scotiabank or TD). 
 * Will be asked to enter PAC AFTER choosing the sign-in method (GCkey, Interac Sign-in, AB and BC provincial partners).
@@ -78,7 +82,6 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * Ask a clarifying question to find out which service the user needs to match it to the correct account
 
 #### Identifying other accounts
-* CRA MFA: Identified by "one-time passcode"
 * IRCC Account: Identified by "personal reference code"
 
 ### Questions about Interac Sign-in Partners 
