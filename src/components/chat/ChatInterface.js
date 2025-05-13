@@ -190,16 +190,21 @@ const ChatInterface = ({
                       ? 'redacted-box'
                       : ''
                 }`}
+                {/* Only add aria-describedby if there's a redaction */}
                 {...(message.redactedText && {
-                  role: "alert",
-                  "aria-describedby": 
-                    message.redactedText.includes('XXX')
-                      ? `privacy-description-${message.id}`
-                      : message.redactedText.includes('###')
-                        ? `redacted-description-${message.id}`
-                        : undefined
+                  "aria-describedby": `description-${message.id}`
                 })}
               >
+                {/* Screen reader description with custom format */}
+                {message.redactedText && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    Warning: Your question was: {message.text}. {message.redactedText.includes('XXX') 
+                      ? `Your question contained personal details replaced with XXX. ${safeT('homepage.chat.messages.privateContent')}`
+                      : `${safeT('homepage.chat.messages.blockedContent')}`
+                    }
+                  </div>
+                )}
+                
                 <p
                   className={
                     message.redactedText?.includes('XXX')
@@ -211,19 +216,6 @@ const ChatInterface = ({
                 >
                   {message.text}
                 </p>
-                
-                {/* Screen reader descriptions */}
-                {message.redactedText?.includes('XXX') && (
-                  <div id={`privacy-description-${message.id}`} className="sr-only">
-                    {safeT('homepage.chat.messages.privateContent')}
-                  </div>
-                )}
-                
-                {message.redactedText?.includes('###') && (
-                  <div id={`redacted-description-${message.id}`} className="sr-only">
-                    {safeT('homepage.chat.messages.blockedContent')}
-                  </div>
-                )}
                 
                 {message.redactedItems?.length > 0 && message.redactedText && (
                   <p
