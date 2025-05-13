@@ -208,9 +208,16 @@ const ChatInterface = ({
                 })}
               >
                 {message.redactedText && (
-                  <div id={`description-${message.id}`} className="sr-only">
-                    {getScreenReaderDescription(message)}
-                  </div>
+                  <>
+                    {/* Hidden description linked via aria-describedby */}
+                    <div id={`description-${message.id}`} className="sr-only">
+                      {getScreenReaderDescription(message)}
+                    </div>
+                    {/* Live announcement for immediate feedback */}
+                    <div aria-live="polite" className="sr-only">
+                      {getScreenReaderDescription(message)}
+                    </div>
+                  </>
                 )}
                 
                 <p
@@ -223,7 +230,7 @@ const ChatInterface = ({
                   }
                   aria-hidden={message.redactedText?.includes('###') ? 'true' : undefined}
                 >
-                  {message.redactedText?.includes('###') ? '' : message.text}
+                  {message.text}
                 </p>
                 
                 {message.redactedItems?.length > 0 && message.redactedText && (
