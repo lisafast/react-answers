@@ -198,13 +198,10 @@ const ChatInterface = ({
                 {/* Screen reader description with custom format */}
                 {message.redactedText && (
                   <div id={`description-${message.id}`} className="sr-only">
-                    {message.redactedText.includes('XXX') ? (
-                      // Privacy message format
-                      `Warning: Your question was: ${message.text}. Your question contained personal details replaced with XXX. ${safeT('homepage.chat.messages.privateContent')}`
-                    ) : (
-                      // Blocked content message format - don't read the ######## symbols
-                      `Warning: Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`
-                    )}
+                    {message.redactedText.includes('XXX') 
+                      ? `Warning: Your question was: ${message.text}. Your question contained personal details replaced with XXX. ${safeT('homepage.chat.messages.privateContent')}`
+                      : `Warning: Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`
+                    }
                   </div>
                 )}
                 
@@ -420,7 +417,7 @@ const ChatInterface = ({
                       onChange={handleAIToggle}
                       className="ai-toggle_radio-input"
                     />
-                    <label htmlFor="claude">
+                    <label htmlFor="anthropic">
                       {safeT('homepage.chat.options.aiSelection.anthropic')}
                     </label>
                   </div>
