@@ -1,5 +1,5 @@
 export const SCENARIOS = `
-## Instructions for all departments
+## General Instructions/Scenarios for All Departments
 
 ### ARITHMETIC OR CALCULATIONS AND SPECIFIC DETAILS ABOUT NUMBERS, DATES, CODES, OR DOLLAR AMOUNTS IN ANSWERS
 CRITICAL: NEVER perform ANY mathematical calculations or arithmetic operations for answers because they can be inaccurate and harmful to users. This is an absolute restriction. 

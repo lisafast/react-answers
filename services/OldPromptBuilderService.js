@@ -1,14 +1,30 @@
 import ServerLoggingService from './ServerLoggingService.js';
-import { CITATION_INSTRUCTIONS } from '../prompts/old/citationInstructions.js';
+import { ROLE } from '../prompts/old/roleAndGoal.js';
 import { BASE_SYSTEM_PROMPT } from '../prompts/old/agenticBase.js';
 import { CONTEXT_PROMPT } from '../prompts/old/contextSystemPrompt.js';
-import { ROLE } from '../prompts/old/roleAndGoal.js';
-import { AVAILABLE_TOOLS } from '../prompts/old/availableTools.js';
+import { CITATION_INSTRUCTIONS } from '../prompts/old/citationInstructions.js';
+import { KEY_GUIDELINES } from '../prompts/old/keyGuidelines.js';
 import { SCENARIOS } from '../prompts/old/scenarios-all.js';
+import { REMINDERS } from '../prompts/old/reminders.js';
+
+
 /**
  * Assembles the complete system prompt from modular components.
  */
 class PromptBuilderService {
+
+    static getPromptFileOrder() {
+        return [
+            'roleAndGoal.js',
+            'agenticBase.js',
+            'workflowSteps.js',
+            'contextSystemPrompt.js',
+            'citationInstructions.js',
+            'keyGuidelines.js',
+            'scenarios-all.js',
+            'reminders.js',
+        ];
+    }
 
 
 
@@ -19,9 +35,34 @@ class PromptBuilderService {
    * @param {object} [overrides={}] - Optional map of filename/content overrides.
    * @returns {Promise<string>} The assembled system prompt.
    */
+
+    static promptContentMap = {
+        'roleAndGoal.js': ROLE,
+        'agenticBase.js': BASE_SYSTEM_PROMPT,
+        'contextSystemPrompt.js': CONTEXT_PROMPT,
+        'citationInstructions.js': CITATION_INSTRUCTIONS,
+        'keyGuidelines.js': KEY_GUIDELINES,
+        'scenarios-all.js': SCENARIOS,
+        'reminders.js': REMINDERS
+    };
+
+    /**
+     * Returns the prompt content for a given filename, using overrides if provided, otherwise the default from promptContentMap.
+     * @param {string} filename
+     * @param {object} overrides
+     * @returns {string}
+     */
+    static getPromptContent(filename, overrides = {}) {
+        if (overrides && overrides[filename]) {
+            if (ServerLoggingService?.debug) ServerLoggingService.debug(`Using provided override for prompt: ${filename}`);
+            return overrides[filename];
+        }
+        return PromptBuilderService.promptContentMap[filename] || '';
+    }
+
     async buildPrompt(language = 'en', referringUrl = '', overrides = {}) {
         try {
-            const citationInstructions = CITATION_INSTRUCTIONS;
+            
 
             // Inform LLM about the current page language
             const languageContext = language === 'fr'
@@ -38,36 +79,26 @@ class PromptBuilderService {
                 day: 'numeric',
             });
 
-            // add context from contextService call into systme prompt
-            const contextPrompt = CONTEXT_PROMPT;
-            const role = ROLE;
-            const availableTools = AVAILABLE_TOOLS;
+            // Compose the BASE_SYSTEM_PROMPT with possible overrides for its placeholders
+            const baseSystemPrompt = PromptBuilderService.getPromptContent('agenticBase.js', overrides)
+                .replaceAll('### CONTEXT_PROMPT ###', PromptBuilderService.getPromptContent('contextSystemPrompt.js', overrides))
+                .replaceAll('### CITATION INSTRUCTIONS ###', PromptBuilderService.getPromptContent('citationInstructions.js', overrides))
+                .replaceAll('### KEY GUIDELINES ###', PromptBuilderService.getPromptContent('keyGuidelines.js', overrides));
 
+            // Compose the full prompt
             const fullPrompt = `
-            ${role}
-      
-            ## Current date
-            Today is ${currentDate}.
-            ## Official language context:
-            ${languageContext}
-            ${referringUrlContext}
+${PromptBuilderService.getPromptContent('roleAndGoal.js', overrides)}
+## Current date
+Today is ${currentDate}.
+## Official language context:
+${languageContext}
+${referringUrlContext}
+${baseSystemPrompt}
+${PromptBuilderService.getPromptContent('scenarios-all.js', overrides)}
+${PromptBuilderService.getPromptContent('reminders.js', overrides)}
+`;
 
-            
-          
-            ${BASE_SYSTEM_PROMPT.replaceAll('### CONTEXT_PROMPT ###', contextPrompt).replaceAll('### CITATION INSTRUCTIONS ###', citationInstructions)}
-      
-            ## General Instructions/Scenarios for All Departments
-            ${SCENARIOS}
-      
-            
-      
-          Reminder: the answer should be brief, in plain language, accurate and must be sourced from Government of Canada online content at ALL turns in the conversation. If you're unsure about any aspect or lack enough information for more than a a sentence or two, provide only those sentences that you are sure of.
-          Reminder: Did you verify the response format by using the "verifyOutputFormat" tool? DO NOT RESPONSE WITHOUT USING THE "verifyOutputFormat" TOOL.
-          `;
-
-
-            return fullPrompt;
-
+            return fullPrompt.trim();
         } catch (error) {
             await ServerLoggingService.error('system', 'PROMPT BUILDER SERVICE ERROR:', error);
             return `Error assembling full prompt. Proceed with caution.`;
