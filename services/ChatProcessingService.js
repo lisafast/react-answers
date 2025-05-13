@@ -300,7 +300,9 @@ class ChatProcessingService {
     ServerLoggingService.debug('Invoking agent', chatId, { requestId, messageCount: agentMessages.length });
     const agentResult = await agent.invoke(
       { messages: agentMessages },
-      { callbacks } // Pass the original callbacks
+      { callbacks }, 
+      { recursion_limit: 50 }
+
     );
     ServerLoggingService.debug('Agent layer invocation complete', chatId, { requestId });
     return agentResult;

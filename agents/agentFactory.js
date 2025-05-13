@@ -26,7 +26,7 @@ const createGenericAgent = async (llmType, tools, chatId) => { // Keep chatId fo
 
     try {
         // Create agent without attaching callbacks here
-        const agent = await createReactAgent({ llm, tools });
+        const agent = await createReactAgent({ llm, tools, });
         // agent.callbacks = callbacks; // Removed
         return agent;
     } catch (error) {

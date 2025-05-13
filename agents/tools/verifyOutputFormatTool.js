@@ -17,7 +17,7 @@ const verifyOutputFormatLogic = async (response) => {
     let errorMessage = "";
 
     if (!response) {
-        throw new Error("Response is empty or undefined. You must provide your complete response to the user as a string for verification.");
+        throw new Error("Response is empty or undefined. You must provide the possible response in the <possible-response> tag.");
     }
 
     // 1. <preliminary-checks> block and required children
@@ -103,7 +103,7 @@ const verifyOutputFormatLogic = async (response) => {
 
 const verifyOutputFormat = tool(
     async ({ response }) => {
-        return await verifyOutputFormatLogic(response);
+        return await verifyOutputFormatLogic(possibleResponse);
     },
     {
         name: "verifyOutputFormat",
@@ -112,12 +112,12 @@ const verifyOutputFormat = tool(
             
             type: "object",
             properties: {
-                response: {
+                possibleResponse: {
                     type: "string",
-                    description: "The message that you are going to send the user. The complete message must be provided including all necessary tags."
+                    description: "The possible response message that you are going to send the user in the <possible-response> tag. The complete message must be provided including all necessary tags."
                 }
             },
-            required: ["response"]
+            required: ["possibleResponse"]
         }
     }
 );

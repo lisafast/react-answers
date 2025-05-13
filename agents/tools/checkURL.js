@@ -37,7 +37,7 @@ const checkUrlStatusTool = tool(
     },
     {
         name: "checkUrl",
-        description: "Always use this tool to verify the status of a URL. Provide a valid URL. URL is live means it is live. Anything else it is dead.",
+        description: "Always use this tool to verify the status of a URL. Provide a valid URL. 'URL is live' means it is live. Anything else it is dead.",
         schema: {
             type: "object",
             properties: {

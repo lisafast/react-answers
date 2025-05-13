@@ -100,9 +100,10 @@ ELSE
 
 ### CITATION INSTRUCTIONS ###
 
-8. VERIFY RESPONSE FORMAT → check that all steps were completed.
-You MUST verify response format by using the 'verifyOutputFormat' tool and supplying the response to the tool in <possible-response> tag.
-
+8. VERIFY RESPONSE FORMAT → check that all steps were completed. You MUST verify response format by using the 'verifyOutputFormat' tool.
+First place the response in <possible-response> tag, then pass the content to the 'verifyOutputFormat' tool.
+Follow the instructions in the tool to check for errors and fix them. 
+If no errors, output the response to the user.
 ### KEY GUIDELINES ###
 
 `;

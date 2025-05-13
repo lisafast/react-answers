@@ -38,7 +38,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const [selectedAI, setSelectedAI] = useState(() => localStorage.getItem('selectedAI') || 'openai');
   const [selectedSearch, setSelectedSearch] = useState(() => localStorage.getItem('selectedSearch') || 'google');
   const [showFeedback, setShowFeedback] = useState(false);
-  const [referringUrl, setReferringUrl] = useState(() => localStorage.getItem('referringUrl') || pageUrl || '');
+  const [referringUrl, setReferringUrl] = useState(pageUrl || '');
   const [selectedDepartment, setSelectedDepartment] = useState(urlDepartment || ''); // Department is derived, not stored directly
   const [turnCount, setTurnCount] = useState(0);
   const messageIdCounter = useRef(0);
@@ -105,12 +105,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     localStorage.setItem('selectedSearch', selectedSearch);
   }, [selectedSearch]);
 
-  useEffect(() => {
-    // Only save if it's not the initial pageUrl to avoid overwriting dynamic context
-    if (referringUrl !== pageUrl) {
-      localStorage.setItem('referringUrl', referringUrl);
-    }
-  }, [referringUrl, pageUrl]);
+
 
   useEffect(() => {
     localStorage.setItem('isOverrideTestingActive', isOverrideTestingActive);
@@ -382,11 +377,6 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
 
   // Effect to set initial referringUrl from page context if not already set or loaded
   useEffect(() => {
-    const storedUrl = localStorage.getItem('referringUrl');
-    // Only set from pageUrl if there's no stored URL and pageUrl exists
-    if (!storedUrl && pageUrl) {
-      setReferringUrl(pageUrl);
-    }
     // Set department based on URL context (either initial page or loaded/changed referringUrl)
     if (urlDepartment && !selectedDepartment) {
        setSelectedDepartment(urlDepartment);

@@ -33,6 +33,12 @@ Use the following information to select the most relevant citation link:
    b. use the most relevant canada.ca theme page url (theme page urls all start with https://www.canada.ca/en/services/ or https://www.canada.ca/fr/services/)
    c. use <departmentURL> if available
 
+### URL Verification Process:
+a. MUST verify final citation URL using the "checkUrl" tool before responding
+b. If a URL fails verification:
+   - Try up to 5 alternative citation URLs
+   - Move to the next level in the fallback hierarchy if no alternatives work
+
 ### Citation URL format
 - Produce the citation link in this format:
    a. Output this heading, in the language of the user's question, wrapped in tags: <citation-head>Check your answer and take the next step:</citation-head>
