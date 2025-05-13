@@ -97,8 +97,9 @@ class ChatProcessingService {
       const finalResponse = this._formatFinalResponse({
         finalAnswer, finalCitationUrl, confidenceRating, savedInteraction
       });
+      
       // Always run background tasks and finalize (no originContext check)
-      this._runBackgroundTasks(savedInteraction, chatId, requestId, baseUrl)
+      await this._runBackgroundTasks(savedInteraction, chatId, requestId, baseUrl)
         .catch(bgError => {
           // Log errors from the async background task initiation itself, if any
           ServerLoggingService.error('Error initiating background tasks', chatId, { requestId, interactionId: savedInteraction?._id, error: bgError.message });
@@ -107,7 +108,7 @@ class ChatProcessingService {
       // Step 10: Finalize (Logging, Events for main response)
       this._finalizeProcessing({ chatId, requestId, startTime, finalResponse, statusEmitterHandler });
       // Return the response to the user immediately
-      ServerLoggingService.info('Processing complete', chatId, {  });
+      
       return finalResponse;
 
     } catch (error) {
@@ -128,7 +129,8 @@ class ChatProcessingService {
     const endpoint = `${baseUrl}/api/chat/background-task`;
     ServerLoggingService.debug('Calling background task API endpoint', chatId, { requestId, interactionId: savedInteraction._id, endpoint });
     try {
-      const res = await fetch(endpoint, {
+      // Fire and forget: start fetch but do not await it
+      fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -136,15 +138,13 @@ class ChatProcessingService {
           chatId,
           requestId
         })
+      }).catch(error => {
+        ServerLoggingService.error('Error calling background task API', chatId, { requestId, interactionId: savedInteraction._id, error: error.message });
       });
-      if (!res.ok) {
-        throw new Error(`Background task API call failed: ${res.statusText}`);
-      }
-      
     } catch (error) {
-      ServerLoggingService.error('Error calling background task API', chatId, { requestId, interactionId: savedInteraction._id, error: error.message });
+      ServerLoggingService.error('Error initiating background task fetch', chatId, { requestId, interactionId: savedInteraction._id, error: error.message });
     }
-    ServerLoggingService.debug('Finished background task API call', chatId, { requestId, interactionId: savedInteraction._id });
+    ServerLoggingService.debug('Finished background task API call (fire and forget)', chatId, { requestId, interactionId: savedInteraction._id });
   }
 
   /**
