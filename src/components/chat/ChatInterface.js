@@ -190,6 +190,15 @@ const ChatInterface = ({
                       ? 'redacted-box'
                       : ''
                 }`}
+                {...(message.redactedText && {
+                  role: "alert",
+                  "aria-describedby": 
+                    message.redactedText.includes('XXX')
+                      ? `privacy-description-${message.id}`
+                      : message.redactedText.includes('###')
+                        ? `redacted-description-${message.id}`
+                        : undefined
+                })}
               >
                 <p
                   className={
@@ -202,6 +211,20 @@ const ChatInterface = ({
                 >
                   {message.text}
                 </p>
+                
+                {/* Screen reader descriptions */}
+                {message.redactedText?.includes('XXX') && (
+                  <div id={`privacy-description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.privateContent')}
+                  </div>
+                )}
+                
+                {message.redactedText?.includes('###') && (
+                  <div id={`redacted-description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.blockedContent')}
+                  </div>
+                )}
+                
                 {message.redactedItems?.length > 0 && message.redactedText && (
                   <p
                     className={
@@ -211,6 +234,7 @@ const ChatInterface = ({
                           ? 'redacted-preview'
                           : ''
                     }
+                    aria-hidden="true" // Hide from screen readers since we have better descriptions above
                   >
                     {message.redactedText?.includes('XXX') && (
                       <>
