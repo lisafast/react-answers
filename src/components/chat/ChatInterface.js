@@ -182,10 +182,12 @@ const ChatInterface = ({
     
     if (message.redactedText.includes('XXX')) {
       // For privacy/redacted messages - read the original question
-      return 'Warning: Your question was: ' + message.text + '. Your question contained personal details replaced with XXX. ' + safeT('homepage.chat.messages.privateContent');
+      const warningMsg = `Warning: Your question was: ${message.text}. Your question contained personal details replaced with XXX. ${safeT('homepage.chat.messages.privateContent')}`;
+      return warningMsg;
     } else {
       // For blocked messages - do NOT read the ##### symbols
-      return 'Warning: Your question was not sent to the AI service. ' + safeT('homepage.chat.messages.blockedContent');
+      const warningMsg = `Warning: Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`;
+      return warningMsg;
     }
   };
 
