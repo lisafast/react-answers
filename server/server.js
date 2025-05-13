@@ -21,6 +21,7 @@ import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 import dbDeleteSystemLogsHandler from '../api/db/db-delete-system-logs.js';
 import chatHandler from '../api/chat/chat.js';
+import backgroundTaskHandler from '../api/chat/background-task.js';
 import { createBatchHandler, listBatchesHandler, getBatchResultsHandler, batchStatusHandler, cancelBatchHandler } from '../api/batch/index.js';
 // Import prompt API handlers
 import promptListHandler from '../api/prompts/list.js';
@@ -81,6 +82,7 @@ app.delete('/api/db/db-delete-system-logs', dbDeleteSystemLogsHandler);
 
 
 app.post('/api/chat/chat', chatHandler); // Keep existing chat handler (now refactored)
+app.post('/api/chat/background-task', backgroundTaskHandler); // New background task endpoint
 
 // Add new batch routes
 app.post('/api/batch/create', createBatchHandler);

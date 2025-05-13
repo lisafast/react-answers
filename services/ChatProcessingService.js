@@ -36,7 +36,7 @@ class ChatProcessingService {
     // Destructure all potential parameters
     const {
       userMessage, lang, selectedAI, selectedSearch, referringUrl,
-      requestId: providedRequestId, user, overrideUserId, chatId, interactionId
+      requestId: providedRequestId, user, overrideUserId, chatId, interactionId, baseUrl
     } = params;
 
     // Use chatId directly
@@ -98,7 +98,7 @@ class ChatProcessingService {
         finalAnswer, finalCitationUrl, confidenceRating, savedInteraction
       });
       // Always run background tasks and finalize (no originContext check)
-      this._runBackgroundTasks(savedInteraction, chatId, requestId)
+      this._runBackgroundTasks(savedInteraction, chatId, requestId, baseUrl)
         .catch(bgError => {
           // Log errors from the async background task initiation itself, if any
           ServerLoggingService.error('Error initiating background tasks', chatId, { requestId, interactionId: savedInteraction?._id, error: bgError.message });
@@ -123,11 +123,41 @@ class ChatProcessingService {
    * @param {string} chatId - The chat ID.
    * @param {string} requestId - The unique ID for tracking.
    */
-  async _runBackgroundTasks(savedInteraction, chatId, requestId) {
+  async _runBackgroundTasks(savedInteraction, chatId, requestId, baseUrl) {
+    // Call the background task API endpoint using the provided baseUrl
+    const endpoint = `${baseUrl}/api/chat/background-task`;
+    ServerLoggingService.debug('Calling background task API endpoint', chatId, { requestId, interactionId: savedInteraction._id, endpoint });
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          interactionId: savedInteraction._id,
+          chatId,
+          requestId
+        })
+      });
+      if (!res.ok) {
+        throw new Error(`Background task API call failed: ${res.statusText}`);
+      }
+      
+    } catch (error) {
+      ServerLoggingService.error('Error calling background task API', chatId, { requestId, interactionId: savedInteraction._id, error: error.message });
+    }
+    ServerLoggingService.debug('Finished background task API call', chatId, { requestId, interactionId: savedInteraction._id });
+  }
+
+  /**
+   * Actually performs the background work (embedding, evaluation) for a saved interaction.
+   * This should be called by the background-task API handler, NOT by user-facing code.
+   * @param {object} savedInteraction - The already persisted interaction document.
+   * @param {string} chatId - The chat ID.
+   * @param {string} requestId - The unique ID for tracking.
+   */
+  async runBackgroundTaskWorkers(savedInteraction, chatId, requestId) {
     ServerLoggingService.debug('Starting background tasks', chatId, { requestId, interactionId: savedInteraction._id });
     try {
       // Fetch the fully populated interaction if needed by services
-      // Assuming DataStoreService has a method like findInteractionById
       const populatedInteraction = await DataStoreService.findInteractionById(savedInteraction._id);
 
       if (!populatedInteraction) {

@@ -132,6 +132,11 @@ async function sseMessageHandler(req, res) {
     ServerLoggingService.debug('Chat API request received, starting processing', chatId, { requestId });
 
     // Remove originContext from processParams
+    // Extract base URL from request headers (works on Vercel, local, etc.)
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const baseUrl = `${protocol}://${host}`;
+
     const processParams = {
       chatId,
       userMessage,
@@ -143,8 +148,9 @@ async function sseMessageHandler(req, res) {
       overrideUserId,
       requestId ,
       interactionId,
+      baseUrl,
     };
-    // Call ChatProcessingService.processMessage without originContext
+    // Call ChatProcessingService.processMessage with baseUrl
     await ChatProcessingService.processMessage(processParams);
 
     // If processMessage completes without throwing, the 'processing_complete' event
