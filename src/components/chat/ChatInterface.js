@@ -126,11 +126,8 @@ const ChatInterface = ({
   
     const getLastMessageSentenceCount = () => {
     const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
-    if (lastAiMessage && lastAiMessage.interaction && lastAiMessage.interaction.answer && lastAiMessage.interaction.answer.paragraphs && lastAiMessage.interaction.answer.paragraphs.length > 0) {
-      return lastAiMessage.interaction.answer.paragraphs.reduce(
-        (count, paragraph) => count + extractSentences(paragraph).length,
-        0
-      );
+    if (lastAiMessage && lastAiMessage.interaction && lastAiMessage.interaction.sentences) {
+      return lastAiMessage.interaction.sentences.length;
     }
     return 1;
   };

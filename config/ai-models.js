@@ -21,7 +21,7 @@ const AI_MODELS = {
     }
   },
   openai: {
-    default: 'gpt-4.1-2025-04-14',
+    default: 'gpt-4o',
     models: {
       'gpt-4.1-2025-04-14': {
         maxTokens: 1024,
