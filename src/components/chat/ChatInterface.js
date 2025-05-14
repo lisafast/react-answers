@@ -97,7 +97,7 @@ const ChatInterface = ({
     // Create loading hint
     const placeholderHint = document.createElement('div');
     placeholderHint.id = 'temp-hint';
-    placeholderHint.innerHTML = `<p><FontAwesome icon="wand-magic-sparkles" />${safeT('homepage.chat.input.loadingHint')}</p>`;
+    placeholderHint.innerHTML = `<p><FontAwesomeIcon icon="wand-magic-sparkles" />${safeT('homepage.chat.input.loadingHint')}</p>`;
 
     if (isLoading) {
       if (textarea) {
@@ -176,19 +176,6 @@ const ChatInterface = ({
     }
   };
 
-  // Helper function to get screen reader description
-  const getScreenReaderDescription = (message) => {
-    if (!message.redactedText) return '';
-    
-    if (message.redactedText.includes('XXX')) {
-      // For privacy messages - add warning prefix to existing message
-      return `${safeT('homepage.chat.messages.warning')} Your question was ${message.text}. Personal information in your question was identified as XXX. ${safeT('homepage.chat.messages.privateContent')}`;
-    } else {
-      // For blocked messages - add warning prefix to existing message
-      return `${safeT('homepage.chat.messages.warning')} Your question was not sent to the AI service. ${safeT('homepage.chat.messages.blockedContent')}`;
-    }
-  };
-
   return (
     <div className="chat-container">
       <div className="message-list">
@@ -204,16 +191,20 @@ const ChatInterface = ({
                       : ''
                 }`}
                 {...(message.redactedText && {
+                  role: "alert",
                   "aria-describedby": `description-${message.id}`
                 })}
               >
-                {message.redactedText && (
-                  <>
-                    {/* Hidden description linked via aria-describedby */}
-                    <div id={`description-${message.id}`} className="sr-only">
-                      {getScreenReaderDescription(message)}
-                    </div>
-                  </>
+                {/* Screen reader only descriptions */}
+                {message.redactedText?.includes('XXX') && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.yourQuestionWas')} {message.text}. {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
+                  </div>
+                )}
+                {message.redactedText?.includes('###') && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.blockedMessage')} {safeT('homepage.chat.messages.blockedContent')}
+                  </div>
                 )}
                 
                 <p
@@ -224,11 +215,10 @@ const ChatInterface = ({
                         ? 'redacted-message'
                         : ''
                   }
-                  aria-hidden={message.redactedText?.includes('###') ? 'true' : undefined}
+                  {...(message.redactedText?.includes('###') && { "aria-hidden": "true" })}
                 >
                   {message.text}
                 </p>
-                
                 {message.redactedItems?.length > 0 && message.redactedText && (
                   <p
                     className={
@@ -298,6 +288,7 @@ const ChatInterface = ({
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
+                      // Add the new props for the skip button
                       showSkipButton={turnCount < MAX_CONVERSATION_TURNS && !isLoading}
                       onSkip={focusTextarea}
                       skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
@@ -307,13 +298,6 @@ const ChatInterface = ({
             )}
           </div>
         ))}
-
-        {/* Live announcement region for screen readers */}
-        <div aria-live="polite" className="sr-only" key="announcements">
-          {messages.length > 0 && messages[messages.length - 1].redactedText && (
-            getScreenReaderDescription(messages[messages.length - 1])
-          )}
-        </div>
 
         {isLoading && (
           <>
