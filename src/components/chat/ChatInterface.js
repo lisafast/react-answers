@@ -41,6 +41,41 @@ const ChatInterface = ({
     return typeof result === 'object' && result !== null ? result.text : result;
   };
 
+  const [redactionAlert, setRedactionAlert] = useState('');
+  const [lastProcessedMessageId, setLastProcessedMessageId] = useState(null);
+
+  // Effect to announce redaction warnings immediately
+    useEffect(() => {
+        if (messages.length > 0) {
+          const lastMessage = messages[messages.length - 1];
+          const secondLastMessage = messages[messages.length - 2];
+          
+          // Check for redaction warnings (system messages following redacted user messages)
+          if (lastMessage.sender === 'system' && lastMessage.error && secondLastMessage && 
+              secondLastMessage.sender === 'user' && secondLastMessage.redactedText &&
+              lastMessage.id !== lastProcessedMessageId) {
+            
+            let warningMessage = '';
+            
+            if (secondLastMessage.redactedText.includes('XXX')) {
+              warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.privacyMessage')} ${safeT('homepage.chat.messages.privateContent')}`;
+            } else if (secondLastMessage.redactedText.includes('###')) {
+              warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.blockedMessage')} ${safeT('homepage.chat.messages.blockedContent')}`;
+            }
+            
+            if (warningMessage) {
+              setLastProcessedMessageId(lastMessage.id);
+              // Announce warning message followed by the original user message
+              setTimeout(() => {
+                setRedactionAlert(`${warningMessage} ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondLastMessage.text}`);
+                // Clear the alert after a moment
+                setTimeout(() => setRedactionAlert(''), 2000);
+              }, 500);
+            }
+          }
+        }
+      }, [messages, safeT, lastProcessedMessageId]);
+
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
   const textareaRef = useRef(null);
@@ -190,7 +225,22 @@ const ChatInterface = ({
                       ? 'redacted-box'
                       : ''
                 }`}
+                {...(message.redactedText && {
+                  "aria-describedby": `description-${message.id}`
+                })}
               >
+                {/* Screen reader descriptions for navigation */}
+                {message.redactedText?.includes('XXX') && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
+                  </div>
+                )}
+                {message.redactedText?.includes('###') && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.blockedMessage')} {safeT('homepage.chat.messages.blockedContent')}
+                  </div>
+                )}
+                
                 <p
                   className={
                     message.redactedText?.includes('XXX')
@@ -199,6 +249,7 @@ const ChatInterface = ({
                         ? 'redacted-message'
                         : ''
                   }
+                  {...(message.redactedText?.includes('###') && { "aria-hidden": "true" })}
                 >
                   {message.text}
                 </p>
@@ -211,6 +262,7 @@ const ChatInterface = ({
                           ? 'redacted-preview'
                           : ''
                     }
+                    aria-hidden="true"
                   >
                     {message.redactedText?.includes('XXX') && (
                       <>
@@ -401,7 +453,7 @@ const ChatInterface = ({
                       onChange={handleAIToggle}
                       className="ai-toggle_radio-input"
                     />
-                    <label htmlFor="claude">
+                    <label htmlFor="anthropic">
                       {safeT('homepage.chat.options.aiSelection.anthropic')}
                     </label>
                   </div>
@@ -484,6 +536,11 @@ const ChatInterface = ({
           </GcdsDetails>
         </div>
       )}
+      
+      {/* Live region for redaction warnings */}
+      <div aria-live="assertive" className="sr-only">
+        {redactionAlert}
+      </div>
       
     </div>
   );

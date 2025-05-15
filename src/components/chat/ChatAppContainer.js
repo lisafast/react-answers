@@ -49,44 +49,52 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   // Add this new state to prevent multiple loading announcements
   const [loadingAnnounced, setLoadingAnnounced] = useState(false);
 
- // This effect monitors displayStatus changes to update screen reader announcements
+  // This effect monitors displayStatus changes to update screen reader announcements
   useEffect(() => {
     if (isLoading) {
-      // Update aria-live message whenever displayStatus changes to one of our key statuses
+      // Update aria-live message whenever displayStatus changes to key statuses
       if (displayStatus === 'moderatingQuestion') {
-        setAriaLiveMessage(safeT('homepage.chat.messages.moderatingQuestion')); // Will say "Assessing question"
-        setLoadingAnnounced(true); // Mark as announced so we don't repeat unnecessarily
+        setAriaLiveMessage(safeT('homepage.chat.messages.moderatingQuestion'));
+        setLoadingAnnounced(true);
       } else if (displayStatus === 'generatingAnswer') {
-        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer')); // Will say "Thinking..."
-        setLoadingAnnounced(true); // Mark as announced so we don't repeat unnecessarily
+        setAriaLiveMessage(safeT('homepage.chat.messages.generatingAnswer'));
+        setLoadingAnnounced(true);
       }
-      // We don't announce other status changes to avoid too many announcements
     } else {
       // Reset the flag when loading completes
       setLoadingAnnounced(false);
       
       const lastMessage = messages[messages.length - 1];
-      const secondToLastMessage = messages[messages.length - 2];
       
       if (lastMessage) {
-        if (lastMessage.sender === 'ai') {
+        if (lastMessage.sender === 'ai' && !lastMessage.error) {
+          // AI response
           const paragraphs = lastMessage.interaction?.answer?.paragraphs || [];
           const sentences = paragraphs.flatMap(paragraph => extractSentences(paragraph));
           const plainText = sentences.join(' ');
           const citation = lastMessage.interaction?.answer?.citationHead || '';
           const displayUrl = lastMessage.interaction?.citationUrl || '';
           setAriaLiveMessage(`${safeT('homepage.chat.messages.yourAnswerIs')} ${plainText} ${citation} ${displayUrl}`.trim());
-        } else if (lastMessage.sender === 'user') {
+        } else if (lastMessage.sender === 'user' && lastMessage.redactedText) {
+          // Redacted user message - announce the redacted text first
           setAriaLiveMessage(lastMessage.text || '');
-        } else if (lastMessage.error) {
-          // Check if this is a redaction case by looking at the second-to-last message
-          if (secondToLastMessage?.redactedText) {
-            const redactionType = secondToLastMessage.redactedText.includes('XXX') 
-              ? t('homepage.chat.messages.privateContent')
-              : t('homepage.chat.messages.blockedContent');
-            setAriaLiveMessage(`${redactionType}. ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondToLastMessage.redactedText}`);
-          } else {
-            setAriaLiveMessage(lastMessage.errorMessage || t('homepage.chat.messages.error'));
+          // Don't set a timeout here - let ChatInterface handle the warning announcement
+        } else if (lastMessage.sender === 'user' && !lastMessage.redactedText && !lastMessage.error) {
+          // Regular user message
+          setAriaLiveMessage(lastMessage.text || '');
+        } else if (lastMessage.error && lastMessage.sender === 'system') {
+          // System error messages (including character limit, general errors, etc.)
+          if (lastMessage.text) {
+            // Handle React elements by extracting text content
+            if (React.isValidElement(lastMessage.text)) {
+              // For system messages with dangerouslySetInnerHTML, we need the actual text
+              // This is a fallback - ideally the error message should be stored as plain text
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = lastMessage.text.props.dangerouslySetInnerHTML.__html;
+              setAriaLiveMessage(tempDiv.textContent || tempDiv.innerText || '');
+            } else {
+              setAriaLiveMessage(lastMessage.text);
+            }
           }
         }
       }
@@ -263,12 +271,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             },
             {
               id: blockedMessageId,
-              text: <div dangerouslySetInnerHTML={{
-                __html:
-                  (error.redactedText.includes('XXX') 
-                    ? safeT('homepage.chat.messages.privateContent')
-                    : safeT('homepage.chat.messages.blockedContent'))
-              }} />,
+              text: error.redactedText.includes('XXX') 
+                ? safeT('homepage.chat.messages.privateContent')
+                : safeT('homepage.chat.messages.blockedContent'),
               sender: 'system',
               error: true
             }
