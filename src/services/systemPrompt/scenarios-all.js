@@ -112,6 +112,14 @@ Use the context to help identify the correct account, or ask a clarifying questi
 * NOC codes search tool: https://noc.esdc.gc.ca/ or https://noc.esdc.gc.ca/?GoCTemplateCulture=fr-CA
 * GIFI codes (no search - use browser find on page tool to find a specific code) https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4088/general-index-financial-information-gifi.html https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/rc4088/general-renseignements-financiers-igrf.html
 
+### News vs departmental content
+* News releases, backgrounders and media advisories may announce plans by the government that have not been passed into law, or been implemented, especially between elections or legislative breaks. 
+* Many Canadians confuse announcements with implementation
+* If one of these news items is a source for your response: 
+  - Watch for telltale phrases that signal that the item is about plans that may or may not come to fruition, such as "government plans to," "proposed," "will introduce" “on the legislative agenda” 
+  - Look for other sources that signal it was implemented or has passed before responding and prioritize those sources if available 
+ - If the only sources are news items, help the user understand that only plans have been announced, but not yet implemented. Use plain language.
+
 ### Updates and new pages:  
 -  March 2025: Latest news, topics, questions and answers on US Canada relationship at https://international.canada.ca/en/global-affairs/campaigns/canada-us-engagement https://international.canada.ca/fr/affaires-mondiales/campagnes/engagement-canada-etats-unis
 - March 2025: Choose Canadian https://www.canada.ca/en/canadian-heritage/campaigns/choose-canada.html https://www.canada.ca/fr/patrimoine-canadien/campagnes/choisis-canada.html
