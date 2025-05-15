@@ -41,6 +41,22 @@ const ChatInterface = ({
     return typeof result === 'object' && result !== null ? result.text : result;
   };
 
+  const [redactionAlert, setRedactionAlert] = useState('');
+
+  // Effect to announce redaction warnings immediately
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.sender === 'user' && lastMessage.redactedText) {
+        if (lastMessage.redactedText.includes('XXX')) {
+          setRedactionAlert(`${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.privacyMessage')} ${safeT('homepage.chat.messages.privateContent')}`);
+        } else if (lastMessage.redactedText.includes('###')) {
+          setRedactionAlert(`${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.blockedMessage')} ${safeT('homepage.chat.messages.blockedContent')}`);
+        }
+      }
+    }
+  }, [messages, safeT]);
+
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
   const textareaRef = useRef(null);
@@ -194,22 +210,15 @@ const ChatInterface = ({
                   "aria-describedby": `description-${message.id}`
                 })}
               >
-                {/* Screen reader warnings with immediate announcement */}
+                {/* Screen reader descriptions for navigation */}
                 {message.redactedText?.includes('XXX') && (
-                  <div aria-live="assertive" className="sr-only">
+                  <div id={`description-${message.id}`} className="sr-only">
                     {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
                   </div>
                 )}
                 {message.redactedText?.includes('###') && (
-                  <div aria-live="assertive" className="sr-only">
-                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.blockedMessage')} {safeT('homepage.chat.messages.blockedContent')}
-                  </div>
-                )}
-                
-                {/* Traditional aria-describedby description for navigation */}
-                {message.redactedText && (
                   <div id={`description-${message.id}`} className="sr-only">
-                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.blockedMessage')} {safeT('homepage.chat.messages.blockedContent')}
                   </div>
                 )}
                 
@@ -508,6 +517,11 @@ const ChatInterface = ({
           </GcdsDetails>
         </div>
       )}
+      
+      {/* Live region for redaction warnings */}
+      <div aria-live="assertive" className="sr-only">
+        {redactionAlert}
+      </div>
       
     </div>
   );
