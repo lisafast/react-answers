@@ -45,36 +45,36 @@ const ChatInterface = ({
   const [lastProcessedMessageId, setLastProcessedMessageId] = useState(null);
 
   // Effect to announce redaction warnings immediately
-  useEffect(() => {
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      const secondLastMessage = messages[messages.length - 2];
-      
-      // Check for redaction warnings (system messages following redacted user messages)
-      if (lastMessage.sender === 'system' && lastMessage.error && secondLastMessage && 
-          secondLastMessage.sender === 'user' && secondLastMessage.redactedText &&
-          lastMessage.id !== lastProcessedMessageId) {
-        
-        let warningMessage = '';
-        
-        if (secondLastMessage.redactedText.includes('XXX')) {
-          warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.privacyMessage')} ${safeT('homepage.chat.messages.privateContent')}`;
-        } else if (secondLastMessage.redactedText.includes('###')) {
-          warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.blockedMessage')} ${safeT('homepage.chat.messages.blockedContent')}`;
+    useEffect(() => {
+        if (messages.length > 0) {
+          const lastMessage = messages[messages.length - 1];
+          const secondLastMessage = messages[messages.length - 2];
+          
+          // Check for redaction warnings (system messages following redacted user messages)
+          if (lastMessage.sender === 'system' && lastMessage.error && secondLastMessage && 
+              secondLastMessage.sender === 'user' && secondLastMessage.redactedText &&
+              lastMessage.id !== lastProcessedMessageId) {
+            
+            let warningMessage = '';
+            
+            if (secondLastMessage.redactedText.includes('XXX')) {
+              warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.privacyMessage')} ${safeT('homepage.chat.messages.privateContent')}`;
+            } else if (secondLastMessage.redactedText.includes('###')) {
+              warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.blockedMessage')} ${safeT('homepage.chat.messages.blockedContent')}`;
+            }
+            
+            if (warningMessage) {
+              setLastProcessedMessageId(lastMessage.id);
+              // Announce warning message followed by the original user message
+              setTimeout(() => {
+                setRedactionAlert(`${warningMessage} ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondLastMessage.text}`);
+                // Clear the alert after a moment
+                setTimeout(() => setRedactionAlert(''), 2000);
+              }, 500);
+            }
+          }
         }
-        
-        if (warningMessage) {
-          setLastProcessedMessageId(lastMessage.id);
-          // Small delay to ensure the user message is announced first
-          setTimeout(() => {
-            setRedactionAlert(warningMessage);
-            // Clear the alert after a moment to avoid repetition
-            setTimeout(() => setRedactionAlert(''), 1000);
-          }, 500);
-        }
-      }
-    }
-  }, [messages, safeT, lastProcessedMessageId]);
+      }, [messages, safeT, lastProcessedMessageId]);
 
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
