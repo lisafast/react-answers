@@ -14,47 +14,87 @@ async function chatLogsHandler(req, res) {
         const totalCount = await Chat.countDocuments();
         console.log('Total documents in collection:', totalCount);
 
-        const days = parseInt(req.query.days) || 1;
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - days);
-
-        const chats = await Chat.find({
-            createdAt: { $gte: startDate }
-        })
-            .populate({
-                path: 'interactions',
-                populate: [
-                    { path: 'context' },
-                    { 
-                        path: 'expertFeedback',
-                        model: 'ExpertFeedback',
-                        select: '-__v'
-                    },
-                    { 
-                        path: 'question',
-                        select: '-embedding'
-                    },
-                    {
-                        path: 'answer',
-                        select: '-embedding -sentenceEmbeddings',
-                        populate: [
-                            { path: 'sentences' },
-                            { path: 'citation' },
-                            { path: 'tools' },
-                        ]
-                    },
-                    {
-                        path: 'autoEval',
-                        model: 'Eval',
-                        populate: {
+        let chats;
+        const daysParam = req.query.days;
+        if (daysParam === 'all') {
+            // Return all logs
+            chats = await Chat.find({})
+                .populate({
+                    path: 'interactions',
+                    populate: [
+                        { path: 'context' },
+                        { 
                             path: 'expertFeedback',
                             model: 'ExpertFeedback',
                             select: '-__v'
+                        },
+                        { 
+                            path: 'question',
+                            select: '-embedding'
+                        },
+                        {
+                            path: 'answer',
+                            select: '-embedding -sentenceEmbeddings',
+                            populate: [
+                                { path: 'sentences' },
+                                { path: 'citation' },
+                                { path: 'tools' },
+                            ]
+                        },
+                        {
+                            path: 'autoEval',
+                            model: 'Eval',
+                            populate: {
+                                path: 'expertFeedback',
+                                model: 'ExpertFeedback',
+                                select: '-__v'
+                            }
                         }
-                    }
-                ]
+                    ]
+                })
+                .sort({ createdAt: -1 });
+        } else {
+            const days = parseInt(daysParam) || 1;
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - days);
+            chats = await Chat.find({
+                createdAt: { $gte: startDate }
             })
-            .sort({ createdAt: -1 });
+                .populate({
+                    path: 'interactions',
+                    populate: [
+                        { path: 'context' },
+                        { 
+                            path: 'expertFeedback',
+                            model: 'ExpertFeedback',
+                            select: '-__v'
+                        },
+                        { 
+                            path: 'question',
+                            select: '-embedding'
+                        },
+                        {
+                            path: 'answer',
+                            select: '-embedding -sentenceEmbeddings',
+                            populate: [
+                                { path: 'sentences' },
+                                { path: 'citation' },
+                                { path: 'tools' },
+                            ]
+                        },
+                        {
+                            path: 'autoEval',
+                            model: 'Eval',
+                            populate: {
+                                path: 'expertFeedback',
+                                model: 'ExpertFeedback',
+                                select: '-__v'
+                            }
+                        }
+                    ]
+                })
+                .sort({ createdAt: -1 });
+        }
 
         return res.status(200).json({
             success: true,

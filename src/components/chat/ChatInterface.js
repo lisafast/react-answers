@@ -14,13 +14,13 @@ const ChatInterface = ({
   handleSendMessage,
   handleReload,
   handleAIToggle,
-  handleSearchToggle, // Add this prop
+  handleSearchToggle,
   handleDepartmentChange,
   handleReferringUrlChange,
   handleFeedback,
   formatAIResponse,
   selectedAI,
-  selectedSearch, // Add this prop
+  selectedSearch,
   selectedDepartment,
   referringUrl,
   turnCount,
@@ -35,9 +35,22 @@ const ChatInterface = ({
   extractSentences,
   chatId,
 }) => {
+  // Add safeT helper function
+  const safeT = (key) => {
+    const result = t(key);
+    return typeof result === 'object' && result !== null ? result.text : result;
+  };
+
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
   const textareaRef = useRef(null);
+
+  // Function to focus textarea when skip button is clicked
+  const focusTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -84,7 +97,7 @@ const ChatInterface = ({
     // Create loading hint
     const placeholderHint = document.createElement('div');
     placeholderHint.id = 'temp-hint';
-    placeholderHint.innerHTML = `<p><FontAwesomeIcon icon="wand-magic-sparkles" />${t('homepage.chat.input.loadingHint')}</p>`;
+    placeholderHint.innerHTML = `<p><FontAwesomeIcon icon="wand-magic-sparkles" />${safeT('homepage.chat.input.loadingHint')}</p>`;
 
     if (isLoading) {
       if (textarea) {
@@ -106,15 +119,17 @@ const ChatInterface = ({
 
   const getLabelForInput = () => {
     if (turnCount >= 1) {
-      return t('homepage.chat.input.followUp');
+      const followUp = t('homepage.chat.input.followUp');
+      return typeof followUp === 'object' ? followUp.text : followUp;
     }
-    return t('homepage.chat.input.initial');
+    const initial = t('homepage.chat.input.initial');
+    return typeof initial === 'object' ? initial.text : initial;
   };
 
   // TOOD is there a difference between paragraphs and sentrences?
   const getLastMessageSentenceCount = () => {
     const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
-    if (lastAiMessage.interaction.answer.paragraphs.length > 0) {
+    if (lastAiMessage && lastAiMessage.interaction && lastAiMessage.interaction.answer && lastAiMessage.interaction.answer.paragraphs && lastAiMessage.interaction.answer.paragraphs.length > 0) {
       return lastAiMessage.interaction.answer.paragraphs.reduce(
         (count, paragraph) => count + extractSentences(paragraph).length,
         0
@@ -162,7 +177,7 @@ const ChatInterface = ({
   };
 
   return (
-    <div className="chat-container" tabIndex="0">
+    <div className="chat-container">
       <div className="message-list">
         {messages.map((message) => (
           <div key={`message-${message.id}`} className={`message ${message.sender}`}>
@@ -200,11 +215,11 @@ const ChatInterface = ({
                     {message.redactedText?.includes('XXX') && (
                       <>
                         <FontAwesomeIcon icon="fa-circle-exclamation" />{' '}
-                        {t('homepage.chat.messages.privacyMessage')}
+                        {safeT('homepage.chat.messages.privacyMessage')}
                       </>
                     )}
                     {message.redactedText?.includes('###') &&
-                      t('homepage.chat.messages.blockedMessage')}
+                      safeT('homepage.chat.messages.blockedMessage')}
                   </p>
                 )}
               </div>
@@ -235,15 +250,17 @@ const ChatInterface = ({
                 ) : (
                   <>
                     {formatAIResponse(message.aiService, message)}
+                    
                     {chatId && (
                       <div className="chat-id">
                         <p>
-                          {t('homepage.chat.chatId')}: {chatId}
+                          {safeT('homepage.chat.chatId')}: {chatId}
                         </p>
                       </div>
                     )}
                   </>
                 )}
+                
                 {message.id === messages[messages.length - 1].id &&
                   showFeedback &&
                   !message.error &&
@@ -253,6 +270,10 @@ const ChatInterface = ({
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
+                      // Add the new props for the skip button
+                      showSkipButton={turnCount < MAX_CONVERSATION_TURNS && !isLoading}
+                      onSkip={focusTextarea}
+                      skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
                     />
                   )}
               </>
@@ -266,14 +287,14 @@ const ChatInterface = ({
               <div className="loading-animation"></div>
               <div className="loading-text">
                 {displayStatus === 'thinkingWithContext'
-                  ? `${t('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment} - ${currentTopic}`
-                  : t(`homepage.chat.messages.${displayStatus}`)}
+                  ? `${safeT('homepage.chat.messages.thinkingWithContext')}: ${currentDepartment || ''} - ${currentTopic || ''}`
+                  : safeT(`homepage.chat.messages.${displayStatus}`)}
               </div>
             </div>
             <div className="loading-hint-text">
               <FontAwesomeIcon icon="wand-magic-sparkles" />
               &nbsp;
-              {t('homepage.chat.input.loadingHint')}
+              {safeT('homepage.chat.input.loadingHint')}
             </div>
           </>
         )}
@@ -281,9 +302,9 @@ const ChatInterface = ({
         {turnCount >= MAX_CONVERSATION_TURNS && (
           <div key="limit-reached" className="message ai">
             <div className="limit-reached-message">
-              <p>{t('homepage.chat.messages.limitReached', { count: MAX_CONVERSATION_TURNS })}</p>
+              <p>{safeT('homepage.chat.messages.limitReached', { count: MAX_CONVERSATION_TURNS })}</p>
               <button onClick={handleReload} className="btn-primary visible">
-                {t('homepage.chat.buttons.reload')}
+                {safeT('homepage.chat.buttons.reload')}
               </button>
             </div>
           </div>
@@ -295,11 +316,18 @@ const ChatInterface = ({
           {!isLoading && (
             <form className="mrgn-tp-xl mrgn-bttm-lg">
               <div className="field-container">
-                <label htmlFor="message">{getLabelForInput()}</label>
+                <label 
+                  htmlFor="message" 
+                  aria-label={turnCount === 0 
+                    ? (typeof t('homepage.chat.input.initial') === 'object' ? t('homepage.chat.input.initial').ariaLabel : undefined)
+                    : (typeof t('homepage.chat.input.followUp') === 'object' ? t('homepage.chat.input.followUp').ariaLabel : undefined)}
+                >
+                  <span className="aria-hidden" aria-hidden="true">{getLabelForInput()}</span>
+                </label>
                 <span className="hint-text">
                   <FontAwesomeIcon icon="wand-magic-sparkles" />
                   &nbsp;
-                  {t('homepage.chat.input.hint')}
+                  {safeT('homepage.chat.input.hint')}
                 </span>
                 <div className="form-group">
                   <textarea
@@ -312,6 +340,9 @@ const ChatInterface = ({
                     onKeyDown={handleKeyPress}
                     onClick={handleTextareaClick}
                     onBlur={handleTextareaBlur}
+                    aria-label={turnCount === 0 
+                      ? safeT('homepage.textarea.ariaLabel.first')
+                      : safeT('homepage.textarea.ariaLabel.followon')}
                     required
                     disabled={isLoading}
                   />
@@ -320,8 +351,9 @@ const ChatInterface = ({
                     onClick={handleSendMessage}
                     className={`btn-primary-send ${inputText.trim().length > 0 && charCount <= MAX_CHARS ? 'visible' : ''}`}
                     disabled={isLoading || charCount > MAX_CHARS || inputText.trim().length === 0}
+                    aria-label={safeT('homepage.chat.buttons.send') || 'Send message'}
                   >
-                    <span className="button-text">{t('homepage.chat.buttons.send')}</span>
+                    <span className="button-text">{safeT('homepage.chat.buttons.send')}</span>
                     <FontAwesomeIcon className="button-icon" icon="arrow-up" size="md" />
                   </button>
                 </div>
@@ -331,33 +363,33 @@ const ChatInterface = ({
                     <FontAwesomeIcon icon="circle-exclamation" />
                     &nbsp;
                     {charCount > MAX_CHARS
-                      ? t('homepage.chat.messages.characterLimit')
+                      ? safeT('homepage.chat.messages.characterLimit')
                           .replace('{count}', Math.max(1, charCount - MAX_CHARS))
                           .replace(
                             '{unit}',
                             charCount - MAX_CHARS === 1
-                              ? t('homepage.chat.messages.character')
-                              : t('homepage.chat.messages.characters')
+                              ? safeT('homepage.chat.messages.character')
+                              : safeT('homepage.chat.messages.characters')
                           )
-                      : t('homepage.chat.messages.characterWarning')
+                      : safeT('homepage.chat.messages.characterWarning')
                           .replace('{count}', MAX_CHARS - charCount)
                           .replace(
                             '{unit}',
                             MAX_CHARS - charCount === 1
-                              ? t('homepage.chat.messages.character')
-                              : t('homepage.chat.messages.characters')
+                              ? safeT('homepage.chat.messages.character')
+                              : safeT('homepage.chat.messages.characters')
                           )}
                   </div>
                 )}
               </div>
             </form>
           )}
-          <GcdsDetails className="hr" detailsTitle={t('homepage.chat.options.title')}>
+          <GcdsDetails className="hr" detailsTitle={safeT('homepage.chat.options.title')} tabIndex="0">
             <div className="ai-toggle">
               <fieldset className="ai-toggle_fieldset">
                 <div className="ai-toggle_container">
                   <legend className="ai-toggle_legend">
-                    {t('homepage.chat.options.aiSelection.label')}
+                    {safeT('homepage.chat.options.aiSelection.label')}
                   </legend>
                   <div className="ai-toggle_option">
                     <input
@@ -370,7 +402,7 @@ const ChatInterface = ({
                       className="ai-toggle_radio-input"
                     />
                     <label htmlFor="claude">
-                      {t('homepage.chat.options.aiSelection.anthropic')}
+                      {safeT('homepage.chat.options.aiSelection.anthropic')}
                     </label>
                   </div>
                   <div className="ai-toggle_option">
@@ -383,7 +415,7 @@ const ChatInterface = ({
                       onChange={handleAIToggle}
                       className="ai-toggle_radio-input"
                     />
-                    <label htmlFor="openai">{t('homepage.chat.options.aiSelection.openai')}</label>
+                    <label htmlFor="openai">{safeT('homepage.chat.options.aiSelection.openai')}</label>
                   </div>
                   <div className="ai-toggle_option">
                     <input
@@ -395,7 +427,7 @@ const ChatInterface = ({
                       onChange={handleAIToggle}
                       className="ai-toggle_radio-input"
                     />
-                    <label htmlFor="azure">{t('homepage.chat.options.aiSelection.azure')}</label>
+                    <label htmlFor="azure">{safeT('homepage.chat.options.aiSelection.azure')}</label>
                   </div>
                 </div>
               </fieldset>
@@ -405,7 +437,7 @@ const ChatInterface = ({
               <fieldset className="ai-toggle_fieldset">
                 <div className="ai-toggle_container">
                   <legend className="ai-toggle_legend">
-                    {t('homepage.chat.options.searchSelection.label')}
+                    {safeT('homepage.chat.options.searchSelection.label')}
                   </legend>
                   <div className="ai-toggle_option">
                     <input
@@ -418,7 +450,7 @@ const ChatInterface = ({
                       className="ai-toggle_radio-input"
                     />
                     <label htmlFor="search-canadaca">
-                      {t('homepage.chat.options.searchSelection.canadaca')}
+                      {safeT('homepage.chat.options.searchSelection.canadaca')}
                     </label>
                   </div>
                   <div className="ai-toggle_option">
@@ -432,7 +464,7 @@ const ChatInterface = ({
                       className="ai-toggle_radio-input"
                     />
                     <label htmlFor="search-google">
-                      {t('homepage.chat.options.searchSelection.google')}
+                      {safeT('homepage.chat.options.searchSelection.google')}
                     </label>
                   </div>
                 </div>
@@ -440,7 +472,7 @@ const ChatInterface = ({
             </div>
 
             <div className="mrgn-bttm-10">
-              <label htmlFor="referring-url">{t('homepage.chat.options.referringUrl.label')}</label>
+              <label htmlFor="referring-url">{safeT('homepage.chat.options.referringUrl.label')}</label>
               <input
                 id="referring-url"
                 type="url"
@@ -452,6 +484,7 @@ const ChatInterface = ({
           </GcdsDetails>
         </div>
       )}
+      
     </div>
   );
 };

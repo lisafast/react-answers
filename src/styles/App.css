@@ -443,7 +443,10 @@ code {
 
 .feedback-link {
   color: var(--gcds-color-blue-850);
+  margin-right: 4px;
+  margin-left: 4px;
 }
+
 .feedback-link:hover {
   text-decoration: underline;
 }
@@ -459,9 +462,52 @@ code {
   font-family: inherit;
   font-size: inherit;
 }
+
 .button-as-link:focus {
-  outline: 2px solid #2b4382;
-  outline-offset: 2px;
+  background-color: var(--gcds-details-focus-background);
+  border-radius: var(--gcds-details-focus-border-radius);
+  box-shadow: var(--gcds-details-focus-box-shadow);
+  color: var(--gcds-details-focus-text);
+  outline: var(--gcds-details-focus-outline);
+  outline-offset: var(--gcds-details-focus-outline-offset);
+  text-decoration: none;
+}
+
+.wb-inv { 
+  position: absolute; 
+  width: 1px; 
+  height: 1px; 
+  margin: -1px; 
+  padding: 0; 
+  overflow: hidden; 
+  clip: rect(0, 0, 0, 0); 
+  border: 0; 
+  white-space: nowrap;
+  font-size: 1em; 
+} 
+
+/* When focused, make it visible for keyboard users */
+.wb-inv:focus, 
+.wb-inv:active { 
+  position: static; 
+  width: auto; 
+  height: auto; 
+  margin: 0; 
+  overflow: visible; 
+  clip: auto; 
+  white-space: normal; 
+  background-color: var(--gcds-link-focus-background); 
+  color: var(--gcds-link-focus-text); 
+  border-radius: var(--gcds-link-focus-border-radius); 
+  box-shadow: var(--gcds-link-focus-box-shadow); 
+  outline: var(--gcds-link-focus-outline-width) solid var(--gcds-link-focus-background); 
+  outline-offset: var(--gcds-link-focus-outline-offset); 
+  text-decoration: none; 
+  padding: 10px; 
+  display: inline-block; 
+  z-index: 9999; 
+  transition: none; 
+  animation: none; 
 }
 /* modifications of GCDS-tokens to Canada.ca design where appropriate */
 :root {
@@ -1028,8 +1074,7 @@ textarea:focus {
   outline-offset: 0 !important;
 }
 
-/* Button text and icon styles */
-.button-text {
+.button-icon {
   display: none !important;
 }
 
@@ -1675,9 +1720,6 @@ fieldset.gc-chckbxrdio {
     outline-offset: -20px;
   }
 }
-.chat-id p {
-  margin-left: 0px !important;
-}
 
 .chat-id {
   padding: 10px 10px;
@@ -1688,12 +1730,12 @@ fieldset.gc-chckbxrdio {
   margin-top: -6px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
+  text-align: center;
 }
 
 .chat-id p {
   font-size: 85%;
   color: #555;
-  text-align: center;
 }
 
 .expert-rating-container .explanation-field {

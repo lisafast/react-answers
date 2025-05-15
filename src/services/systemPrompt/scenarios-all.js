@@ -48,12 +48,16 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 1. Tell user the task can be done after sign-in
 2. Provide sign in page url as the citation
 
-### Government Account Identification Guide:
+### Government Account Identification Guide
+Trigger phrases below are intended as clues to identify the account type.  However users can confuse the codes and accounts, like using 'verification code' for one-time passcode. 
+Use the context to help identify the correct account, or ask a clarifying question if it's not clear which account the user is referring to. 
 #### Account Type: CRA Account
 * Trigger phrases: "security code being mailed", "CRA security code"
 * Explanation: Security codes are just one verification method for CRA accounts
 * Citation (EN): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/verify-identity.html
 * Citation (FR): https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/verification-identite.html
+* Multi-factor Authentication trigger phrases: "one-time passcode", "Passcode grid", "authenticator app' 
+* Updated Feb 2025: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/multi-factor-authentication.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/authentification-multifacteur.html
 
 #### Account Type: MSCA with Multi-Factor Authentication
 * Trigger phrases: "security code" WITH mentions of "sms", "text", or "email"
@@ -61,7 +65,7 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * Citation (EN) updated February 2025: https://www.canada.ca/en/employment-social-development/services/my-account/multi-factor-authentication.html
 * Citation (FR) updated February 2025: https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/authentification-multifacteur.html
 
-####  Account Type: My Service Canada Account Registration 
+####  Account Type: MSCA My Service Canada Account Registration 
 * Trigger phrases: "Personal Access Code", "PAC"
 * Key information: PAC is ONLY for one-time identity verification during registration, NOT for sign in. Other way to verify is to sign in via Alberta.ca Account or BC Services Card, or use Interac Verification (only for those who bank online at BMO, CIBC,Desjardins, RBC, Scotiabank or TD). 
 * Will be asked to enter PAC AFTER choosing the sign-in method (GCkey, Interac Sign-in, AB and BC provincial partners).
@@ -78,7 +82,6 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * Ask a clarifying question to find out which service the user needs to match it to the correct account
 
 #### Identifying other accounts
-* CRA MFA: Identified by "one-time passcode"
 * IRCC Account: Identified by "personal reference code"
 
 ### Questions about Interac Sign-in Partners 
@@ -114,7 +117,7 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 - March 2025: Choose Canadian https://www.canada.ca/en/canadian-heritage/campaigns/choose-canada.html https://www.canada.ca/fr/patrimoine-canadien/campagnes/choisis-canada.html
 - March 2025: Buying, selling and supporting Canadian  https://ised-isde.canada.ca/site/ised/en/made-canada-buying-selling-and-supporting-canadian https://ised-isde.canada.ca/site/isde/fr/fait-canada-acheter-vendre-soutenir-produits-canadiens
 - March 2025: Canada's response to US tariffs https://www.canada.ca/en/department-finance/programs/international-trade-finance-policy/canadas-response-us-tariffs.html https://www.canada.ca/fr/ministere-finances/programmes/politiques-finances-echanges-internationaux/reponse-canada-droits-douane-americains.html
-- March 4 2025: List of products from the United States subject to 25% tariffs effective March 4, 2025 https://www.canada.ca/en/department-finance/news/2025/03/list-of-products-from-the-united-states-subject-to-25-per-cent-tariffs-effective-march-4-2025.html https://www.canada.ca/fr/ministere-finances/nouvelles/2025/03/liste-des-produits-en-provenance-des-etats-unis-assujettis-a-des-droits-de-douane-de-25--a-compter-du-4-mars-2025.html 
+- May 2025: List of products from the United States subject to 25% counter tariffs https://www.canada.ca/en/department-finance/programs/international-trade-finance-policy/canadas-response-us-tariffs/complete-list-us-products-subject-to-counter-tariffs.html https://www.canada.ca/fr/ministere-finances/programmes/politiques-finances-echanges-internationaux/reponse-canada-droits-douane-americains/liste-complete-produits-americains-assujettis-contre-mesures-tarifaires.html
 - Added December 2024: Submit a firearm compensation claim  https://www.canada.ca/en/public-safety-canada/campaigns/firearms-buyback/submit-firearm-compensation-claim-businesses.html https://www.canada.ca/fr/securite-publique-canada/campagnes/rachat-armes-a-feu/presenter-demande-indemnisation-arme-feu-entreprises.html
 - Added December 2024: new pages for What to do when someone dies, who to notify at https://www.canada.ca/en/services/death.html or https://www.canada.ca/fr/services/deces.html
 - Added December 2024: new pages for Learn and plan for your retirement at https://www.canada.ca/en/services/retirement.html https://www.canada.ca/fr/services/retraite/apprendre/decider-quand-recevoir-sa-pension-publique.html
