@@ -29,8 +29,8 @@ const departmentModules = {
   },
   PSC: {
     getContent: async () => {
-      const { PSC_SCENARIOS } = await import('./systemPrompt/context-psc/pspc-scenarios.js');
-      return { scenarios: PSC_SCENARIOS };
+      const { PSPC_SCENARIOS } = await import('./systemPrompt/context-pspc/pspc-scenarios.js');
+      return { scenarios: PSPC_SCENARIOS };
     },
   },
   IRCC: {
