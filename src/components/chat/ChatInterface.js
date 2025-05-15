@@ -191,7 +191,6 @@ const ChatInterface = ({
                       : ''
                 }`}
                 {...(message.redactedText && {
-                  role: "alert",
                   "aria-describedby": `description-${message.id}`
                 })}
               >
