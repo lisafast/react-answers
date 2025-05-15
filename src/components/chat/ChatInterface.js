@@ -65,9 +65,13 @@ const ChatInterface = ({
             
             if (warningMessage) {
               setLastProcessedMessageId(lastMessage.id);
-              // Announce warning message followed by the original user message
+              // Announce warning message, and for XXX cases, include the original message
               setTimeout(() => {
-                setRedactionAlert(`${warningMessage} ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondLastMessage.text}`);
+                if (secondLastMessage.redactedText.includes('XXX')) {
+                  setRedactionAlert(`${warningMessage} ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondLastMessage.text}`);
+                } else {
+                  setRedactionAlert(warningMessage);
+                }
                 // Clear the alert after a moment
                 setTimeout(() => setRedactionAlert(''), 2000);
               }, 500);
