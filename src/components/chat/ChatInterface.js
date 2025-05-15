@@ -42,6 +42,7 @@ const ChatInterface = ({
   };
 
   const [redactionAlert, setRedactionAlert] = useState('');
+  const [lastProcessedMessageId, setLastProcessedMessageId] = useState(null);
 
   // Effect to announce redaction warnings immediately
   useEffect(() => {
@@ -51,7 +52,8 @@ const ChatInterface = ({
       
       // Check for redaction warnings (system messages following redacted user messages)
       if (lastMessage.sender === 'system' && lastMessage.error && secondLastMessage && 
-          secondLastMessage.sender === 'user' && secondLastMessage.redactedText) {
+          secondLastMessage.sender === 'user' && secondLastMessage.redactedText &&
+          lastMessage.id !== lastProcessedMessageId) {
         
         let warningMessage = '';
         
@@ -62,16 +64,17 @@ const ChatInterface = ({
         }
         
         if (warningMessage) {
+          setLastProcessedMessageId(lastMessage.id);
           // Small delay to ensure the user message is announced first
           setTimeout(() => {
             setRedactionAlert(warningMessage);
             // Clear the alert after a moment to avoid repetition
-            setTimeout(() => setRedactionAlert(''), 100);
+            setTimeout(() => setRedactionAlert(''), 1000);
           }, 500);
         }
       }
     }
-  }, [messages, safeT]);
+  }, [messages, safeT, lastProcessedMessageId]);
 
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
