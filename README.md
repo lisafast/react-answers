@@ -11,7 +11,7 @@ A React-based AI chat application that provides answers designed and sourced exc
 ## 🌟 Key Features
 
 ### Tuned for Canada.ca user needs
-
+   
 - AI response is tagged so sentences in answer can be displayed in accessible canada.ca format and single citation url can be displayed for next step of task, with clickable link 
 - assumes the AI service will be called from a specific canada.ca page, and uses the referral url to pass that information to the AI service. The referral url is either passed to the AI service from the chat interface for testing purposes, or from the query tag on the call of the application. The query tag is the url of the page that AI Answers is called from - it must be encoded properly.
 - system prompt forces short answers of a maximum of 4 sentences to improve clarity, use plain language, and reduce risk of hallucinations.
@@ -182,7 +182,7 @@ Blocks four categories of inappropriate content:
 
 TODO:contributing guidelines and code of conduct for details on how to participate in this project.
 
-## Microservices and AI tools architecture diagram
+## Microservices and AI tools architecture diagram ##
 
 ```mermaid
 flowchart TB
