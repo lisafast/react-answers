@@ -195,15 +195,22 @@ const ChatInterface = ({
                   "aria-describedby": `description-${message.id}`
                 })}
               >
-                {/* Screen reader only descriptions */}
+                {/* Screen reader warnings with immediate announcement */}
                 {message.redactedText?.includes('XXX') && (
-                  <div id={`description-${message.id}`} className="sr-only">
-                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.yourQuestionWas')} {message.text}. {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
+                  <div aria-live="assertive" className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
                   </div>
                 )}
                 {message.redactedText?.includes('###') && (
-                  <div id={`description-${message.id}`} className="sr-only">
+                  <div aria-live="assertive" className="sr-only">
                     {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.blockedMessage')} {safeT('homepage.chat.messages.blockedContent')}
+                  </div>
+                )}
+                
+                {/* Traditional aria-describedby description for navigation */}
+                {message.redactedText && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
                   </div>
                 )}
                 

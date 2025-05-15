@@ -76,7 +76,14 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           const displayUrl = lastMessage.interaction?.citationUrl || '';
           setAriaLiveMessage(`${safeT('homepage.chat.messages.yourAnswerIs')} ${plainText} ${citation} ${displayUrl}`.trim());
         } else if (lastMessage.sender === 'user') {
-          setAriaLiveMessage(lastMessage.text || '');
+          // For redacted messages, delay the user message announcement to come after the warning
+          if (lastMessage.redactedText) {
+            setTimeout(() => {
+              setAriaLiveMessage(`${safeT('homepage.chat.messages.yourQuestionWas')} ${lastMessage.text}`);
+            }, 1000); // 1 second delay to let the warning announce first
+          } else {
+            setAriaLiveMessage(lastMessage.text || '');
+          }
         } else if (lastMessage.error && !lastMessage.redactedText) {
           // Only announce non-redaction errors - let ChatInterface handle redaction warnings
           setAriaLiveMessage(lastMessage.errorMessage || t('homepage.chat.messages.error'));
