@@ -12,8 +12,8 @@ vi.mock('../../prompts/scenarios/context-specific/esdc/esdc-scenarios.js', () =>
 vi.mock('../../prompts/scenarios/context-specific/isc/isc-scenarios.js', () => ({
   ISC_SCENARIOS: 'Mock ISC Scenarios Content',
 }));
-vi.mock('../../prompts/scenarios/context-specific/psc/psc-scenarios.js', () => ({
-  PSC_SCENARIOS: 'Mock PSC Scenarios Content',
+vi.mock('../../prompts/scenarios/context-specific/pspc/pspc-scenarios.js', () => ({
+  PSPC_SCENARIOS: 'Mock PSPC Scenarios Content',
 }));
 vi.mock('../../prompts/scenarios/context-specific/ircc/ircc-scenarios.js', () => ({
   IRCC_SCENARIOS: 'Mock IRCC Scenarios Content',

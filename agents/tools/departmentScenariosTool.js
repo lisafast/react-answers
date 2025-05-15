@@ -6,7 +6,7 @@ const frenchDepartmentMap = {
   ARC: 'CRA',
   EDSC: 'ESDC',
   SAC: 'ISC',
-  CFP: 'PSC',
+  SPAC: 'PSPC',
   IRCC: 'IRCC', // Stays the same
 };
 
