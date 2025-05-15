@@ -182,7 +182,7 @@ Blocks four categories of inappropriate content:
 
 TODO:contributing guidelines and code of conduct for details on how to participate in this project.
 
-## Microservices and AI tools architecture diagram ##
+## Microservices and AI tools architecture diagram #
 
 ```mermaid
 flowchart TB
