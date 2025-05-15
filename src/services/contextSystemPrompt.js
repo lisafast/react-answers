@@ -92,8 +92,9 @@ async function loadContextSystemPrompt(language = 'en', department = '') {
 - Canadian Armed Forces Pensions → PSPC (administering department)
 - Veterans benefits → VAC (administering department)
 - Public service group insurance benefit plans → TBS (administering department)
-- Collective agreements for the public service → TBS (administering department)
-- Public service pay system → PSC (administering department)
+- Public service collective agreements → TBS (administering department)
+- Public service pay system → PSPC (administering department)
+- Public service jobs, language requirements, tests, applications and GC Jobs → PSC (administering department)
 - International students study permits and visas → IRCC (administering department)
 - International students find schools and apply for scholarships on Educanada → EDU (separate official website administered by GAC)
 
