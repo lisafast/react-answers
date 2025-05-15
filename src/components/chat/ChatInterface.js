@@ -47,11 +47,27 @@ const ChatInterface = ({
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      if (lastMessage.sender === 'user' && lastMessage.redactedText) {
-        if (lastMessage.redactedText.includes('XXX')) {
-          setRedactionAlert(`${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.privacyMessage')} ${safeT('homepage.chat.messages.privateContent')}`);
-        } else if (lastMessage.redactedText.includes('###')) {
-          setRedactionAlert(`${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.blockedMessage')} ${safeT('homepage.chat.messages.blockedContent')}`);
+      const secondLastMessage = messages[messages.length - 2];
+      
+      // Check for redaction warnings (system messages following redacted user messages)
+      if (lastMessage.sender === 'system' && lastMessage.error && secondLastMessage && 
+          secondLastMessage.sender === 'user' && secondLastMessage.redactedText) {
+        
+        let warningMessage = '';
+        
+        if (secondLastMessage.redactedText.includes('XXX')) {
+          warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.privacyMessage')} ${safeT('homepage.chat.messages.privateContent')}`;
+        } else if (secondLastMessage.redactedText.includes('###')) {
+          warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.blockedMessage')} ${safeT('homepage.chat.messages.blockedContent')}`;
+        }
+        
+        if (warningMessage) {
+          // Small delay to ensure the user message is announced first
+          setTimeout(() => {
+            setRedactionAlert(warningMessage);
+            // Clear the alert after a moment to avoid repetition
+            setTimeout(() => setRedactionAlert(''), 100);
+          }, 500);
         }
       }
     }
