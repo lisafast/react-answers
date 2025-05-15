@@ -100,7 +100,7 @@
         "blockedContent": "Your question used words that aren't accepted. Please try asking it differently.",
         "blockedMessage": "Your question was not sent to the AI service.",
         "privateContent": "To protect your privacy, your question was not sent to the AI service. Please ask your question again below without this personal information.",
-        "privacyMessage": "Personal information you cannot include in your question was identified as XXX.",
+        "privacyMessage": "Personal information you cannot include in your question is identified as XXX.",
         "characterWarning": "{count} {unit} remaining",
         "characterLimit": "Your message is {count} {unit} too long. Please simplify your question.",
         "character": "character",
