@@ -538,7 +538,7 @@ const ChatInterface = ({
       )}
       
       {/* Live region for redaction warnings */}
-      <div aria-live="assertive" className="sr-only">
+      <div role="alert" className="sr-only">
         {redactionAlert}
       </div>
       
