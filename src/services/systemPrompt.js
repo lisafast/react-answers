@@ -29,7 +29,7 @@ const departmentModules = {
   },
   PSC: {
     getContent: async () => {
-      const { PSC_SCENARIOS } = await import('./systemPrompt/context-psc/psc-scenarios.js');
+      const { PSC_SCENARIOS } = await import('./systemPrompt/context-psc/pspc-scenarios.js');
       return { scenarios: PSC_SCENARIOS };
     },
   },
