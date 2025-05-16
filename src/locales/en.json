@@ -234,8 +234,7 @@
     "title": "Chat Viewer",
     "start": "Start",
     "pause": "Pause"
-  },
-  "admin": {
+  },  "admin": {
     "title": "Admin Dashboard",
     "navigation": {
       "ariaLabel": "Admin Navigation",
@@ -245,7 +244,8 @@
       "users": "User Management",
       "chatViewer": "Chat Viewer",
       "database": "Database Management",
-      "eval": "Evaluation Tools"
+      "eval": "Evaluation Tools",
+      "logout": "Logout"
     },
     "chatLogs": {
       "title": "Recent Chat Interactions"
@@ -308,7 +308,10 @@
     },
     "actions": {
       "activate": "Activate",
-      "deactivate": "Deactivate"
+      "deactivate": "Deactivate",
+      "save": "Save",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this user?"
     }
   }
 }
