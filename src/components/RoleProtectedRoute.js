@@ -7,9 +7,14 @@ import { useAuth } from '../contexts/AuthContext.js';
 // Basic authentication protection
 export const ProtectedRoute = ({ children, lang = 'en' }) => {
   const location = useLocation();
+  const { currentUser, loading } = useAuth();
   const { t } = useTranslations(lang);
   
-  if (!AuthService.isAuthenticated()) {
+  if (loading) {
+    return null; // or a loading spinner component
+  }
+  
+  if (!currentUser) {
     // Redirect to login page with return url
     return <Navigate to={`/${lang}/login`} state={{ from: location }} replace />;
   }
@@ -25,17 +30,21 @@ export const RoleProtectedRoute = ({
   redirectTo = null // Custom redirect path
 }) => {
   const location = useLocation();
-  const { currentUser } = useAuth();
+  const { currentUser, loading, getDefaultRouteForRole } = useAuth();
   
-  // First check authentication
-  if (!AuthService.isAuthenticated()) {
-    return <Navigate to={`/${lang}/login`} state={{ from: location }} replace />;
+  // If still loading, don't redirect yet
+  if (loading) {
+    return null; // or a loading spinner component
   }
   
-  // If roles are specified, check if user has one of them
-  if (roles.length > 0 && (!currentUser || !roles.includes(currentUser.role))) {
-    // Redirect to custom path or homepage
-    return <Navigate to={redirectTo || `/${lang}`} replace />;
+  // First check authentication
+  if (!currentUser) {
+    return <Navigate to={`/${lang}/login`} state={{ from: location }} replace />;
+  }
+    // If roles are specified, check if user has one of them
+  if (roles.length > 0 && !roles.includes(currentUser.role)) {
+    // Redirect to custom path or the default route for user's role
+    return <Navigate to={redirectTo || getDefaultRouteForRole(currentUser.role, lang)} replace />;
   }
   
   // User is authenticated and has proper role
@@ -88,15 +97,18 @@ export const withProtection = (Component) => {
  * Usage: export default withRoleProtection(['admin'], { redirectTo: '/home' })(MyComponent)
  */
 export const withRoleProtection = (roles = [], options = {}) => {
-  return (Component) => {
-    const RoleProtectedComponent = (props) => {
+  return (Component) => {    const RoleProtectedComponent = (props) => {
       const { lang = 'en', ...restProps } = props;
-      const { currentUser } = useAuth();
+      const { currentUser, getDefaultRouteForRole } = useAuth();
       
       // If user is not authenticated or doesn't have required role
-      if (!AuthService.isAuthenticated() || (roles.length > 0 && (!currentUser || !roles.includes(currentUser.role)))) {
+      if (!currentUser || (roles.length > 0 && !roles.includes(currentUser.role))) {
         return (
-          <RoleProtectedRoute roles={roles} lang={lang} redirectTo={options.redirectTo}>
+          <RoleProtectedRoute 
+            roles={roles} 
+            lang={lang} 
+            redirectTo={options.redirectTo || (currentUser ? getDefaultRouteForRole(currentUser.role, lang) : undefined)}
+          >
             <Component {...restProps} lang={lang} />
           </RoleProtectedRoute>
         );
