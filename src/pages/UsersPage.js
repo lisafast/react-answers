@@ -3,12 +3,13 @@ import { createRoot } from 'react-dom/client';
 import DataTable from 'datatables.net-react';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import DT from 'datatables.net-dt';
-import { GcdsButton } from '@cdssnc/gcds-components-react';
+import { GcdsButton, GcdsLink, GcdsText } from '@cdssnc/gcds-components-react';
 import { getApiUrl } from '../utils/apiToUrl.js';
 import { useTranslations } from '../hooks/useTranslations.js';
 import AuthService from '../services/AuthService.js';
 import { useAuth } from '../contexts/AuthContext.js';
 import { AdminOnly } from '../components/RoleBasedUI.js';
+import { usePageContext } from '../hooks/usePageParam.js';
 
 DataTable.use(DT);
 
@@ -22,12 +23,14 @@ const statusOptions = [
 ];
 
 const UsersPage = ({ lang }) => {
+  const { t } = useTranslations(lang);
+  const { language } = usePageContext();
   const [users, setUsers] = useState([]);
   // Use a ref to store edit states persistently between DataTable renders
   const editStatesRef = useRef({});
   // This state is just used to trigger re-renders when editStatesRef changes
   const [triggerRender, setTriggerRender] = useState(0);
-  const { t } = useTranslations(lang);  const { currentUser } = useAuth();
+  const { currentUser } = useAuth();
 
   // Initialize editStates with data from users
   useEffect(() => {
@@ -217,7 +220,12 @@ const UsersPage = ({ lang }) => {
   return (
     <div className="container mt-4">
       <h1>{t('users.title')}</h1>
-      
+
+      <nav className="mb-400">
+        <GcdsText>
+          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin', 'Back to Admin')}</GcdsLink>
+        </GcdsText>
+      </nav>
       
       <DataTable
         data={users}
