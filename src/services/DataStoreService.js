@@ -133,13 +133,9 @@ class DataStoreService {
     }
 
   }
-
   static async getChatSession(sessionId) {
     try {
-      const response = await fetch(getApiUrl(`db-chat-session?sessionId=${sessionId}`), {
-        headers: AuthService.getAuthHeader()
-      });
-      
+      const response = await fetch(getApiUrl(`db-chat-session?sessionId=${sessionId}`));
       if (!response.ok) throw new Error('Failed to get chat session');
       return await response.json();
     } catch (error) {
