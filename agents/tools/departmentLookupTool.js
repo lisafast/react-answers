@@ -32,7 +32,7 @@ const departmentLookup = tool(
       const deptUrl = department.url.trim().replace(/\/$/, '');
       const deptUrlObj = new URL(deptUrl);
       const deptHostname = deptUrlObj.hostname;
-      const deptPathname = deptUrlObj.pathname;
+      const deptPathname = deptUrlObj.pathname.replaceAll(".html", ""); 
 
       // If hostname matches
       if (normalizedHostname === deptHostname) {
