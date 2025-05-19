@@ -341,7 +341,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
               error: true
             },
             {
-              id: blockedMessageId,
+              id: redactionBlockedMsgId,  // Changed from blockedMessageId to redactionBlockedMsgId
               text: error.redactedText.includes('XXX') 
                 ? safeT('homepage.chat.messages.privateContent')
                 : safeT('homepage.chat.messages.blockedContent'),
