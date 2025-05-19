@@ -4,11 +4,13 @@ import BatchUpload from '../components/batch/BatchUpload.js';
 import BatchList from '../components/batch/BatchList.js';
 import { getApiUrl, getProviderApiUrl } from '../utils/apiToUrl.js';
 import { useTranslations } from '../hooks/useTranslations.js';
+import { usePageContext } from '../hooks/usePageParam.js';
 import ExportService from '../services/ExportService.js';
 import AuthService from '../services/AuthService.js';
 
 const BatchPage = ({ lang = 'en' }) => {
   const { t } = useTranslations(lang);
+  const { language } = usePageContext();
   const handleDownloadClick = async (batchId, type) => {
     console.log('Button clicked for batch:', batchId);
     const response = await fetch(getApiUrl(`db-batch-retrieve?batchId=${batchId}`), {
@@ -37,7 +39,14 @@ const BatchPage = ({ lang = 'en' }) => {
   return (
     <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600">
       <h1 className="mb-400">{t('batch.navigation.title')}</h1>
-      <nav className="mb-400" aria-label={t('batch.navigation.ariaLabel')}>
+
+      <nav className="mb-400">
+        <GcdsText>
+          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin', 'Back to Admin')}</GcdsLink>
+        </GcdsText>
+      </nav>
+      
+      <nav className="mb-400 mt-400" aria-label={t('batch.navigation.ariaLabel')}>
         <h2 className="mt-400 mb-400">{t('batch.navigation.links.onThisPage')}</h2>
         <ul>
           <li className="mb-400">
