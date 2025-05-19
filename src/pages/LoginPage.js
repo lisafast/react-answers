@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import AuthService from '../services/AuthService.js';
+import { useAuth } from '../contexts/AuthContext.js';
 import { useTranslations } from '../hooks/useTranslations.js';
 import styles from '../styles/auth.module.css';
 
 const LoginPage = ({ lang = 'en' }) => {
   const { t } = useTranslations(lang);
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
+  const [isLoading, setIsLoading] = useState(false);    const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await AuthService.login(email, password);
-      navigate(`/${lang}/admin`); // Redirect to admin page after successful login
+      const { defaultRoute } = await login(email, password);
+      // Navigate to the user's default route based on their role
+      navigate(defaultRoute);
     } catch (err) {
       setError(t('login.invalidCredentials'));
     } finally {
