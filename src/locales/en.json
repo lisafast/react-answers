@@ -97,10 +97,10 @@
         "thinkingMore": "Thinking some more...",
         "limitReached": "You've reached the limit of 3 questions per conversation.\nReload to start a new conversation.",
         "error": "Sorry, we're having a problem connecting to the service right now. Please try again in a few minutes.",
-        "blockedContent": "Your question used words that aren't accepted. Please try asking it differently.",
+        "blockedContent": "Your question used words that aren't accepted. Please ask it differently below.",
         "blockedMessage": "Your question was not sent to the AI service.",
-        "privateContent": "To protect your privacy, your question was not sent to the AI service. Please ask your question again without any personal details.",
-        "privacyMessage": "Your question contained personal details replaced with XXX.",
+        "privateContent": "To protect your privacy, your question was not sent to the AI service. Please ask your question again below without this personal information.",
+        "privacyMessage": "Personal information you cannot include in your question is identified as XXX.",
         "characterWarning": "{count} {unit} remaining",
         "characterLimit": "Your message is {count} {unit} too long. Please simplify your question.",
         "character": "character",
@@ -112,7 +112,8 @@
         "moderatingQuestion": "Assessing question",
         "needClarification": "Requires clarification...",
         "yourQuestionWas": "Your question was:",
-        "yourAnswerIs": "Your answer is:"
+        "yourAnswerIs": "Your answer is:",
+        "warning": "Warning:"
       },
       "citation": {
         "confidence": "Confidence:",

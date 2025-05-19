@@ -31,7 +31,7 @@ const ChatOptions = ({
                   onChange={handleAIToggle}
                   className="ai-toggle_radio-input"
                 />
-                <label htmlFor="claude">
+                <label htmlFor="anthropic">
                   {safeT('homepage.chat.options.aiSelection.anthropic')}
                 </label>
               </div>
