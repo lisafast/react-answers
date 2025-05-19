@@ -23,16 +23,18 @@ class AuthService {
     localStorage.removeItem('user');
   }
 
+  static logout() {
+    this.removeToken();
+  }
+
   static isAuthenticated() {
     const token = this.getToken();
     const user = this.getUser();
     
-    // First check if token exists and user is active
     if (!token || !user || !user.active) {
       return false;
     }
     
-    // Check if token is expired
     if (this.isTokenExpired()) {
       this.logout();
       return false;
@@ -114,25 +116,6 @@ class AuthService {
     return publicRoutes.some(route => pathname.startsWith(route));
   }
 
-  static logout() {
-    // Clear authentication data
-    this.removeToken();
-
-    // Determine the current language from URL or default to English
-    let language = 'en';
-    const pathname = window.location.pathname;
-
-    // Check if current path contains French indicator
-    if (pathname.includes('/fr/')) {
-      language = 'fr';
-    }
-
-    // Redirect to the language-specific login page only if not on a public route
-    if (!this.isPublicRoute(pathname)) {
-      window.location.href = `/${language}/login`;
-    }
-  }
-
   static getAuthHeader() {
     const token = this.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -163,7 +146,10 @@ class AuthService {
     }
   }
 
- 
+  static hasRole(requiredRoles = []) {
+    const user = this.getUser();
+    return user && requiredRoles.includes(user.role);
+  }
 }
 
 export default AuthService;

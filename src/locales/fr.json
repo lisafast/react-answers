@@ -97,10 +97,10 @@
         
         "limitReached": "Votre limite de 3 questions par conversation a été atteinte. Actualisez la page pour commencer une nouvelle conversation.",
         "error": "Désolé, nous avons un problème de connexion au service en ce moment. Veuillez réessayer dans quelques minutes.",
-        "blockedContent": "Votre question contenait des mots qui ne sont pas acceptés.\nVeuillez la reformuler différemment.",
+        "blockedContent": "Votre question contenait des mots qui ne sont pas acceptés.\nVeuillez la reformuler différemment ci-dessous.",
         "blockedMessage": "Votre question n'a pas été envoyée au service d'IA.",
-        "privateContent": "Pour protéger vos renseignements personnels, votre question n'a pas été envoyée au service AI. Veuillez reposer votre question sans fournir de détails personnels.",
-        "privacyMessage": "Votre question contenait des renseignements personnels remplacés par XXX.",
+        "privateContent": "Pour protéger votre vie privée, votre question n'a pas été envoyée au service d'intelligence artificielle. Veuillez reposer votre question ci-dessous sans ces informations personnelles.",
+        "privacyMessage": "Les informations personnelles que vous ne pouvez pas inclure dans votre question ont été identifiées comme XXX.",
         "characterWarning": "{count} {unit} restants",
         "characterLimit": "Votre message est trop long de {count} {unit}. Veuillez simplifier votre question.",
         "character": "caractère",
@@ -113,7 +113,39 @@
         "moderatingQuestion": "Évaluation de la question",
         "needClarification": "Nécessite des précisions...",
         "yourQuestionWas": "Votre question était :",
-        "yourAnswerIs": "Votre réponse est :"
+        "yourAnswerIs": "Votre réponse est :",
+        "warning": "Avertissement :"
+      },
+      "status": {
+        "startingToThink": "Réflexion...",
+        "thinking": "Réflexion...",
+        "thinkingWithContext": "Tirant la réponse à partir des résultats de recherche et du ministère.",
+        "thinkingMore": "Réflexion prolongée...",
+        "agent_start": "Début de la réflexion...",
+        "llm_start": "Réflexion...",
+        "tool_error": "Erreur lors de l'utilisation de l'outil {{toolName}}: {{message}}",
+        "using_tool_unknown": "Utilisation d'un outil inconnu...",
+        "tool": {
+          "downloadWebPage": "Lecture de la page web...",
+          "checkUrl": "Vérification de l'URL...",
+          "departmentScenarios": "Recherche de scénarios de ministère...",
+          "departmentLookup": "Recherche d'informations sur le ministère...",
+          "verifyOutputFormat": "Vérification du format de la réponse...",
+          "googleContextSearch": "Recherche Google...",
+          "canadaCASearch": "Recherche Canada.ca...",
+          "unknown": "Utilisation d'un outil...",
+          "redacting": "Vérification du message...",
+          "searching": "Recherche d'informations pertinentes...",
+          "gettingContext": "Compréhension du contexte...",
+          "generatingAnswer": "Génération de la réponse...",
+          "complete": "Réponse prête...",
+          "verifyingCitation": "Vérification de l'URL de citation...",
+          "updatingDatastore": "Mise à jour du datastore...",
+          "moderatingAnswer": "Modération de la réponse...",
+          "moderatingQuestion": "Modération de la question...",
+          "needClarification" : "Nécessite des précisions...",
+          "contextSearch" : "Recherche..."
+        }
       },
       "status": {
         "startingToThink": "Réflexion...",
@@ -285,6 +317,7 @@
       "chatViewer": "Visualiseur de chat",
       "database": "Gestion de la base de données",
       "eval": "Outils d'évaluation",
+      "logout": "Se déconnecter",
       "prompts": "Gérer les invites",
       "settings": "Paramètres du système"
     },
@@ -349,9 +382,13 @@
     "actions": {
       "activate": "Activer",
       "deactivate": "Désactiver",
+      "save": "Enregistrer",
       "delete": "Supprimer",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur?"
     }
+  },
+  "common": {
+    "backToAdmin": "Retour à l'administration"
   },
   "prompts": {
     "title": "Gérer les invites système",

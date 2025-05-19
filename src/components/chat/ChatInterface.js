@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { GcdsDetails } from '@cdssnc/gcds-components-react';
 import FeedbackComponent from './FeedbackComponent.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ChatOptions from './ChatOptions.js';
 
 const MAX_CHARS = 400;
 
@@ -37,6 +37,41 @@ const ChatInterface = ({
     const result = t(key);
     return typeof result === 'object' && result !== null ? result.text : result;
   };
+
+  const [redactionAlert, setRedactionAlert] = useState('');
+  const [lastProcessedMessageId, setLastProcessedMessageId] = useState(null);
+
+  // Effect to announce redaction warnings immediately
+    useEffect(() => {
+        if (messages.length > 0) {
+          const lastMessage = messages[messages.length - 1];
+          const secondLastMessage = messages[messages.length - 2];
+          
+          // Check for redaction warnings (system messages following redacted user messages)
+          if (lastMessage.sender === 'system' && lastMessage.error && secondLastMessage && 
+              secondLastMessage.sender === 'user' && secondLastMessage.redactedText &&
+              lastMessage.id !== lastProcessedMessageId) {
+            
+            let warningMessage = '';
+            
+            if (secondLastMessage.redactedText.includes('XXX')) {
+              warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.privacyMessage')} ${safeT('homepage.chat.messages.privateContent')}`;
+            } else if (secondLastMessage.redactedText.includes('###')) {
+              warningMessage = `${safeT('homepage.chat.messages.warning')} ${safeT('homepage.chat.messages.blockedMessage')} ${safeT('homepage.chat.messages.blockedContent')}`;
+            }
+            
+            if (warningMessage) {
+              setLastProcessedMessageId(lastMessage.id);
+              // Announce warning message followed by the original user message
+              setTimeout(() => {
+                setRedactionAlert(`${warningMessage} ${safeT('homepage.chat.messages.yourQuestionWas')} ${secondLastMessage.text}`);
+                // Clear the alert after a moment
+                setTimeout(() => setRedactionAlert(''), 2000);
+              }, 500);
+            }
+          }
+        }
+      }, [messages, safeT, lastProcessedMessageId]);
 
   const [charCount, setCharCount] = useState(0);
   const [userHasClickedTextarea, setUserHasClickedTextarea] = useState(false);
@@ -184,7 +219,22 @@ const ChatInterface = ({
                       ? 'redacted-box'
                       : ''
                 }`}
+                {...(message.redactedText && {
+                  "aria-describedby": `description-${message.id}`
+                })}
               >
+                {/* Screen reader descriptions for navigation */}
+                {message.redactedText?.includes('XXX') && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.privacyMessage')} {safeT('homepage.chat.messages.privateContent')}
+                  </div>
+                )}
+                {message.redactedText?.includes('###') && (
+                  <div id={`description-${message.id}`} className="sr-only">
+                    {safeT('homepage.chat.messages.warning')} {safeT('homepage.chat.messages.blockedMessage')} {safeT('homepage.chat.messages.blockedContent')}
+                  </div>
+                )}
+                
                 <p
                   className={
                     message.redactedText?.includes('XXX')
@@ -193,6 +243,7 @@ const ChatInterface = ({
                         ? 'redacted-message'
                         : ''
                   }
+                  {...(message.redactedText?.includes('###') && { "aria-hidden": "true" })}
                 >
                   {message.text}
                 </p>
@@ -205,6 +256,7 @@ const ChatInterface = ({
                           ? 'redacted-preview'
                           : ''
                     }
+                    aria-hidden="true"
                   >
                     {message.redactedText?.includes('XXX') && (
                       <>
@@ -380,124 +432,23 @@ const ChatInterface = ({
               </div>
             </form>
           )}
-          <GcdsDetails className="hr" detailsTitle={safeT('homepage.chat.options.title')} tabIndex="0">
-            <div className="ai-toggle">
-              <fieldset className="ai-toggle_fieldset">
-                <div className="ai-toggle_container">
-                  <legend className="ai-toggle_legend">
-                    {safeT('homepage.chat.options.aiSelection.label')}
-                  </legend>
-                  <div className="ai-toggle_option">
-                    <input
-                      type="radio"
-                      id="anthropic"
-                      name="ai-selection"
-                      value="anthropic"
-                      checked={selectedAI === 'anthropic'}
-                      onChange={handleAIToggle}
-                      className="ai-toggle_radio-input"
-                    />
-                    <label htmlFor="claude">
-                      {safeT('homepage.chat.options.aiSelection.anthropic')}
-                    </label>
-                  </div>
-                  <div className="ai-toggle_option">
-                    <input
-                      type="radio"
-                      id="openai"
-                      name="ai-selection"
-                      value="openai"
-                      checked={selectedAI === 'openai'}
-                      onChange={handleAIToggle}
-                      className="ai-toggle_radio-input"
-                    />
-                    <label htmlFor="openai">{safeT('homepage.chat.options.aiSelection.openai')}</label>
-                  </div>
-                  <div className="ai-toggle_option">
-                    <input
-                      type="radio"
-                      id="azure"
-                      name="ai-selection"
-                      value="azure"
-                      checked={selectedAI === 'azure'}
-                      onChange={handleAIToggle}
-                      className="ai-toggle_radio-input"
-                    />
-                    <label htmlFor="azure">{safeT('homepage.chat.options.aiSelection.azure')}</label>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-
-            <div className="search-toggle">
-              <fieldset className="ai-toggle_fieldset">
-                <div className="ai-toggle_container">
-                  <legend className="ai-toggle_legend">
-                    {safeT('homepage.chat.options.searchSelection.label')}
-                  </legend>
-                  <div className="ai-toggle_option">
-                    <input
-                      type="radio"
-                      id="search-canadaca"
-                      name="search-selection"
-                      value="canadaca"
-                      checked={selectedSearch === 'canadaca'}
-                      onChange={handleSearchToggle}
-                      className="ai-toggle_radio-input"
-                    />
-                    <label htmlFor="search-canadaca">
-                      {safeT('homepage.chat.options.searchSelection.canadaca')}
-                    </label>
-                  </div>
-                  <div className="ai-toggle_option">
-                    <input
-                      type="radio"
-                      id="search-google"
-                      name="search-selection"
-                      value="google"
-                      checked={selectedSearch === 'google'}
-                      onChange={handleSearchToggle}
-                      className="ai-toggle_radio-input"
-                    />
-                    <label htmlFor="search-google">
-                      {safeT('homepage.chat.options.searchSelection.google')}
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-
-            <div className="mrgn-bttm-10">
-              <label htmlFor="referring-url">{safeT('homepage.chat.options.referringUrl.label')}</label>
-              <input
-                id="referring-url"
-                type="url"
-                value={referringUrl}
-                onChange={handleReferringUrlChange}
-                className="chat-border"
-              />
-            </div>
-
-            {/* Conditionally render the override toggle for admins */}
-            {isAdmin && (
-              <div className="override-toggle">
-                 <input
-                  type="checkbox"
-                  id="override-toggle-checkbox"
-                  name="overrideToggle"
-                  checked={isOverrideTestingActive}
-                  onChange={handleOverrideToggleChange} // Use the passed handler
-                />
-                <label htmlFor="override-toggle-checkbox">
-                  {t('homepage.chat.options.overrideToggle.label', 'Test with my prompt overrides')}
-                </label>
-               
-              </div>
-            )}
-          </GcdsDetails>
+          <ChatOptions
+            safeT={safeT}
+            selectedAI={selectedAI}
+            handleAIToggle={handleAIToggle}
+            selectedSearch={selectedSearch}
+            handleSearchToggle={handleSearchToggle}
+            referringUrl={referringUrl}
+            handleReferringUrlChange={handleReferringUrlChange}
+          />
         </div>
       )}
-
+      
+      {/* Live region for redaction warnings */}
+      <div role="alert" className="sr-only">
+        {redactionAlert}
+      </div>
+      
     </div>
   );
 };

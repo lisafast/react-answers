@@ -312,10 +312,10 @@ class RedactionService {
         pattern: /\d+\s+([A-Za-z]+\s+){1,3}(Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Court|Ct|Lane|Ln|Way|Parkway|Pkwy|Square|Sq|Terrace|Ter|Place|Pl|circle|cir|Loop)\b/gi,
         description: 'Street addresses'
       },
-      {
-        pattern: /\b(?<!\$)\d{5}(?:-\d{4})?\b/g,
-        description: 'US ZIP codes of 5 digits (excluding dollar amounts)'
-      },
+      // {
+      //   pattern: /\b(?<!\$)\d{5}(?:-\d{4})?\b/g,
+      //   description: 'US ZIP codes of 5 digits (excluding dollar amounts)' REMOVED - WAS CATCHING TOO MANY CRA LINE NUMBERS AND FORM NUMBERS
+      // },
       {
         pattern: /\b(apt|bldg|dept|fl|hngr|lot|pier|rm|ste|slip|trlr|unit|#)\.? *\d+[a-z]?\b/gi,
         description: 'Apartment addresses'

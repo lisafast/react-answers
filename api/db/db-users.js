@@ -17,18 +17,20 @@ async function usersHandler(req, res) {
 
         case 'PATCH':
             try {
-                const { userId, active } = req.body;
+                const { userId, active, role } = req.body;
                 if (!userId) {
                     return res.status(400).json({ message: 'User ID is required' });
                 }
-                if (typeof active !== 'boolean') {
-                    return res.status(400).json({ message: 'Active status must be boolean' });
+                const updateFields = {};
+                if (typeof active === 'boolean') updateFields.active = active;
+                if (role) updateFields.role = role;
+                if (Object.keys(updateFields).length === 0) {
+                    return res.status(400).json({ message: 'No valid fields to update' });
                 }
-
                 await dbConnect();
                 const user = await User.findByIdAndUpdate(
                     userId,
-                    { active },
+                    updateFields,
                     { new: true, select: '-password' }
                 );
 
@@ -62,7 +64,7 @@ async function usersHandler(req, res) {
             break;
 
         default:
-            res.setHeader('Allow', ['GET', 'PATCH']);
+            res.setHeader('Allow', ['GET', 'PATCH', 'DELETE']);
             res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 }

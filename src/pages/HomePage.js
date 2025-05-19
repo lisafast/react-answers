@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ChatAppContainer from '../components/chat/ChatAppContainer.js';
 import { GcdsContainer, GcdsDetails, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
-import { getApiUrl } from '../utils/apiToUrl.js';
+import DataStoreService from '../services/DataStoreService.js';
 
 // Error Boundary remains the same
 class ErrorBoundary extends React.Component {
@@ -52,16 +52,13 @@ const HomePage = ({ lang = 'en' }) => {
       isAvailable: true,
       message: t('homepage.errors.serviceUnavailable'),
     };
-    setServiceStatus(status);
-    // TODO move to DataStoreService
-    async function fetchSession() {
+    setServiceStatus(status);    async function fetchSession() {
       try {
-        const res = await fetch(getApiUrl('db-chat-session'));
-        const data = await res.json();
+        const data = await DataStoreService.getChatSession();
         setChatId(data.chatId);
         localStorage.setItem('chatId', data.chatId);
       } catch (error) {
-        console.error(error);
+        console.error('Failed to get chat session:', error);
         setServiceStatus({
           isAvailable: false,
           message: t('homepage.errors.serviceUnavailable'),

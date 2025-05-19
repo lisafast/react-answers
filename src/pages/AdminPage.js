@@ -2,12 +2,19 @@ import React from 'react';
 import { useTranslations } from '../hooks/useTranslations.js';
 import { GcdsContainer, GcdsLink } from '@cdssnc/gcds-components-react';
 import { usePageContext } from '../hooks/usePageParam.js';
+import { useAuth } from '../contexts/AuthContext.js';
 import ChatLogsDashboard from '../components/admin/ChatLogsDashboard.js';
 import DeleteChatSection from '../components/admin/DeleteChatSection.js';
 
 const AdminPage = () => {
   const { t } = useTranslations();
   const { language } = usePageContext();
+  const { logout } = useAuth();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout();
+  };
 
   return (
     <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600">
@@ -54,6 +61,11 @@ const AdminPage = () => {
           <li className="">
             <GcdsLink href={`/${language}/settings`}>
               {t('admin.navigation.settings', 'System Settings')}
+            </GcdsLink>
+          </li>
+          <li className="">
+            <GcdsLink href="#" onClick={handleLogout}>
+              {t('admin.navigation.logout', 'Logout')}
             </GcdsLink>
           </li>
         </ul>

@@ -48,12 +48,16 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 1. Tell user the task can be done after sign-in
 2. Provide sign in page url as the citation
 
-### Government Account Identification Guide:
+### Government Account Identification Guide
+Trigger phrases below are intended as clues to identify the account type.  However users can confuse the codes and accounts, like using 'verification code' for one-time passcode. 
+Use the context to help identify the correct account, or ask a clarifying question if it's not clear which account the user is referring to. 
 #### Account Type: CRA Account
 * Trigger phrases: "security code being mailed", "CRA security code"
 * Explanation: Security codes are just one verification method for CRA accounts
 * Citation (EN): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/verify-identity.html
 * Citation (FR): https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/verification-identite.html
+* Multi-factor Authentication trigger phrases: "one-time passcode", "Passcode grid", "authenticator app' 
+* Updated Feb 2025: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/multi-factor-authentication.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/authentification-multifacteur.html
 
 #### Account Type: MSCA with Multi-Factor Authentication
 * Trigger phrases: "security code" WITH mentions of "sms", "text", or "email"
@@ -61,7 +65,7 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * Citation (EN) updated February 2025: https://www.canada.ca/en/employment-social-development/services/my-account/multi-factor-authentication.html
 * Citation (FR) updated February 2025: https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/authentification-multifacteur.html
 
-####  Account Type: My Service Canada Account Registration 
+####  Account Type: MSCA My Service Canada Account Registration 
 * Trigger phrases: "Personal Access Code", "PAC"
 * Key information: PAC is ONLY for one-time identity verification during registration, NOT for sign in. Other way to verify is to sign in via Alberta.ca Account or BC Services Card, or use Interac Verification (only for those who bank online at BMO, CIBC,Desjardins, RBC, Scotiabank or TD). 
 * Will be asked to enter PAC AFTER choosing the sign-in method (GCkey, Interac Sign-in, AB and BC provincial partners).
@@ -78,7 +82,6 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * Ask a clarifying question to find out which service the user needs to match it to the correct account
 
 #### Identifying other accounts
-* CRA MFA: Identified by "one-time passcode"
 * IRCC Account: Identified by "personal reference code"
 
 ### Questions about Interac Sign-in Partners 
@@ -109,7 +112,21 @@ For questions about future dates (payments, deadlines, holidays, etc.):
 * NOC codes search tool: https://noc.esdc.gc.ca/ or https://noc.esdc.gc.ca/?GoCTemplateCulture=fr-CA
 * GIFI codes (no search - use browser find on page tool to find a specific code) https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4088/general-index-financial-information-gifi.html https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/rc4088/general-renseignements-financiers-igrf.html
 
+### News releases vs implemented programs
+* CRITICAL: Carefully evaluate news releases (URLs with "news" or "nouvelles") before citing:
+  1. RECENT news releases from CURRENT government (dated after April 2025 election) may announce valid upcoming initiatives
+  2. News releases from PREVIOUS government (before April 2025 election) should be treated as historical only, NOT active plans
+  3. Even for current government announcements, clearly distinguish between:
+     - Announcements of plans ("will introduce," "planning to")
+     - Announcements of implementation ("is now available," "applications open today")
+* When answering questions about potential benefits or programs:
+  - First search for non-news program pages showing current availability
+  - If only found in pre-election news releases, avoid mentioning if not directly asked, or answer that it was announced by the previous government so the status is unclear. Do not convey that it is an active plan,use the past tense about it - eg. "was planned" or "was announced".
+  - For recent post-election news releases where only news sources are available, your answer should convey that planning, consultation and possible legislative processes may be underway. 
+* AVOID misleading phrases like "expected soon,", "expected in.." , "check for updates," or any suggestion that any announcements are proceeding on the timeline proposed in the news sources, unless further news sources confirm that status. 
+
 ### Updates and new pages:  
+* After the April federal election, a new cabinet was sworn in and many departments have new ministers. Updated May 2025: https://www.pm.gc.ca/en/cabinet https://www.pm.gc.ca/fr/cabinet
 -  March 2025: Latest news, topics, questions and answers on US Canada relationship at https://international.canada.ca/en/global-affairs/campaigns/canada-us-engagement https://international.canada.ca/fr/affaires-mondiales/campagnes/engagement-canada-etats-unis
 - March 2025: Choose Canadian https://www.canada.ca/en/canadian-heritage/campaigns/choose-canada.html https://www.canada.ca/fr/patrimoine-canadien/campagnes/choisis-canada.html
 - March 2025: Buying, selling and supporting Canadian  https://ised-isde.canada.ca/site/ised/en/made-canada-buying-selling-and-supporting-canadian https://ised-isde.canada.ca/site/isde/fr/fait-canada-acheter-vendre-soutenir-produits-canadiens
