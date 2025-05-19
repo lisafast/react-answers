@@ -106,7 +106,7 @@ class DataStoreService {
         feedback: expertFeedback.isPositive ? 'positive' : 'negative'
       };
     }
-    console.log(`User feedback: ${expertFeedback}`);
+    console.log('User feedback:', JSON.stringify(formattedExpertFeedback, null, 2));
 
     try {
       const response = await fetch(getApiUrl('db-persist-feedback'), {
@@ -122,13 +122,13 @@ class DataStoreService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to log interaction');
+        throw new Error('Failed to log feedback');
       }
 
-      console.log('Interaction logged successfully to database');
+      console.log('Feedback logged successfully to database');
     } catch (error) {
-      console.log('Development mode: Interaction logged to console', {
-        ...expertFeedback
+      console.log('Development mode: Feedback not logged to console', {
+        ...formattedExpertFeedback
       });
     }
 
