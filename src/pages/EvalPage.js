@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { getApiUrl } from '../utils/apiToUrl.js';
-import { GcdsContainer, GcdsText, GcdsButton, GcdsDetails } from '@cdssnc/gcds-components-react';
+import { GcdsContainer, GcdsText, GcdsButton, GcdsDetails, GcdsLink } from '@cdssnc/gcds-components-react';
+import { useTranslations } from '../hooks/useTranslations.js';
+import { usePageContext } from '../hooks/usePageParam.js';
 
 const EvalPage = () => {
+  const { t } = useTranslations();
+  const { language } = usePageContext();
   const [embeddingProgress, setEmbeddingProgress] = useState(null);
   const [evalProgress, setEvalProgress] = useState(null);
   const [isAutoProcessingEmbeddings, setIsAutoProcessingEmbeddings] = useState(false);
@@ -164,6 +168,12 @@ const EvalPage = () => {
     <GcdsContainer size="xl" centered>
       <h1>Evaluation Tools</h1>
       
+      <nav className="mb-400">
+        <GcdsText>
+          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin', 'Back to Admin')}</GcdsLink>
+        </GcdsText>
+      </nav>
+
       <div className="mb-400">
         <h2>Generate Embeddings</h2>
         <GcdsText>
