@@ -32,7 +32,7 @@ variable "fargate_cpu" {
 variable "fargate_memory" {
   description = "Fargate Memory units"
   type        = number
-  default     = 2048 # Increased from 512 (4x) for performance testing
+  default     = 4096 # Increased from 512 (4x) for performance testing
 }
 
 variable "iam_role_ai-answers-ecs-role_arn" {
