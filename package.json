@@ -95,6 +95,7 @@
     "concurrently": "^9.0.1",
     "dotenv-cli": "^7.4.4",
     "eslint": "^8.57.1",
-    "eslint-plugin-react": "^7.37.2"
+    "eslint-plugin-react": "^7.37.2",
+    "mongodb-memory-server": "^10.1.4"
   }
 }

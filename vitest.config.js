@@ -5,6 +5,9 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'v8'
-    }
+    },
+    setupFiles: ['./test/setup.js'],
+    globalSetup: ['./test/setup.js'],
+    testTimeout: 20000 // Increase timeout for MongoDB operations
   }
 });
