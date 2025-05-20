@@ -27,9 +27,9 @@ async function dbConnect() {
   if (!cached.promise) {
     const mongoDbOpts = {
       bufferCommands: false,
-      connectTimeoutMS: 30000, // 30 seconds timeout
-      socketTimeoutMS: 45000,  // Close sockets after 45 seconds of inactivity
-      serverSelectionTimeoutMS: 60000, // Timeout for selecting a server
+      connectTimeoutMS: 60000,     // 60 seconds timeout
+      socketTimeoutMS: 300000,     // 5 minutes timeout for operations
+      serverSelectionTimeoutMS: 60000, // 60 seconds timeout for server selection
       heartbeatFrequencyMS: 10000,    // How often to check the connection
       maxPoolSize: 100,               // Maximum number of connections
       minPoolSize: 5                  // Minimum number of connections
@@ -40,11 +40,11 @@ async function dbConnect() {
       tlsCAFile: '/app/global-bundle.pem',
       retryWrites: false,
       bufferCommands: false,
-      connectTimeoutMS: 30000,        // 30 seconds timeout
-      socketTimeoutMS: 45000,         // Close sockets after 45 seconds of inactivity
-      serverSelectionTimeoutMS: 60000, // Timeout for selecting a server
+      connectTimeoutMS: 60000,        // 60 seconds timeout
+      socketTimeoutMS: 300000,        // 5 minutes timeout for operations
+      serverSelectionTimeoutMS: 60000, // 60 seconds timeout for server selection
       heartbeatFrequencyMS: 10000,     // How often to check the connection
-      minPoolSize: 20,                // Keep 10 connections ready
+      minPoolSize: 20,                // Keep 20 connections ready
       maxPoolSize: 1000               // Allow up to 1000 connections
     };
 
