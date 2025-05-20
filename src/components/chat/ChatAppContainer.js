@@ -333,9 +333,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
       );
     }
     const displayUrl = message.interaction.citationUrl;
-    const finalConfidenceRating = message.interaction.confidenceRating ? message.interaction.confidenceRating : '0.1';
-  
-    const messageDepartment = message?.department || selectedDepartment;
+    // Confidence rating and department are currently unused
   
     return (
       <div className="ai-message-content">
@@ -372,12 +370,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         )}
       </div>
     );
-  }, [t, selectedDepartment, safeT]);
+  }, [safeT]);
 
   // Add handler for department changes
-  const handleDepartmentChange = (department) => {
-    setSelectedDepartment(department);
-  };
 
   const initialInput = t('homepage.chat.input.initial');
 
@@ -393,12 +388,10 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         handleReload={handleReload}
         handleAIToggle={handleAIToggle}
         handleSearchToggle={handleSearchToggle} // Add this line
-        handleDepartmentChange={handleDepartmentChange}
         handleReferringUrlChange={handleReferringUrlChange}
         formatAIResponse={formatAIResponse}
         selectedAI={selectedAI}
         selectedSearch={selectedSearch} // Add this line
-        selectedDepartment={selectedDepartment}
         referringUrl={referringUrl}
         turnCount={turnCount}
         showFeedback={showFeedback}

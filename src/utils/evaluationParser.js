@@ -1,4 +1,4 @@
-export const parseEvaluationResponse = (text, aiService) => {
+export const parseEvaluationResponse = (text) => {
   const citationUrlRegex = /<citation-url>(.*?)<\/citation-url>/;
   const confidenceRatingRegex = /<confidence>(.*?)<\/confidence>/;
 

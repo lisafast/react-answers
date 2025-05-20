@@ -5,7 +5,7 @@ import { useTranslations } from '../hooks/useTranslations.js';
 
 const ProtectedRoute = ({ children, lang = 'en' }) => {
   const location = useLocation();
-  const { t } = useTranslations(lang);
+  useTranslations(lang); // initialize translations
   
   if (!AuthService.isAuthenticated()) {
     // Redirect to login page with return url

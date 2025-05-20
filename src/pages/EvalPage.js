@@ -7,9 +7,8 @@ const EvalPage = () => {
   const [evalProgress, setEvalProgress] = useState(null);
   const [isAutoProcessingEmbeddings, setIsAutoProcessingEmbeddings] = useState(false);
   const [isAutoProcessingEvals, setIsAutoProcessingEvals] = useState(false);
-  const [evalLastProcessedId, setEvalLastProcessedId] = useState(null);
   const [isRegeneratingAll, setIsRegeneratingAll] = useState(false);
-  const [isRegeneratingEmbeddings, setIsRegeneratingEmbeddings] = useState(false);
+  const [isRegeneratingEmbeddings] = useState(false);
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const [isEvalRequestInProgress, setIsEvalRequestInProgress] = useState(false);
 
@@ -82,7 +81,6 @@ const EvalPage = () => {
       setIsEvalRequestInProgress(true);
       if (!isAutoProcess) {
         setIsAutoProcessingEvals(true);
-        setEvalLastProcessedId(null);
         if (regenerateAll) {
           setIsRegeneratingAll(true);
         }
@@ -108,7 +106,6 @@ const EvalPage = () => {
       
       // Only update progress if we got a valid response
       if (typeof result.remaining === 'number') {
-        setEvalLastProcessedId(result.lastProcessedId);
         setEvalProgress({
           remaining: result.remaining,
           lastProcessedId: result.lastProcessedId
@@ -119,7 +116,6 @@ const EvalPage = () => {
           handleGenerateEvals(true, false, result.lastProcessedId);
         } else {
           setIsAutoProcessingEvals(false);
-          setEvalLastProcessedId(null);
           setIsRegeneratingAll(false);
           if (!isAutoProcess) {
             alert('All evaluations have been generated!');
@@ -128,7 +124,6 @@ const EvalPage = () => {
       } else {
         // If we don't get a valid remaining count, stop processing
         setIsAutoProcessingEvals(false);
-        setEvalLastProcessedId(null);
         setIsRegeneratingAll(false);
         throw new Error('Invalid response format from server');
       }
@@ -164,26 +159,6 @@ const EvalPage = () => {
     }
   };
 
-  const handleProcessInteractions = async () => {
-    try {
-      const response = await fetch(getApiUrl('db-process-interactions'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to process interactions');
-      }
-
-      const result = await response.json();
-      alert(`Processed ${result.completed} interactions out of ${result.total}. ${result.remaining || 0} remaining.`);
-    } catch (error) {
-      console.error('Error processing interactions:', error);
-      alert('Failed to process interactions. Check the console for details.');
-    }
-  };
 
   return (
     <GcdsContainer size="xl" centered>

@@ -54,5 +54,11 @@
         "extensions": [".js", ".jsx"]
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/*.{js,jsx}", "**/*.test.{js,jsx}"],
+      "env": { "jest": true }
+    }
+  ]
 }

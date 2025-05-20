@@ -51,7 +51,7 @@ const UsersPage = ({ lang }) => {
       { 
         title: t('users.columns.status'), 
         data: 'active',
-        render: (data, type, row) => data ? t('users.status.active') : t('users.status.inactive')
+        render: (data) => data ? t('users.status.active') : t('users.status.inactive')
       },
       { 
         title: t('users.columns.createdAt'), 

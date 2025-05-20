@@ -7,7 +7,7 @@ import ContextService from '../../services/ContextService.js';
 import '../../styles/App.css';
 import * as XLSX from 'xlsx';
 
-const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
+const BatchUpload = ({ lang }) => {
   const { t } = useTranslations(lang);
   const [file, setFile] = useState(null);
   const [processing, setProcessing] = useState(false);
@@ -223,18 +223,6 @@ const BatchUpload = ({ lang, selectedEntries, ...otherProps }) => {
     document.getElementById('csvFile').value = ''; // Reset file input
   };
 
-  // Loading indicator component
-  const LoadingIndicator = ({ status }) => {
-    return (
-      <div className="flex flex-col items-center space-y-2">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        <div className="text-sm text-gray-600">
-          {status === 'preparing' && 'Creating batch...'}
-          {status === 'started' && 'Batch started...'}
-        </div>
-      </div>
-    );
-  };
 
   useEffect(() => {
     console.log('State changed:', {
