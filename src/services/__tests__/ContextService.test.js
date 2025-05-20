@@ -1,10 +1,28 @@
 import ContextService from '../ContextService.js';
 import { getProviderApiUrl, getApiUrl } from '../../utils/apiToUrl.js';
+import { vi, describe, it, expect, beforeEach, beforeAll } from 'vitest';
 
-// Mock fetch globally
-global.fetch = jest.fn();
+// Mock LoggingService to avoid auth and network calls
+vi.mock('../ClientLoggingService.js', () => ({
+  default: {
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  }
+}));
+
+// Mock fetch globally for all tests
+global.fetch = vi.fn();
 
 describe('ContextService', () => {
+  beforeAll(() => {
+    global.localStorage = {
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+    };
+  });
   beforeEach(() => {
     fetch.mockClear();
   });
@@ -28,6 +46,7 @@ describe('ContextService', () => {
         searchProvider: 'google',
         conversationHistory: [],
         referringUrl: 'https://referrer.com',
+        chatId: 'system',
       });
     });
 
@@ -41,6 +60,7 @@ describe('ContextService', () => {
         searchProvider: null,
         conversationHistory: [],
         referringUrl: '',
+        chatId: 'system',
       });
     });
   });
@@ -119,7 +139,9 @@ describe('ContextService', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: 'search query',
+            lang: 'en',
             searchService: 'google',
+            chatId: 'system',
           }),
         })
       );

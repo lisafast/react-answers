@@ -62,19 +62,10 @@
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!(@cdssnc/gcds-components-react)/)"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest",
-      "^.+\\.tsx?$": "babel-jest"
-    }
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "vitest run",
     "eject": "react-scripts eject",
     "start-server": "node server/server.js",
     "dev": "concurrently \"npm run start-server\" \"npm start\"",
@@ -82,8 +73,7 @@
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -102,7 +92,6 @@
     "@babel/eslint-parser": "^7.25.9",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/preset-env": "^7.25.4",
-    "babel-jest": "^29.7.0",
     "concurrently": "^9.0.1",
     "dotenv-cli": "^7.4.4",
     "eslint": "^8.57.1",
