@@ -58,6 +58,7 @@
     "similarity": "^1.2.1",
     "streamsaver": "^2.0.6",
     "uuid": "^11.0.5",
+    "vitest": "^3.1.4",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
