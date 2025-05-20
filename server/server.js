@@ -54,6 +54,14 @@ app.use(express.json({ limit: "10mb" }));
 app.use(fileUpload());
 app.use(express.static(path.join(__dirname, "../build")));
 
+// Set higher timeout limits for all routes
+app.use((req, res, next) => {
+  // Set timeout to 5 minutes
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+});
+
 // Logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} request to ${req.url}`);
