@@ -92,16 +92,17 @@ resource "aws_docdb_cluster" "ai-answers-docdb-cluster" {
 
 # DocumentDB Cluster Instance
 resource "aws_docdb_cluster_instance" "ai-answers-docdb-instance" {
-  count              = var.docdb_instane_count
+  count              = var.docdb_instance_count
   identifier         = "${var.product_name}-docdb-instance"
   cluster_identifier = aws_docdb_cluster.ai-answers-docdb-cluster.id
-  instance_class     = "db.t3.medium" # We are using the smallest instance class for now and can scale later. 
+  instance_class     = "db.r5.large" # Increased from db.t3.medium for higher throughput testing
   engine             = "docdb"
   apply_immediately  = true
 
   tags = {
     CostCentre = var.billing_code
     Terraform  = true
+    Temporary  = "true" # Marking as temporary for easy identification
   }
 }
 

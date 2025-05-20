@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - "terragrunt/**"
-      - "!terragrunt/env/staging/**"
+      - "!terragrunt/env/production/**"
       - ".github/workflows/tf_plan_staging.yml"
 
 env:
