@@ -27,7 +27,7 @@
         "chatgpt": "Service d'IA ChatGPT : GPT-4.1 d'OpenAI, connaissances jusqu'en mai 2025",
         "azure": "Service d'IA Azure : Microsoft Azure OpenAI"
       },
-      "systemPrompt": "Lire l'invite système",
+      "systemPrompt": "Réponses IA sur Github",
       "contact": "Le développement est toujours en cours — Contactez lisa.fast@cds-snc.ca pour plus d'informations."
     },
     "feedback": {

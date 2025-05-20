@@ -111,7 +111,6 @@ const HomePage = ({ lang = 'en' }) => {
               {t('homepage.privacy.termsLink')}
             </GcdsLink>
           </GcdsText>
-          <GcdsLink href={`/${lang}/admin`}>Ad</GcdsLink>
         </GcdsDetails>
         {/* main section with user input and answer fields */}
         <ChatAppContainer lang={lang} chatId={chatId} />
