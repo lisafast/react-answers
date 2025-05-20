@@ -23,8 +23,8 @@ variable "docdb_password_name" {
   type        = string
 }
 
-variable "docdb_instane_count" {
+variable "docdb_instance_count" {
   description = "The number of instances in the DocumentDB cluster"
   type        = number
-  default     = 1
+  default     = 2  # Increased from 1 to 2 for higher throughput testing
 }
