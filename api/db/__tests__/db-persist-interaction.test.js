@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { vi, describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import mongoose from 'mongoose';
 import handler from '../db-persist-interaction.js';
 import { Chat } from '../../../models/chat.js';
@@ -11,14 +11,17 @@ import { Tool } from '../../../models/tool.js';
 import { embedText, embedDocuments } from '../../../services/EmbeddingService.js';
 
 // Mock the dependencies
-jest.mock('../../../services/EmbeddingService.js');
-jest.mock('../../../services/ServerLoggingService.js');
+vi.mock('../../../services/EmbeddingService.js');
+vi.mock('../../../services/ServerLoggingService.js');
 
-describe('db-persist-interaction handler', () => {
+const mongoUri = global.__MONGO_URI__ || process.env.MONGODB_URI;
+const describeFn = mongoUri ? describe : describe.skip;
+
+describeFn('db-persist-interaction handler', () => {
   let req, res;
 
   beforeAll(async () => {
-    await mongoose.connect(global.__MONGO_URI__);
+    await mongoose.connect(mongoUri);
   });
 
   afterAll(async () => {
@@ -61,8 +64,8 @@ describe('db-persist-interaction handler', () => {
       }
     };
     res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn()
     };
 
     // Mock the embedding functions
@@ -78,7 +81,7 @@ describe('db-persist-interaction handler', () => {
     await Citation.deleteMany({});
     await Answer.deleteMany({});
     await Tool.deleteMany({});
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should handle method not allowed', async () => {
