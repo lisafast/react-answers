@@ -1,14 +1,18 @@
 // config/ai-models.js
 const AI_MODELS = {
   azure: {
-    default: 'openai-gpt4o-mini',
+    default: "gpt-4o",
     models: {
-      'openai-gpt4o-mini': {
+      "gpt-4o": {
         maxTokens: 1024,
         temperature: 0.0,
         timeoutMs: 60000,
-      }
-
+      },
+      "openai-gpt4o-mini": {
+        maxTokens: 1024,
+        temperature: 0.0,
+        timeoutMs: 60000,
+      },
     },
     embeddings: {
       default: 'text-embedding-ada-002',
@@ -37,7 +41,7 @@ const AI_MODELS = {
         maxTokens: 1024,
         temperature: 0.0,
         timeoutMs: 60000,
-    }
+      }
 
     },
     embeddings: {
@@ -79,7 +83,7 @@ const AI_MODELS = {
       }
     }
   },
- 
+
 };
 
 export const getModelConfig = (provider, modelName = null) => {

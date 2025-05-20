@@ -17,18 +17,20 @@ async function usersHandler(req, res) {
 
         case 'PATCH':
             try {
-                const { userId, active } = req.body;
+                const { userId, active, role } = req.body;
                 if (!userId) {
                     return res.status(400).json({ message: 'User ID is required' });
                 }
-                if (typeof active !== 'boolean') {
-                    return res.status(400).json({ message: 'Active status must be boolean' });
+                const updateFields = {};
+                if (typeof active === 'boolean') updateFields.active = active;
+                if (role) updateFields.role = role;
+                if (Object.keys(updateFields).length === 0) {
+                    return res.status(400).json({ message: 'No valid fields to update' });
                 }
-
                 await dbConnect();
                 const user = await User.findByIdAndUpdate(
                     userId,
-                    { active },
+                    updateFields,
                     { new: true, select: '-password' }
                 );
 
@@ -43,8 +45,26 @@ async function usersHandler(req, res) {
             }
             break;
 
+        case 'DELETE':
+            try {
+                const { userId } = req.body;
+                if (!userId) {
+                    return res.status(400).json({ message: 'User ID is required' });
+                }
+                await dbConnect();
+                const user = await User.findByIdAndDelete(userId);
+                if (!user) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+                res.status(200).json({ message: 'User deleted' });
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                res.status(500).json({ message: 'Failed to delete user', error: error.message });
+            }
+            break;
+
         default:
-            res.setHeader('Allow', ['GET', 'PATCH']);
+            res.setHeader('Allow', ['GET', 'PATCH', 'DELETE']);
             res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 }
