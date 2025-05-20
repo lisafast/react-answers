@@ -35,7 +35,9 @@ async function dbConnect() {
       tlsCAFile: '/app/global-bundle.pem',
       retryWrites: false,
       bufferCommands: false,
-      connectTimeoutMS: 30000 // 30 seconds timeout
+      connectTimeoutMS: 30000, // 30 seconds timeout
+      minPoolSize: 10,        // Keep 10 connections ready
+      maxPoolSize: 1000        // Allow up to 1000 connections
     };
 
     const connectionString = process.env.MONGODB_URI || process.env.DOCDB_URI;
