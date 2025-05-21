@@ -1,14 +1,12 @@
 import React from 'react';
 import { useTranslations } from '../hooks/useTranslations.js';
 import { GcdsContainer, GcdsLink } from '@cdssnc/gcds-components-react';
-import { usePageContext } from '../hooks/usePageParam.js';
 import { useAuth } from '../contexts/AuthContext.js';
 import ChatLogsDashboard from '../components/admin/ChatLogsDashboard.js';
 import DeleteChatSection from '../components/admin/DeleteChatSection.js';
 
-const AdminPage = () => {
-  const { t } = useTranslations();
-  const { language } = usePageContext();
+const AdminPage = ({ lang = 'en' }) => {
+  const { t } = useTranslations(lang);
   const { logout } = useAuth();
 
   const handleLogout = (e) => {
@@ -24,33 +22,38 @@ const AdminPage = () => {
         <h2 className="mt-400 mb-400">{t('admin.navigation.title', 'Admin Menu')}</h2>
         <ul className="list-none p-0">
           <li className="">
-            <GcdsLink href={`/${language}`}>
+            <GcdsLink href={`/${lang}`}>
               {t('admin.navigation.aiAnswers', 'AI Answers')}
             </GcdsLink>
           </li>
           <li className="">
-            <GcdsLink href={`/${language}/batch`}>
+            <GcdsLink href={`/${lang}/batch`}>
               {t('admin.navigation.batches', 'Batches')}
             </GcdsLink>
           </li>
           <li className="">
-            <GcdsLink href={`/${language}/users`}>
+            <GcdsLink href={`/${lang}/users`}>
               {t('admin.navigation.users', 'User Management')}
             </GcdsLink>
           </li>
           <li className="">
-            <GcdsLink href={`/${language}/chat-viewer`}>
+            <GcdsLink href={`/${lang}/chat-viewer`}>
               {t('admin.navigation.chatViewer')}
             </GcdsLink>
           </li>
           <li className="">
-            <GcdsLink href={`/${language}/database`}>
+            <GcdsLink href={`/${lang}/database`}>
               {t('admin.navigation.database', 'Database Management')}
             </GcdsLink>
           </li>
           <li className="">
-            <GcdsLink href={`/${language}/eval`}>
+            <GcdsLink href={`/${lang}/eval`}>
               {t('admin.navigation.eval', 'Evaluation Tools')}
+            </GcdsLink>
+          </li>
+          <li className="">
+            <GcdsLink href={`/${lang}/settings`}>
+              {t('settings.title', 'Settings')}
             </GcdsLink>
           </li>
           <li className="">

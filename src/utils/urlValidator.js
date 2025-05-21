@@ -152,7 +152,7 @@ class URLValidator {
     };
 
     // Search through menu structure
-    Object.entries(menuStructure).forEach(([category, data]) => {
+    Object.entries(menuStructure).forEach(([, data]) => {
       // Check main category URL
       const mainUrlConfidence = compareUrls(data.url);
       if (mainUrlConfidence > bestMatch.confidence) {
@@ -162,7 +162,7 @@ class URLValidator {
 
       // Check most requested
       if (data.mostRequested) {
-        Object.entries(data.mostRequested).forEach(([item, itemUrl]) => {
+        Object.entries(data.mostRequested).forEach(([, itemUrl]) => {
           if (typeof itemUrl === 'string') {
             const itemConfidence = compareUrls(itemUrl);
             if (itemConfidence > bestMatch.confidence) {
@@ -175,7 +175,7 @@ class URLValidator {
 
       // Check topics
       if (data.topics) {
-        Object.entries(data.topics).forEach(([topic, topicUrl]) => {
+        Object.entries(data.topics).forEach(([, topicUrl]) => {
           if (typeof topicUrl === 'string') {
             const topicConfidence = compareUrls(topicUrl);
             if (topicConfidence > bestMatch.confidence) {

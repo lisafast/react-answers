@@ -7,7 +7,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
     "@cdssnc/gcds-components": "^0.26.1",
-    "@cdssnc/gcds-components-react": "^0.26.3",
+    "@cdssnc/gcds-components-react": "^0.34.3",
     "@cdssnc/gcds-utility": "^1.4.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -33,7 +33,7 @@
     "datatables.net": "^2.2.1",
     "datatables.net-dt": "^2.2.1",
     "datatables.net-react": "^1.0.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.5.0",
     "duck-duck-scrape": "^2.2.6",
     "express": "^4.21.1",
     "express-fileupload": "^1.5.1",
@@ -58,31 +58,22 @@
     "similarity": "^1.2.1",
     "streamsaver": "^2.0.6",
     "uuid": "^11.0.5",
+    "vitest": "^3.1.4",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
-  },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!(@cdssnc/gcds-components-react)/)"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest",
-      "^.+\\.tsx?$": "babel-jest"
-    }
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "vitest run",
     "eject": "react-scripts eject",
     "start-server": "node server/server.js",
     "dev": "concurrently \"npm run start-server\" \"npm start\"",
-    "lint": "dotenv -e .env eslint src/**/*.{js,jsx}"
+    "lint": "cross-env NODE_ENV=development dotenv -e .env eslint \"src/**/*.{js,jsx}\""
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -101,10 +92,11 @@
     "@babel/eslint-parser": "^7.25.9",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/preset-env": "^7.25.4",
-    "babel-jest": "^29.7.0",
     "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
     "dotenv-cli": "^7.4.4",
     "eslint": "^8.57.1",
-    "eslint-plugin-react": "^7.37.2"
+    "eslint-plugin-react": "^7.37.2",
+    "mongodb-memory-server": "^10.1.4"
   }
 }

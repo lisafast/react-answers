@@ -4,7 +4,7 @@ import { departments_EN } from './systemPrompt/departments_EN.js';
 import { departments_FR } from './systemPrompt/departments_FR.js';
 import LoggingService from './ClientLoggingService.js';
 
-async function loadContextSystemPrompt(language = 'en', department = '') {
+async function loadContextSystemPrompt(language = 'en') {
   try {
     // Validate base imports
     if (!departments_EN || !departments_FR) {
