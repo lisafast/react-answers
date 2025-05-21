@@ -246,6 +246,36 @@ class DataStoreService {
       throw error;
     }
   }
+
+  static async getSiteStatus() {
+    try {
+      const response = await fetch(getApiUrl('db-settings?key=siteStatus'));
+      if (!response.ok) throw new Error('Failed to get site status');
+      const data = await response.json();
+      return data.value || 'available';
+    } catch (error) {
+      console.error('Error getting site status:', error);
+      return 'available';
+    }
+  }
+
+  static async setSiteStatus(status) {
+    try {
+      const response = await fetch(getApiUrl('db-settings'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...AuthService.getAuthHeader()
+        },
+        body: JSON.stringify({ key: 'siteStatus', value: status })
+      });
+      if (!response.ok) throw new Error('Failed to set site status');
+      return await response.json();
+    } catch (error) {
+      console.error('Error setting site status:', error);
+      throw error;
+    }
+  }
 }
 
 export default DataStoreService;

@@ -42,6 +42,7 @@ import generateEmbeddingsHandler from '../api/db/db-generate-embeddings.js';
 import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 import dbDeleteSystemLogsHandler from '../api/db/db-delete-system-logs.js';
+import dbSettingsHandler from '../api/db/db-settings.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -90,6 +91,7 @@ app.post('/api/db/db-generate-embeddings', generateEmbeddingsHandler);
 app.post('/api/db/db-generate-evals', generateEvalsHandler);
 app.all('/api/db/db-database-management', dbDatabaseManagementHandler);
 app.delete('/api/db/db-delete-system-logs', dbDeleteSystemLogsHandler);
+app.all('/api/db/db-settings', dbSettingsHandler);
 
 app.post("/api/openai/openai-message", openAIHandler);
 app.post("/api/openai/openai-context", openAIContextAgentHandler);
