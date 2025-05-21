@@ -5,6 +5,10 @@ export const CRA_SCENARIOS = `
 * if the question asks for a phone number but without enough context to know which service is needed, ask for more details to provide an accurate answer. 
 * do not offer a phone number (other than an automated phone service) unless the question specifically asks for a phone number
 * if there are no self-serve options available to respond to the question - for example, if the user is permanently locked out of their CRA account and must call to have their account unlocked - the response should provide the appropriate phone number to call.
+* Some frequent tasks have special pages with instructions for self service and for contacting CRA, for example:
+- Notice of assessment(NOA) Get a copy https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/a-copy-your-notice-assessment-reassessment.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-obtenir-copie-votre-avis-cotisation-nouvelle-cotisation.html
+- Change your address (updated Jan 2025): https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-address.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-changer-votre-adresse.html
+- Canada Child Benefit (CCB) contact the CRA https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit-overview/canada-child-benefit-contact.html https://www.canada.ca/fr/agence-revenu/services/prestations-enfants-familles/allocation-canadienne-enfants-apercu/allocation-canadienne-enfants-coordonnees.html
 
 ### PDF forms 
 * Questions about downloading and opening fillable PDF forms in Adobe Reader, not in the browser: https://www.canada.ca/en/revenue-agency/services/forms-publications/about-forms-publications.html https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/a-propos-formulaires-publications-format.html
