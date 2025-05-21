@@ -315,6 +315,18 @@
       "confirmDelete": "Are you sure you want to delete this user?"
     }
   },
+  "settings": {
+    "title": "Settings",
+    "statusLabel": "Service status",
+    "statuses": {
+      "available": "Available",
+      "unavailable": "Unavailable"
+    }
+  },
+  "outage": {
+    "title": "Service Unavailable",
+    "message": "This service is currently unavailable."
+  },
   "common": {
     "backToAdmin": "Back to Admin"
   }
