@@ -1,4 +1,4 @@
-import  { useEffect } from 'react';
+import  { useEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
 import AdminPage from './pages/AdminPage.js';
@@ -12,8 +12,11 @@ import './styles/App.css';
 import UsersPage from './pages/UsersPage.js';
 import EvalPage from './pages/EvalPage.js';
 import DatabasePage from './pages/DatabasePage.js';
-import { AuthProvider } from './contexts/AuthContext.js';
+import SettingsPage from './pages/SettingsPage.js';
+import OutagePage from './pages/OutagePage.js';
+import { AuthProvider, useAuth } from './contexts/AuthContext.js';
 import { AdminRoute, RoleProtectedRoute } from './components/RoleProtectedRoute.js';
+import DataStoreService from './services/DataStoreService.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -68,91 +71,73 @@ const AppLayout = () => {
   );
 };
 
-const routes = {
-  public: [
-    { path: "/", element: <HomePage lang="en" /> },
-    { path: "/en", element: <HomePage lang="en" /> },
-    { path: "/fr", element: <HomePage lang="fr" /> },
-    { path: "/en/login", element: <LoginPage lang="en" /> },
-    { path: "/fr/login", element: <LoginPage lang="fr" /> },
-    { path: "/en/signup", element: <SignupPage lang="en" /> },
-    { path: "/fr/signup", element: <SignupPage lang="fr" /> },
-    { path: "/en/logout", element: <LogoutPage lang="en" /> },
-    { path: "/fr/logout", element: <LogoutPage lang="fr" /> }
-  ],
-  protected: [
-    {
-      path: "/en/admin",
-      element: <AdminPage lang="en" />,
-      roles: ['admin']
-    },
-    {
-      path: "/fr/admin",
-      element: <AdminPage lang="fr" />,
-      roles: ['admin']
-    },
-    {
-      path: "/en/batch",
-      element: <AdminRoute lang="en"><BatchPage lang="en" /></AdminRoute>,
-    },
-    {
-      path: "/fr/batch",
-      element: <AdminRoute lang="fr"><BatchPage lang="fr" /></AdminRoute>,
-    },
-    {
-      path: "/en/chat-viewer",
-      element: <AdminRoute lang="en"><ChatViewer lang="en" /></AdminRoute>,
-    },
-    {
-      path: "/fr/chat-viewer",
-      element: <AdminRoute lang="fr"><ChatViewer lang="fr" /></AdminRoute>,
-    },
-    {
-      path: "/en/users",
-      element: <AdminRoute lang="en"><UsersPage lang="en" /></AdminRoute>,
-    },
-    {
-      path: "/fr/users",
-      element: <AdminRoute lang="fr"><UsersPage lang="fr" /></AdminRoute>,
-    },
-    {
-      path: "/en/eval",
-      element: <AdminRoute lang="en"><EvalPage lang="en" /></AdminRoute>,
-    },
-    {
-      path: "/fr/eval",
-      element: <AdminRoute lang="fr"><EvalPage lang="fr" /></AdminRoute>,
-    },
-    {
-      path: "/en/database",
-      element: <AdminRoute lang="en"><DatabasePage lang="en" /></AdminRoute>,
-    },
-    {
-      path: "/fr/database",
-      element: <AdminRoute lang="fr"><DatabasePage lang="fr" /></AdminRoute>,
-    },
-  ]
-};
-
-const router = createBrowserRouter([
-  {
-    element: <AppLayout />,
-    children: [
-      
-      ...routes.public,
-            ...routes.protected.map(route => ({
-        path: route.path,
-        element: (
-          <RoleProtectedRoute roles={route.roles} lang={route.path.includes('/fr/') ? 'fr' : 'en'}>
-            {route.element}
-          </RoleProtectedRoute>
-        )
-      }))
-    ]
-  },
-]);
-
 export default function App() {
+  const [siteStatus, setSiteStatus] = useState('available');
+
+  useEffect(() => {
+    DataStoreService.getSiteStatus().then(setSiteStatus);
+  }, []);
+
+  const router = useMemo(() => {
+    const HomeWrapper = ({ lang }) => {
+      const { currentUser } = useAuth();
+      const allowed = currentUser && ['admin', 'partner'].includes(currentUser.role);
+      if (siteStatus === 'unavailable' && !allowed) {
+        return <OutagePage lang={lang} />;
+      }
+      return <HomePage lang={lang} />;
+    };
+
+    const homeEn = <HomeWrapper lang="en" />;
+    const homeFr = <HomeWrapper lang="fr" />;
+
+    const publicRoutes = [
+      { path: '/', element: homeEn },
+      { path: '/en', element: homeEn },
+      { path: '/fr', element: homeFr },
+      { path: '/en/login', element: <LoginPage lang="en" /> },
+      { path: '/fr/login', element: <LoginPage lang="fr" /> },
+      { path: '/en/signup', element: <SignupPage lang="en" /> },
+      { path: '/fr/signup', element: <SignupPage lang="fr" /> },
+      { path: '/en/logout', element: <LogoutPage lang="en" /> },
+      { path: '/fr/logout', element: <LogoutPage lang="fr" /> }
+    ];
+
+    const protectedRoutes = [
+      { path: '/en/admin', element: <AdminPage lang="en" />, roles: ['admin'] },
+      { path: '/fr/admin', element: <AdminPage lang="fr" />, roles: ['admin'] },
+      { path: '/en/batch', element: <AdminRoute lang="en"><BatchPage lang="en" /></AdminRoute> },
+      { path: '/fr/batch', element: <AdminRoute lang="fr"><BatchPage lang="fr" /></AdminRoute> },
+      { path: '/en/chat-viewer', element: <AdminRoute lang="en"><ChatViewer lang="en" /></AdminRoute> },
+      { path: '/fr/chat-viewer', element: <AdminRoute lang="fr"><ChatViewer lang="fr" /></AdminRoute> },
+      { path: '/en/users', element: <AdminRoute lang="en"><UsersPage lang="en" /></AdminRoute> },
+      { path: '/fr/users', element: <AdminRoute lang="fr"><UsersPage lang="fr" /></AdminRoute> },
+      { path: '/en/eval', element: <AdminRoute lang="en"><EvalPage lang="en" /></AdminRoute> },
+      { path: '/fr/eval', element: <AdminRoute lang="fr"><EvalPage lang="fr" /></AdminRoute> },
+      { path: '/en/database', element: <AdminRoute lang="en"><DatabasePage lang="en" /></AdminRoute> },
+      { path: '/fr/database', element: <AdminRoute lang="fr"><DatabasePage lang="fr" /></AdminRoute> },
+      { path: '/en/settings', element: <AdminRoute lang="en"><SettingsPage lang="en" /></AdminRoute> },
+      { path: '/fr/settings', element: <AdminRoute lang="fr"><SettingsPage lang="fr" /></AdminRoute> }
+    ];
+
+    return createBrowserRouter([
+      {
+        element: <AppLayout />,
+        children: [
+          ...publicRoutes,
+          ...protectedRoutes.map(route => ({
+            path: route.path,
+            element: (
+              <RoleProtectedRoute roles={route.roles} lang={route.path.includes('/fr/') ? 'fr' : 'en'}>
+                {route.element}
+              </RoleProtectedRoute>
+            )
+          }))
+        ]
+      }
+    ]);
+  }, [siteStatus]);
+
   return (
     <AuthProvider>
       <RouterProvider router={router} />
