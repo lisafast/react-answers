@@ -255,7 +255,7 @@
       "title": "Télécharger les journaux de chat récents"
     },
     "deleteChat": {
-      "title": "Supprimer une conversation et les rétroactions associées",
+      "title": "Supprimer une conversation avec des rétroactions incorrectes",
       "idLabel": "ID de chat",
       "button": "Supprimer la conversation",
       "confirm": "Confirmer la suppression",

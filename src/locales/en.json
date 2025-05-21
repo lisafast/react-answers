@@ -243,7 +243,7 @@
       "aiAnswers": "Use AI Answers with expert feedback options",
       "batches": "View and manage batches",
       "users": "Manage user accounts",
-      "chatViewer": "View full log for a Chat ID",
+      "chatViewer": "View full interaction for a Chat ID",
       "database": "Manage the database",
       "eval": "Control evaluation embeddings",
       "logout": "Sign out"
@@ -252,7 +252,7 @@
       "title": "Download recent chat logs"
     },
     "deleteChat": {
-      "title": "Delete a chat and associatedfeedback",
+      "title": "Delete a chat with incorrect feedback",
       "idLabel": "Chat ID",
       "button": "Delete Chat",
       "confirm": "Confirm Delete",
@@ -280,7 +280,7 @@
     "confirmPassword": "Confirm Password",
     "submit": "Submit",
     "passwordMismatch": "Passwords do not match",
-    "errorOccurred": "An error occurred during signup",
+    "errorOccurred": "An error occurred creating your account",
     "form": {
       "username": "Username:",
       "password": "Password:",
@@ -289,7 +289,7 @@
     },
     "messages": {
       "success": "Success! You can now ",
-      "error": "An error occurred during signup",
+      "error": "An error occurred creating your account",
       "failed": "Signup failed",
       "loginLink": "sign in to AI Answers Admin"
     }
