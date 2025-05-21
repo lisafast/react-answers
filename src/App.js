@@ -29,7 +29,21 @@ const getAlternatePath = (currentPath, currentLang) => {
   return `/${newLang}${pathWithoutLang}`;
 };
 
-// We're now using the ProtectedRoute component from components/ProtectedRoute.js
+// HomeWrapper component moved outside
+const HomeWrapper = ({ lang, siteStatus, isLoading }) => {
+  const { currentUser } = useAuth();
+  const allowed = currentUser && ['admin', 'partner'].includes(currentUser.role);
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // If site is unavailable and user is not allowed, show outage page
+  if (siteStatus === 'unavailable' && !allowed) {
+    return <OutagePage lang={lang} />;
+  }
+  return <HomePage lang={lang} />;
+};
 
 const AppLayout = () => {
   const location = useLocation();
@@ -72,25 +86,22 @@ const AppLayout = () => {
 };
 
 export default function App() {
-  const [siteStatus, setSiteStatus] = useState('available');
+  const [siteStatus, setSiteStatus] = useState('unavailable');
+  const [isLoadingSiteStatus, setIsLoadingSiteStatus] = useState(true);
 
   useEffect(() => {
-    DataStoreService.getSiteStatus().then(setSiteStatus);
+    DataStoreService.getSiteStatus().then(status => {
+      setSiteStatus(status);
+      setIsLoadingSiteStatus(false);
+    })
+    .catch(() => {
+      setIsLoadingSiteStatus(false);
+    });
   }, []);
 
   const router = useMemo(() => {
-    const HomeWrapper = ({ lang }) => {
-      const { currentUser } = useAuth();
-      const allowed = currentUser && ['admin', 'partner'].includes(currentUser.role);
-      if (siteStatus === 'unavailable' && !allowed) {
-        return <OutagePage lang={lang} />;
-      }
-      return <HomePage lang={lang} />;
-    };
-
-    const homeEn = <HomeWrapper lang="en" />;
-    const homeFr = <HomeWrapper lang="fr" />;
-
+    const homeEn = <HomeWrapper lang="en" siteStatus={siteStatus} isLoading={isLoadingSiteStatus} />;
+    const homeFr = <HomeWrapper lang="fr" siteStatus={siteStatus} isLoading={isLoadingSiteStatus} />;
     const publicRoutes = [
       { path: '/', element: homeEn },
       { path: '/en', element: homeEn },
@@ -136,11 +147,14 @@ export default function App() {
         ]
       }
     ]);
-  }, [siteStatus]);
+  }, [siteStatus, isLoadingSiteStatus]);
+
+  // Create a key that changes when siteStatus or isLoadingSiteStatus changes
+  const routerKey = `${siteStatus}-${isLoadingSiteStatus}`;
 
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} key={routerKey} />
     </AuthProvider>
   );
 }
