@@ -26,13 +26,13 @@ variable "ecr_repository_url" {
 variable "fargate_cpu" {
   description = "Fargate CPU units"
   type        = number
-  default     = 1024 # Increased from 256 (4x) for performance testing
+  default     = 2048 # Increased from 256 (4x) for performance testing
 }
 
 variable "fargate_memory" {
   description = "Fargate Memory units"
   type        = number
-  default     = 4096 # Increased from 512 (4x) for performance testing
+  default     = 8192 # Increased from 512 (4x) for performance testing
 }
 
 variable "iam_role_ai-answers-ecs-role_arn" {
