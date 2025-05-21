@@ -16,7 +16,7 @@ const AnswerService = {
     referringUrl,
     chatId
   ) => {
-    await ClientLoggingService.info(chatId, `Processing message in ${lang.toUpperCase()}`);
+    ClientLoggingService.info(chatId, `Processing message in ${lang.toUpperCase()}`);
 
     const SYSTEM_PROMPT = await loadSystemPrompt(lang, context);
     if (evaluation) {
@@ -24,7 +24,7 @@ const AnswerService = {
     }
     const finalHistory = message.includes('<evaluation>') ? [] : conversationHistory;
     const messageWithReferrer = `${message}${referringUrl.trim() ? `\n<referring-url>${referringUrl.trim()}</referring-url>` : ''}`;
-    await ClientLoggingService.debug(chatId, 'Sending to ' + provider + ' API:', {
+    ClientLoggingService.debug(chatId, 'Sending to ' + provider + ' API:', {
       messageWithReferrer,
       conversationHistory: finalHistory,
       systemPromptLength: SYSTEM_PROMPT.length,
@@ -70,17 +70,17 @@ const AnswerService = {
 
       if (!response.ok) {
         const errorText = await response.text();
-        await ClientLoggingService.error(chatId, provider + ' API error response:', errorText);
+        ClientLoggingService.error(chatId, provider + ' API error response:', errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      await ClientLoggingService.debug(chatId, provider + ' API response:', data);
+      ClientLoggingService.debug(chatId, provider + ' API response:', data);
       const parsedResponse = AnswerService.parseResponse(data.content);
       const mergedResponse = { ...data, ...parsedResponse };
       return mergedResponse;
     } catch (error) {
-      await ClientLoggingService.error(chatId, 'Error calling ' + provider + ' API:', error);
+      ClientLoggingService.error(chatId, 'Error calling ' + provider + ' API:', error);
       throw error;
     }
   },
@@ -215,7 +215,7 @@ const AnswerService = {
 
   sendBatchMessages: async (provider, entries, lang, batchName, chatId) => {
     try {
-      await ClientLoggingService.info(
+      ClientLoggingService.info(
         chatId,
         `Processing batch of ${entries.length} entries in ${lang.toUpperCase()}`
       );
@@ -268,7 +268,7 @@ const AnswerService = {
 
       return response.json();
     } catch (error) {
-      await ClientLoggingService.error(chatId, 'Error in sendBatchMessages:', error);
+      ClientLoggingService.error(chatId, 'Error in sendBatchMessages:', error);
       throw error;
     }
   },
