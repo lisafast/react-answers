@@ -99,8 +99,8 @@
         "error": "Sorry, we're having a problem connecting to the service right now. Please try again in a few minutes.",
         "blockedContent": "Your question used words that aren't accepted. Please ask it differently below.",
         "blockedMessage": "Your question was not sent to the AI service.",
-        "privateContent": "To protect your privacy, your question was not sent to the AI service. Please ask your question again below without this personal information.",
-        "privacyMessage": "Personal information you cannot include in your question is identified as XXX.",
+        "privateContent": "To protect your privacy, your question was not sent to the AI service. Ask it differently below without any personal information.",
+        "privacyMessage": "Personal information in your question is marked as XXX.",
         "characterWarning": "{count} {unit} remaining",
         "characterLimit": "Your message is {count} {unit} too long. Please simplify your question.",
         "character": "character",
@@ -236,23 +236,23 @@
     "start": "Start",
     "pause": "Pause"
   },  "admin": {
-    "title": "Admin Dashboard",
+    "title": "AI Answers Admin dashboard",
     "navigation": {
       "ariaLabel": "Admin Navigation",
       "title": "Admin Menu",
-      "aiAnswers": "AI Answers",
-      "batches": "Batches",
-      "users": "User Management",
-      "chatViewer": "Chat Viewer",
-      "database": "Database Management",
-      "eval": "Evaluation Tools",
-      "logout": "Logout"
+      "aiAnswers": "Use AI Answers with expert feedback options",
+      "batches": "View and manage batches",
+      "users": "Manage user accounts",
+      "chatViewer": "View full log for a Chat ID",
+      "database": "Manage the database",
+      "eval": "Control evaluation embeddings",
+      "logout": "Sign out"
     },
     "chatLogs": {
-      "title": "Recent Chat Interactions"
+      "title": "Download recent chat logs"
     },
     "deleteChat": {
-      "title": "Delete Chat",
+      "title": "Delete a chat and associatedfeedback",
       "idLabel": "Chat ID",
       "button": "Delete Chat",
       "confirm": "Confirm Delete",
@@ -263,39 +263,39 @@
     }
   },
   "login": {
-    "title": "Login",
+    "title": "Sign in to AI Answers Admin",
     "email": "Email",
     "password": "Password",
-    "submit": "Log In",
+    "submit": "Sign in",
     "invalidCredentials": "Invalid email or password",
     "form": {
-      "submitting": "Logging in...",
-      "signupLink": "Need an account? Sign up here"
+      "submitting": "Signing in...",
+      "signupLink": "Create an account"
     }
   },
   "signup": {
-    "title": "Sign Up",
+    "title": "Create an account",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "submit": "Sign Up",
+    "submit": "Submit",
     "passwordMismatch": "Passwords do not match",
     "errorOccurred": "An error occurred during signup",
     "form": {
       "username": "Username:",
       "password": "Password:",
-      "submit": "Sign Up",
-      "submitting": "Creating account..."
+      "submit": "Submit",
+      "submitting": "Creating account...wait for approval"
     },
     "messages": {
-      "success": "Signup successful! You can now",
+      "success": "Success! You can now ",
       "error": "An error occurred during signup",
       "failed": "Signup failed",
-      "loginLink": "log in to your account"
+      "loginLink": "sign in to AI Answers Admin"
     }
   },
   "users": {
-    "title": "User Management",
+    "title": "Manage user accounts",
     "columns": {
       "email": "Email",
       "role": "Role",
