@@ -101,6 +101,8 @@ describe('ContextService', () => {
           body: expect.any(String),
         })
       );
+      const body = JSON.parse(fetch.mock.calls[0][1].body);
+      expect(body.chatId).toBe('system');
     });
 
     it('should handle API errors', async () => {
