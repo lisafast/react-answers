@@ -1,6 +1,5 @@
 import React from 'react';
 import { GcdsDetails } from '@cdssnc/gcds-components-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { RoleBasedContent } from '../RoleBasedUI.js';
 
 const ChatOptions = ({ 

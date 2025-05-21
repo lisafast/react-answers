@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ExpertRatingComponent from './ExpertRatingComponent.js';
-import { RoleBasedContent, useHasAnyRole } from '../RoleBasedUI.js';
+import { useHasAnyRole } from '../RoleBasedUI.js';
 import '../../styles/App.css';
 import { useTranslations } from '../../hooks/useTranslations.js';
 import DataStoreService from '../../services/DataStoreService.js';

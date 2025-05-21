@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import FeedbackComponent from './FeedbackComponent.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ChatOptions from './ChatOptions.js';
@@ -15,13 +15,10 @@ const ChatInterface = ({
   handleReload,
   handleAIToggle,
   handleSearchToggle,
-  handleDepartmentChange,
   handleReferringUrlChange,
-  handleFeedback,
   formatAIResponse,
   selectedAI,
   selectedSearch,
-  selectedDepartment,
   referringUrl,
   turnCount,
   showFeedback,
@@ -31,15 +28,17 @@ const ChatInterface = ({
   MAX_CONVERSATION_TURNS,
   t,
   lang,
-  parsedResponses,
   extractSentences,
   chatId,
 }) => {
   // Add safeT helper function
-  const safeT = (key) => {
-    const result = t(key);
-    return typeof result === 'object' && result !== null ? result.text : result;
-  };
+  const safeT = useCallback(
+    (key) => {
+      const result = t(key);
+      return typeof result === 'object' && result !== null ? result.text : result;
+    },
+    [t]
+  );
 
   const [redactionAlert, setRedactionAlert] = useState('');
   const [lastProcessedMessageId, setLastProcessedMessageId] = useState(null);
@@ -150,7 +149,7 @@ const ChatInterface = ({
       const tempHint = document.getElementById('temp-hint');
       if (tempHint) tempHint.remove();
     };
-  }, [isLoading, t]);
+  }, [isLoading, t, safeT]);
 
   const getLabelForInput = () => {
     if (turnCount >= 1) {
