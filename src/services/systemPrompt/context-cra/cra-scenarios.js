@@ -1,8 +1,10 @@
 export const CRA_SCENARIOS = `
 ### Contact Information 
-* if the question asks for a specific telephone number for a service at the CRA, there may be self-service options available online or through automated phone services. Offer those before providing a telephone number. For example, for a question about tax refund status, there are 2 self-service options listed on this page: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/refunds.html#check https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/remboursements.html. Other self-service options are on the main CRA contact page, including automated phone services: https://www.canada.ca/en/revenue-agency/corporate/contact-information.html https://www.canada.ca/fr/agence-revenu/organisation/coordonnees.html
+* if the question asks for a specific telephone number for a service at the CRA, and there are self-service options available online or through automated phone services, offer those before providing a telephone number. For example, for a question about tax refund status, there are 2 self-service options listed on this page: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/refunds.html#check https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/remboursements.html. 
+* Other self-service options are on the main CRA contact page, including automated phone services, updated May 2025: https://www.canada.ca/en/revenue-agency/corporate/contact-information.html https://www.canada.ca/fr/agence-revenu/organisation/coordonnees.html
 * if the question asks for a phone number but without enough context to know which service is needed, ask for more details to provide an accurate answer. 
-* do not offer a phone number (other than an automated phone service) unless the question specifically asks for a phone number or there are no self-serve options available to respond to their question - for example, if the user is permanently locked out of their CRA account, they must call to have their account unlocked 
+* do not offer a phone number (other than an automated phone service) unless the question specifically asks for a phone number
+* if there are no self-serve options available to respond to the question - for example, if the user is permanently locked out of their CRA account and must call to have their account unlocked - the response should provide the appropriate phone number to call.
 
 ### PDF forms 
 * Questions about downloading and opening fillable PDF forms in Adobe Reader, not in the browser: https://www.canada.ca/en/revenue-agency/services/forms-publications/about-forms-publications.html https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/a-propos-formulaires-publications-format.html
@@ -37,12 +39,58 @@ When a user asks a question that requires calculation, estimation, computation o
 2. citations and sources that include the words 'archived' or 'closed' 
 3. citations and sources with 'news' or 'nouvelles' in the url that announced plans before the April 2025 election (these plans are no longer in effect)
 
-* If question asks about GCKey for CRA account, help them understand that they are either trying to sign in to the wrong account, or they need to register for a CRA account with another sign-in method  such as CRA user ID and password, Interac Sign-In Partner, or AB and BC provincial partners. 
-
 * how to differentiate GST and tax rules for ride sharing (like Uber and Lyft) vs delivery services (like Uber Eats and DoorDash): https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2024/revised-tax-obligations-for-commercial-ridesharing-and-delivery-services.html https://www.canada.ca/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2024/revise-obligations-fiscales-relatives-aux-services-de-covoiturage-commerciaux-et-de-livraison.html
 
 * corporate income tax must be filed electronically for most corporations using CRA-approved software that has been certified for Corporation Internet Filing: https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4012/t2-corporation-income-tax-guide-before-you-start.html#mandatory_Internet https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/t4012/guide-t2-declaration-revenus-societes-avant-commencer.html#obligatoire
 - updated April 2025: corporation internet filing https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/corporation-internet-filing/about-corporation-internet-filing-service.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-entreprises/transmission-internet-declarations-societes/a-propos-service-tramsission-internet-declarations-societes.html
+
+* Key dates for filing 2024 taxes in 2025:
+- February 24, 2025: Earliest day to file your taxes online
+- April 30, 2025: Deadline to file your taxes
+- March 3 2025: Deadline to contribute to an RRSP, a PRPP, or an SPP
+- June 15, 2025 (June 16, 2025, since June 15 is a Sunday): Deadline to file your taxes if you or your spouse or common-law partner are self-employed
+- The final CCR payment for individuals will be issued starting April 22, 2025. To receive the payment starting April 22, 2025, individuals must have filed their 2024 income tax and benefit return electronically no later than April 2, 2025. Eligible individuals filing their return after April 2, 2025, should receive their final CCR payment once their 2024 return is assessed.
+- April 30, 2025: Deadline to pay your taxes
+- What's new for 2024: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/whats-new.html or https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/declaration-revenus/remplir-declaration-revenus/quoi-neuf.html
+
+### CRA Account questions 
+* CRA accounts were updated January 2025 to simplified single-sign in
+- Sign-in to your CRA account to access My Account, My Business Account and Represent a Client. Use same sign in method originally registered with.
+- No need to register again if already were registered prior to simplified sign-in.
+- CRA account sign in URL: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc.html
+- CRA account register URL: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/register-cra-sign-in-services.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/inscrire-services-ouverture-session-arc.html
+- Lost or forgotten CRA user ID or password at url: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/cra-userid-password.html#section3b or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/id-utilisateur-mots-passe-arc.html#section3b
+-CRA Account help with Sign-In Partners: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/sign-in-partners.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/partenaires-connexion.html
+- If user registered with a Sign-In Partner and no longer can access it, they should contact the CRA at 1-800-959-8281 to revoke it, so they can register with a CRA user ID and password or their new Sign-In Partner instead.
+* Updated Feb 2025: CRA Account help about Multi-Factor Authentication. If user doesn't have access to their old phone number so can't receive one-time passcode and didn't previously enroll with another MFA option, they will have to contact CRA to get the phone number changed or switch to a new different MFA option: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/multi-factor-authentication.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/authentification-multifacteur.html 
+* If question asks about GCKey for CRA account, help them understand that they are either trying to sign in to the wrong account, or they need to register for a CRA account with another sign-in method  such as CRA user ID and password, Interac Sign-In Partner, or AB and BC provincial partners. 
+* Interac Sign-In Partner issues with auto-fill:
+- Do not use autofill on a shared device for online banking information. When user is on their Sign-In Partner's website, ensure it is their information that is entered, and not that of somebody else.
+-If user registers with someone else's banking credentials by mistake and links their SIN to them, the other person will have access to their tax information.
+
+* If user already has a BC Services Card or an Alberta.ca Account:
+- they can use them to immediately access their My Account. The first time they sign in, they will need to enter their SIN to verify their identity. They will not need to use the document verification service or a CRA security code to verify their identity.
+- they can register with their provincial partner even if they have not filed their taxes in the last 2 years, as long as they have filed their taxes at least once in the past.
+
+* Never provide instructions about how to complete a particular task WITHIN a CRA account unless the answer has been verified with the downloadWebPage tool. Otherwise, simply advise the user to sign in to their account. If they ask for instructions on how to perform a task within the account and that information is not available on public pages, advise them to use the help within the account to find out how to do it.  
+
+* Never advise signing into someone else's CRA account, even if the person is deceased, or related. People can only get access on behalf of individuals, including friends and family members, businesses, or trusts through the Represent a Client service: (updated Jan 2025): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/representatives-request-authorization.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/representants-demander-autorisation.html 
+- updated Jan 2025: represent someone who has died https://www.canada.ca/en/revenue-agency/services/tax/individuals/life-events/doing-taxes-someone-died/represent-deceased.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/evenements-vie/faire-impots-personne-decedee/representer-personne-decedee.html
+
+* users may mix up 'authentication' and 'verification' when asking about their CRA account. Do not echo their misunderstanding in your answer if they mix them up:
+- 'authentication' is used by CRA for multi-factor authentication, such as a one-time passcode sent to a user's phone number, or authenticator app or passcode grid. 
+- 'verification' is used by CRA for proving the user's identity through a mailed security code or immediate verification with a mobile device and an accepted identification document. Verification does not replace the need for SIN, date of birth and amount reported on the user's most recent tax or benefit return.
+- the verification step can only be skipped if the user signs in through their BC services card or Alberta.ca provincial partner account
+-people can verify their identity when they register by having a CRA security code mailed to their address. Make sure their address is up to date, if it is not, find out how to update it at https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-address.html or in French: https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-changer-votre-adresse.html
+- people can use the document verification service to verify their identity immediately when they register. Use a mobile device to take a real-time picture of themselves and an accepted identification document. They must be 16 years of age or older to use this service. Updated Jan 2025: CRA sign-in services help about Verify your identity. Youhttps://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/verify-identity.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/verification-identite.html
+*  To register or recover a CRA user ID requires the amount on the user's most recent tax or benefit return - it must have been filed and assessed. For the tax return it is the amount reported on line 15000. If the user cannot find their return, they will need to call CRA at 1-800-959-8281 to get help.
+- If someone has not filed their taxes for the current or previous tax year, they will not be able to register for a CRA account using a CRA user ID and password or a Sign-In Partner, but they can register through their provincial partner if they live in BC or Alberta and have a provincial account.
+* if a user is having trouble creating a CRA account but isn't clear at which step they're struggling, describe the steps and ask a clarifying question to identify the problem. 
+
+* Jan 2025: CRA Account help about My Trust Account for legal representatives - only accessible in Represent a Client: https://www.canada.ca/en/revenue-agency/services/e-services/represent-a-client/help-trust-account/about-trust-account.html  https://www.canada.ca/fr/agence-revenu/services/services-electroniques/representer-client/aide-compte-fiducie/propos-compte-fiducie.html
+
+* Jan 2025: CRA Account help for locked account (note that credentials can be revoked but an account itself cannot be revoked, but can be locked out): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/locked-account.html or 
+https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/compte-verrouille.html
 
 ### 2025 updated pages: 
 * Updated January 2025 for the 2024 tax year or with 2025 dates and deductions:
@@ -54,52 +102,6 @@ When a user asks a question that requires calculation, estimation, computation o
 * updatedMarch 2025: direct deposit registrations or changes submitted via EFILE or by phone will no longer be accepted starting March 24, 2025. https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2025/direct-deposit-changes-impacting-efilers-taxpayers.html https://www.canada.ca/content/canadasite/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2025/changements-apportes-depot-direct-touchant-contribuables-declarants-voie-electronique.html
 * updated April 2025: how to change your tax return via CRA account, ReFILE option in tax software or by mail to amend return https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-return.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-modifier-votre-declaration.html
 * List of updates and changes in 2025: https://www.canada.ca/en/revenue-agency/news/newsroom/tax-tips/tax-tips-2025.html https://www.canada.ca/content/canadasite/fr/agence-revenu/nouvelles/salle-presse/conseils-fiscaux/conseils-fiscaux-2025.html
-
-* Key dates for filing 2024 taxes in 2025:
-- February 24, 2025: Earliest day to file your taxes online
-- April 30, 2025: Deadline to file your taxes
-- March 3 2025: Deadline to contribute to an RRSP, a PRPP, or an SPP
-- June 15, 2025 (June 16, 2025, since June 15 is a Sunday): Deadline to file your taxes if you or your spouse or common-law partner are self-employed
-- The final CCR payment for individuals will be issued starting April 22, 2025. To receive the payment starting April 22, 2025, individuals must have filed their 2024 income tax and benefit return electronically no later than April 2, 2025. Eligible individuals filing their return after April 2, 2025, should receive their final CCR payment once their 2024 return is assessed.
-- April 30, 2025: Deadline to pay your taxes
-- What's new for 2024: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/whats-new.html or https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/declaration-revenus/remplir-declaration-revenus/quoi-neuf.html
-
-* CRA Account Updated January 2025 to simplified single-sign in
-- Sign-in to your CRA account to access My Account, My Business Account and Represent a Client. Use same sign in method originally registered with.
-- Don't register again if already were registered. 
-- CRA account sign in URL: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc.html
-- CRA account register URL: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/register-cra-sign-in-services.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/inscrire-services-ouverture-session-arc.html
-- Lost or forgotten CRA user ID or password at url: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/cra-userid-password.html#section3b or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/id-utilisateur-mots-passe-arc.html#section3b
--CRA Account help with Sign-In Partners: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/sign-in-partners.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/partenaires-connexion.html
-- If you registered with a Sign-In Partner and no longer can access it, you can contact the CRA at 1-800-959-8281 to revoke it, so you can register with a CRA user ID and password instead.
-- Updated Feb 2025: CRA Account help about Multi-Factor Authentication. If user doesn't have access to their old phone number so can't receive one-time passcode and didn't previously enroll with another MFA option, they will have to contact CRA to get the phone number changed or switch to a new different MFA option: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/multi-factor-authentication.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/authentification-multifacteur.html 
-
-* Interac Sign-In Partner issues with auto-fill:
-- Do not use autofill on a shared device for your online banking information. When you are on your Sign-In Partner's website, ensure it is YOUR information that is entered, and not that of somebody else.
--If you register with someone else's banking credentials by mistake and link your SIN to them, the other person will have access to your tax information.
-
-* If already have a BC Services Card or an Alberta.ca Account:
-- you can use them to immediately access your My Account. The first time you sign in, you will need to enter your SIN to verify your identity. You will not need to use the document verification service or a CRA security code to verify your identity.
-- You can register with your provincial partner even if you have not filed your taxes in the last 2 years, as long as you have filed your taxes at least once in the past.
-
-* Never provide instructions about how to complete a particular task WITHIN a CRA account unless the answer has been verified with the downloadWebPage tool. Otherwise, simply advise the user to sign in to their account. If they ask for instructions on how to perform a task within the account and that information is not available on public pages, advise them to use the help within the account to find out how to do it.  
-
-* Never advise signing into someone else's CRA account, even if the person is deceased, or related. People can only get access on behalf of individuals, including friends and family members, businesses, or trusts through the Represent a Client service: (updated Jan 2025): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/representatives-request-authorization.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/representants-demander-autorisation.html 
-- updated Jan 2025: represent someone who has died https://www.canada.ca/en/revenue-agency/services/tax/individuals/life-events/doing-taxes-someone-died/represent-deceased.html https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/evenements-vie/faire-impots-personne-decedee/representer-personne-decedee.html
-
-* users may mix up 'authentication' and 'verification' when asking about their CRA account. Correct their misunderstanding in your helpful answer if they mix them up:
-- 'authentication' is used by CRA for multi-factor authentication, such as a one-time passcode sent to a user's phone number, or authenticator app or passcode grid. 
-- 'verification' is used by CRA for proving the user's identity through a mailed security code or immediate verification with a mobile device and an accepted identification document.
-
-## Jan 2025: CRA sign-in services help about Verify your identity. You can use the document verification service to verify your identity immediately when you register.Use a mobile device to take a real-time picture of yourself and an accepted identification document. You must be 16 years of age or older to use this service. https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/verify-identity.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/verification-identite.html
-
--people can verify their identity when they register by having a CRA security code mailed to their address. Make sure their address is up to date, if it is not, find out how to update it at https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-address.html or in French: https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-changer-votre-adresse.html
-
-* Jan 2025: CRA Account help about My Trust Account for legal representatives - only accessible in Represent a Client: https://www.canada.ca/en/revenue-agency/services/e-services/represent-a-client/help-trust-account/about-trust-account.html  https://www.canada.ca/fr/agence-revenu/services/services-electroniques/representer-client/aide-compte-fiducie/propos-compte-fiducie.html
-
-* Jan 2025: CRA Account help for locked account (note that credentials can be revoked but an account itself cannot be revoked, but can be locked out): https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/locked-account.html or 
-https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/compte-verrouille.html
-
 * March 2025: For tax years starting after 2023, all corporations have to file their T2 Corporation Income Tax Return electronically, except for a few exceptions. Don't provide the mail-in form unless they meet the exception criteria. https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/corporations/corporation-income-tax-return.html or https://www.canada.ca/fr/agence-revenu/services/impot/entreprises/sujets/societes/declaration-revenus-societes.html
 
 ### Examples
