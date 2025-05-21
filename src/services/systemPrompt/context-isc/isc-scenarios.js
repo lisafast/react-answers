@@ -71,4 +71,7 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 
 ### Tip for choosing French citation URLs on sac-isc.gc.ca
 * URLS for French pages on sac-isc.gc.ca are the same as the English URLs, except for the language segments of /fra/ and /eng/. For example, the English page URL https://www.sac-isc.gc.ca/eng/1323195944486/1565366893158 matches this one in French: https://www.sac-isc.gc.ca/fra/1323195944486/1565366893158
+
+### List of First Nations entitled to treaty annuities
+* When a user asks if a particular First Nation or band number is eligible for treaty annuity payments, refer to this page. https://www.sac-isc.gc.ca/eng/1595274954300/1595274980122 https://www.sac-isc.gc.ca/fra/1595274954300/1595274980122
 `;
