@@ -1,4 +1,4 @@
-import  { useEffect, useMemo, useState } from 'react';
+import  { useEffect, useMemo } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
 import AdminPage from './pages/AdminPage.js';
@@ -13,10 +13,8 @@ import UsersPage from './pages/UsersPage.js';
 import EvalPage from './pages/EvalPage.js';
 import DatabasePage from './pages/DatabasePage.js';
 import SettingsPage from './pages/SettingsPage.js';
-import OutagePage from './pages/OutagePage.js';
-import { AuthProvider, useAuth } from './contexts/AuthContext.js';
+import { AuthProvider } from './contexts/AuthContext.js';
 import { AdminRoute, RoleProtectedRoute } from './components/RoleProtectedRoute.js';
-import DataStoreService from './services/DataStoreService.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -29,28 +27,11 @@ const getAlternatePath = (currentPath, currentLang) => {
   return `/${newLang}${pathWithoutLang}`;
 };
 
-// HomeWrapper component moved outside
-const HomeWrapper = ({ lang, siteStatus, isLoading }) => {
-  const { currentUser } = useAuth();
-  const allowed = currentUser && ['admin', 'partner'].includes(currentUser.role);
-  
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  // If site is unavailable and user is not allowed, show outage page
-  if (siteStatus === 'unavailable' && !allowed) {
-    return <OutagePage lang={lang} />;
-  }
-  return <HomePage lang={lang} />;
-};
-
 const AppLayout = () => {
   const location = useLocation();
   const currentLang = location.pathname.startsWith('/fr') ? 'fr' : 'en';
   const alternateLangHref = getAlternatePath(location.pathname, currentLang);
 
-  // Set up token expiration checker when the app layout mounts
   useEffect(() => {
     // Removed the auth expiration checker setup
   }, []);
@@ -86,22 +67,9 @@ const AppLayout = () => {
 };
 
 export default function App() {
-  const [siteStatus, setSiteStatus] = useState('unavailable');
-  const [isLoadingSiteStatus, setIsLoadingSiteStatus] = useState(true);
-
-  useEffect(() => {
-    DataStoreService.getSiteStatus().then(status => {
-      setSiteStatus(status);
-      setIsLoadingSiteStatus(false);
-    })
-    .catch(() => {
-      setIsLoadingSiteStatus(false);
-    });
-  }, []);
-
   const router = useMemo(() => {
-    const homeEn = <HomeWrapper lang="en" siteStatus={siteStatus} isLoading={isLoadingSiteStatus} />;
-    const homeFr = <HomeWrapper lang="fr" siteStatus={siteStatus} isLoading={isLoadingSiteStatus} />;
+    const homeEn = <HomePage lang="en" />;
+    const homeFr = <HomePage lang="fr" />;
     const publicRoutes = [
       { path: '/', element: homeEn },
       { path: '/en', element: homeEn },
@@ -147,14 +115,11 @@ export default function App() {
         ]
       }
     ]);
-  }, [siteStatus, isLoadingSiteStatus]);
-
-  // Create a key that changes when siteStatus or isLoadingSiteStatus changes
-  const routerKey = `${siteStatus}-${isLoadingSiteStatus}`;
+  }, []);
 
   return (
     <AuthProvider>
-      <RouterProvider router={router} key={routerKey} />
+      <RouterProvider router={router} />
     </AuthProvider>
   );
 }

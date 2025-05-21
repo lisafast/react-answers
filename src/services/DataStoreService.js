@@ -252,10 +252,10 @@ class DataStoreService {
       const response = await fetch(getApiUrl('db-settings?key=siteStatus'));
       if (!response.ok) throw new Error('Failed to get site status');
       const data = await response.json();
-      return data.value || 'available';
+      return data.value || 'unavailable';
     } catch (error) {
       console.error('Error getting site status:', error);
-      return 'available';
+      return 'unavailable';
     }
   }
 

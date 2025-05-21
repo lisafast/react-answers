@@ -53,7 +53,11 @@
         "message": "Reload the page to try again.",
         "button": "Reload"
       },
-      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then."
+      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then.",
+      "statusUnknown": {
+        "title": "Service Status Unknown",
+        "message": "The service status could not be determined. Please try again later."
+      }
     },
     "chat": {
       "chatId": "Chat ID",

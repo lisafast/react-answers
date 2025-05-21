@@ -7,7 +7,7 @@ const OutagePage = ({ lang = 'en' }) => {
 
   return (
     <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600">
-      <h1 className="mb-400">{t('homepage.title', 'AI Answers')}</h1>
+      <h1 className="mb-400">AI Answers</h1>
       <GcdsNotice type="warning" noticeTitleTag="h2" noticeTitle={t('outage.title', 'Service Unavailable')}>
         <p>{t('outage.message', 'This service is currently unavailable.')}</p>
       </GcdsNotice>
