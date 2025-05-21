@@ -8,7 +8,6 @@ import { getApiUrl } from '../utils/apiToUrl.js';
 import { useTranslations } from '../hooks/useTranslations.js';
 import AuthService from '../services/AuthService.js';
 import { useAuth } from '../contexts/AuthContext.js';
-import { AdminOnly } from '../components/RoleBasedUI.js';
 import { usePageContext } from '../hooks/usePageParam.js';
 
 DataTable.use(DT);
@@ -29,6 +28,7 @@ const UsersPage = ({ lang }) => {
   // Use a ref to store edit states persistently between DataTable renders
   const editStatesRef = useRef({});
   // This state is just used to trigger re-renders when editStatesRef changes
+  // eslint-disable-next-line no-unused-vars
   const [triggerRender, setTriggerRender] = useState(0);
   const { currentUser } = useAuth();
 
@@ -237,8 +237,7 @@ const UsersPage = ({ lang }) => {
           order: [[3, 'desc']],
           createdRow: (row, data) => {
             // Attach select change handlers
-            row.querySelectorAll('select').forEach(select => {
-              select.onchange = (e) => {
+            row.querySelectorAll('select').forEach(select => {              select.onchange = () => {
                 const userId = select.getAttribute('data-userid');
                 const field = select.getAttribute('data-field');
                 let value = select.value;
@@ -279,9 +278,5 @@ const UsersPage = ({ lang }) => {
   );
 };
 
-// You can use the HOC approach directly in components if you prefer:
-// export default withAdminProtection()(UsersPage);
 
-// Or use the route-based protection as configured in App.js.
-// We're using route-based protection, so export the component directly.
 export default UsersPage;

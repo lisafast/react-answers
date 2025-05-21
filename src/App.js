@@ -1,5 +1,5 @@
 import  { useEffect } from 'react';
-import { createBrowserRouter, RouterProvider, Outlet, useLocation, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
 import AdminPage from './pages/AdminPage.js';
 import BatchPage from './pages/BatchPage.js';

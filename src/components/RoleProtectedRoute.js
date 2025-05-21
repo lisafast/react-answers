@@ -1,14 +1,11 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import AuthService from '../services/AuthService.js';
-import { useTranslations } from '../hooks/useTranslations.js';
 import { useAuth } from '../contexts/AuthContext.js';
 
 // Basic authentication protection
 export const ProtectedRoute = ({ children, lang = 'en' }) => {
   const location = useLocation();
   const { currentUser, loading } = useAuth();
-  const { t } = useTranslations(lang);
   
   if (loading) {
     return null; // or a loading spinner component

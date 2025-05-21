@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import FeedbackComponent from './FeedbackComponent.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ChatOptions from './ChatOptions.js';
