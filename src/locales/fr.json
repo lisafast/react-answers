@@ -103,8 +103,8 @@
         "error": "Désolé, nous avons un problème de connexion au service en ce moment. Veuillez réessayer dans quelques minutes.",
         "blockedContent": "Votre question contenait des mots qui ne sont pas acceptés.\nVeuillez la reformuler différemment ci-dessous.",
         "blockedMessage": "Votre question n'a pas été envoyée au service d'IA.",
-        "privateContent": "Pour protéger votre vie privée, votre question n'a pas été envoyée au service d'intelligence artificielle. Veuillez reposer votre question ci-dessous sans ces informations personnelles.",
-        "privacyMessage": "Les informations personnelles que vous ne pouvez pas inclure dans votre question ont été identifiées comme XXX.",
+        "privateContent": "Pour protéger votre vie privée, votre question n'a pas été envoyée au service d'IA. Posez-la différemment ci-dessous sans aucune information personnelle.",
+        "privacyMessage": "Les informations personnelles dans votre question sont marquées comme XXX.",
         "characterWarning": "{count} {unit} restants",
         "characterLimit": "Votre message est trop long de {count} {unit}. Veuillez simplifier votre question.",
         "character": "caractère",
@@ -243,25 +243,25 @@
     "pause": "Pause"
   },
   "admin": {
-    "title": "Tableau de bord d'administration",
+    "title": "Tableau de bord d'administration de Réponses IA",
     "navigation": {
       "ariaLabel": "Navigation administrateur",
       "title": "Menu administrateur",
-      "aiAnswers": "Réponses IA",
-      "batches": "Lots",
-      "users": "Gestion des utilisateurs",
-      "chatViewer": "Visualiseur de chat",
-      "database": "Gestion de la base de données",
-      "eval": "Outils d'évaluation",
+      "aiAnswers": "Utiliser Réponses IA avec les options de rétroaction d'expert",
+      "batches": "Voir et gérer les lots",
+      "users": "Gérer les comptes utilisateurs",
+      "chatViewer": "Voir le journal complet pour un ID de chat",
+      "database": "Gérer la base de données",
+      "eval": "Contrôler les intégrations d'évaluation",
       "logout": "Se déconnecter"
     },
     "chatLogs": {
-      "title": "Interactions de chat récentes"
+      "title": "Télécharger les journaux de chat récents"
     },
     "deleteChat": {
-      "title": "Supprimer la conversation",
-      "idLabel": "ID de la conversation",
-      "button": "Supprimer",
+      "title": "Supprimer une conversation avec des rétroactions incorrectes",
+      "idLabel": "ID de chat",
+      "button": "Supprimer la conversation",
       "confirm": "Confirmer la suppression",
       "cancel": "Annuler",
       "loading": "Suppression en cours...",
@@ -270,38 +270,39 @@
     }
   },
   "signup": {
-    "title": "Inscription",
+    "title": "Créer un compte",
     "email": "Courriel",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
-    "submit": "S'inscrire",
+    "submit": "Soumettre",
     "passwordMismatch": "Les mots de passe ne correspondent pas",
     "errorOccurred": "Une erreur est survenue lors de l'inscription",
     "form": {
-      "submitting": "Création du compte...",
-      "username": "Nom d'utilisateur",
-      "password": "Mot de passe"
+      "username": "Nom d'utilisateur :",
+      "password": "Mot de passe :",
+      "submit": "Soumettre",
+      "submitting": "Création du compte...en attente d'approbation"
     },
     "messages": {
-      "success": "Inscription réussie ! Vous pouvez maintenant",
-      "error": "Une erreur s'est produite lors de l'inscription",
+      "success": "Succès ! Vous pouvez maintenant ",
+      "error": "Une erreur est survenue lors de l'inscription",
       "failed": "L'inscription a échoué",
-      "loginLink": "vous connecter à votre compte"
+      "loginLink": "vous connecter à l'administration de Réponses IA"
     }
   },
   "login": {
-    "title": "Connexion",
+    "title": "Se connecter à l'administration de Réponses IA",
     "email": "Courriel",
     "password": "Mot de passe",
     "submit": "Se connecter",
     "invalidCredentials": "Courriel ou mot de passe invalide",
     "form": {
       "submitting": "Connexion en cours...",
-      "signupLink": "Besoin d'un compte ? Inscrivez-vous ici"
+      "signupLink": "Créer un compte"
     }
   },
   "users": {
-    "title": "Gestion des utilisateurs",
+    "title": "Gérer les comptes utilisateurs",
     "columns": {
       "email": "Courriel",
       "role": "Rôle",
@@ -318,7 +319,7 @@
       "deactivate": "Désactiver",
       "save": "Enregistrer",
       "delete": "Supprimer",
-      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur?"
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?"
     }
   },
   "settings": {
