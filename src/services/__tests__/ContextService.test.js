@@ -1,5 +1,14 @@
 import ContextService from '../ContextService.js';
 import { getProviderApiUrl, getApiUrl } from '../../utils/apiToUrl.js';
+import LoggingService from '../ClientLoggingService.js';
+
+jest.mock('../ClientLoggingService.js', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn().mockResolvedValue(),
+    error: jest.fn().mockResolvedValue(),
+  },
+}));
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -28,6 +37,7 @@ describe('ContextService', () => {
         searchProvider: 'google',
         conversationHistory: [],
         referringUrl: 'https://referrer.com',
+        chatId: 'system',
       });
     });
 
@@ -41,6 +51,7 @@ describe('ContextService', () => {
         searchProvider: null,
         conversationHistory: [],
         referringUrl: '',
+        chatId: 'system',
       });
     });
   });
@@ -81,6 +92,8 @@ describe('ContextService', () => {
           body: expect.any(String),
         })
       );
+      const body = JSON.parse(fetch.mock.calls[0][1].body);
+      expect(body.chatId).toBe('system');
     });
 
     it('should handle API errors', async () => {
@@ -117,12 +130,16 @@ describe('ContextService', () => {
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: 'search query',
-            searchService: 'google',
-          }),
+          body: expect.any(String),
         })
       );
+      const body = JSON.parse(fetch.mock.calls[0][1].body);
+      expect(body).toEqual({
+        query: 'search query',
+        lang: 'en',
+        searchService: 'google',
+        chatId: 'system',
+      });
     });
   });
 
