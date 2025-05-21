@@ -3,6 +3,7 @@ resource "aws_lb" "ai_answers" {
   internal           = false #tfsec:ignore:AWS005
   load_balancer_type = "application"
 
+  idle_timeout               = 300
   enable_deletion_protection = true
   drop_invalid_header_fields = true
 
