@@ -97,7 +97,9 @@ export default async function handler(req, res) {
     await chat.save();
 
     // 5. Generate embeddings for the interaction
+    ServerLoggingService.info('[db-persist-interaction] Embedding creation start', chatId, {});
     await EmbeddingService.createEmbedding(dbInteraction,interaction.selectedAI);
+    ServerLoggingService.info('[db-persist-interaction] Embedding creation end', chatId, {});
  
 
     // 6. Perform evaluation on the saved interaction (fire and forget, log success and error)
