@@ -22,6 +22,7 @@ export default async function handler(req, res) {
 
     const interaction = req.body;
     let chatId = interaction.chatId;
+    ServerLoggingService.info('[db-persist-interaction] Start - chatId:', chatId, {});
     let chat = await Chat.findOne({ chatId: chatId });
 
     if (!chat) {
@@ -97,7 +98,9 @@ export default async function handler(req, res) {
     await chat.save();
 
     // 5. Generate embeddings for the interaction
+    ServerLoggingService.info('[db-persist-interaction] Embedding creation start', chatId, {});
     await EmbeddingService.createEmbedding(dbInteraction,interaction.selectedAI);
+    ServerLoggingService.info('[db-persist-interaction] Embedding creation end', chatId, {});
  
 
     // 6. Perform evaluation on the saved interaction (fire and forget, log success and error)
@@ -111,6 +114,7 @@ export default async function handler(req, res) {
       });
 
     res.status(200).json({ message: 'Interaction logged successfully' });
+    ServerLoggingService.info('[db-persist-interaction] End - chatId:', chatId, {});
   } catch (error) {
     ServerLoggingService.error('Failed to log interaction', req.body?.chatId || 'system', error);
     res.status(500).json({ message: 'Failed to log interaction', error: error.message });
