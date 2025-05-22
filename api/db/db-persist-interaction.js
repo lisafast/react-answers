@@ -100,19 +100,15 @@ export default async function handler(req, res) {
     await EmbeddingService.createEmbedding(dbInteraction,interaction.selectedAI);
  
 
-    // 6. Perform evaluation on the saved interaction
-    try {
-      ServerLoggingService.info('Starting evaluation for interaction', chat.chatId, { });
-      const evaluationResult = await EvaluationService.evaluateInteraction(dbInteraction, chatId);
-      if (evaluationResult) {
-        ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {
-          evaluationId: evaluationResult._id
-        });
-      }
-    } catch (evalError) {
-      // Log evaluation error but don't fail the request
-      ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
-    }
+    // 6. Perform evaluation on the saved interaction (fire and forget, log success and error)
+    ServerLoggingService.info('Starting evaluation for interaction', chat.chatId, {});
+    EvaluationService.evaluateInteraction(dbInteraction, chatId)
+      .then(() => {
+        ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
+      })
+      .catch(evalError => {
+        ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
+      });
 
     res.status(200).json({ message: 'Interaction logged successfully' });
   } catch (error) {
