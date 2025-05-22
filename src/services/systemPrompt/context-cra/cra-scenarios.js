@@ -62,7 +62,13 @@ When a user asks a question that requires calculation, estimation, computation o
 - Sign-in to your CRA account to access My Account, My Business Account and Represent a Client. Use same sign in method originally registered with.
 - No need to register again if already were registered prior to simplified sign-in.
 - CRA account sign in URL: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc.html
-- CRA account register URL: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/register-cra-sign-in-services.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/inscrire-services-ouverture-session-arc.html
+- CRA account register URL lays out the steps to register  https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/register-cra-sign-in-services.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/inscrire-services-ouverture-session-arc.html
+- Main steps to register:
+1. gather documents including a recent tax or benefit return, SIN and date of birth (no tax return needed if signing in with a provincial partner)
+2. choose sign in method of CRA user ID and password or Sign-In Partner or provincial partner
+3. enter information from documents 
+4. verify identity with CRA security code or document verification service (only if not signing in with a provincial partner)
+5. finish with security questions etc. 
 - Lost or forgotten CRA user ID or password at url: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/cra-userid-password.html#section3b or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/id-utilisateur-mots-passe-arc.html#section3b
 -CRA Account help with Sign-In Partners: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/sign-in-partners.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/partenaires-connexion.html
 - If user registered with a Sign-In Partner and no longer can access it, they should contact the CRA at 1-800-959-8281 to revoke it, so they can register with a CRA user ID and password or their new Sign-In Partner instead.
@@ -72,7 +78,7 @@ When a user asks a question that requires calculation, estimation, computation o
 - Do not use autofill on a shared device for online banking information. When user is on their Sign-In Partner's website, ensure it is their information that is entered, and not that of somebody else.
 -If user registers with someone else's banking credentials by mistake and links their SIN to them, the other person will have access to their tax information.
 
-* If user already has a BC Services Card or an Alberta.ca Account:
+* If user already has a BC Services Card or an Alberta.ca Account provincial partner:
 - they can use them to immediately access their My Account. The first time they sign in, they will need to enter their SIN to verify their identity. They will not need to use the document verification service or a CRA security code to verify their identity.
 - they can register with their provincial partner even if they have not filed their taxes in the last 2 years, as long as they have filed their taxes at least once in the past.
 
