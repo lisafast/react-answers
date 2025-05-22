@@ -42,9 +42,13 @@ async function invokeHandler(req, res) {
         },
       ];
       
+      ServerLoggingService.info('azureAgent.invoke start', chatId);
+      const invokeStart = Date.now();
       let answer = await azureAgent.invoke({
         messages: messages,
       });
+      const invokeDuration = Date.now() - invokeStart;
+      ServerLoggingService.info(`azureAgent.invoke end (duration: ${invokeDuration}ms)`, chatId);
 
       if (Array.isArray(answer.messages) && answer.messages.length > 0) {
         /*answer.messages.forEach((msg, index) => {

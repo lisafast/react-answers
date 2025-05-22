@@ -9,7 +9,7 @@ const checkUrlStatus = async (url, chatId = 'system') => {
         const response = await axios.get(url, { 
             httpsAgent, 
             maxRedirects: 10,
-            timeout: 10000,
+            timeout: 2000,
         });
         const isLive = response.status === 200;
         if (!isLive) {
