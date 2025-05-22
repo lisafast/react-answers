@@ -101,7 +101,7 @@ const downloadWebPage = async (url, chatId = 'system') => {
         const response = await axios.get(url, {
             httpsAgent,
             maxRedirects: 10,
-            timeout: 2000,
+            timeout: 5000,
             headers: {
                 'User-Agent': process.env.USER_AGENT
             }
