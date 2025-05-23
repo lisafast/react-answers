@@ -68,7 +68,7 @@ When a user asks a question that requires calculation, estimation, computation o
 2. choose sign in method of CRA user ID and password or Sign-In Partner or provincial partner
 3. enter information from documents 
 4. verify identity with CRA security code or document verification service (only if not signing in with a provincial partner)
-5. finish with security questions etc. 
+5. set up multi-factor authentication (MFA) and so on
 - Lost or forgotten CRA user ID or password at url: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/cra-userid-password.html#section3b or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/id-utilisateur-mots-passe-arc.html#section3b
 -CRA Account help with Sign-In Partners: https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/sign-in-partners.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/partenaires-connexion.html
 - If user registered with a Sign-In Partner and no longer can access it, they should contact the CRA at 1-800-959-8281 to revoke it, so they can register with a CRA user ID and password or their new Sign-In Partner instead.
@@ -79,8 +79,8 @@ When a user asks a question that requires calculation, estimation, computation o
 -If user registers with someone else's banking credentials by mistake and links their SIN to them, the other person will have access to their tax information.
 
 * If user already has a BC Services Card or an Alberta.ca Account provincial partner:
-- they can use them to immediately access their My Account. The first time they sign in, they will need to enter their SIN to verify their identity. They will not need to use the document verification service or a CRA security code to verify their identity.
-- they can register with their provincial partner even if they have not filed their taxes in the last 2 years, as long as they have filed their taxes at least once in the past.
+- they can use them to immediately access their My Account. The first time they sign in, they will need to enter their SIN. They will not need to use the document verification service or a CRA security code to verify their identity.
+- they can register with their provincial partner even if they have not filed their taxes in the last 2 years.
 
 * Never provide instructions about how to complete a particular task WITHIN a CRA account unless the answer has been verified with the downloadWebPage tool. Otherwise, simply advise the user to sign in to their account. If they ask for instructions on how to perform a task within the account and that information is not available on public pages, advise them to use the help within the account to find out how to do it.  
 
@@ -93,7 +93,7 @@ When a user asks a question that requires calculation, estimation, computation o
 - the verification step and tax return amount can only be skipped if the user signs in through their BC services card or Alberta.ca provincial partner account
 -people can verify their identity when they register by having a CRA security code mailed to their address. Make sure their address is up to date, if it is not, find out how to update it at https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-address.html or in French: https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-changer-votre-adresse.html
 - people can use the document verification service to verify their identity immediately when they register. Use a mobile device to take a real-time picture of themselves and an accepted identification document. They must be 16 years of age or older to use this service. Updated Jan 2025: CRA sign-in services help about Verify your identity. Youhttps://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/verify-identity.html or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/verification-identite.html
-*  Except for people who sign in through their BC or AB provincial partner accounts, to register or recover a CRA user ID requires the amount on the user's most recent tax or benefit return - it must have been filed and assessed. For the tax return it is the amount reported on line 15000. If the user has filed a return within the last 2 years but cannot find it, they will need to call CRA at 1-800-959-8281 to get help.
+*  Except for people who sign in through their BC or AB provincial partner accounts, to register or recover a CRA user ID requires entering an amount reported on the user's most recent tax or benefit return - it must have been filed and assessed. If the user has filed a return within the last 2 years but cannot access it, they will need to call CRA at 1-800-959-8281 to get help.
 - If someone has not filed their taxes for the current or previous tax year, they will not be able to register for a CRA account using a CRA user ID and password or a Sign-In Partner, but they can register through their provincial partner if they live in BC or Alberta and have a provincial account.
 * if a user is having trouble creating a CRA account but isn't clear at which step they're struggling, describe the steps and ask a clarifying question to identify the problem. 
 
