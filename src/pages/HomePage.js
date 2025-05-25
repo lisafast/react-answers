@@ -136,6 +136,9 @@ const HomePage = ({ lang = 'en' }) => {
             </GcdsLink>
           </GcdsText>
           <GcdsText>{t('homepage.about.contact')}</GcdsText>
+          <GcdsText>
+            <GcdsLink href={`/${lang}/admin`}>Ad</GcdsLink>
+          </GcdsText>
         </GcdsDetails>
  
       </GcdsContainer>

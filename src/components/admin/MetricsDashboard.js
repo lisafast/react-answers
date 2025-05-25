@@ -36,6 +36,7 @@ const MetricsDashboard = () => {
     const metrics = {
       totalSessions: logs.length,
       totalQuestions: 0,
+      totalConversations: new Set(), // Track unique chatIDs
       humanScored: {
         total: 0,
         correct: 0,
@@ -56,6 +57,11 @@ const MetricsDashboard = () => {
       log.interactions?.forEach(interaction => {
         // Count total questions
         metrics.totalQuestions++;
+        
+        // Track unique chatIDs
+        if (interaction.chatID) {
+          metrics.totalConversations.add(interaction.chatID);
+        }
 
         // Get department
         const department = interaction.context?.department || 'Unknown';
@@ -210,6 +216,10 @@ const MetricsDashboard = () => {
             <div className="bg-gray-50 p-4 rounded-lg mb-6">
               <h3 className="text-lg font-semibold mb-4">Total Questions</h3>
               <p className="text-xl">{metrics.totalQuestions}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <h3 className="text-lg font-semibold mb-4">Total Conversations</h3>
+              <p className="text-xl">{metrics.totalConversations.size}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="bg-gray-50 p-4 rounded-lg">
