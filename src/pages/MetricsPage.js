@@ -3,6 +3,7 @@ import { useTranslations } from '../hooks/useTranslations.js';
 import { GcdsContainer, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
 import { usePageContext } from '../hooks/usePageParam.js';
 import { AdminRoute } from '../components/RoleProtectedRoute.js';
+import MetricsDashboard from '../components/admin/MetricsDashboard.js';
 
 const MetricsPage = ({ lang = 'en' }) => {
   const { t } = useTranslations(lang);
@@ -20,7 +21,7 @@ const MetricsPage = ({ lang = 'en' }) => {
 
       <section id="metrics-dashboard" className="mb-600">
         <h2 className="mt-400 mb-400">{t('metrics.dashboard.title', 'Performance Metrics')}</h2>
-        {/* MetricsDashboard component will be added here */}
+        <MetricsDashboard />
       </section>
     </GcdsContainer>
   );
