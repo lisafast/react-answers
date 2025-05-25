@@ -35,6 +35,7 @@ const MetricsDashboard = () => {
     // Initialize metrics object
     const metrics = {
       totalSessions: logs.length,
+      totalQuestions: 0,
       humanScored: {
         total: 0,
         correct: 0,
@@ -53,6 +54,9 @@ const MetricsDashboard = () => {
     // Process each log
     logs.forEach(log => {
       log.interactions?.forEach(interaction => {
+        // Count total questions
+        metrics.totalQuestions++;
+
         // Process human-scored metrics
         if (interaction.expertFeedback?.totalScore !== undefined) {
           metrics.humanScored.total++;
@@ -67,9 +71,9 @@ const MetricsDashboard = () => {
         }
 
         // Process AI-scored metrics
-        if (interaction.autoEval?.totalScore !== undefined) {
+        if (interaction.autoEval?.expertFeedback?.totalScore !== undefined) {
           metrics.aiScored.total++;
-          const score = interaction.autoEval.totalScore;
+          const score = interaction.autoEval.expertFeedback.totalScore;
           if (score === 100) {
             metrics.aiScored.correct++;
           } else if (score >= 82 && score <= 99) {
@@ -181,6 +185,10 @@ const MetricsDashboard = () => {
           </div>
         ) : metrics.totalSessions > 0 ? (
           <div className="p-4">
+            <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <h3 className="text-lg font-semibold mb-4">Total Questions</h3>
+              <p className="text-xl">{metrics.totalQuestions}</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold mb-4">Human Scored Metrics</h3>
