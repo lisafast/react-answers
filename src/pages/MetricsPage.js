@@ -1,0 +1,36 @@
+import React from 'react';
+import { useTranslations } from '../hooks/useTranslations.js';
+import { GcdsContainer, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
+import { usePageContext } from '../hooks/usePageParam.js';
+import { AdminRoute } from '../components/RoleProtectedRoute.js';
+
+const MetricsPage = ({ lang = 'en' }) => {
+  const { t } = useTranslations(lang);
+  const { language } = usePageContext();
+
+  return (
+    <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600">
+      <h1 className="mb-400">{t('metrics.title', 'Metrics Dashboard')}</h1>
+      
+      <nav className="mb-400">
+        <GcdsText>
+          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin', 'Back to Admin')}</GcdsLink>
+        </GcdsText>
+      </nav>
+
+      <section id="metrics-dashboard" className="mb-600">
+        <h2 className="mt-400 mb-400">{t('metrics.dashboard.title', 'Performance Metrics')}</h2>
+        {/* MetricsDashboard component will be added here */}
+      </section>
+    </GcdsContainer>
+  );
+};
+
+// Wrap the component with AdminRoute for protection
+export default function ProtectedMetricsPage(props) {
+  return (
+    <AdminRoute lang={props.lang}>
+      <MetricsPage {...props} />
+    </AdminRoute>
+  );
+} 

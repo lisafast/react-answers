@@ -246,6 +246,7 @@
       "chatViewer": "View full interaction for a Chat ID",
       "database": "Manage the database",
       "eval": "Control evaluation embeddings",
+      "metrics": "View performance metrics",
       "logout": "Sign out"
     },
     "chatLogs": {
@@ -317,5 +318,30 @@
   },
   "common": {
     "backToAdmin": "Back to Admin"
+  },
+  "metrics": {
+    "title": "Metrics Dashboard",
+    "dashboard": {
+      "title": "Performance Metrics",
+      "totalSessions": "Total Sessions",
+      "humanScored": {
+        "title": "Human Scored Metrics",
+        "total": "Total",
+        "correct": "Correct",
+        "needsImprovement": "Needs Improvement",
+        "hasError": "Has Error"
+      },
+      "aiScored": {
+        "title": "AI Scored Metrics",
+        "total": "Total",
+        "correct": "Correct",
+        "needsImprovement": "Needs Improvement",
+        "hasError": "Has Error"
+      },
+      "byDepartment": {
+        "title": "Department Breakdown",
+        "totalSessions": "Total Sessions"
+      }
+    }
   }
 }
