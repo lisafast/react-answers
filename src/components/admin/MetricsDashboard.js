@@ -57,16 +57,40 @@ const MetricsDashboard = () => {
         // Count total questions
         metrics.totalQuestions++;
 
+        // Get department
+        const department = interaction.context?.department || 'Unknown';
+        
+        // Initialize department metrics if not exists
+        if (!metrics.byDepartment[department]) {
+          metrics.byDepartment[department] = {
+            total: 0,
+            humanScored: {
+              total: 0,
+              correct: 0,
+              needsImprovement: 0,
+              hasError: 0
+            }
+          };
+        }
+
+        // Increment department total
+        metrics.byDepartment[department].total++;
+
         // Process human-scored metrics
         if (interaction.expertFeedback?.totalScore !== undefined) {
           metrics.humanScored.total++;
+          metrics.byDepartment[department].humanScored.total++;
+          
           const score = interaction.expertFeedback.totalScore;
           if (score === 100) {
             metrics.humanScored.correct++;
+            metrics.byDepartment[department].humanScored.correct++;
           } else if (score >= 82 && score <= 99) {
             metrics.humanScored.needsImprovement++;
+            metrics.byDepartment[department].humanScored.needsImprovement++;
           } else {
             metrics.humanScored.hasError++;
+            metrics.byDepartment[department].humanScored.hasError++;
           }
         }
 
@@ -82,19 +106,14 @@ const MetricsDashboard = () => {
             metrics.aiScored.hasError++;
           }
         }
-
-        // Process department metrics
-        const department = interaction.context?.department || 'Unknown';
-        if (!metrics.byDepartment[department]) {
-          metrics.byDepartment[department] = 0;
-        }
-        metrics.byDepartment[department]++;
       });
     });
 
     return metrics;
   };
 
+  // Commenting out export functions for now
+  /*
   const filename = (ext) => {
     let name = 'metrics-' + timeRange + '-' + new Date().toISOString();
     return name + '.' + ext;
@@ -118,6 +137,7 @@ const MetricsDashboard = () => {
   const downloadExcel = () => {
     ExportService.export(metrics, filename('xlsx'));
   };
+  */
 
   return (
     <div className="space-y-6">
@@ -150,6 +170,7 @@ const MetricsDashboard = () => {
           {loading ? 'Loading...' : 'Get metrics'}
         </GcdsButton>
 
+        {/* Commenting out export buttons for now
         {metrics.totalSessions > 0 && (
           <>
             <GcdsButton
@@ -176,6 +197,7 @@ const MetricsDashboard = () => {
             </GcdsButton>
           </>
         )}
+        */}
       </div>
 
       <div className="bg-white shadow rounded-lg">
@@ -212,16 +234,25 @@ const MetricsDashboard = () => {
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="text-lg font-semibold mb-4">Department Breakdown</h3>
               <DataTable
-                data={Object.entries(metrics.byDepartment).map(([department, count]) => ({
+                data={Object.entries(metrics.byDepartment).map(([department, data]) => ({
                   department,
-                  count
+                  total: data.total,
+                  humanScoredTotal: data.humanScored.total,
+                  humanScoredCorrect: data.humanScored.correct,
+                  humanScoredNeedsImprovement: data.humanScored.needsImprovement,
+                  humanScoredHasError: data.humanScored.hasError
                 }))}
                 columns={[
                   { title: 'Department', data: 'department' },
-                  { title: 'Total Sessions', data: 'count' }
+                  { title: 'Total Questions', data: 'total' },
+                  { title: 'Human Scored Total', data: 'humanScoredTotal' },
+                  { title: 'Correct', data: 'humanScoredCorrect' },
+                  { title: 'Needs Improvement', data: 'humanScoredNeedsImprovement' },
+                  { title: 'Has Error', data: 'humanScoredHasError' }
                 ]}
                 options={{
                   paging: true,
+                  pageLength: 25,
                   searching: true,
                   ordering: true,
                   order: [[1, 'desc']]
