@@ -54,65 +54,68 @@ const MetricsDashboard = () => {
       byDepartment: {}
     };
 
-    // Process each log as an interaction directly
-    logs.forEach(interaction => {
-      // Count total questions
-      metrics.totalQuestions++;
-      
-      // Track unique chatIds
-      if (interaction.chatId) {
-        uniqueChatIds.add(interaction.chatId);
+    // Process each chat document
+    logs.forEach(chat => {
+      // Track unique chatIds from the chat document
+      if (chat.chatId) {
+        uniqueChatIds.add(chat.chatId);
       }
 
-      // Get department
-      const department = interaction.context?.department || 'Unknown';
-      
-      // Initialize department metrics if not exists
-      if (!metrics.byDepartment[department]) {
-        metrics.byDepartment[department] = {
-          total: 0,
-          humanScored: {
-            total: 0,
-            correct: 0,
-            needsImprovement: 0,
-            hasError: 0
-          }
-        };
-      }
-
-      // Increment department total
-      metrics.byDepartment[department].total++;
-
-      // Process human-scored metrics
-      if (interaction.expertFeedback?.totalScore !== undefined) {
-        metrics.humanScored.total++;
-        metrics.byDepartment[department].humanScored.total++;
+      // Process each interaction in the chat
+      chat.interactions?.forEach(interaction => {
+        // Count total questions
+        metrics.totalQuestions++;
         
-        const score = interaction.expertFeedback.totalScore;
-        if (score === 100) {
-          metrics.humanScored.correct++;
-          metrics.byDepartment[department].humanScored.correct++;
-        } else if (score >= 82 && score <= 99) {
-          metrics.humanScored.needsImprovement++;
-          metrics.byDepartment[department].humanScored.needsImprovement++;
-        } else {
-          metrics.humanScored.hasError++;
-          metrics.byDepartment[department].humanScored.hasError++;
+        // Get department
+        const department = interaction.context?.department || 'Unknown';
+        
+        // Initialize department metrics if not exists
+        if (!metrics.byDepartment[department]) {
+          metrics.byDepartment[department] = {
+            total: 0,
+            humanScored: {
+              total: 0,
+              correct: 0,
+              needsImprovement: 0,
+              hasError: 0
+            }
+          };
         }
-      }
 
-      // Process AI-scored metrics
-      if (interaction.autoEval?.expertFeedback?.totalScore !== undefined) {
-        metrics.aiScored.total++;
-        const score = interaction.autoEval.expertFeedback.totalScore;
-        if (score === 100) {
-          metrics.aiScored.correct++;
-        } else if (score >= 82 && score <= 99) {
-          metrics.aiScored.needsImprovement++;
-        } else {
-          metrics.aiScored.hasError++;
+        // Increment department total
+        metrics.byDepartment[department].total++;
+
+        // Process human-scored metrics
+        if (interaction.expertFeedback?.totalScore !== undefined) {
+          metrics.humanScored.total++;
+          metrics.byDepartment[department].humanScored.total++;
+          
+          const score = interaction.expertFeedback.totalScore;
+          if (score === 100) {
+            metrics.humanScored.correct++;
+            metrics.byDepartment[department].humanScored.correct++;
+          } else if (score >= 82 && score <= 99) {
+            metrics.humanScored.needsImprovement++;
+            metrics.byDepartment[department].humanScored.needsImprovement++;
+          } else {
+            metrics.humanScored.hasError++;
+            metrics.byDepartment[department].humanScored.hasError++;
+          }
         }
-      }
+
+        // Process AI-scored metrics
+        if (interaction.autoEval?.expertFeedback?.totalScore !== undefined) {
+          metrics.aiScored.total++;
+          const score = interaction.autoEval.expertFeedback.totalScore;
+          if (score === 100) {
+            metrics.aiScored.correct++;
+          } else if (score >= 82 && score <= 99) {
+            metrics.aiScored.needsImprovement++;
+          } else {
+            metrics.aiScored.hasError++;
+          }
+        }
+      });
     });
 
     // Set the totalConversations as the number of unique chatIds
