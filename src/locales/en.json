@@ -325,15 +325,15 @@
       "title": "Performance Metrics",
       "totalSessions": "Total Sessions",
       "humanScored": {
-        "title": "Human Scored Metrics",
-        "total": "Total",
+        "title": "Expert feedback metrics",
+        "total": "Total expert scored questions",
         "correct": "Correct",
         "needsImprovement": "Needs Improvement",
         "hasError": "Has Error"
       },
       "aiScored": {
-        "title": "AI Scored Metrics",
-        "total": "Total",
+        "title": "AI feedback metrics",
+        "total": "Total AI scored questions",
         "correct": "Correct",
         "needsImprovement": "Needs Improvement",
         "hasError": "Has Error"

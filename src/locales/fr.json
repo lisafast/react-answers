@@ -328,18 +328,18 @@
       "title": "Métriques de performance",
       "totalSessions": "Sessions totales",
       "humanScored": {
-        "title": "Métriques évaluées par l'humain",
-        "total": "Total",
+        "title": "Métriques de rétroaction d'expert",
+        "total": "Total des questions évaluées par l'expert",
         "correct": "Correct",
-        "needsImprovement": "Nécessite des améliorations",
-        "hasError": "Contient des erreurs"
+        "needsImprovement": "Nécessite une amélioration",
+        "hasError": "Contient une erreur"
       },
       "aiScored": {
-        "title": "Métriques évaluées par l'IA",
-        "total": "Total",
+        "title": "Métriques de rétroaction IA",
+        "total": "Total des questions évaluées par l'IA",
         "correct": "Correct",
-        "needsImprovement": "Nécessite des améliorations",
-        "hasError": "Contient des erreurs"
+        "needsImprovement": "Nécessite une amélioration",
+        "hasError": "Contient une erreur"
       },
       "byDepartment": {
         "title": "Répartition par département",

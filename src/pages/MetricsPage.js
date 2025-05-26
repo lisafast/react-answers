@@ -11,17 +11,17 @@ const MetricsPage = ({ lang = 'en' }) => {
 
   return (
     <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600">
-      <h1 className="mb-400">{t('metrics.title', 'Metrics Dashboard')}</h1>
+      <h1 className="mb-400">{t('metrics.title')}</h1>
       
       <nav className="mb-400">
         <GcdsText>
-          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin', 'Back to Admin')}</GcdsLink>
+          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin')}</GcdsLink>
         </GcdsText>
       </nav>
 
       <section id="metrics-dashboard" className="mb-600">
-        <h2 className="mt-400 mb-400">{t('metrics.dashboard.title', 'Performance Metrics')}</h2>
-        <MetricsDashboard />
+        <h2 className="mt-400 mb-400">{t('metrics.dashboard.title')}</h2>
+        <MetricsDashboard lang={lang} />
       </section>
     </GcdsContainer>
   );

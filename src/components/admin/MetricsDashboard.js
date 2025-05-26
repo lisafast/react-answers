@@ -5,9 +5,12 @@ import DataStoreService from '../../services/DataStoreService.js';
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import ExportService from '../../services/ExportService.js';
+import { useTranslations } from '../../hooks/useTranslations.js';
+
 DataTable.use(DT);
 
-const MetricsDashboard = () => {
+const MetricsDashboard = ({ lang = 'en' }) => {
+  const { t } = useTranslations(lang);
   const [timeRange, setTimeRange] = useState('7');
   const [metrics, setMetrics] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -220,35 +223,35 @@ const MetricsDashboard = () => {
         ) : metrics.totalSessions > 0 ? (
           <div className="p-4">
             <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-4">Total Questions</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.title')}</h3>
               <p className="text-xl">{metrics.totalQuestions}</p>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-4">Total Conversations</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.totalSessions')}</h3>
               <p className="text-xl">{metrics.totalConversations}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">Human Scored Metrics</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.humanScored.title')}</h3>
                 <div className="space-y-2">
-                  <p>Total: {metrics.humanScored.total}</p>
-                  <p>Correct: {metrics.humanScored.correct}</p>
-                  <p>Needs Improvement: {metrics.humanScored.needsImprovement}</p>
-                  <p>Has Error: {metrics.humanScored.hasError}</p>
+                  <p>{t('metrics.dashboard.humanScored.total')}: {metrics.humanScored.total}</p>
+                  <p>{t('metrics.dashboard.humanScored.correct')}: {metrics.humanScored.correct} ({metrics.humanScored.total ? Math.round((metrics.humanScored.correct / metrics.humanScored.total) * 100) : 0}%)</p>
+                  <p>{t('metrics.dashboard.humanScored.needsImprovement')}: {metrics.humanScored.needsImprovement} ({metrics.humanScored.total ? Math.round((metrics.humanScored.needsImprovement / metrics.humanScored.total) * 100) : 0}%)</p>
+                  <p>{t('metrics.dashboard.humanScored.hasError')}: {metrics.humanScored.hasError} ({metrics.humanScored.total ? Math.round((metrics.humanScored.hasError / metrics.humanScored.total) * 100) : 0}%)</p>
                 </div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">AI Scored Metrics</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.aiScored.title')}</h3>
                 <div className="space-y-2">
-                  <p>Total: {metrics.aiScored.total}</p>
-                  <p>Correct: {metrics.aiScored.correct}</p>
-                  <p>Needs Improvement: {metrics.aiScored.needsImprovement}</p>
-                  <p>Has Error: {metrics.aiScored.hasError}</p>
+                  <p>{t('metrics.dashboard.aiScored.total')}: {metrics.aiScored.total}</p>
+                  <p>{t('metrics.dashboard.aiScored.correct')}: {metrics.aiScored.correct} ({metrics.aiScored.total ? Math.round((metrics.aiScored.correct / metrics.aiScored.total) * 100) : 0}%)</p>
+                  <p>{t('metrics.dashboard.aiScored.needsImprovement')}: {metrics.aiScored.needsImprovement} ({metrics.aiScored.total ? Math.round((metrics.aiScored.needsImprovement / metrics.aiScored.total) * 100) : 0}%)</p>
+                  <p>{t('metrics.dashboard.aiScored.hasError')}: {metrics.aiScored.hasError} ({metrics.aiScored.total ? Math.round((metrics.aiScored.hasError / metrics.aiScored.total) * 100) : 0}%)</p>
                 </div>
               </div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Department Breakdown</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.byDepartment.title')}</h3>
               <DataTable
                 data={Object.entries(metrics.byDepartment).map(([department, data]) => ({
                   department,
@@ -256,15 +259,25 @@ const MetricsDashboard = () => {
                   humanScoredTotal: data.humanScored.total,
                   humanScoredCorrect: data.humanScored.correct,
                   humanScoredNeedsImprovement: data.humanScored.needsImprovement,
-                  humanScoredHasError: data.humanScored.hasError
+                  humanScoredHasError: data.humanScored.hasError,
+                  humanScoredHasErrorPercent: data.humanScored.total ? Math.round((data.humanScored.hasError / data.humanScored.total) * 100) : 0
                 }))}
                 columns={[
-                  { title: 'Department', data: 'department' },
-                  { title: 'Total Questions', data: 'total' },
-                  { title: 'Human Scored Total', data: 'humanScoredTotal' },
-                  { title: 'Correct', data: 'humanScoredCorrect' },
-                  { title: 'Needs Improvement', data: 'humanScoredNeedsImprovement' },
-                  { title: 'Has Error', data: 'humanScoredHasError' }
+                  { title: t('metrics.dashboard.byDepartment.title'), data: 'department' },
+                  { title: t('metrics.dashboard.humanScored.total'), data: 'total' },
+                  { title: t('metrics.dashboard.humanScored.total'), data: 'humanScoredTotal' },
+                  { title: t('metrics.dashboard.humanScored.correct'), data: 'humanScoredCorrect' },
+                  { title: t('metrics.dashboard.humanScored.needsImprovement'), data: 'humanScoredNeedsImprovement' },
+                  { 
+                    title: t('metrics.dashboard.humanScored.hasError'), 
+                    data: 'humanScoredHasError',
+                    render: (data, type, row) => {
+                      if (type === 'display') {
+                        return `${data} (${row.humanScoredHasErrorPercent}%)`;
+                      }
+                      return data;
+                    }
+                  }
                 ]}
                 options={{
                   paging: true,
