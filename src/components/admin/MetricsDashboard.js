@@ -32,7 +32,7 @@ const MetricsDashboard = () => {
   };
 
   const processMetrics = (logs) => {
-    // Use a local Set to track unique chatIDs
+    // Use a local Set to track unique chatIds
     const uniqueChatIds = new Set();
     // Initialize metrics object
     const metrics = {
@@ -60,9 +60,9 @@ const MetricsDashboard = () => {
         // Count total questions
         metrics.totalQuestions++;
         
-        // Track unique chatIDs
-        if (interaction.chatID) {
-          uniqueChatIds.add(interaction.chatID);
+        // Track unique chatIds
+        if (interaction.chatId) {
+          uniqueChatIds.add(interaction.chatId);
         }
 
         // Get department
@@ -117,7 +117,7 @@ const MetricsDashboard = () => {
       });
     });
 
-    // Set the totalConversations as the number of unique chatIDs
+    // Set the totalConversations as the number of unique chatIds
     metrics.totalConversations = uniqueChatIds.size;
 
     return metrics;
