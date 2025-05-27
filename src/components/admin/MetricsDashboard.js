@@ -215,25 +215,25 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         */}
       </div>
 
-      <div className="bg-white shadow rounded-lg">
+      <div className="bg-white shadow rounded-lg mb-600">
         {loading ? (
           <div className="p-4">
             <p className="text-gray-500">Loading metrics...</p>
           </div>
         ) : metrics.totalSessions > 0 ? (
           <div className="p-4">
-            <h2 className="text-2xl font-bold mb-6">{t('metrics.dashboard.title')}</h2>
-            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.totalQuestions')}</h3>
+            <h2 className="mt-400 mb-400">{t('metrics.dashboard.title')}</h2>
+            <div className="bg-gray-50 p-4 rounded-lg mb-600">
+              <h3 className="mb-300">{t('metrics.dashboard.totalQuestions')}</h3>
               <p className="text-xl">{metrics.totalQuestions}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.totalSessions')}</h3>
+            <div className="bg-gray-50 p-4 rounded-lg mb-600">
+              <h3 className="mb-300">{t('metrics.dashboard.totalSessions')}</h3>
               <p className="text-xl">{metrics.totalConversations}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.humanScored.title')}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-600">
+              <div className="bg-gray-50 p-4 rounded-lg mb-600 md:mb-0">
+                <h3 className="mb-300">{t('metrics.dashboard.humanScored.title')}</h3>
                 <div className="space-y-2">
                   <p>{t('metrics.dashboard.humanScored.total')}: {metrics.humanScored.total}</p>
                   <p>{t('metrics.dashboard.humanScored.correct')}: {metrics.humanScored.correct} ({metrics.humanScored.total ? Math.round((metrics.humanScored.correct / metrics.humanScored.total) * 100) : 0}%)</p>
@@ -242,7 +242,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                 </div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.aiScored.title')}</h3>
+                <h3 className="mb-300">{t('metrics.dashboard.aiScored.title')}</h3>
                 <div className="space-y-2">
                   <p>{t('metrics.dashboard.aiScored.total')}: {metrics.aiScored.total}</p>
                   <p>{t('metrics.dashboard.aiScored.correct')}: {metrics.aiScored.correct} ({metrics.aiScored.total ? Math.round((metrics.aiScored.correct / metrics.aiScored.total) * 100) : 0}%)</p>
@@ -251,8 +251,8 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.byDepartment.title')}</h3>
+            <div className="bg-gray-50 p-4 rounded-lg mb-600">
+              <h3 className="mb-300">{t('metrics.dashboard.byDepartment.title')}</h3>
               <DataTable
                 data={Object.entries(metrics.byDepartment).map(([department, data]) => ({
                   department,
