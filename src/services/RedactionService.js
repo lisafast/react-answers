@@ -63,59 +63,37 @@ class RedactionService {
   }
 
   /**
-   * Load and process profanity lists from both English and French sources
+   * Load and process profanity lists for the specified language
+   * @param {string} lang Language code ('en' or 'fr')
    * @returns {Promise<string[]>} Array of cleaned profanity words
    */
-  async loadProfanityLists() {
+  async loadProfanityLists(lang) {
     try {
-      const [responseEn, responseFr] = await Promise.all([
-        fetch(profanityListEn),
-        fetch(profanityListFr)
-      ]);
-
-      const [textEn, textFr] = await Promise.all([
-        responseEn.text(),
-        responseFr.text()
-      ]);
-
-      const cleanFrenchWords = this.cleanWordList(textFr);
-      const cleanEnglishWords = this.cleanWordList(textEn);
-
-      const combinedWords = [...cleanEnglishWords, ...cleanFrenchWords];
-      await LoggingService.info("system", `Loaded profanity words: ${combinedWords.length} words`);
-
-      return combinedWords;
+      const response = await fetch(lang === 'fr' ? profanityListFr : profanityListEn);
+      const text = await response.text();
+      const words = this.cleanWordList(text);
+      await LoggingService.info("system", `Loaded profanity words for ${lang}: ${words.length} words`);
+      return words;
     } catch (error) {
-      await LoggingService.error("system", 'Error loading profanity lists:', error);
+      await LoggingService.error("system", `Error loading profanity list for ${lang}:`, error);
       return [];
     }
   }
 
   /**
-   * Load and process threat lists from both English and French sources
+   * Load and process threat lists for the specified language
+   * @param {string} lang Language code ('en' or 'fr')
    * @returns {Promise<string[]>} Array of cleaned threat words
    */
-  async loadThreatLists() {
+  async loadThreatLists(lang) {
     try {
-      const [responseEn, responseFr] = await Promise.all([
-        fetch(threatsListEn),
-        fetch(threatsListFr)
-      ]);
-
-      const [textEn, textFr] = await Promise.all([
-        responseEn.text(),
-        responseFr.text()
-      ]);
-
-      const cleanEnglishWords = this.cleanWordList(textEn);
-      const cleanFrenchWords = this.cleanWordList(textFr);
-
-      const combinedWords = [...cleanEnglishWords, ...cleanFrenchWords];
-      await LoggingService.info("system", `Loaded threat words: ${combinedWords.length} words`);
-
-      return combinedWords;
+      const response = await fetch(lang === 'fr' ? threatsListFr : threatsListEn);
+      const text = await response.text();
+      const words = this.cleanWordList(text);
+      await LoggingService.info("system", `Loaded threat words for ${lang}: ${words.length} words`);
+      return words;
     } catch (error) {
-      await LoggingService.error("system", 'Error loading threat lists:', error);
+      await LoggingService.error("system", `Error loading threat list for ${lang}:`, error);
       return [];
     }
   }
@@ -138,33 +116,33 @@ class RedactionService {
   }
 
   /**
-   * Initialize the profanity pattern
+   * Initialize the profanity pattern for the specified language
+   * @param {string} lang Language code ('en' or 'fr')
    */
-  async initializeProfanityPattern() {
-    const words = await this.loadProfanityLists();
+  async initializeProfanityPattern(lang) {
+    const words = await this.loadProfanityLists(lang);
     const pattern = words.map(word => `\\b${word}\\b`).join('|');
     this.profanityPattern = new RegExp(`(${pattern})`, 'gi');
   }
 
   /**
-   * Initialize the threat pattern
+   * Initialize the threat pattern for the specified language
+   * @param {string} lang Language code ('en' or 'fr')
    */
-  async initializeThreatPattern() {
-    const words = await this.loadThreatLists();
+  async initializeThreatPattern(lang) {
+    const words = await this.loadThreatLists(lang);
     const pattern = words.map(word => `\\b${word}\\b`).join('|');
     this.threatPattern = new RegExp(`(${pattern})`, 'gi');
   }
 
   /**
-   * Initialize the manipulation pattern
+   * Initialize the manipulation pattern for the specified language
+   * @param {string} lang Language code ('en' or 'fr')
    */
-  initializeManipulationPattern() {
-    const manipulationWords = [
-      ...manipulationEn.suspiciousWords,
-      ...manipulationEn.manipulationPhrases,
-      ...manipulationFr.suspiciousWords,
-      ...manipulationFr.manipulationPhrases
-    ];
+  initializeManipulationPattern(lang) {
+    const manipulationWords = lang === 'fr' 
+      ? [...manipulationFr.suspiciousWords, ...manipulationFr.manipulationPhrases]
+      : [...manipulationEn.suspiciousWords, ...manipulationEn.manipulationPhrases];
 
     const pattern = manipulationWords
       .map(word => {
@@ -389,10 +367,11 @@ class RedactionService {
   /**
    * Redact sensitive information from text
    * @param {string} text Text to redact
+   * @param {string} lang Language code ('en' or 'fr')
    * @returns {{redactedText: string, redactedItems: Array<{value: string, type: string}>}}
    * @throws {Error} If service is not initialized
    */
-  redactText(text) {
+  redactText(text, lang = 'en') {
     if (!this.isReady()) {
       throw new Error('RedactionService is not initialized');
     }
@@ -446,10 +425,10 @@ class RedactionService {
 const redactionService = new RedactionService();
 
 // Add a method to ensure the service is initialized before use
-redactionService.ensureInitialized = async function() {
+redactionService.ensureInitialized = async function(lang = 'en') {
   if (!this.isInitialized) {
-    console.log('RedactionService not initialized, initializing now...');
-    await this.initialize();
+    console.log(`RedactionService not initialized, initializing now for language: ${lang}...`);
+    await this.initialize(lang);
   }
   return this.isInitialized;
 };

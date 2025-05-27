@@ -57,7 +57,7 @@ export const ChatPipelineService = {
     sendStatusUpdate(onStatusUpdate, PipelineStatus.MODERATING_QUESTION);
 
     // Do redaction but don't display status
-    await ChatPipelineService.processRedaction(userMessage);
+    await ChatPipelineService.processRedaction(userMessage, lang);
     await LoggingService.info(chatId, 'Starting pipeline with data:', {
       userMessage,
       lang,
@@ -181,11 +181,11 @@ export const ChatPipelineService = {
     await LoggingService.info(null, 'Validated URL:', validationResult);
     return validationResult;
   },
-  processRedaction: async (userMessage) => {
+  processRedaction: async (userMessage, lang) => {
     // Ensure RedactionService is initialized before using it
-    await RedactionService.ensureInitialized();
+    await RedactionService.ensureInitialized(lang);
 
-    const { redactedText, redactedItems } = RedactionService.redactText(userMessage);
+    const { redactedText, redactedItems } = RedactionService.redactText(userMessage, lang);
 
     // Check for blocked content (# for profanity/threats/manipulation, XXX for private info)
     const hasBlockedContent = redactedText.includes('#') || redactedText.includes('XXX');
