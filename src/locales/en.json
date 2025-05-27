@@ -327,6 +327,11 @@
       "usageMetrics": "Usage metrics",
       "totalSessions": "Total sessions",
       "totalQuestions": "Total questions",
+      "sessionsByQuestionCount": {
+        "singleQuestion": "Sessions with 1 question",
+        "twoQuestions": "Sessions with 2 questions",
+        "threeQuestions": "Sessions with 3 questions"
+      },
       "expertScored": {
         "title": "Expert evaluations",
         "description": "Evaluations by signed-in departmental subject matter experts",
@@ -353,7 +358,8 @@
       "byDepartment": {
         "title": "Department breakdown",
         "totalQuestions": "Total questions",
-        "totalSessions": "Total sessions"
+        "totalSessions": "Total sessions",
+        "expertTotal": "Expert evaluations"
       }
     }
   }

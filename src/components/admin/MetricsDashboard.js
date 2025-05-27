@@ -42,6 +42,11 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       totalSessions: logs.length,
       totalQuestions: 0,
       totalConversations: 0, // Will set this at the end
+      sessionsByQuestionCount: {
+        singleQuestion: 0,
+        twoQuestions: 0,
+        threeQuestions: 0
+      },
       expertScored: {
         total: 0,
         correct: 0,
@@ -67,6 +72,16 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       // Track unique chatIds from the chat document
       if (chat.chatId) {
         uniqueChatIds.add(chat.chatId);
+      }
+
+      // Count questions for this session
+      const questionCount = chat.interactions?.length || 0;
+      if (questionCount === 1) {
+        metrics.sessionsByQuestionCount.singleQuestion++;
+      } else if (questionCount === 2) {
+        metrics.sessionsByQuestionCount.twoQuestions++;
+      } else if (questionCount === 3) {
+        metrics.sessionsByQuestionCount.threeQuestions++;
       }
 
       // Process each interaction in the chat
@@ -250,6 +265,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
               <div>
                 <GcdsText>{t('metrics.dashboard.totalSessions')}: {metrics.totalConversations}</GcdsText>
                 <GcdsText>{t('metrics.dashboard.totalQuestions')}: {metrics.totalQuestions}</GcdsText>
+                <GcdsText>{t('metrics.dashboard.sessionsByQuestionCount.singleQuestion')}: {metrics.sessionsByQuestionCount.singleQuestion} ({metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.singleQuestion / metrics.totalConversations) * 100) : 0}%)</GcdsText>
+                <GcdsText>{t('metrics.dashboard.sessionsByQuestionCount.twoQuestions')}: {metrics.sessionsByQuestionCount.twoQuestions} ({metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.twoQuestions / metrics.totalConversations) * 100) : 0}%)</GcdsText>
+                <GcdsText>{t('metrics.dashboard.sessionsByQuestionCount.threeQuestions')}: {metrics.sessionsByQuestionCount.threeQuestions} ({metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.threeQuestions / metrics.totalConversations) * 100) : 0}%)</GcdsText>
               </div>
             </div>
             <div>
@@ -298,7 +316,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                 columns={[
                   { title: t('metrics.dashboard.byDepartment.title'), data: 'department' },
                   { title: t('metrics.dashboard.byDepartment.totalQuestions'), data: 'totalQuestions' },
-                  { title: t('metrics.dashboard.expertScored.total'), data: 'expertScoredTotal' },
+                  { title: t('metrics.dashboard.byDepartment.expertTotal'), data: 'expertScoredTotal' },
                   { title: t('metrics.dashboard.expertScored.correct'), data: 'expertScoredCorrect' },
                   { title: t('metrics.dashboard.expertScored.needsImprovement'), data: 'expertScoredNeedsImprovement' },
                   { 

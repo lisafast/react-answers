@@ -330,6 +330,11 @@
       "usageMetrics": "Métriques d'utilisation",
       "totalSessions": "Total des sessions",
       "totalQuestions": "Total des questions",
+      "sessionsByQuestionCount": {
+        "singleQuestion": "Sessions avec 1 question",
+        "twoQuestions": "Sessions avec 2 questions",
+        "threeQuestions": "Sessions avec 3 questions"
+      },
       "expertScored": {
         "title": "Évaluations d'experts",
         "description": "Évaluations par des experts en la matière des départements connectés",
@@ -356,7 +361,8 @@
       "byDepartment": {
         "title": "Répartition par département",
         "totalQuestions": "Total des questions",
-        "totalSessions": "Sessions totales"
+        "totalSessions": "Sessions totales",
+        "expertTotal": "Évaluations d'experts"
       }
     }
   }
