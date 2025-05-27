@@ -320,29 +320,40 @@
     "backToAdmin": "Back to Admin"
   },
   "metrics": {
-    "title": "Metrics Dashboard",
+    "title": "Metrics dashboard",
+    "timeRangeTitle": "Get usage and evaluation metrics",
     "dashboard": {
-      "title": "Performance Metrics",
+      "title": "Results",
+      "usageMetrics": "Usage metrics",
+      "totalSessions": "Total sessions",
       "totalQuestions": "Total questions",
-      "totalSessions": "Total Sessions",
       "humanScored": {
-        "title": "Expert feedback metrics",
-        "total": "Total expert scored questions",
+        "title": "Expert evaluations",
+        "description": "Evaluations by signed-in departmental subject matter experts",
+        "total": "Total questions evaluated",
         "correct": "Correct",
-        "needsImprovement": "Needs Improvement",
-        "hasError": "Has Error"
+        "needsImprovement": "Needs improvement",
+        "hasError": "Has error"
       },
       "aiScored": {
-        "title": "AI feedback metrics",
-        "total": "Total AI scored questions",
+        "title": "AI evaluations",
+        "description": "Automated AI evaluations based on expert evaluations of similar questions",
+        "total": "Total questions evaluated",
         "correct": "Correct",
-        "needsImprovement": "Needs Improvement",
-        "hasError": "Has Error"
+        "needsImprovement": "Needs improvement",
+        "hasError": "Has error"
+      },
+      "userScored": {
+        "title": "End-user feedback",
+        "description": "Yes-no feedback from end-users",
+        "total": "Total questions with feedback",
+        "helpful": "Helpful (yes)",
+        "unhelpful": "Unhelpful (no)"
       },
       "byDepartment": {
-        "title": "Department Breakdown",
+        "title": "Department breakdown",
         "totalQuestions": "Total questions",
-        "totalSessions": "Total Sessions"
+        "totalSessions": "Total sessions"
       }
     }
   }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GcdsButton } from '@cdssnc/gcds-components-react';
+import { GcdsButton, GcdsContainer, GcdsText } from '@cdssnc/gcds-components-react';
 import '../../styles/App.css';
 import DataStoreService from '../../services/DataStoreService.js';
 import DataTable from 'datatables.net-react';
@@ -155,7 +155,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
   */
 
   return (
-    <div className="space-y-6">
+    <GcdsContainer size="xl" className="space-y-6">
       <div className="flex items-center gap-4 flex-wrap">
         <div className="w-48">
           <label htmlFor="timeRange" className="block text-sm font-medium text-gray-700 mb-1">
@@ -215,40 +215,50 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         */}
       </div>
 
-      <div className="bg-white shadow rounded-lg mb-600">
+      <GcdsContainer size="xl" className="bg-white shadow rounded-lg mb-600">
         {loading ? (
           <div className="p-4">
-            <p className="text-gray-500">Loading metrics...</p>
+            <GcdsText>Loading metrics...</GcdsText>
           </div>
         ) : metrics.totalSessions > 0 ? (
           <div className="p-4">
             <h2 className="mt-400 mb-400">{t('metrics.dashboard.title')}</h2>
-            <div className="bg-gray-50 p-4 rounded-lg mb-600">
-              <h3 className="mb-300">{t('metrics.dashboard.totalQuestions')}</h3>
-              <p className="text-xl">{metrics.totalQuestions}</p>
+            <div>
+              <h3 className="mb-300">{t('metrics.dashboard.usageMetrics')}</h3>
+              <div>
+                <GcdsText>{t('metrics.dashboard.totalSessions')}: {metrics.totalConversations}</GcdsText>
+                <GcdsText>{t('metrics.dashboard.totalQuestions')}: {metrics.totalQuestions}</GcdsText>
+              </div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg mb-600">
-              <h3 className="mb-300">{t('metrics.dashboard.totalSessions')}</h3>
-              <p className="text-xl">{metrics.totalConversations}</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-600">
-              <div className="bg-gray-50 p-4 rounded-lg mb-600 md:mb-0">
-                <h3 className="mb-300">{t('metrics.dashboard.humanScored.title')}</h3>
-                <div className="space-y-2">
-                  <p>{t('metrics.dashboard.humanScored.total')}: {metrics.humanScored.total}</p>
-                  <p>{t('metrics.dashboard.humanScored.correct')}: {metrics.humanScored.correct} ({metrics.humanScored.total ? Math.round((metrics.humanScored.correct / metrics.humanScored.total) * 100) : 0}%)</p>
-                  <p>{t('metrics.dashboard.humanScored.needsImprovement')}: {metrics.humanScored.needsImprovement} ({metrics.humanScored.total ? Math.round((metrics.humanScored.needsImprovement / metrics.humanScored.total) * 100) : 0}%)</p>
-                  <p>{t('metrics.dashboard.humanScored.hasError')}: {metrics.humanScored.hasError} ({metrics.humanScored.total ? Math.round((metrics.humanScored.hasError / metrics.humanScored.total) * 100) : 0}%)</p>
+            <div>
+              <div>
+                <h3>{t('metrics.dashboard.humanScored.title')}</h3>
+                <GcdsText className="mb-300">{t('metrics.dashboard.humanScored.description')}</GcdsText>
+                <div>
+                  <GcdsText>{t('metrics.dashboard.humanScored.total')}: {metrics.humanScored.total}</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.humanScored.correct')}: {metrics.humanScored.correct} ({metrics.humanScored.total ? Math.round((metrics.humanScored.correct / metrics.humanScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.humanScored.needsImprovement')}: {metrics.humanScored.needsImprovement} ({metrics.humanScored.total ? Math.round((metrics.humanScored.needsImprovement / metrics.humanScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.humanScored.hasError')}: {metrics.humanScored.hasError} ({metrics.humanScored.total ? Math.round((metrics.humanScored.hasError / metrics.humanScored.total) * 100) : 0}%)</GcdsText>
                 </div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="mb-300">{t('metrics.dashboard.aiScored.title')}</h3>
-                <div className="space-y-2">
-                  <p>{t('metrics.dashboard.aiScored.total')}: {metrics.aiScored.total}</p>
-                  <p>{t('metrics.dashboard.aiScored.correct')}: {metrics.aiScored.correct} ({metrics.aiScored.total ? Math.round((metrics.aiScored.correct / metrics.aiScored.total) * 100) : 0}%)</p>
-                  <p>{t('metrics.dashboard.aiScored.needsImprovement')}: {metrics.aiScored.needsImprovement} ({metrics.aiScored.total ? Math.round((metrics.aiScored.needsImprovement / metrics.aiScored.total) * 100) : 0}%)</p>
-                  <p>{t('metrics.dashboard.aiScored.hasError')}: {metrics.aiScored.hasError} ({metrics.aiScored.total ? Math.round((metrics.aiScored.hasError / metrics.aiScored.total) * 100) : 0}%)</p>
+              <div>
+                <h3>{t('metrics.dashboard.aiScored.title')}</h3>
+                <GcdsText className="mb-300">{t('metrics.dashboard.aiScored.description')}</GcdsText>
+                <div>
+                  <GcdsText>{t('metrics.dashboard.aiScored.total')}: {metrics.aiScored.total}</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.aiScored.correct')}: {metrics.aiScored.correct} ({metrics.aiScored.total ? Math.round((metrics.aiScored.correct / metrics.aiScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.aiScored.needsImprovement')}: {metrics.aiScored.needsImprovement} ({metrics.aiScored.total ? Math.round((metrics.aiScored.needsImprovement / metrics.aiScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.aiScored.hasError')}: {metrics.aiScored.hasError} ({metrics.aiScored.total ? Math.round((metrics.aiScored.hasError / metrics.aiScored.total) * 100) : 0}%)</GcdsText>
                 </div>
+              </div>
+              <div>
+                <h3>{t('metrics.dashboard.userScored.title')}</h3>
+                <GcdsText className="mb-300">{t('metrics.dashboard.userScored.description')}</GcdsText>
+                {/* <div>
+                  <GcdsText>{t('metrics.dashboard.userScored.total')}: {metrics.userScored.total}</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.userScored.helpful')}: {metrics.userScored.helpful} ({metrics.userScored.total ? Math.round((metrics.userScored.helpful / metrics.userScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.userScored.unhelpful')}: {metrics.userScored.unhelpful} ({metrics.userScored.total ? Math.round((metrics.userScored.unhelpful / metrics.userScored.total) * 100) : 0}%)</GcdsText>
+                </div> */}
               </div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg mb-600">
@@ -292,13 +302,13 @@ const MetricsDashboard = ({ lang = 'en' }) => {
           </div>
         ) : (
           <div className="p-4">
-            <p className="text-gray-500">
+            <GcdsText>
               Select a time range and click 'Get metrics' to view performance metrics
-            </p>
+            </GcdsText>
           </div>
         )}
-      </div>
-    </div>
+      </GcdsContainer>
+    </GcdsContainer>
   );
 };
 
