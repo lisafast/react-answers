@@ -330,7 +330,7 @@
       "usageMetrics": "Métriques d'utilisation",
       "totalSessions": "Total des sessions",
       "totalQuestions": "Total des questions",
-      "humanScored": {
+      "expertScored": {
         "title": "Évaluations d'experts",
         "description": "Évaluations par des experts en la matière des départements connectés",
         "total": "Total des questions évaluées",

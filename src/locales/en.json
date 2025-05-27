@@ -327,7 +327,7 @@
       "usageMetrics": "Usage metrics",
       "totalSessions": "Total sessions",
       "totalQuestions": "Total questions",
-      "humanScored": {
+      "expertScored": {
         "title": "Expert evaluations",
         "description": "Evaluations by signed-in departmental subject matter experts",
         "total": "Total questions evaluated",

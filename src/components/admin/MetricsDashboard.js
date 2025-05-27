@@ -42,11 +42,16 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       totalSessions: logs.length,
       totalQuestions: 0,
       totalConversations: 0, // Will set this at the end
-      humanScored: {
+      expertScored: {
         total: 0,
         correct: 0,
         needsImprovement: 0,
         hasError: 0
+      },
+      userScored: {
+        total: 0,
+        helpful: 0,
+        unhelpful: 0
       },
       aiScored: {
         total: 0,
@@ -76,11 +81,16 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         if (!metrics.byDepartment[department]) {
           metrics.byDepartment[department] = {
             total: 0,
-            humanScored: {
+            expertScored: {
               total: 0,
               correct: 0,
               needsImprovement: 0,
               hasError: 0
+            },
+            userScored: {
+              total: 0,
+              helpful: 0,
+              unhelpful: 0
             }
           };
         }
@@ -88,21 +98,33 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         // Increment department total
         metrics.byDepartment[department].total++;
 
-        // Process human-scored metrics
-        if (interaction.expertFeedback?.totalScore !== undefined) {
-          metrics.humanScored.total++;
-          metrics.byDepartment[department].humanScored.total++;
-          
+        // Process human- and user-scored metrics
+        if (interaction.expertFeedback?.totalScore !== undefined && interaction.expertFeedback?.type) {
+          const type = interaction.expertFeedback.type;
           const score = interaction.expertFeedback.totalScore;
-          if (score === 100) {
-            metrics.humanScored.correct++;
-            metrics.byDepartment[department].humanScored.correct++;
-          } else if (score >= 82 && score <= 99) {
-            metrics.humanScored.needsImprovement++;
-            metrics.byDepartment[department].humanScored.needsImprovement++;
-          } else {
-            metrics.humanScored.hasError++;
-            metrics.byDepartment[department].humanScored.hasError++;
+          if (type === 'expert') {
+            metrics.expertScored.total++;
+            metrics.byDepartment[department].expertScored.total++;
+            if (score === 100) {
+              metrics.expertScored.correct++;
+              metrics.byDepartment[department].expertScored.correct++;
+            } else if (score >= 82 && score <= 99) {
+              metrics.expertScored.needsImprovement++;
+              metrics.byDepartment[department].expertScored.needsImprovement++;
+            } else {
+              metrics.expertScored.hasError++;
+              metrics.byDepartment[department].expertScored.hasError++;
+            }
+          } else if (type === 'public') {
+            metrics.userScored.total++;
+            metrics.byDepartment[department].userScored.total++;
+            if (score >= 90) {
+              metrics.userScored.helpful++;
+              metrics.byDepartment[department].userScored.helpful++;
+            } else {
+              metrics.userScored.unhelpful++;
+              metrics.byDepartment[department].userScored.unhelpful++;
+            }
           }
         }
 
@@ -232,13 +254,13 @@ const MetricsDashboard = ({ lang = 'en' }) => {
             </div>
             <div>
               <div>
-                <h3>{t('metrics.dashboard.humanScored.title')}</h3>
-                <GcdsText className="mb-300">{t('metrics.dashboard.humanScored.description')}</GcdsText>
+                <h3>{t('metrics.dashboard.expertScored.title')}</h3>
+                <GcdsText className="mb-300">{t('metrics.dashboard.expertScored.description')}</GcdsText>
                 <div>
-                  <GcdsText>{t('metrics.dashboard.humanScored.total')}: {metrics.humanScored.total}</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.humanScored.correct')}: {metrics.humanScored.correct} ({metrics.humanScored.total ? Math.round((metrics.humanScored.correct / metrics.humanScored.total) * 100) : 0}%)</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.humanScored.needsImprovement')}: {metrics.humanScored.needsImprovement} ({metrics.humanScored.total ? Math.round((metrics.humanScored.needsImprovement / metrics.humanScored.total) * 100) : 0}%)</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.humanScored.hasError')}: {metrics.humanScored.hasError} ({metrics.humanScored.total ? Math.round((metrics.humanScored.hasError / metrics.humanScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.expertScored.total')}: {metrics.expertScored.total}</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.expertScored.correct')}: {metrics.expertScored.correct} ({metrics.expertScored.total ? Math.round((metrics.expertScored.correct / metrics.expertScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.expertScored.needsImprovement')}: {metrics.expertScored.needsImprovement} ({metrics.expertScored.total ? Math.round((metrics.expertScored.needsImprovement / metrics.expertScored.total) * 100) : 0}%)</GcdsText>
+                  <GcdsText>{t('metrics.dashboard.expertScored.hasError')}: {metrics.expertScored.hasError} ({metrics.expertScored.total ? Math.round((metrics.expertScored.hasError / metrics.expertScored.total) * 100) : 0}%)</GcdsText>
                 </div>
               </div>
               <div>
@@ -254,11 +276,11 @@ const MetricsDashboard = ({ lang = 'en' }) => {
               <div>
                 <h3>{t('metrics.dashboard.userScored.title')}</h3>
                 <GcdsText className="mb-300">{t('metrics.dashboard.userScored.description')}</GcdsText>
-                {/* <div>
+                <div>
                   <GcdsText>{t('metrics.dashboard.userScored.total')}: {metrics.userScored.total}</GcdsText>
                   <GcdsText>{t('metrics.dashboard.userScored.helpful')}: {metrics.userScored.helpful} ({metrics.userScored.total ? Math.round((metrics.userScored.helpful / metrics.userScored.total) * 100) : 0}%)</GcdsText>
                   <GcdsText>{t('metrics.dashboard.userScored.unhelpful')}: {metrics.userScored.unhelpful} ({metrics.userScored.total ? Math.round((metrics.userScored.unhelpful / metrics.userScored.total) * 100) : 0}%)</GcdsText>
-                </div> */}
+                </div>
               </div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg mb-600">
@@ -267,24 +289,24 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                 data={Object.entries(metrics.byDepartment).map(([department, data]) => ({
                   department,
                   totalQuestions: data.total,
-                  humanScoredTotal: data.humanScored.total,
-                  humanScoredCorrect: data.humanScored.correct,
-                  humanScoredNeedsImprovement: data.humanScored.needsImprovement,
-                  humanScoredHasError: data.humanScored.hasError,
-                  humanScoredHasErrorPercent: data.humanScored.total ? Math.round((data.humanScored.hasError / data.humanScored.total) * 100) : 0
+                  expertScoredTotal: data.expertScored.total,
+                  expertScoredCorrect: data.expertScored.correct,
+                  expertScoredNeedsImprovement: data.expertScored.needsImprovement,
+                  expertScoredHasError: data.expertScored.hasError,
+                  expertScoredHasErrorPercent: data.expertScored.total ? Math.round((data.expertScored.hasError / data.expertScored.total) * 100) : 0
                 }))}
                 columns={[
                   { title: t('metrics.dashboard.byDepartment.title'), data: 'department' },
                   { title: t('metrics.dashboard.byDepartment.totalQuestions'), data: 'totalQuestions' },
-                  { title: t('metrics.dashboard.humanScored.total'), data: 'humanScoredTotal' },
-                  { title: t('metrics.dashboard.humanScored.correct'), data: 'humanScoredCorrect' },
-                  { title: t('metrics.dashboard.humanScored.needsImprovement'), data: 'humanScoredNeedsImprovement' },
+                  { title: t('metrics.dashboard.expertScored.total'), data: 'expertScoredTotal' },
+                  { title: t('metrics.dashboard.expertScored.correct'), data: 'expertScoredCorrect' },
+                  { title: t('metrics.dashboard.expertScored.needsImprovement'), data: 'expertScoredNeedsImprovement' },
                   { 
-                    title: t('metrics.dashboard.humanScored.hasError'), 
-                    data: 'humanScoredHasError',
+                    title: t('metrics.dashboard.expertScored.hasError'), 
+                    data: 'expertScoredHasError',
                     render: (data, type, row) => {
                       if (type === 'display') {
-                        return `${data} (${row.humanScoredHasErrorPercent}%)`;
+                        return `${data} (${row.expertScoredHasErrorPercent}%)`;
                       }
                       return data;
                     }
