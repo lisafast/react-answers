@@ -70,7 +70,7 @@ const ChatViewer = () => {
             data: 'metadata',
             className: 'metadata-column',
 
-            render: (data, type, row, meta) => {
+            render: (data) => {
               if (!data) {
                 data = {}; // Default to empty object for consistent formatting
               }

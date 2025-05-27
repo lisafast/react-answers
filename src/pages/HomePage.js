@@ -99,20 +99,17 @@ const HomePage = ({ lang = 'en' }) => {
         )}
         <h2 className="mt-400 mb-400" aria-label={t('homepage.subtitle.ariaLabel')}><span className="aria-hidden">{t('homepage.subtitle.text')}</span></h2>
         <GcdsText className="mb-200">{t('homepage.intro.researchOnly')}</GcdsText>
-
-        <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex="0">
-          <GcdsText>{t('homepage.about.privacyNote')}</GcdsText>
-          <GcdsText>{t('homepage.about.aiServices.claude')}</GcdsText>
-          <GcdsText>{t('homepage.about.aiServices.chatgpt')}</GcdsText>
-          {/* <GcdsText>{t('homepage.about.aiServices.cohere')}</GcdsText> */}
+        <GcdsDetails detailsTitle={t('homepage.privacy.title')} className="mb-400" tabIndex="0">
+          <GcdsText>{t('homepage.privacy.storage')}</GcdsText>
+          <GcdsText>{t('homepage.privacy.disclaimer')}</GcdsText>
           <GcdsText>
-            <GcdsLink href="https://github.com/lisafast/react-answers/blob/main/prompts/systemPrompt.js">
-              {t('homepage.about.systemPrompt')}
+            {t('homepage.privacy.terms')}{' '}
+            <GcdsLink href="https://www.canada.ca/en/transparency/terms.html">
+              {t('homepage.privacy.termsLink')}
             </GcdsLink>
           </GcdsText>
-          <GcdsText>{t('homepage.about.contact')}</GcdsText>
         </GcdsDetails>
-
+        {/* main section with user input and answer fields */}
         <ChatAppContainer lang={lang} chatId={chatId} />
       </GcdsContainer>
 
@@ -128,18 +125,19 @@ const HomePage = ({ lang = 'en' }) => {
             {t('homepage.feedback.surveyLink')}
           </a>
         </GcdsText>
-
-        <GcdsDetails detailsTitle={t('homepage.privacy.title')} className="mb-400" tabIndex="0">
-          <GcdsText>{t('homepage.privacy.storage')}</GcdsText>
-          <GcdsText>{t('homepage.privacy.disclaimer')}</GcdsText>
+        <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex="0">
+          <GcdsText>{t('homepage.about.privacyNote')}</GcdsText>
+          {/* <GcdsText>{t('homepage.about.aiServices.claude')}</GcdsText>
+          <GcdsText>{t('homepage.about.aiServices.chatgpt')}</GcdsText> */}
+        <GcdsText>{t('homepage.about.aiServices.azure')}</GcdsText> 
           <GcdsText>
-            {t('homepage.privacy.terms')}{' '}
-            <GcdsLink href="https://www.canada.ca/en/transparency/terms.html">
-              {t('homepage.privacy.termsLink')}
+            <GcdsLink href="https://github.com/cds-snc/ai-answers">
+              {t('homepage.about.systemPrompt')}
             </GcdsLink>
           </GcdsText>
-          <GcdsLink href={`/${lang}/admin`}>Ad</GcdsLink>
+          <GcdsText>{t('homepage.about.contact')}</GcdsText>
         </GcdsDetails>
+ 
       </GcdsContainer>
     </WrappedErrorBoundary>
   );
