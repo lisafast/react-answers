@@ -1,7 +1,7 @@
 /**
  * RedactionService.js
  * A service for redacting sensitive information from text content.
- *
+ * Important: This service uses the words lists associated with the language passed in - which is the PAGE language, not the language of the user's question. 
  * Redaction Types:
  * - Private Information (including names, replaced with 'XXX')
  * - Profanity (replaced with '#' characters)
@@ -26,7 +26,7 @@ class RedactionService {
     this.namePattern = null;
     this.isInitialized = false;
     this.enableNameDetection = false; // Temporarily disabled name detection
-    this.initialize();
+    this.currentLang = null;
   }
 
   /**
@@ -47,13 +47,15 @@ class RedactionService {
   }
 
   /**
-   * Initialize the redaction patterns
+   * Initialize patterns for the specified language
+   * @param {string} lang Language code ('en' or 'fr')
    */
-  async initialize() {
+  async initialize(lang = 'en') {
     try {
-      await this.initializeProfanityPattern();
-      await this.initializeThreatPattern();
-      this.initializeManipulationPattern();
+      this.currentLang = lang;
+      await this.initializeProfanityPattern(lang);
+      await this.initializeThreatPattern(lang);
+      this.initializeManipulationPattern(lang);
       this.initializeNamePattern();
       this.isInitialized = true;
     } catch (error) {
@@ -372,8 +374,8 @@ class RedactionService {
    * @throws {Error} If service is not initialized
    */
   redactText(text, lang = 'en') {
-    if (!this.isReady()) {
-      throw new Error('RedactionService is not initialized');
+    if (!this.isReady() || this.currentLang !== lang) {
+      throw new Error('RedactionService is not initialized for the current language');
     }
 
     if (!text) return { redactedText: '', redactedItems: [] };
@@ -426,7 +428,7 @@ const redactionService = new RedactionService();
 
 // Add a method to ensure the service is initialized before use
 redactionService.ensureInitialized = async function(lang = 'en') {
-  if (!this.isInitialized) {
+  if (!this.isInitialized || this.currentLang !== lang) {
     console.log(`RedactionService not initialized, initializing now for language: ${lang}...`);
     await this.initialize(lang);
   }
