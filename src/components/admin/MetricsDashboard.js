@@ -222,8 +222,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
           </div>
         ) : metrics.totalSessions > 0 ? (
           <div className="p-4">
+            <h2 className="text-2xl font-bold mb-6">{t('metrics.dashboard.title')}</h2>
             <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.title')}</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('metrics.dashboard.totalQuestions')}</h3>
               <p className="text-xl">{metrics.totalQuestions}</p>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg mb-6">
@@ -255,7 +256,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
               <DataTable
                 data={Object.entries(metrics.byDepartment).map(([department, data]) => ({
                   department,
-                  total: data.total,
+                  totalQuestions: data.total,
                   humanScoredTotal: data.humanScored.total,
                   humanScoredCorrect: data.humanScored.correct,
                   humanScoredNeedsImprovement: data.humanScored.needsImprovement,
@@ -264,7 +265,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                 }))}
                 columns={[
                   { title: t('metrics.dashboard.byDepartment.title'), data: 'department' },
-                  { title: t('metrics.dashboard.humanScored.total'), data: 'total' },
+                  { title: t('metrics.dashboard.byDepartment.totalQuestions'), data: 'totalQuestions' },
                   { title: t('metrics.dashboard.humanScored.total'), data: 'humanScoredTotal' },
                   { title: t('metrics.dashboard.humanScored.correct'), data: 'humanScoredCorrect' },
                   { title: t('metrics.dashboard.humanScored.needsImprovement'), data: 'humanScoredNeedsImprovement' },

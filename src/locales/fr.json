@@ -326,6 +326,7 @@
     "title": "Tableau de bord des métriques",
     "dashboard": {
       "title": "Métriques de performance",
+      "totalQuestions": "Total des questions",
       "totalSessions": "Sessions totales",
       "humanScored": {
         "title": "Métriques de rétroaction d'expert",
@@ -343,6 +344,7 @@
       },
       "byDepartment": {
         "title": "Répartition par département",
+        "totalQuestions": "Total des questions",
         "totalSessions": "Sessions totales"
       }
     }
