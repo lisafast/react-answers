@@ -246,6 +246,7 @@ class ExportService {
       { dataLabel: 'answer.sentences.2', outputLabel: 'sentence3' },
       { dataLabel: 'answer.sentences.3', outputLabel: 'sentence4' },
       { dataLabel: 'expertFeedback.feedback', outputLabel: 'feedback' },
+      { dataLabel: 'expertFeedback.user.email', outputLabel: 'userEmail' },
       { dataLabel: 'expertFeedback.totalScore', outputLabel: 'expertFeedback.totalScore' },
       { dataLabel: 'expertFeedback.sentence1Score', outputLabel: 'expertFeedback.sentence1Score' },
       {

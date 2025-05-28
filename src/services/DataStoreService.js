@@ -113,6 +113,7 @@ class DataStoreService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...AuthService.getAuthHeader()
         },
         body: JSON.stringify({
           chatId: chatId,
