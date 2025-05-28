@@ -34,7 +34,7 @@ class ErrorBoundary extends React.Component {
             className="gcds-button gcds-button--primary"
           >
             {t('homepage.errors.timeout.button')}
-          </button>
+          </button> {/* Corrected: Ensure button is properly closed */}
         </GcdsContainer>
       );
     }
