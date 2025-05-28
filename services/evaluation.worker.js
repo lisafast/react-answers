@@ -280,6 +280,8 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
                 populate: { path: 'sentences' }
             });
         const matchedSentenceText = matchedInteraction?.answer?.sentences[match.targetIndex];
+        // Fetch chatId from matchedInteraction
+        const matchedChatId = matchedInteraction?.chatId;
         if (match.expertFeedback && feedbackIdx >= 1 && feedbackIdx <= 4) {
             const score = match.expertFeedback[`sentence${feedbackIdx}Score`] ?? 100;
             newExpertFeedback[`sentence${newIdx}Score`] = score;
@@ -290,6 +292,7 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
             sourceIndex: match.sourceIndex,
             sourceSentenceText: sourceSentenceText,
             matchedInteractionId: match.matchId,
+            matchedChatId: matchedChatId, // <-- Added for traceability
             matchedSentenceIndex: match.targetIndex,
             matchedSentenceText: matchedSentenceText,
             matchedExpertFeedbackSentenceScore: match.expertFeedback?.[`sentence${feedbackIdx}Score`] ?? 100,
