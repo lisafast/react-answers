@@ -246,6 +246,7 @@
       "chatViewer": "View full interaction for a Chat ID",
       "database": "Manage the database",
       "eval": "Control evaluation embeddings",
+      "metrics": "View performance metrics",
       "logout": "Sign out"
     },
     "chatLogs": {
@@ -317,5 +318,49 @@
   },
   "common": {
     "backToAdmin": "Back to Admin"
+  },
+  "metrics": {
+    "title": "Metrics dashboard",
+    "timeRangeTitle": "Get usage and evaluation metrics",
+    "dashboard": {
+      "title": "Results",
+      "usageMetrics": "Usage metrics",
+      "totalSessions": "Total sessions",
+      "totalQuestions": "Total questions",
+      "sessionsByQuestionCount": {
+        "singleQuestion": "Sessions with 1 question",
+        "twoQuestions": "Sessions with 2 questions",
+        "threeQuestions": "Sessions with 3 questions"
+      },
+      "expertScored": {
+        "title": "Expert evaluations",
+        "description": "Evaluations by signed-in departmental subject matter experts",
+        "total": "Total questions evaluated",
+        "correct": "Correct",
+        "needsImprovement": "Needs improvement",
+        "hasError": "Has error"
+      },
+      "aiScored": {
+        "title": "AI evaluations",
+        "description": "Automated AI evaluations based on expert evaluations of similar questions",
+        "total": "Total questions evaluated",
+        "correct": "Correct",
+        "needsImprovement": "Needs improvement",
+        "hasError": "Has error"
+      },
+      "userScored": {
+        "title": "End-user feedback",
+        "description": "Yes-no feedback from end-users",
+        "total": "Total questions with feedback",
+        "helpful": "Helpful (yes)",
+        "unhelpful": "Unhelpful (no)"
+      },
+      "byDepartment": {
+        "title": "Department breakdown",
+        "totalQuestions": "Total questions",
+        "totalSessions": "Total sessions",
+        "expertTotal": "Expert evaluations"
+      }
+    }
   }
 }

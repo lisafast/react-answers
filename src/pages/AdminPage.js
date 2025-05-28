@@ -54,6 +54,11 @@ const AdminPage = () => {
             </GcdsLink>
           </li>
           <li className="">
+            <GcdsLink href={`/${language}/metrics`}>
+              {t('admin.navigation.metrics', 'View performance metrics')}
+            </GcdsLink>
+          </li>
+          <li className="">
             <GcdsLink href="#" onClick={handleLogout}>
               {t('admin.navigation.logout', 'Logout')}
             </GcdsLink>
