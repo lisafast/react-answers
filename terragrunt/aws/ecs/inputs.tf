@@ -3,6 +3,11 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "vpc_cidr_block" {
+  description = "CIDR block list for the React Answers VPC"
+  type        = string
+}
+
 variable "vpc_private_subnet_ids" {
   description = "Private subnet ids of the AI Answers VPC"
   type        = list(string)
@@ -27,7 +32,7 @@ variable "fargate_cpu" {
 variable "fargate_memory" {
   description = "Fargate Memory units"
   type        = number
-  default     = 512
+  default     = 2048
 }
 
 variable "iam_role_ai-answers-ecs-role_arn" {
@@ -106,5 +111,14 @@ variable "user_agent_arn" {
 }
 variable "jwt_secret_key_arn" {
   description = "ARN of the JWT Secret Key parameter"
+  type        = string
+}
+variable "google_api_key_arn" {
+  description = "ARN of the Google AI API key parameter"
+  type        = string
+}
+
+variable "google_search_engine_id_arn" {
+  description = "ARN of the Google Search Engine ID parameter"
   type        = string
 }

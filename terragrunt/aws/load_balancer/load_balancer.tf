@@ -1,9 +1,9 @@
 resource "aws_lb" "ai_answers" {
-
-  name               = "ai-answers-lb"
+  name               = "${var.product_name}-lb"
   internal           = false #tfsec:ignore:AWS005
   load_balancer_type = "application"
 
+  idle_timeout               = 300
   enable_deletion_protection = true
   drop_invalid_header_fields = true
 
@@ -14,7 +14,7 @@ resource "aws_lb" "ai_answers" {
   subnets = var.vpc_public_subnet_ids
 
   tags = {
-    "CostCentre" = var.billing_code
+    CostCentre = var.billing_code
   }
 }
 
@@ -38,7 +38,7 @@ resource "aws_lb_listener" "ai_answers_listener" {
 }
 
 resource "aws_lb_target_group" "ai_answers" {
-  name                 = "ai-answers"
+  name                 = var.product_name
   port                 = 3001
   protocol             = "HTTP"
   protocol_version     = "HTTP1"
@@ -56,6 +56,6 @@ resource "aws_lb_target_group" "ai_answers" {
   }
 
   tags = {
-    "CostCentre" = var.billing_code
+    CostCentre = var.billing_code
   }
 }

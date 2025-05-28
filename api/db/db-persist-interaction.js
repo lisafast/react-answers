@@ -22,6 +22,7 @@ export default async function handler(req, res) {
 
     const interaction = req.body;
     let chatId = interaction.chatId;
+    ServerLoggingService.info('[db-persist-interaction] Start - chatId:', chatId, {});
     let chat = await Chat.findOne({ chatId: chatId });
 
     if (!chat) {
@@ -97,24 +98,23 @@ export default async function handler(req, res) {
     await chat.save();
 
     // 5. Generate embeddings for the interaction
-    await EmbeddingService.createEmbedding(dbInteraction);
+    ServerLoggingService.info('[db-persist-interaction] Embedding creation start', chatId, {});
+    await EmbeddingService.createEmbedding(dbInteraction,interaction.selectedAI);
+    ServerLoggingService.info('[db-persist-interaction] Embedding creation end', chatId, {});
  
 
-    // 6. Perform evaluation on the saved interaction
-    try {
-      ServerLoggingService.info('Starting evaluation for interaction', chat.chatId, { });
-      const evaluationResult = await EvaluationService.evaluateInteraction(dbInteraction, chatId);
-      if (evaluationResult) {
-        ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {
-          evaluationId: evaluationResult._id
-        });
-      }
-    } catch (evalError) {
-      // Log evaluation error but don't fail the request
-      ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
-    }
+    // 6. Perform evaluation on the saved interaction (fire and forget, log success and error)
+    ServerLoggingService.info('Starting evaluation for interaction', chat.chatId, {});
+    EvaluationService.evaluateInteraction(dbInteraction, chatId)
+      .then(() => {
+        ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
+      })
+      .catch(evalError => {
+        ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
+      });
 
     res.status(200).json({ message: 'Interaction logged successfully' });
+    ServerLoggingService.info('[db-persist-interaction] End - chatId:', chatId, {});
   } catch (error) {
     ServerLoggingService.error('Failed to log interaction', req.body?.chatId || 'system', error);
     res.status(500).json({ message: 'Failed to log interaction', error: error.message });

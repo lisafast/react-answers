@@ -1,6 +1,6 @@
 resource "aws_acm_certificate" "ai_answers" {
-  domain_name               = "ai-answers.cdssandbox.xyz"
-  subject_alternative_names = ["*.ai-answers.cdssandbox.xyz"]
+  domain_name               = var.domain
+  subject_alternative_names = ["*.${var.domain}"]
   validation_method         = "DNS"
 
   tags = {

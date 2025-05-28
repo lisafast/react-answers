@@ -69,13 +69,19 @@ class LogQueue {
 
     async processLogEntry({ level, message, chatId, data }) {
         console[level](`[${level.toUpperCase()}][${chatId}] ${message}`, data);
-        
+
+        // Only save to DB if chatId is present and not "system"
+        if (!chatId || chatId === 'system') {
+            // Do not save to DB, just log to console
+            return;
+        }
+
         try {
             await dbConnect();
             // If data is null/undefined, use empty string, otherwise process it
             const processedData = data ? JSON.stringify(data) : '';
             const parsedData = processedData ? JSON.parse(processedData) : '';
-            
+
             const log = new Logs({
                 chatId,
                 logLevel: level,

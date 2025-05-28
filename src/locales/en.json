@@ -53,7 +53,11 @@
         "message": "Reload the page to try again.",
         "button": "Reload"
       },
-      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then."
+      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then.",
+      "statusUnknown": {
+        "title": "Service Status Unknown",
+        "message": "The service status could not be determined. Please try again later."
+      }
     },
     "chat": {
       "chatId": "Chat ID",
@@ -315,6 +319,18 @@
       "delete": "Delete",
       "confirmDelete": "Are you sure you want to delete this user?"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "statusLabel": "Service status",
+    "statuses": {
+      "available": "Available",
+      "unavailable": "Unavailable"
+    }
+  },
+  "outage": {
+    "title": "Service Unavailable",
+    "message": "This service is currently unavailable."
   },
   "common": {
     "backToAdmin": "Back to Admin"

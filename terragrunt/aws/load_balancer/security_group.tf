@@ -18,6 +18,6 @@ resource "aws_security_group" "ai_answers_load_balancer_sg" {
   }
 
   tags = {
-    "CostCentre" = var.billing_code
+    CostCentre = var.billing_code
   }
 }

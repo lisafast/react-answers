@@ -15,8 +15,16 @@ const AI_MODELS = {
       },
     },
     embeddings: {
-      default: 'text-embedding-ada-002',
+      default: 'text-embedding-3-large',
       models: {
+        'text-embedding-3-large': {
+          dimensions: 3072,
+          timeoutMs: 30000,
+        },
+        'text-embedding-3-small': {
+          dimensions: 1536,
+          timeoutMs: 30000,
+        },
         'text-embedding-ada-002': {
           dimensions: 1536,
           timeoutMs: 30000,

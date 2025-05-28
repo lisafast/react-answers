@@ -53,7 +53,11 @@
         "message": "Actualisez la page pour réessayer.",
         "button": "Actualiser"
       },
-      "serviceUnavailable": "Réponses IA est indisponible jusqu'à demain en raison de l'atteinte des limites d'utilisation quotidiennes. Veuillez revenir plus tard."
+      "serviceUnavailable": "Réponses IA est indisponible jusqu'à demain en raison de l'atteinte des limites d'utilisation quotidiennes. Veuillez revenir plus tard.",
+      "statusUnknown": {
+        "title": "État du service inconnu",
+        "message": "L'état du service n'a pas pu être déterminé. Veuillez réessayer plus tard."
+      }
     },
     "chat": {
       "chatId": "ID de chat",
@@ -318,6 +322,18 @@
       "delete": "Supprimer",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?"
     }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "statusLabel": "Statut du service",
+    "statuses": {
+      "available": "Disponible",
+      "unavailable": "Indisponible"
+    }
+  },
+  "outage": {
+    "title": "Service indisponible",
+    "message": "Ce service est actuellement indisponible."
   },
   "common": {
     "backToAdmin": "Retour à l'administration"
