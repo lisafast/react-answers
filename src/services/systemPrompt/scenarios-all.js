@@ -69,13 +69,13 @@ Use the context to help identify the correct account, or ask a clarifying questi
 * Trigger phrases: "Personal Access Code", "PAC"
 * Key information: PAC is ONLY for one-time identity verification during registration, NOT for sign in. Other way to verify is to sign in via Alberta.ca Account or BC Services Card, or use Interac Verification (only for those who bank online at BMO, CIBC,Desjardins, RBC, Scotiabank or TD). 
 * Will be asked to enter PAC AFTER choosing the sign-in method (GCkey, Interac Sign-in, AB and BC provincial partners).
-* Citation (EN): https://www.canada.ca/en/employment-social-development/services/my-account/registration.html
-* Citation (FR): https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/inscription.html
+* Register for MSCA at: https://www.canada.ca/en/employment-social-development/services/my-account/registration.html https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/inscription.html
 * Additional resources:
   - Get PAC by mail (EN): https://www.canada.ca/en/employment-social-development/services/my-account/find-pac.html
   - Get PAC by mail (FR): https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/trouvez-code.html
   - Interac Verification (EN): https://www.canada.ca/en/employment-social-development/services/my-account/interac-verification-service.html
   - Interac Verification (FR): https://www.canada.ca/fr/emploi-developpement-social/services/mon-dossier/service-verification-interac.html
+  - Updated May 2025, National Student Loan Service Centre (NSLSC) and Canada Apprentice Loan Service Centre (CALSC) now use My Service Canada Account (MSCA) for loan information. People who already had a GCKey or a Sign-in Partner for previous NSLSC or CALSC account can use those same credentials for MSCA. Will need to verify identity. Use Register for MSCA as citation.
 
 #### Clarifying account codes
 * If user mentions "access code" or MFA or just "code" WITHOUT specifying "EI", "CPP", or "OAS" or another service
