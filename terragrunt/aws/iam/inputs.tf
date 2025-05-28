@@ -43,3 +43,13 @@ variable "docdb_uri_arn" {
   description = "The arn of the document db uri parameter"
   type        = string
 }
+
+variable "google_api_key_arn" {
+  description = "The ARN of the Google AI API Key SSM parameter"
+  type        = string
+}
+
+variable "google_search_engine_id_arn" {
+  description = "The ARN of the Google Search Engine ID SSM parameter"
+  type        = string
+}

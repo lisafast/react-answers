@@ -31,6 +31,14 @@ locals {
     {
       "name"      = "JWT_SECRET_KEY"
       "valueFrom" = var.jwt_secret_key_arn
+    },
+    {
+      "name"      = "GOOGLE_API_KEY"
+      "valueFrom" = var.google_api_key_arn
+    },
+    {
+      "name"      = "GOOGLE_SEARCH_ENGINE_ID"
+      "valueFrom" = var.google_search_engine_id_arn
     }
   ]
 }
@@ -39,8 +47,8 @@ module "ai_answers" {
   source = "github.com/cds-snc/terraform-modules//ecs?ref=v10.3.0"
 
   # Cluster and service
-  cluster_name = "ai-answers-cluster"
-  service_name = "ai-answers-app-service"
+  cluster_name = "${var.product_name}-cluster"
+  service_name = "${var.product_name}-app-service"
   depends_on = [
     var.lb_listener,
     var.ai-answers-ecs-policy_attachment
@@ -48,7 +56,7 @@ module "ai_answers" {
 
   # Task/Container definition
   container_image            = "${var.ecr_repository_url}:latest"
-  container_name             = "ai-answers"
+  container_name             = var.product_name
   task_cpu                   = var.fargate_cpu
   task_memory                = var.fargate_memory
   container_port             = 3001
@@ -65,10 +73,9 @@ module "ai_answers" {
   container_read_only_root_filesystem = false
 
   # Task definition
-  task_name          = "ai-answers-task"
+  task_name          = "${var.product_name}-task"
   task_exec_role_arn = var.iam_role_ai-answers-ecs-role_arn
   task_role_arn      = var.iam_role_ai-answers-ecs-role_arn
-
 
   # Scaling
   enable_autoscaling = true
@@ -81,17 +88,17 @@ module "ai_answers" {
 
   # Forward logs to Sentinel
   sentinel_forwarder           = true
-  sentinel_forwarder_layer_arn = "arn:aws:lambda:ca-central-1:283582579564:layer:aws-sentinel-connector-layer:188"
+  sentinel_forwarder_layer_arn = "arn:aws:lambda:ca-central-1:283582579564:layer:aws-sentinel-connector-layer:199"
 
   billing_tag_value = var.billing_code
 }
 
 resource "aws_cloudwatch_log_group" "ai_answers_group" {
-  name              = "/aws/ecs/ai-answers-cluster"
+  name              = "/aws/ecs/${var.product_name}-cluster"
   retention_in_days = 30
 }
 
 resource "aws_cloudwatch_log_stream" "ai_answers_stream" {
-  name           = "ai-answers-log-stream"
+  name           = "${var.product_name}-log-stream"
   log_group_name = aws_cloudwatch_log_group.ai_answers_group.name
 }

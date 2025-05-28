@@ -53,7 +53,11 @@
         "message": "Actualisez la page pour réessayer.",
         "button": "Actualiser"
       },
-      "serviceUnavailable": "Réponses IA est indisponible jusqu'à demain en raison de l'atteinte des limites d'utilisation quotidiennes. Veuillez revenir plus tard."
+      "serviceUnavailable": "Réponses IA est indisponible jusqu'à demain en raison de l'atteinte des limites d'utilisation quotidiennes. Veuillez revenir plus tard.",
+      "statusUnknown": {
+        "title": "État du service inconnu",
+        "message": "L'état du service n'a pas pu être déterminé. Veuillez réessayer plus tard."
+      }
     },
     "chat": {
       "chatId": "ID de chat",
@@ -252,9 +256,6 @@
       "metrics": "Voir les métriques de performance",
       "logout": "Se déconnecter"
     },
-    "chatLogs": {
-      "title": "Télécharger les journaux de chat récents"
-    },
     "deleteChat": {
       "title": "Supprimer une conversation avec des rétroactions incorrectes",
       "idLabel": "ID de chat",
@@ -264,6 +265,28 @@
       "loading": "Suppression en cours...",
       "success": "Conversation supprimée avec succès",
       "error": "Échec de la suppression de la conversation : "
+    },
+    "chatLogs": {
+      "title": "Télécharger les journaux de chat récents",
+      "timeRange": "Plage de temps",
+      "last1Day": "Dernier jour",
+      "last7Days": "7 derniers jours",
+      "last30Days": "30 derniers jours",
+      "last60Days": "60 derniers jours",
+      "last90Days": "90 derniers jours",
+      "allLogs": "Tous les journaux",
+      "getLogs": "Obtenir les journaux",
+      "loading": "Chargement...",
+      "loadingLogs": "Chargement des journaux...",
+      "downloadJson": "Télécharger JSON",
+      "downloadCsv": "Télécharger CSV",
+      "downloadExcel": "Télécharger Excel",
+      "found": "Trouvé",
+      "interactionsFound": "interactions de chat. Téléchargez les journaux pour voir l'ensemble complet et les détails.",
+      "selectRange": "Sélectionnez une plage de temps et cliquez sur « Obtenir les journaux » pour voir l’historique des conversations",
+      "date": "Date",
+      "chatId": "ID de chat",
+      "interactions": "Interactions"
     }
   },
   "signup": {
@@ -318,6 +341,18 @@
       "delete": "Supprimer",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?"
     }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "statusLabel": "Statut du service",
+    "statuses": {
+      "available": "Disponible",
+      "unavailable": "Indisponible"
+    }
+  },
+  "outage": {
+    "title": "Service indisponible",
+    "message": "Ce service est actuellement indisponible."
   },
   "common": {
     "backToAdmin": "Retour à l'administration"

@@ -53,7 +53,11 @@
         "message": "Reload the page to try again.",
         "button": "Reload"
       },
-      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then."
+      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then.",
+      "statusUnknown": {
+        "title": "Service Status Unknown",
+        "message": "The service status could not be determined. Please try again later."
+      }
     },
     "chat": {
       "chatId": "Chat ID",
@@ -250,7 +254,26 @@
       "logout": "Sign out"
     },
     "chatLogs": {
-      "title": "Download recent chat logs"
+      "title": "Download recent chat logs",
+      "timeRange": "Time range",
+      "last1Day": "Last 1 day",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last60Days": "Last 60 days",
+      "last90Days": "Last 90 days",
+      "allLogs": "All logs",
+      "getLogs": "Get logs",
+      "loading": "Loading...",
+      "loadingLogs": "Loading logs...",
+      "downloadJson": "Download JSON",
+      "downloadCsv": "Download CSV",
+      "downloadExcel": "Download Excel",
+      "found": "Found",
+      "interactionsFound": "chat interactions. Download the logs to see the full set and details.",
+      "selectRange": "Select a time range and click 'Get logs' to view chat history",
+      "date": "Date",
+      "chatId": "Chat ID",
+      "interactions": "Interactions"
     },
     "deleteChat": {
       "title": "Delete a chat with incorrect feedback",
@@ -315,6 +338,18 @@
       "delete": "Delete",
       "confirmDelete": "Are you sure you want to delete this user?"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "statusLabel": "Service status",
+    "statuses": {
+      "available": "Available",
+      "unavailable": "Unavailable"
+    }
+  },
+  "outage": {
+    "title": "Service Unavailable",
+    "message": "This service is currently unavailable."
   },
   "common": {
     "backToAdmin": "Back to Admin"
