@@ -317,6 +317,7 @@
       "chatViewer": "Voir le journal complet pour un ID de chat",
       "database": "Gérer la base de données",
       "eval": "Contrôler les intégrations d'évaluation",
+      "metrics": "Voir les métriques de performance",
       "logout": "Se déconnecter"
     },
     "chatLogs": {
@@ -388,6 +389,50 @@
   },
   "common": {
     "backToAdmin": "Retour à l'administration"
+  },
+  "metrics": {
+    "title": "Tableau de bord des métriques",
+    "timeRangeTitle": "Obtenir les métriques d'utilisation et d'évaluation",
+    "dashboard": {
+      "title": "Résultats",
+      "usageMetrics": "Métriques d'utilisation",
+      "totalSessions": "Total des sessions",
+      "totalQuestions": "Total des questions",
+      "sessionsByQuestionCount": {
+        "singleQuestion": "Sessions avec 1 question",
+        "twoQuestions": "Sessions avec 2 questions",
+        "threeQuestions": "Sessions avec 3 questions"
+      },
+      "expertScored": {
+        "title": "Évaluations d'experts",
+        "description": "Évaluations par des experts en la matière des départements connectés",
+        "total": "Total des questions évaluées",
+        "correct": "Correct",
+        "needsImprovement": "Nécessite une amélioration",
+        "hasError": "Contient une erreur"
+      },
+      "aiScored": {
+        "title": "Évaluations IA",
+        "description": "Évaluations automatisées par IA basées sur les évaluations d'experts de questions similaires",
+        "total": "Total des questions évaluées",
+        "correct": "Correct",
+        "needsImprovement": "Nécessite une amélioration",
+        "hasError": "Contient une erreur"
+      },
+      "userScored": {
+        "title": "Rétroaction des utilisateurs",
+        "description": "Rétroaction oui-non des utilisateurs finaux",
+        "total": "Total des questions avec rétroaction",
+        "helpful": "Utile (oui)",
+        "unhelpful": "Inutile (non)"
+      },
+      "byDepartment": {
+        "title": "Répartition par département",
+        "totalQuestions": "Total des questions",
+        "totalSessions": "Sessions totales",
+        "expertTotal": "Évaluations d'experts"
+      }
+    }
   },
   "prompts": {
     "title": "Gérer les invites système",

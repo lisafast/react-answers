@@ -16,6 +16,7 @@ import PromptsPage from './pages/PromptsPage.js'; // Added for prompts managemen
 import SettingsPage from './pages/SettingsPage.js';
 import { AuthProvider } from './contexts/AuthContext.js';
 import { AdminRoute, RoleProtectedRoute } from './components/RoleProtectedRoute.js';
+import MetricsPage from './pages/MetricsPage.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -132,6 +133,14 @@ const routes = {
     {
       path: "/fr/database",
       element: <AdminRoute lang="fr"><DatabasePage lang="fr" /></AdminRoute>,
+    },
+    {
+      path: "/en/metrics",
+      element: <AdminRoute lang="en"><MetricsPage lang="en" /></AdminRoute>,
+    },
+    {
+      path: "/fr/metrics",
+      element: <AdminRoute lang="fr"><MetricsPage lang="fr" /></AdminRoute>,
     },
   ]
 };
