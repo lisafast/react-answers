@@ -348,6 +348,11 @@
     "statuses": {
       "available": "Disponible",
       "unavailable": "Indisponible"
+    },
+    "deploymentModeLabel": "Mode de déploiement",
+    "deploymentMode": {
+      "cds": "CDS (travailleur en arrière-plan)",
+      "vercel": "Vercel (attendre la fin de l'évaluation)"
     }
   },
   "outage": {

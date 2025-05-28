@@ -276,6 +276,37 @@ class DataStoreService {
       throw error;
     }
   }
+
+  // Add deployment mode setting
+  static async getDeploymentMode() {
+    try {
+      const response = await fetch(getApiUrl('db-settings?key=deploymentMode'));
+      if (!response.ok) throw new Error('Failed to get deployment mode');
+      const data = await response.json();
+      return data.value || 'CDS';
+    } catch (error) {
+      console.error('Error getting deployment mode:', error);
+      return 'CDS';
+    }
+  }
+
+  static async setDeploymentMode(mode) {
+    try {
+      const response = await fetch(getApiUrl('db-settings'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...AuthService.getAuthHeader()
+        },
+        body: JSON.stringify({ key: 'deploymentMode', value: mode })
+      });
+      if (!response.ok) throw new Error('Failed to set deployment mode');
+      return await response.json();
+    } catch (error) {
+      console.error('Error setting deployment mode:', error);
+      throw error;
+    }
+  }
 }
 
 export default DataStoreService;
