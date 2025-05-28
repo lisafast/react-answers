@@ -20,7 +20,8 @@ const expertFeedbackSchema = new Schema({
     citationExplanation: { type: String, required: false, default: '' },
     answerImprovement: { type: String, required: false, default: '' },
     expertCitationUrl: { type: String, required: false, default: '' },
-    feedback: { type: String, required: false, default: '' }
+    feedback: { type: String, required: false, default: '' },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }
 }, {
     timestamps: true, versionKey: false,
     id: false,
