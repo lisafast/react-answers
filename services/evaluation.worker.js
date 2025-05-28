@@ -280,6 +280,13 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
                 populate: { path: 'sentences' }
             });
         const matchedSentenceText = matchedInteraction?.answer?.sentences[match.targetIndex];
+        // Fetch chatId from Chat collection by finding the chat that contains this interaction
+        let matchedChatId = null;
+        const Chat = mongoose.model('Chat');
+        const chatDoc = await Chat.findOne({ interactions: matchedInteraction._id }, { chatId: 1 });
+        if (chatDoc) {
+            matchedChatId = chatDoc._id; // Use the MongoDB _id for reference
+        }
         if (match.expertFeedback && feedbackIdx >= 1 && feedbackIdx <= 4) {
             const score = match.expertFeedback[`sentence${feedbackIdx}Score`] ?? 100;
             newExpertFeedback[`sentence${newIdx}Score`] = score;
@@ -290,6 +297,7 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
             sourceIndex: match.sourceIndex,
             sourceSentenceText: sourceSentenceText,
             matchedInteractionId: match.matchId,
+            matchedChatId: matchedChatId, 
             matchedSentenceIndex: match.targetIndex,
             matchedSentenceText: matchedSentenceText,
             matchedExpertFeedbackSentenceScore: match.expertFeedback?.[`sentence${feedbackIdx}Score`] ?? 100,

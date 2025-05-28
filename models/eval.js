@@ -7,6 +7,7 @@ const sentenceMatchTraceSchema = new Schema({
     sourceIndex: { type: Number, required: true }, // Index of the sentence in the current interaction's answer
     sourceSentenceText: { type: String, required: false, default: '' }, // Added: Actual text of the source sentence
     matchedInteractionId: { type: Schema.Types.ObjectId, ref: 'Interaction', required: true }, // ID of the interaction providing the expert feedback
+    matchedChatId: { type: Schema.Types.ObjectId, ref: 'Chat', required: false }, // Added for traceability
     matchedSentenceIndex: { type: Number, required: true }, // Index of the sentence in the matched interaction's answer
     matchedSentenceText: { type: String, required: false, default: '' }, // Added: Actual text of the matched sentence
     matchedExpertFeedbackSentenceScore: { type: Number, required: false, default: null }, // Score given by expert for the matched sentence
