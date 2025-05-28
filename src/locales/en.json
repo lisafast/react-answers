@@ -345,6 +345,11 @@
     "statuses": {
       "available": "Available",
       "unavailable": "Unavailable"
+    },
+    "deploymentModeLabel": "Deployment Mode",
+    "deploymentMode": {
+      "cds": "CDS (Background worker)",
+      "vercel": "Vercel (Wait for completion)"
     }
   },
   "outage": {

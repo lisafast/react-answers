@@ -9,6 +9,7 @@ import { Tool } from '../../models/tool.js';
 import EmbeddingService from '../../services/EmbeddingService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import EvaluationService from '../../services/EvaluationService.js';
+import { Setting } from '../../models/setting.js';
 
 
 
@@ -101,17 +102,32 @@ export default async function handler(req, res) {
     ServerLoggingService.info('[db-persist-interaction] Embedding creation start', chatId, {});
     await EmbeddingService.createEmbedding(dbInteraction,interaction.selectedAI);
     ServerLoggingService.info('[db-persist-interaction] Embedding creation end', chatId, {});
- 
 
-    // 6. Perform evaluation on the saved interaction (fire and forget, log success and error)
-    ServerLoggingService.info('Starting evaluation for interaction', chat.chatId, {});
-    EvaluationService.evaluateInteraction(dbInteraction, chatId)
-      .then(() => {
+    // 6. Perform evaluation on the saved interaction (mode depends on deploymentMode setting)
+    let deploymentMode = 'CDS';
+    try {
+      const setting = await Setting.findOne({ key: 'deploymentMode' });
+      if (setting && setting.value) deploymentMode = setting.value;
+    } catch (e) {
+      ServerLoggingService.error('Failed to read deploymentMode setting', chatId, e);
+    }
+    ServerLoggingService.info('Deployment mode', chatId, { deploymentMode });
+    if (deploymentMode === 'Vercel') {
+      try {
+        await EvaluationService.evaluateInteraction(dbInteraction, chatId);
         ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
-      })
-      .catch(evalError => {
+      } catch (evalError) {
         ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
-      });
+      }
+    } else {
+      EvaluationService.evaluateInteraction(dbInteraction, chatId)
+        .then(() => {
+          ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
+        })
+        .catch(evalError => {
+          ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
+        });
+    }
 
     res.status(200).json({ message: 'Interaction logged successfully' });
     ServerLoggingService.info('[db-persist-interaction] End - chatId:', chatId, {});
