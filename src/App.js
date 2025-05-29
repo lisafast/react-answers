@@ -104,7 +104,11 @@ export default function App() {
 
     return createBrowserRouter([
       {
-        element: <AppLayout />,
+        element: (
+          <AuthProvider>
+            <AppLayout />
+          </AuthProvider>
+        ),
         children: [
           ...publicRoutes,
           ...protectedRoutes.map(route => ({
@@ -121,8 +125,6 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   );
 }

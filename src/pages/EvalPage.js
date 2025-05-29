@@ -3,6 +3,7 @@ import { getApiUrl } from '../utils/apiToUrl.js';
 import { GcdsContainer, GcdsText, GcdsButton, GcdsDetails, GcdsLink } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
 import { usePageContext } from '../hooks/usePageParam.js';
+import DataStoreService from '../services/DataStoreService.js';
 
 const EvalPage = () => {
   const { t } = useTranslations();
@@ -27,30 +28,13 @@ const EvalPage = () => {
         setIsAutoProcessingEmbeddings(true);
       }
 
-      const response = await fetch(getApiUrl('db-generate-embeddings'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          lastProcessedId: lastId,
-          regenerateAll: regenerateAll 
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate embeddings');
-      }
-
-      const result = await response.json();
-      
+      const result = await DataStoreService.generateEmbeddings({ lastProcessedId: lastId, regenerateAll });
       // Only update progress if we got a valid response
       if (typeof result.remaining === 'number') {
         setEmbeddingProgress({
           remaining: result.remaining,
           lastProcessedId: result.lastProcessedId
         });
-        
         // Only continue processing if there are actually items remaining
         if (result.remaining > 0) {
           handleGenerateEmbeddings(true, false, result.lastProcessedId);
@@ -91,30 +75,13 @@ const EvalPage = () => {
       }
 
       setEvalProgress(prev => ({ ...prev, loading: true }));
-      const response = await fetch(getApiUrl('db-generate-evals'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          lastProcessedId: lastId,
-          regenerateAll: regenerateAll 
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate evals');
-      }
-
-      const result = await response.json();
-      
+      const result = await DataStoreService.generateEvals({ lastProcessedId: lastId, regenerateAll });
       // Only update progress if we got a valid response
       if (typeof result.remaining === 'number') {
         setEvalProgress({
           remaining: result.remaining,
           lastProcessedId: result.lastProcessedId
         });
-        
         // Only continue processing if there are actually items remaining
         if (result.remaining > 0) {
           handleGenerateEvals(true, false, result.lastProcessedId);
