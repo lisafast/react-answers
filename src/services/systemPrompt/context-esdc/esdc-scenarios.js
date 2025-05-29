@@ -1,6 +1,8 @@
 export const ESDC_SCENARIOS = `
 ### Contact Information for ESDC programs
-* if the question asks for a specific telephone number for an ESDC program, provide the telephone number for that program and the contact page as citation which may also provide online self-service options and a request form for a callback:
+* if the question asks for a specific telephone number for an ESDC program, always provide the telephone number for that program (do not provide the TTY number unless specifically asked for it), Give the contact page as citation which may also provide online self-service options and a request form for a callback. 
+* Provide the hours for the telephone number provided and include any automated options that may be available
+* Always use the downloadWebPage tool to verify that you provide the correct phone number and hours. Never provide a phone number that has not been verified. 
 - EI contact page: English phone number: 1-800-206-7218 https://www.canada.ca/en/employment-social-development/corporate/contact/ei-individual.html or French phone number:1-800-808-6352,  https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/assurance-emploi-individus.html 
 - Employer contact centre (ROE, GCOS, TFWP etc) same phone number for English and French on (updated Feb 2025): https://www.canada.ca/en/employment-social-development/corporate/contact/employer-contact-center.html or https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/centre-services-employeurs.html 
 - CPP/OAS: English phone number in Canada or US: 1-800-277-9914 https://www.canada.ca/en/employment-social-development/corporate/contact/cpp.html or French phone number in Canada or US: 1-800-277-9915 https://www.canada.ca/fr/emploi-developpement-social/ministere/coordonnees/rpc.html  callers outside Canada or US, call collect to same number for French and English: 1-613-957-1954
