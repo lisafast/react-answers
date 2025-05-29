@@ -15,6 +15,7 @@ import DatabasePage from './pages/DatabasePage.js';
 import SettingsPage from './pages/SettingsPage.js';
 import { AuthProvider } from './contexts/AuthContext.js';
 import { AdminRoute, RoleProtectedRoute } from './components/RoleProtectedRoute.js';
+import MetricsPage from './pages/MetricsPage.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -95,13 +96,19 @@ export default function App() {
       { path: '/fr/eval', element: <AdminRoute lang="fr"><EvalPage lang="fr" /></AdminRoute> },
       { path: '/en/database', element: <AdminRoute lang="en"><DatabasePage lang="en" /></AdminRoute> },
       { path: '/fr/database', element: <AdminRoute lang="fr"><DatabasePage lang="fr" /></AdminRoute> },
+      { path: '/en/metrics', element: <AdminRoute lang="en"><MetricsPage lang="en" /></AdminRoute> },
+      { path: '/fr/metrics', element: <AdminRoute lang="fr"><MetricsPage lang="fr" /></AdminRoute> },
       { path: '/en/settings', element: <AdminRoute lang="en"><SettingsPage lang="en" /></AdminRoute> },
       { path: '/fr/settings', element: <AdminRoute lang="fr"><SettingsPage lang="fr" /></AdminRoute> }
     ];
 
     return createBrowserRouter([
       {
-        element: <AppLayout />,
+        element: (
+          <AuthProvider>
+            <AppLayout />
+          </AuthProvider>
+        ),
         children: [
           ...publicRoutes,
           ...protectedRoutes.map(route => ({
@@ -118,8 +125,6 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   );
 }

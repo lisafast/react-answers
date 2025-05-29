@@ -203,6 +203,20 @@ async function findBestCitationMatch(interaction, bestAnswerMatches) {
         url: '',
         similarity: 0
     };
+    // Always score the search page as zero
+    const searchPagePattern = /^https:\/\/www\.canada\.ca\/(en|fr)\/sr\/srb\.html$/i;
+    if (searchPagePattern.test(sourceUrl)) {
+        bestCitationMatch.score = 0;
+        bestCitationMatch.explanation = 'Search page citations are always scored zero.';
+        bestCitationMatch.url = sourceUrl;
+        bestCitationMatch.similarity = 1;
+        ServerLoggingService.debug('Citation matching result (worker):', 'system', {
+            sourceUrl,
+            matchedUrl: bestCitationMatch.url,
+            score: bestCitationMatch.score
+        });
+        return bestCitationMatch;
+    }
     for (const match of bestAnswerMatches) {
         const expertFeedback = match.embedding.interactionId.expertFeedback;
         const matchInteraction = await Interaction.findById(match.embedding.interactionId._id).populate({
@@ -280,6 +294,13 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
                 populate: { path: 'sentences' }
             });
         const matchedSentenceText = matchedInteraction?.answer?.sentences[match.targetIndex];
+        // Fetch chatId from Chat collection by finding the chat that contains this interaction
+        let matchedChatId = null;
+        const Chat = mongoose.model('Chat');
+        const chatDoc = await Chat.findOne({ interactions: matchedInteraction._id }, { chatId: 1 });
+        if (chatDoc) {
+            matchedChatId = chatDoc._id; // Use the MongoDB _id for reference
+        }
         if (match.expertFeedback && feedbackIdx >= 1 && feedbackIdx <= 4) {
             const score = match.expertFeedback[`sentence${feedbackIdx}Score`] ?? 100;
             newExpertFeedback[`sentence${newIdx}Score`] = score;
@@ -290,6 +311,7 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
             sourceIndex: match.sourceIndex,
             sourceSentenceText: sourceSentenceText,
             matchedInteractionId: match.matchId,
+            matchedChatId: matchedChatId, 
             matchedSentenceIndex: match.targetIndex,
             matchedSentenceText: matchedSentenceText,
             matchedExpertFeedbackSentenceScore: match.expertFeedback?.[`sentence${feedbackIdx}Score`] ?? 100,

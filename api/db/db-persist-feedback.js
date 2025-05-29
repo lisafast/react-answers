@@ -1,8 +1,9 @@
 import dbConnect from './db-connect.js';
 import { Chat } from '../../models/chat.js';
 import { ExpertFeedback } from '../../models/expertFeedback.js';
+import { withOptionalUser } from '../../middleware/auth.js';
 
-export default async function handler(req, res) {
+async function feedbackHandler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -25,7 +26,10 @@ export default async function handler(req, res) {
     const feedbackFields = {
       ...feedback
     };
-    
+    // Attach user if authenticated (for expert feedback only)
+    if (req.user && req.user.userId && feedback.type === 'expert') {
+      feedbackFields.user = req.user.userId;
+    }
     existingInteraction.expertFeedback = expertFeedback._id;
     Object.assign(expertFeedback, feedbackFields);
     
@@ -40,3 +44,5 @@ export default async function handler(req, res) {
     res.status(500).json({ message: 'Failed to log Feedback', error: error.message });
   }
 }
+
+export default withOptionalUser(feedbackHandler);

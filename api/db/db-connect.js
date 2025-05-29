@@ -12,6 +12,7 @@ import '../../models/eval.js';
 import '../../models/user.js';
 import '../../models/logs.js';
 import '../../models/embedding.js';
+import '../../models/setting.js';
 
 let cached = global.mongoose;
 

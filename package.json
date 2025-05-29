@@ -6,6 +6,7 @@
   "proxy": "https://api.anthropic.com",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@cdssnc/gcds-components": "^0.26.1",
     "@cdssnc/gcds-components-react": "^0.34.3",
     "@cdssnc/gcds-utility": "^1.4.0",

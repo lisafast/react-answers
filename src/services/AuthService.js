@@ -1,6 +1,12 @@
 import { getApiUrl } from '../utils/apiToUrl.js';
 
 class AuthService {
+  static unauthorizedCallback = null; // <-- Add this
+
+  static setUnauthorizedCallback(cb) {
+    this.unauthorizedCallback = cb;
+  }
+
   static setToken(token) {
     localStorage.setItem('token', token);
   }
@@ -126,7 +132,10 @@ class AuthService {
     const response = await fetch(url, { ...options, headers });
 
     if (response.status === 401) {
-      this.logout(); // Redirect to login if token is invalid
+      this.logout();
+      if (typeof this.unauthorizedCallback === 'function') {
+        this.unauthorizedCallback(); // Notify context/provider
+      }
     }
 
     return response;

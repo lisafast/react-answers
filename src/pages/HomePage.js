@@ -4,7 +4,7 @@ import ChatAppContainer from '../components/chat/ChatAppContainer.js';
 import { GcdsContainer, GcdsDetails, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
 import DataStoreService from '../services/DataStoreService.js';
-import OutageComponent from '../components/OutageComponent.js'; // Keep this import
+import OutageComponent from '../components/OutageComponent.js';
 import { useHasAnyRole } from '../components/RoleBasedUI.js';
 
 // Error Boundary
@@ -37,8 +37,7 @@ class ErrorBoundary extends React.Component {
           </button> {/* Corrected: Ensure button is properly closed */}
         </GcdsContainer>
       );
-    } // Corrected: Removed extraneous semicolon from };
-
+    }
     return this.props.children;
   }
 }
@@ -101,7 +100,9 @@ const HomePage = ({ lang = 'en' }) => {
           className="mb-600"
         >
           <h1 className="mb-400">{t('homepage.title')}</h1>
-          <h2 className="mt-400 mb-400" aria-label={t('homepage.subtitle.ariaLabel')}><span className="aria-hidden">{t('homepage.subtitle.text')}</span></h2>
+          <h2 className="mt-400 mb-400" aria-label={t('homepage.subtitle.ariaLabel')}>
+            <span className="aria-hidden">{t('homepage.subtitle.text')}</span>
+          </h2>
           <GcdsText className="mb-200">{t('homepage.intro.researchOnly')}</GcdsText>
           <GcdsDetails detailsTitle={t('homepage.privacy.title')} className="mb-400" tabIndex={0}>
             <GcdsText>{t('homepage.privacy.storage')}</GcdsText>
@@ -128,7 +129,7 @@ const HomePage = ({ lang = 'en' }) => {
           </GcdsText>
           <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex={0}>
             <GcdsText>{t('homepage.about.privacyNote')}</GcdsText>
-            <GcdsText>{t('homepage.about.aiServices.azure')}</GcdsText> 
+            <GcdsText>{t('homepage.about.aiServices.azure')}</GcdsText>
             <GcdsText>
               <GcdsLink href="https://github.com/cds-snc/ai-answers">
                 {t('homepage.about.systemPrompt')}

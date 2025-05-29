@@ -120,5 +120,11 @@ export const withProtection = (handler, ...middleware) => {
   };
 };
 
+// Optional authentication: sets req.user if valid token, does not block if not
+export const withOptionalUser = (handler) => async (req, res) => {
+  await verifyAuth(req, res); // sets req.user or leaves undefined
+  return handler(req, res);
+};
+
 export const authMiddleware = verifyAuth;
 export const adminMiddleware = verifyAdmin;

@@ -253,10 +253,8 @@
       "chatViewer": "Voir le journal complet pour un ID de chat",
       "database": "Gérer la base de données",
       "eval": "Contrôler les intégrations d'évaluation",
+      "metrics": "Voir les métriques de performance",
       "logout": "Se déconnecter"
-    },
-    "chatLogs": {
-      "title": "Télécharger les journaux de chat récents"
     },
     "deleteChat": {
       "title": "Supprimer une conversation avec des rétroactions incorrectes",
@@ -267,6 +265,28 @@
       "loading": "Suppression en cours...",
       "success": "Conversation supprimée avec succès",
       "error": "Échec de la suppression de la conversation : "
+    },
+    "chatLogs": {
+      "title": "Télécharger les journaux de chat récents",
+      "timeRange": "Plage de temps",
+      "last1Day": "Dernier jour",
+      "last7Days": "7 derniers jours",
+      "last30Days": "30 derniers jours",
+      "last60Days": "60 derniers jours",
+      "last90Days": "90 derniers jours",
+      "allLogs": "Tous les journaux",
+      "getLogs": "Obtenir les journaux",
+      "loading": "Chargement...",
+      "loadingLogs": "Chargement des journaux...",
+      "downloadJson": "Télécharger JSON",
+      "downloadCsv": "Télécharger CSV",
+      "downloadExcel": "Télécharger Excel",
+      "found": "Trouvé",
+      "interactionsFound": "interactions de chat. Téléchargez les journaux pour voir l'ensemble complet et les détails.",
+      "selectRange": "Sélectionnez une plage de temps et cliquez sur « Obtenir les journaux » pour voir l’historique des conversations",
+      "date": "Date",
+      "chatId": "ID de chat",
+      "interactions": "Interactions"
     }
   },
   "signup": {
@@ -328,6 +348,11 @@
     "statuses": {
       "available": "Disponible",
       "unavailable": "Indisponible"
+    },
+    "deploymentModeLabel": "Mode de déploiement",
+    "deploymentMode": {
+      "cds": "CDS (travailleur en arrière-plan)",
+      "vercel": "Vercel (attendre la fin de l'évaluation)"
     }
   },
   "outage": {
@@ -336,5 +361,49 @@
   },
   "common": {
     "backToAdmin": "Retour à l'administration"
+  },
+  "metrics": {
+    "title": "Tableau de bord des métriques",
+    "timeRangeTitle": "Obtenir les métriques d'utilisation et d'évaluation",
+    "dashboard": {
+      "title": "Résultats",
+      "usageMetrics": "Métriques d'utilisation",
+      "totalSessions": "Total des sessions",
+      "totalQuestions": "Total des questions",
+      "sessionsByQuestionCount": {
+        "singleQuestion": "Sessions avec 1 question",
+        "twoQuestions": "Sessions avec 2 questions",
+        "threeQuestions": "Sessions avec 3 questions"
+      },
+      "expertScored": {
+        "title": "Évaluations d'experts",
+        "description": "Évaluations par des experts en la matière des départements connectés",
+        "total": "Total des questions évaluées",
+        "correct": "Correct",
+        "needsImprovement": "Nécessite une amélioration",
+        "hasError": "Contient une erreur"
+      },
+      "aiScored": {
+        "title": "Évaluations IA",
+        "description": "Évaluations automatisées par IA basées sur les évaluations d'experts de questions similaires",
+        "total": "Total des questions évaluées",
+        "correct": "Correct",
+        "needsImprovement": "Nécessite une amélioration",
+        "hasError": "Contient une erreur"
+      },
+      "userScored": {
+        "title": "Rétroaction des utilisateurs",
+        "description": "Rétroaction oui-non des utilisateurs finaux",
+        "total": "Total des questions avec rétroaction",
+        "helpful": "Utile (oui)",
+        "unhelpful": "Inutile (non)"
+      },
+      "byDepartment": {
+        "title": "Répartition par département",
+        "totalQuestions": "Total des questions",
+        "totalSessions": "Sessions totales",
+        "expertTotal": "Évaluations d'experts"
+      }
+    }
   }
 }
