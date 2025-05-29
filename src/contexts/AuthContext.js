@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AuthService from '../services/AuthService.js';
+import { useNavigate } from 'react-router-dom'; // <-- Add this if using react-router
 
 const AuthContext = createContext();
 
@@ -10,14 +11,27 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const navigate = useNavigate(); 
+
   useEffect(() => {
     // Load user from localStorage on initial render
     const user = AuthService.getUser();
     setCurrentUser(user);
     setLoading(false);
-  }, []);
-    // Update context when user logs in or out
+
+    // Set up unauthorized callback
+    AuthService.setUnauthorizedCallback(() => {
+      setCurrentUser(null);
+      navigate('/login'); // Redirect to login on 401
+    });
+
+    // Cleanup on unmount
+    return () => {
+      AuthService.setUnauthorizedCallback(null);
+    };
+  }, [navigate]);
+
+  // Update context when user logs in or out
   const login = async (email, password) => {
     try {
       setLoading(true);

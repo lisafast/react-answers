@@ -203,6 +203,20 @@ async function findBestCitationMatch(interaction, bestAnswerMatches) {
         url: '',
         similarity: 0
     };
+    // Always score the search page as zero
+    const searchPagePattern = /^https:\/\/www\.canada\.ca\/(en|fr)\/sr\/srb\.html$/i;
+    if (searchPagePattern.test(sourceUrl)) {
+        bestCitationMatch.score = 0;
+        bestCitationMatch.explanation = 'Search page citations are always scored zero.';
+        bestCitationMatch.url = sourceUrl;
+        bestCitationMatch.similarity = 1;
+        ServerLoggingService.debug('Citation matching result (worker):', 'system', {
+            sourceUrl,
+            matchedUrl: bestCitationMatch.url,
+            score: bestCitationMatch.score
+        });
+        return bestCitationMatch;
+    }
     for (const match of bestAnswerMatches) {
         const expertFeedback = match.embedding.interactionId.expertFeedback;
         const matchInteraction = await Interaction.findById(match.embedding.interactionId._id).populate({
