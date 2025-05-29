@@ -24,11 +24,10 @@ class DataStoreService {
 
   static async persistBatch(batchData) {
     try {
-      const response = await fetch(getApiUrl('db-batch'), {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-batch'), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...AuthService.getAuthHeader()
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(batchData)
       });
@@ -43,9 +42,7 @@ class DataStoreService {
 
   static async getBatchList() {
     try {
-      const response = await fetch(getApiUrl('db-batch-list'), {
-        headers: AuthService.getAuthHeader()
-      });
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-batch-list'));
       
       if (!response.ok) throw new Error('Failed to get batch list');
       return await response.json();
@@ -57,9 +54,7 @@ class DataStoreService {
 
   static async getBatch(batchId) {
     try {
-      const response = await fetch(getApiUrl(`db-batch-retrieve?batchId=${batchId}`), {
-        headers: AuthService.getAuthHeader()
-      });
+      const response = await AuthService.fetchWithAuth(getApiUrl(`db-batch-retrieve?batchId=${batchId}`));
       
       if (!response.ok) throw new Error('Failed to retrieve batch');
       return await response.json();
@@ -75,7 +70,8 @@ class DataStoreService {
       const response = await fetch(getApiUrl('db-persist-interaction'), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...AuthService.getAuthHeader()
         },
         body: JSON.stringify(interactionData)
       });
@@ -113,7 +109,6 @@ class DataStoreService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeader()
         },
         body: JSON.stringify({
           chatId: chatId,
@@ -148,10 +143,7 @@ class DataStoreService {
   static async getChatLogs(filters = {}) {
     try {
       const queryParams = new URLSearchParams(filters).toString();
-      const response = await fetch(getApiUrl(`db-chat-logs?${queryParams}`), {
-        headers: AuthService.getAuthHeader()
-      });
-      
+      const response = await AuthService.fetchWithAuth(getApiUrl(`db-chat-logs?${queryParams}`));
       if (!response.ok) throw new Error('Failed to get chat logs');
       return await response.json();
     } catch (error) {
@@ -162,9 +154,7 @@ class DataStoreService {
 
   static async getLogs(chatId) {
     try {
-      const response = await fetch(getApiUrl(`db-log?chatId=${chatId}`), {
-        headers: AuthService.getAuthHeader()
-      });
+      const response = await AuthService.fetchWithAuth(getApiUrl(`db-log?chatId=${chatId}`));
       
       if (!response.ok) throw new Error('Failed to get logs');
       return await response.json();
@@ -176,11 +166,8 @@ class DataStoreService {
 
   static async getBatchStatus(batchId, aiProvider) {
     try {
-      const response = await fetch(
-        getProviderApiUrl(aiProvider, `batch-status?batchId=${batchId}`),
-        {
-          headers: AuthService.getAuthHeader()
-        }
+      const response = await AuthService.fetchWithAuth(
+        getProviderApiUrl(aiProvider, `batch-status?batchId=${batchId}`)
       );
       const data = await response.json();
       return { batchId, status: data.status };
@@ -192,11 +179,8 @@ class DataStoreService {
 
   static async cancelBatch(batchId, aiProvider) {
     try {
-      const response = await fetch(
-        getProviderApiUrl(aiProvider, `batch-cancel?batchId=${batchId}`),
-        {
-          headers: AuthService.getAuthHeader()
-        }
+      const response = await AuthService.fetchWithAuth(
+        getProviderApiUrl(aiProvider, `batch-cancel?batchId=${batchId}`)
       );
       if (!response.ok) throw new Error('Failed to cancel batch');
       return await response.json();
@@ -232,9 +216,8 @@ class DataStoreService {
 
   static async deleteChat(chatId) {
     try {
-      const response = await fetch(getApiUrl(`db-delete-chat?chatId=${chatId}`), {
-        method: 'DELETE',
-        headers: AuthService.getAuthHeader()
+      const response = await AuthService.fetchWithAuth(getApiUrl(`db-delete-chat?chatId=${chatId}`), {
+        method: 'DELETE'
       });
       
       if (!response.ok) {
@@ -262,11 +245,10 @@ class DataStoreService {
 
   static async setSiteStatus(status) {
     try {
-      const response = await fetch(getApiUrl('db-settings'), {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-settings'), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...AuthService.getAuthHeader()
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ key: 'siteStatus', value: status })
       });
@@ -293,11 +275,10 @@ class DataStoreService {
 
   static async setDeploymentMode(mode) {
     try {
-      const response = await fetch(getApiUrl('db-settings'), {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-settings'), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...AuthService.getAuthHeader()
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ key: 'deploymentMode', value: mode })
       });
@@ -305,6 +286,40 @@ class DataStoreService {
       return await response.json();
     } catch (error) {
       console.error('Error setting deployment mode:', error);
+      throw error;
+    }
+  }
+
+  static async generateEmbeddings({ lastProcessedId = null, regenerateAll = false } = {}) {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-generate-embeddings'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ lastProcessedId, regenerateAll })
+      });
+      if (!response.ok) throw new Error('Failed to generate embeddings');
+      return await response.json();
+    } catch (error) {
+      console.error('Error generating embeddings:', error);
+      throw error;
+    }
+  }
+
+  static async generateEvals({ lastProcessedId = null, regenerateAll = false } = {}) {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-generate-evals'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ lastProcessedId, regenerateAll })
+      });
+      if (!response.ok) throw new Error('Failed to generate evals');
+      return await response.json();
+    } catch (error) {
+      console.error('Error generating evals:', error);
       throw error;
     }
   }
