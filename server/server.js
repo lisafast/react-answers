@@ -43,6 +43,8 @@ import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 import dbDeleteSystemLogsHandler from '../api/db/db-delete-system-logs.js';
 import dbSettingsHandler from '../api/db/db-settings.js';
+import dbPublicSiteStatusHandler from '../api/db/db-public-site-status.js';
+import dbExpertFeedbackCountHandler from '../api/db/db-expert-feedback-count.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -80,7 +82,7 @@ app.get("*", (req, res, next) => {
   }
   res.sendFile(path.join(__dirname, "../build", "index.html"));
 });
-
+app.get('/api/db/db-public-site-status', dbPublicSiteStatusHandler);
 app.post('/api/db/db-persist-feedback', dbPersistFeedback);
 app.post('/api/db/db-persist-interaction', dbPersistInteraction);
 app.get('/api/db/db-chat-session', dbChatSessionHandler);
@@ -100,6 +102,7 @@ app.post('/api/db/db-generate-evals', generateEvalsHandler);
 app.all('/api/db/db-database-management', dbDatabaseManagementHandler);
 app.delete('/api/db/db-delete-system-logs', dbDeleteSystemLogsHandler);
 app.all('/api/db/db-settings', dbSettingsHandler);
+app.get('/api/db/db-expert-feedback-count', dbExpertFeedbackCountHandler);
 
 app.post("/api/openai/openai-message", openAIHandler);
 app.post("/api/openai/openai-context", openAIContextAgentHandler);
@@ -126,6 +129,7 @@ app.post("/api/azure/azure-context", azureContextHandler);
 //app.get('/api/azure-batch-process-results', azureBatchProcessResultsHandler);
 
 app.post('/api/search/search-context', contextSearchHandler);
+
 
 const PORT = process.env.PORT || 3001;
 

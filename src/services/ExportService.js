@@ -187,8 +187,8 @@ class ExportService {
       );
 
       // Make sure we include the referringUrl from both the chat level and interaction level
-      const globalInfo = [chat.chatId, chat.pageLanguage, chat.aiProvider, chat.searchProvider];
-      const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService'];
+      const globalInfo = [chat.chatId, chat.pageLanguage, chat.aiProvider, chat.searchProvider, chat.user?.email || ''];
+      const globalInfoHeaders = ['chatId', 'pageLanguage', 'aiService', 'searchService','user.email'];
 
       const rowsWithGlobalInfo = filteredRows.map((row) => globalInfo.concat(row));
 
@@ -230,6 +230,7 @@ class ExportService {
     const headerOrder = [
       { dataLabel: 'uniqueID', outputLabel: 'uniqueID' },
       { dataLabel: 'chatId', outputLabel: 'chatId' },
+      { dataLabel: 'user.email', outputLabel: 'userEmail' }, // <-- Add user email as 3rd column
       { dataLabel: 'createdAt', outputLabel: 'createdAt' },
       { dataLabel: 'pageLanguage', outputLabel: 'pageLanguage' },
       { dataLabel: 'referringUrl', outputLabel: 'referringUrl' },
@@ -246,7 +247,6 @@ class ExportService {
       { dataLabel: 'answer.sentences.2', outputLabel: 'sentence3' },
       { dataLabel: 'answer.sentences.3', outputLabel: 'sentence4' },
       { dataLabel: 'expertFeedback.feedback', outputLabel: 'feedback' },
-      { dataLabel: 'expertFeedback.user.email', outputLabel: 'userEmail' },
       { dataLabel: 'expertFeedback.totalScore', outputLabel: 'expertFeedback.totalScore' },
       { dataLabel: 'expertFeedback.sentence1Score', outputLabel: 'expertFeedback.sentence1Score' },
       {

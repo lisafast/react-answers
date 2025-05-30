@@ -35,18 +35,19 @@ const createDirectAzureOpenAIClient = () => {
     if (!process.env.AZURE_OPENAI_API_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
       return null;
     }
-    const modelConfig = getModelConfig('openai');
-    const azureConfig = modelConfig.azure;
+    const modelConfig = getModelConfig('azure');
+    console.log('Creating Azure OpenAI client with model:', modelConfig.name);
     return new OpenAI({
 
       apiKey: process.env.AZURE_OPENAI_API_KEY,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
       azureOpenAIEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
-      azureOpenAIApiDeploymentName: 'openai-gpt4o-mini',
+      azureOpenAIApiDeploymentName: modelConfig.name,
 
       maxRetries: 3,
       timeout: modelConfig.timeoutMs,
     });
+    
   } catch (error) {
     console.error('Error creating Azure OpenAI client:', error);
     return null;
@@ -83,10 +84,10 @@ const createTools = (chatId = 'system') => {
 const createAzureOpenAIAgent = async (chatId = 'system') => {
   const modelConfig = getModelConfig('azure');
   const openai = new AzureChatOpenAI({
-    azureApiKey: process.env.AZURE_OPENAI_API_KEY,  // Azure API Key
-    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT, // Azure endpoint
+    azureApiKey: process.env.AZURE_OPENAI_API_KEY,  
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT, 
     apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
-    azureOpenAIApiDeploymentName: modelConfig.name, // Hardcoded deployment name
+    azureOpenAIApiDeploymentName: modelConfig.name, 
     temperature: modelConfig.temperature,
     maxTokens: modelConfig.maxTokens,
     timeout: modelConfig.timeoutMs,
@@ -131,6 +132,7 @@ const createOpenAIAgent = async (chatId = 'system') => {
     }
   });
   agent.callbacks = callbacks;
+  console.log('Creating Azure OpenAI context agent with model:', modelConfig.name);
   return agent;
 };
 
@@ -185,11 +187,12 @@ const createContextAgent = async (agentType, chatId = 'system') => {
         azureApiKey: process.env.AZURE_OPENAI_API_KEY,
         azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
         apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
-        azureOpenAIApiDeploymentName: azureConfig.name, // Hardcoded deployment name
+        azureOpenAIApiDeploymentName: azureConfig.name, 
         temperature: azureConfig.temperature,
         maxTokens: azureConfig.maxTokens,
         timeout: azureConfig.timeoutMs,
       });
+      console.log('Creating Azure OpenAI context agent with model:', azureConfig.name);
       break;
     case 'cohere':
       llm = new CohereClient({
