@@ -117,21 +117,23 @@ async function handler(req, res) {
     ServerLoggingService.info('Deployment mode', chatId, { deploymentMode });
     if (deploymentMode === 'Vercel') {
       try {
-        await EvaluationService.evaluateInteraction(dbInteraction, chatId);
-        ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
+        // Pass deploymentMode to evaluateInteraction
+        await EvaluationService.evaluateInteraction(dbInteraction, chatId, deploymentMode);
+        ServerLoggingService.info('Evaluation completed successfully (Vercel mode)', chat.chatId, {});
       } catch (evalError) {
-        ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
+        ServerLoggingService.error('Evaluation failed (Vercel mode)', chat.chatId, evalError);
       }
       res.status(200).json({ message: 'Interaction logged successfully' });
     } else {
-      // Respond immediately, then run evaluation in background
+      // CDS mode (or default)
       res.status(200).json({ message: 'Interaction logged successfully' });
-      EvaluationService.evaluateInteraction(dbInteraction, chatId)
+      // Pass deploymentMode to evaluateInteraction for background processing
+      EvaluationService.evaluateInteraction(dbInteraction, chatId, deploymentMode)
         .then(() => {
-          ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
+          ServerLoggingService.info('Evaluation completed successfully (CDS mode background)', chat.chatId, {});
         })
         .catch(evalError => {
-          ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
+          ServerLoggingService.error('Evaluation failed (CDS mode background)', chat.chatId, evalError);
         });
     }
     ServerLoggingService.info('[db-persist-interaction] End - chatId:', chatId, {});
