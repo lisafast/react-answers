@@ -233,7 +233,7 @@ class DataStoreService {
 
   static async getSiteStatus() {
     try {
-      const response = await fetch(getApiUrl('db-settings?key=siteStatus'));
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-settings?key=siteStatus')); // Use fetchWithAuth
       if (!response.ok) throw new Error('Failed to get site status');
       const data = await response.json();
       return data.value || 'unavailable';
@@ -263,7 +263,7 @@ class DataStoreService {
   // Add deployment mode setting
   static async getDeploymentMode() {
     try {
-      const response = await fetch(getApiUrl('db-settings?key=deploymentMode'));
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-settings?key=deploymentMode')); // Use fetchWithAuth
       if (!response.ok) throw new Error('Failed to get deployment mode');
       const data = await response.json();
       return data.value || 'CDS';
