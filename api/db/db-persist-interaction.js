@@ -12,8 +12,6 @@ import EvaluationService from '../../services/EvaluationService.js';
 import { Setting } from '../../models/setting.js';
 import { withOptionalUser } from '../../middleware/auth.js';
 
-
-
 async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
@@ -66,7 +64,6 @@ async function handler(req, res) {
     question.language = interaction.answer.questionLanguage;
     question.englishQuestion = interaction.answer.englishQuestion;
 
-    
     // Handle tools data with proper validation
     const toolsData = Array.isArray(interaction.answer.tools) ? interaction.answer.tools : [];
     const toolObjects = toolsData.map(toolData => new Tool({
@@ -144,4 +141,6 @@ async function handler(req, res) {
   }
 }
 
-export default withOptionalUser(handler);
+export default function handlerWithUser(req, res) {
+  return withOptionalUser(handler)(req, res);
+}
