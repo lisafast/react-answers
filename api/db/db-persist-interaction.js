@@ -10,10 +10,11 @@ import EmbeddingService from '../../services/EmbeddingService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import EvaluationService from '../../services/EvaluationService.js';
 import { Setting } from '../../models/setting.js';
+import { withOptionalUser } from '../../middleware/auth.js';
 
 
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -34,6 +35,11 @@ export default async function handler(req, res) {
     chat.searchProvider = interaction.searchProvider;
     chat.pageLanguage = interaction.pageLanguage;
     
+    // Assign user to chat if authenticated and not already set
+    if (req.user && req.user.userId && !chat.user) {
+      chat.user = req.user.userId;
+    }
+
     // Create all MongoDB document objects without saving them yet
     const dbInteraction = new Interaction();
     dbInteraction.interactionId = interaction.userMessageId;
@@ -136,3 +142,5 @@ export default async function handler(req, res) {
     res.status(500).json({ message: 'Failed to log interaction', error: error.message });
   }
 }
+
+export default withOptionalUser(handler);
