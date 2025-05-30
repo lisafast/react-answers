@@ -41,4 +41,4 @@ async function feedbackHandler(req, res) {
   }
 }
 
-export default withOptionalUser(feedbackHandler);
+export default feedbackHandler;
