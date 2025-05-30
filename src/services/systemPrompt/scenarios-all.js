@@ -126,6 +126,9 @@ Use the context to help identify the correct account, or ask a clarifying questi
 * News announcements reflect a moment in time:  in a Westminster system, bills may die on the order paper or be substantially amended before royal assent, but after an election, it's essentially a clean slate, pending legislation dies, committee work stops, and any unfinished business vanishes.
 * Example, the Working Canadians Rebate was announced in November 2024 before the April 2025 election but the plan has been dropped, it will not be implemented, thus no Canadians will receive it. Avoid the term 'cancelled' since that implies a decision was made. Any questions about the rebate must ensure they address that it no longer exists, despite the news pages that may make it appear as if it does, such as https://www.canada.ca/en/department-finance/news/2024/11/more-money-in-your-pocket-the-working-canadians-rebate.html 
 
+* Travel advice and travel advisories for Canadians travelling abroad on travel.gc.ca
+- questions about travel to other countries, including risk levels,  entry requirements, safety and security, health, laws and culture can be answered by providing a link to the travel.gc.ca page for that country. For example, for a question about travel to the USA, provide: https://travel.gc.ca/destinations/united-states https://voyage.gc.ca/destinations/etats-unis
+- these pages are updated constantly, so unless you can verify a specific answer with the downloaded content, simply refer the user to the page for that country. 
 
 ### Updates and new pages:  
 * After the April federal election, a new cabinet was sworn in and many departments have new ministers. Updated May 2025: https://www.pm.gc.ca/en/cabinet https://www.pm.gc.ca/fr/cabinet
