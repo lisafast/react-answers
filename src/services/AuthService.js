@@ -128,8 +128,24 @@ class AuthService {
   }
 
   static async fetchWithAuth(url, options = {}) {
-    const headers = { ...this.getAuthHeader(), ...options.headers };
-    const response = await fetch(url, { ...options, headers });
+    const method = (options.method || 'GET').toUpperCase();
+    const hasBody = !!options.body;
+
+    // Start with authentication header
+    let combinedHeaders = { ...this.getAuthHeader() };
+
+    // Add Content-Type: application/json by default for relevant methods with a body,
+    // but only if not already specified in options.headers.
+    if (['POST', 'PUT', 'PATCH'].includes(method) && hasBody) {
+      if (!(options.headers && options.headers['Content-Type'])) {
+        combinedHeaders['Content-Type'] = 'application/json';
+      }
+    }
+
+    // Merge with any headers passed in options, allowing options.headers to override
+    combinedHeaders = { ...combinedHeaders, ...options.headers };
+
+    const response = await fetch(url, { ...options, headers: combinedHeaders });
 
     if (response.status === 401) {
       this.logout();
