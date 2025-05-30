@@ -35,18 +35,19 @@ const createDirectAzureOpenAIClient = () => {
     if (!process.env.AZURE_OPENAI_API_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
       return null;
     }
-    const modelConfig = getModelConfig('openai');
-    const azureConfig = modelConfig.azure;
+    const modelConfig = getModelConfig('azure');
+    console.log('Creating Azure OpenAI client with model:', modelConfig.name);
     return new OpenAI({
 
       apiKey: process.env.AZURE_OPENAI_API_KEY,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
       azureOpenAIEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
-      azureOpenAIApiDeploymentName: azureConfig.name,
+      azureOpenAIApiDeploymentName: modelConfig.name,
 
       maxRetries: 3,
       timeout: modelConfig.timeoutMs,
     });
+    
   } catch (error) {
     console.error('Error creating Azure OpenAI client:', error);
     return null;
@@ -131,6 +132,7 @@ const createOpenAIAgent = async (chatId = 'system') => {
     }
   });
   agent.callbacks = callbacks;
+  console.log('Creating Azure OpenAI context agent with model:', modelConfig.name);
   return agent;
 };
 
@@ -190,6 +192,7 @@ const createContextAgent = async (agentType, chatId = 'system') => {
         maxTokens: azureConfig.maxTokens,
         timeout: azureConfig.timeoutMs,
       });
+      console.log('Creating Azure OpenAI context agent with model:', azureConfig.name);
       break;
     case 'cohere':
       llm = new CohereClient({
