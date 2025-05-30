@@ -125,7 +125,10 @@ async function handler(req, res) {
       } catch (evalError) {
         ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
       }
+      res.status(200).json({ message: 'Interaction logged successfully' });
     } else {
+      // Respond immediately, then run evaluation in background
+      res.status(200).json({ message: 'Interaction logged successfully' });
       EvaluationService.evaluateInteraction(dbInteraction, chatId)
         .then(() => {
           ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
@@ -134,8 +137,6 @@ async function handler(req, res) {
           ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
         });
     }
-
-    res.status(200).json({ message: 'Interaction logged successfully' });
     ServerLoggingService.info('[db-persist-interaction] End - chatId:', chatId, {});
   } catch (error) {
     ServerLoggingService.error('Failed to log interaction', req.body?.chatId || 'system', error);
