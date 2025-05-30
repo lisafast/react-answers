@@ -16,6 +16,13 @@ const EvalPage = () => {
   const [isRegeneratingEmbeddings] = useState(false);
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const [isEvalRequestInProgress, setIsEvalRequestInProgress] = useState(false);
+  const [expertFeedbackCount, setExpertFeedbackCount] = useState(null);
+
+  React.useEffect(() => {
+    DataStoreService.getExpertFeedbackCount()
+      .then(setExpertFeedbackCount)
+      .catch(() => setExpertFeedbackCount('Error'));
+  }, []);
 
   const handleGenerateEmbeddings = async (isAutoProcess = false, regenerateAll = false, lastId = null) => {
     if (isRequestInProgress) {
@@ -143,6 +150,11 @@ const EvalPage = () => {
 
       <div className="mb-400">
         <h2>Generate Embeddings</h2>
+        {expertFeedbackCount !== null && (
+          <GcdsText>
+            <strong>Expert Evaluations in System:</strong> {expertFeedbackCount}
+          </GcdsText>
+        )}
         <GcdsText>
           Process interactions to generate embeddings.
         </GcdsText>

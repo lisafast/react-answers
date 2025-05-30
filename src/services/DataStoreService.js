@@ -323,6 +323,18 @@ class DataStoreService {
       throw error;
     }
   }
+
+  static async getExpertFeedbackCount() {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-expert-feedback-count'));
+      if (!response.ok) throw new Error('Failed to get expert feedback count');
+      const data = await response.json();
+      return data.count;
+    } catch (error) {
+      console.error('Error getting expert feedback count:', error);
+      throw error;
+    }
+  }
 }
 
 export default DataStoreService;
