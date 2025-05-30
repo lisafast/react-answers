@@ -2,6 +2,8 @@ import dbConnect from './db-connect.js';
 import { Interaction } from '../../models/interaction.js';
 import EvaluationService from '../../services/EvaluationService.js';
 import config from '../../config/eval.js';
+import { Setting } from '../../models/setting.js';
+
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -11,7 +13,17 @@ export default async function handler(req, res) {
     try {
         const { lastProcessedId, regenerateAll } = req.body;
         const duration = 10; // Process for 30 seconds at a time
-        const result = await EvaluationService.processEvaluationsForDuration(duration, !regenerateAll, lastProcessedId);
+
+        // Get deploymentMode from settings
+        let deploymentMode = 'CDS';
+        try {
+            await dbConnect();
+            const setting = await Setting.findOne({ key: 'deploymentMode' });
+            if (setting && setting.value) deploymentMode = setting.value;
+        } catch (e) {
+            console.error('Failed to read deploymentMode setting', e);
+        }
+        const result = await EvaluationService.processEvaluationsForDuration(duration, !regenerateAll, lastProcessedId, deploymentMode);
         res.status(200).json(result);
     } catch (error) {
         console.error('Error in generate-evals:', error);
