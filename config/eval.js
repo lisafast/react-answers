@@ -15,7 +15,7 @@ const config = {
         recencyWeight: 0.1 // Weight for recency bias in favor of newer embeddings
     },
     embedBatchProcessingDuration: 10, // Duration in seconds to process interactions
-    evalBatchProcessingDuration: 400 // Duration in seconds to process evaluations (changed from 10 to 30)
+    evalBatchProcessingDuration: 200 // Duration in seconds to process evaluations (changed from 10 to 30)
 };
 
 export default config;
