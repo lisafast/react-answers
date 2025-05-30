@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     try {
         const { lastProcessedId, regenerateAll } = req.body;
-        const duration = 10; // Process for 30 seconds at a time
+        const duration = config.evalBatchProcessingDuration; // Use config value for duration
 
         // Get deploymentMode from settings
         let deploymentMode = 'CDS';
