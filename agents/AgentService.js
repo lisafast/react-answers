@@ -42,7 +42,7 @@ const createDirectAzureOpenAIClient = () => {
       apiKey: process.env.AZURE_OPENAI_API_KEY,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
       azureOpenAIEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
-      azureOpenAIApiDeploymentName: 'openai-gpt4o-mini',
+      azureOpenAIApiDeploymentName: azureConfig.name,
 
       maxRetries: 3,
       timeout: modelConfig.timeoutMs,
@@ -83,10 +83,10 @@ const createTools = (chatId = 'system') => {
 const createAzureOpenAIAgent = async (chatId = 'system') => {
   const modelConfig = getModelConfig('azure');
   const openai = new AzureChatOpenAI({
-    azureApiKey: process.env.AZURE_OPENAI_API_KEY,  // Azure API Key
-    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT, // Azure endpoint
+    azureApiKey: process.env.AZURE_OPENAI_API_KEY,  
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT, 
     apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
-    azureOpenAIApiDeploymentName: modelConfig.name, // Hardcoded deployment name
+    azureOpenAIApiDeploymentName: modelConfig.name, 
     temperature: modelConfig.temperature,
     maxTokens: modelConfig.maxTokens,
     timeout: modelConfig.timeoutMs,
@@ -185,7 +185,7 @@ const createContextAgent = async (agentType, chatId = 'system') => {
         azureApiKey: process.env.AZURE_OPENAI_API_KEY,
         azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
         apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
-        azureOpenAIApiDeploymentName: azureConfig.name, // Hardcoded deployment name
+        azureOpenAIApiDeploymentName: azureConfig.name, 
         temperature: azureConfig.temperature,
         maxTokens: azureConfig.maxTokens,
         timeout: azureConfig.timeoutMs,
