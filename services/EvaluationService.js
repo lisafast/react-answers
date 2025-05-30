@@ -12,39 +12,47 @@ import path from 'path';
 import os from 'os';
 import { fileURLToPath } from 'url';
 
+// Remove isActuallyOnVercel and only use deploymentMode
+let pool;
+let directWorkerFn;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const numCPUs = os.cpus().length;
-const pool = new Piscina({
+
+// Always initialize both, but only use one depending on deploymentMode
+pool = new Piscina({
   filename: path.resolve(__dirname, 'evaluation.worker.js'),
   minThreads: 1,
   maxThreads: Math.max(1, numCPUs > 1 ? numCPUs - 1 : 1),
 });
+// directWorkerFn will be loaded as needed
 
 class EvaluationService {
-    async evaluateInteraction(interaction, chatId) {
+    async evaluateInteraction(interaction, chatId, deploymentMode) {
         if (!interaction || !interaction._id) {
             ServerLoggingService.error('Invalid interaction object passed to evaluateInteraction', chatId, 
                 { hasInteraction: !!interaction, hasId: !!interaction?._id });
-            // Return a rejected promise or throw an error for consistency, as the method is async.
-            // Throwing is fine as it will result in a rejected promise.
             throw new Error('Invalid interaction object'); 
         }
         const interactionIdStr = interaction._id.toString();
         try {
-            ServerLoggingService.debug('Dispatching evaluation task to worker', chatId, { interactionId: interactionIdStr });
-            // Return the promise from pool.run() directly.
-            // The caller (e.g., processEvaluationsForDuration) will await this promise
-            // and handle its resolution or rejection.
-            return pool.run({ interactionId: interactionIdStr, chatId });
+            if (deploymentMode === 'CDS') {
+                // Use Piscina worker pool for background processing
+                return pool.run({ interactionId: interactionIdStr, chatId });
+            } else {
+                // For 'Vercel' or any other mode, run worker function directly
+                if (!directWorkerFn) {
+                    // Use dynamic import instead of require
+                    const imported = await import('./evaluation.worker.js');
+                    directWorkerFn = imported.default || imported;
+                }
+                return directWorkerFn({ interactionId: interactionIdStr, chatId });
+            }
         } catch (error) {
-            // This catch block will only handle synchronous errors from pool.run() itself (e.g., pool closed).
-            // Errors during worker execution will cause the promise returned by pool.run() to reject.
-            ServerLoggingService.error('Error synchronously dispatching task to evaluation worker', chatId, { 
+            ServerLoggingService.error('Error during interaction evaluation dispatch', chatId, { 
                 interactionId: interactionIdStr, 
-                errorMessage: error.message,
+                errorMessage: error.message
             });
-            // Re-throw the error so the caller's await will reject.
             throw error;
         }
     }
@@ -90,7 +98,7 @@ class EvaluationService {
      * Process interactions for evaluation for a specified duration.
      * This method will now call the worker-offloaded `evaluateInteraction`.
      */
-    async processEvaluationsForDuration(duration, skipExisting = true, lastProcessedId = null) {
+    async processEvaluationsForDuration(duration, skipExisting = true, lastProcessedId = null, deploymentMode = 'CDS') {
         const startTime = Date.now();
         let lastId = lastProcessedId;
 
@@ -155,7 +163,7 @@ class EvaluationService {
                 }
                 const chats = await Chat.find({ interactions: interaction._id });
                 const chatId = chats.length > 0 ? chats[0].chatId : null;
-                await this.evaluateInteraction(interaction, chatId);
+                await this.evaluateInteraction(interaction, chatId, deploymentMode);
                 lastId = interaction._id.toString();
             }
 

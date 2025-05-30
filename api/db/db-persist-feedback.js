@@ -26,10 +26,6 @@ async function feedbackHandler(req, res) {
     const feedbackFields = {
       ...feedback
     };
-    // Attach user if authenticated (for expert feedback only)
-    if (req.user && req.user.userId && feedback.type === 'expert') {
-      feedbackFields.user = req.user.userId;
-    }
     existingInteraction.expertFeedback = expertFeedback._id;
     Object.assign(expertFeedback, feedbackFields);
     
@@ -45,4 +41,4 @@ async function feedbackHandler(req, res) {
   }
 }
 
-export default withOptionalUser(feedbackHandler);
+export default feedbackHandler;

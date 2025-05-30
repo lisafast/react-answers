@@ -10,10 +10,9 @@ import EmbeddingService from '../../services/EmbeddingService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import EvaluationService from '../../services/EvaluationService.js';
 import { Setting } from '../../models/setting.js';
+import { withOptionalUser } from '../../middleware/auth.js';
 
-
-
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -34,6 +33,11 @@ export default async function handler(req, res) {
     chat.searchProvider = interaction.searchProvider;
     chat.pageLanguage = interaction.pageLanguage;
     
+    // Assign user to chat if authenticated and not already set
+    if (req.user && req.user.userId && !chat.user) {
+      chat.user = req.user.userId;
+    }
+
     // Create all MongoDB document objects without saving them yet
     const dbInteraction = new Interaction();
     dbInteraction.interactionId = interaction.userMessageId;
@@ -60,7 +64,6 @@ export default async function handler(req, res) {
     question.language = interaction.answer.questionLanguage;
     question.englishQuestion = interaction.answer.englishQuestion;
 
-    
     // Handle tools data with proper validation
     const toolsData = Array.isArray(interaction.answer.tools) ? interaction.answer.tools : [];
     const toolObjects = toolsData.map(toolData => new Tool({
@@ -114,25 +117,32 @@ export default async function handler(req, res) {
     ServerLoggingService.info('Deployment mode', chatId, { deploymentMode });
     if (deploymentMode === 'Vercel') {
       try {
-        await EvaluationService.evaluateInteraction(dbInteraction, chatId);
-        ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
+        // Pass deploymentMode to evaluateInteraction
+        await EvaluationService.evaluateInteraction(dbInteraction, chatId, deploymentMode);
+        ServerLoggingService.info('Evaluation completed successfully (Vercel mode)', chat.chatId, {});
       } catch (evalError) {
-        ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
+        ServerLoggingService.error('Evaluation failed (Vercel mode)', chat.chatId, evalError);
       }
+      res.status(200).json({ message: 'Interaction logged successfully' });
     } else {
-      EvaluationService.evaluateInteraction(dbInteraction, chatId)
+      // CDS mode (or default)
+      res.status(200).json({ message: 'Interaction logged successfully' });
+      // Pass deploymentMode to evaluateInteraction for background processing
+      EvaluationService.evaluateInteraction(dbInteraction, chatId, deploymentMode)
         .then(() => {
-          ServerLoggingService.info('Evaluation completed successfully', chat.chatId, {});
+          ServerLoggingService.info('Evaluation completed successfully (CDS mode background)', chat.chatId, {});
         })
         .catch(evalError => {
-          ServerLoggingService.error('Evaluation failed', chat.chatId, evalError);
+          ServerLoggingService.error('Evaluation failed (CDS mode background)', chat.chatId, evalError);
         });
     }
-
-    res.status(200).json({ message: 'Interaction logged successfully' });
     ServerLoggingService.info('[db-persist-interaction] End - chatId:', chatId, {});
   } catch (error) {
     ServerLoggingService.error('Failed to log interaction', req.body?.chatId || 'system', error);
     res.status(500).json({ message: 'Failed to log interaction', error: error.message });
   }
+}
+
+export default function handlerWithUser(req, res) {
+  return withOptionalUser(handler)(req, res);
 }

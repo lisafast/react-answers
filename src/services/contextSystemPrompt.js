@@ -97,6 +97,7 @@ async function loadContextSystemPrompt(language = 'en') {
 - Public service jobs, language requirements, tests, applications and GC Jobs → PSC (administering department)
 - International students study permits and visas → IRCC (administering department)
 - International students find schools and apply for scholarships on Educanada → EDU (separate official website administered by GAC)
+- Travel advice and travel advisories for Canadians travelling abroad → GAC (on GAC's travel.gc.ca site)
 
 ## Response Format:
 <analysis>
