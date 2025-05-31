@@ -7,6 +7,7 @@ import dbConnect from './db-connect.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 import mongoose from 'mongoose';
 import fs from 'fs';
+import crypto from 'crypto'; // Import crypto for generating UUIDs
 
 async function databaseManagementHandler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) {
@@ -46,7 +47,11 @@ async function databaseManagementHandler(req, res) {
         if (endDate) dateFilter[dateField].$lte = new Date(endDate);
       }
       // Paginated export for a single collection with optional date filter
-      const docs = await model.find(dateFilter).skip(Number(skip)).limit(Number(limit)).lean();
+      const docs = await model.find(dateFilter)
+        .sort({ _id: 1 }) // Ensure consistent ordering between chunks
+        .skip(Number(skip))
+        .limit(Number(limit))
+        .lean();
       const total = await model.countDocuments(dateFilter);
       return res.status(200).json({
         collection,
@@ -57,36 +62,60 @@ async function databaseManagementHandler(req, res) {
       });
     } else if (req.method === 'POST') {
       // Only support chunked upload
-      const { chunkIndex, totalChunks, fileName } = req.body;
+      const { chunkIndex, totalChunks, fileName, uploadId: clientUploadId } = req.body; // Expect uploadId from client for subsequent chunks
       const chunk = req.files?.chunk;
 
       if (chunk && chunkIndex !== undefined && totalChunks !== undefined && fileName) {
+        let uploadId = clientUploadId;
+        if (parseInt(chunkIndex) === 0 && !clientUploadId) {
+          uploadId = crypto.randomUUID(); // Generate a new uploadId for the first chunk
+        } else if (parseInt(chunkIndex) > 0 && !clientUploadId) {
+          return res.status(400).json({ message: 'Missing uploadId for subsequent chunks.' });
+        }
+        if (!uploadId) { // Should not happen if logic above is correct
+            return res.status(400).json({ message: 'Upload ID is missing or could not be established.' });
+        }
+
         // Buffer to hold incomplete lines between chunks
         if (!global._jsonlImportBuffers) global._jsonlImportBuffers = {};
         if (!global._jsonlImportStats) global._jsonlImportStats = {};
-        const bufferKey = `${fileName}`;
+        
+        const bufferKey = uploadId; // Use uploadId as the key
         let buffer = global._jsonlImportBuffers[bufferKey] || '';
         let stats = global._jsonlImportStats[bufferKey] || { inserted: 0, failed: 0 };
+        
         buffer += chunk.data.toString();
-        const lines = buffer.split(/\r?\n/);
-        // If this is not the last chunk, keep the last (possibly incomplete) line in buffer
+        const lines = buffer.split(/\\r?\\n/);
+        
         if (parseInt(chunkIndex) + 1 < parseInt(totalChunks)) {
           buffer = lines.pop();
         } else {
-          // On the last chunk, process all lines including the last one
           buffer = '';
         }
+
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
             const { collection, doc } = JSON.parse(line);
             const model = collections[collection.toLowerCase()];
             if (model && doc) {
-              await model.create(doc);
+              // Use findOneAndUpdate with upsert instead of create
+              // This ensures we don't create duplicates and properly handle existing IDs
+              const docId = doc._id;
+              if (docId) {
+                await model.findOneAndUpdate(
+                  { _id: docId },
+                  doc,
+                  { upsert: true, new: true, overwrite: true }
+                );
+              } else {
+                await model.create(doc);
+              }
               stats.inserted++;
             }
           } catch (err) {
             stats.failed++;
+            console.error('Import error:', err.message);
           }
         }
         // On the last chunk, if buffer is not empty, try to process it as a line
@@ -104,14 +133,21 @@ async function databaseManagementHandler(req, res) {
         }
         global._jsonlImportBuffers[bufferKey] = buffer;
         global._jsonlImportStats[bufferKey] = stats;
-        // If last chunk, clean up and return stats
+        
+        const responsePayload = { 
+            message: `Chunk ${parseInt(chunkIndex) + 1} uploaded and processed`,
+            uploadId: uploadId // Always return uploadId
+        };
+
         if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
           delete global._jsonlImportBuffers[bufferKey];
           const finalStats = global._jsonlImportStats[bufferKey];
           delete global._jsonlImportStats[bufferKey];
-          return res.status(200).json({ message: 'Database imported successfully (JSONL streaming)', stats: finalStats });
+          responsePayload.message = 'Database imported successfully (JSONL streaming)';
+          responsePayload.stats = finalStats;
+          return res.status(200).json(responsePayload);
         }
-        return res.status(200).json({ message: `Chunk ${parseInt(chunkIndex) + 1} uploaded and processed` });
+        return res.status(200).json(responsePayload);
       }
       // If not chunked upload, return error
       return res.status(400).json({ message: 'Chunked upload required. Missing chunk, chunkIndex, totalChunks, or fileName.' });

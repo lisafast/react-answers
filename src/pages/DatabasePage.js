@@ -136,9 +136,9 @@ const DatabasePage = ({ lang }) => {
       setIsImporting(true);
       setMessage('');
 
-      const chunkSize = 5 * 1024 * 1024; // 5MB per chunk
-      const totalChunks = Math.ceil(file.size / chunkSize);
+      const chunkSize = 5 * 1024 * 1024;      const totalChunks = Math.ceil(file.size / chunkSize);
       const fileName = file.name;
+      let uploadId = null; // Variable to store the uploadId received from the server
 
       for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
         const start = chunkIndex * chunkSize;
@@ -150,6 +150,9 @@ const DatabasePage = ({ lang }) => {
         formData.append('chunkIndex', chunkIndex);
         formData.append('totalChunks', totalChunks);
         formData.append('fileName', fileName);
+        if (uploadId) { // Send uploadId for subsequent chunks
+          formData.append('uploadId', uploadId);
+        }
 
         const response = await fetch(getApiUrl('db-database-management'), {
           method: 'POST',
@@ -159,10 +162,15 @@ const DatabasePage = ({ lang }) => {
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.message || `Failed to upload chunk ${chunkIndex + 1}`);
+          throw new Error(error.message || 'Failed to upload chunk');
         }
 
-        setMessage(`Uploaded chunk ${chunkIndex + 1} of ${totalChunks}`);
+        const result = await response.json();
+        if (result.uploadId && !uploadId) { // Store uploadId from the first chunk response
+          uploadId = result.uploadId;
+        }
+        // Update message with progress, potentially using result.message
+        setMessage(result.message || `Chunk ${chunkIndex + 1}/${totalChunks} processed`); 
       }
 
       setMessage('Database imported successfully');
