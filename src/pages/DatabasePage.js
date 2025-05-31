@@ -132,49 +132,69 @@ const DatabasePage = ({ lang }) => {
       return;
     }
 
-    try {
-      setIsImporting(true);
-      setMessage('');
+    setIsImporting(true);
+    setMessage('Starting import...');
+    let lineBuffer = '';
+    let accumulatedStats = { inserted: 0, failed: 0 };
 
-      const chunkSize = 5 * 1024 * 1024;      const totalChunks = Math.ceil(file.size / chunkSize);
+    try {
+      const chunkSize = 5 * 1024 * 1024; // 5MB chunks
+      const totalChunks = Math.ceil(file.size / chunkSize);
       const fileName = file.name;
-      let uploadId = null; // Variable to store the uploadId received from the server
 
       for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
         const start = chunkIndex * chunkSize;
         const end = Math.min(start + chunkSize, file.size);
-        const chunk = file.slice(start, end);
+        const chunkBlob = file.slice(start, end);
+        const chunkText = await chunkBlob.text();
 
-        const formData = new FormData();
-        formData.append('chunk', chunk);
-        formData.append('chunkIndex', chunkIndex);
-        formData.append('totalChunks', totalChunks);
-        formData.append('fileName', fileName);
-        if (uploadId) { // Send uploadId for subsequent chunks
-          formData.append('uploadId', uploadId);
+        let textToProcess = lineBuffer + chunkText;
+        let lines = textToProcess.split(/\r?\n/);
+
+        if (chunkIndex < totalChunks - 1) {
+          lineBuffer = lines.pop() || '';
+        } else {
+          lineBuffer = ''; // No more buffering after the last chunk
         }
 
-        const response = await fetch(getApiUrl('db-database-management'), {
-          method: 'POST',
-          headers: AuthService.getAuthHeader(),
-          body: formData,
-        });
+        const completeLines = lines.filter(line => line.trim().startsWith('{'));
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Failed to upload chunk');
-        }
+        if (completeLines.length > 0) {
+          const dataToSend = completeLines.join('\n');
+          const formData = new FormData();
+          formData.append('chunk', new Blob([dataToSend], { type: 'text/plain' }), fileName);
+          formData.append('chunkIndex', chunkIndex.toString());
+          formData.append('totalChunks', totalChunks.toString());
+          formData.append('fileName', fileName);
 
-        const result = await response.json();
-        if (result.uploadId && !uploadId) { // Store uploadId from the first chunk response
-          uploadId = result.uploadId;
+          setMessage(`Uploading chunk ${chunkIndex + 1} of ${totalChunks}...`);
+
+          const response = await fetch(getApiUrl('db-database-management'), {
+            method: 'POST',
+            headers: AuthService.getAuthHeader(), // Assuming AuthService is available
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorResult = await response.json();
+            throw new Error(`Server error on chunk ${chunkIndex + 1}: ${errorResult.message || response.statusText}`);
+          }
+
+          const result = await response.json();
+          if (result.stats) {
+            accumulatedStats.inserted += result.stats.inserted;
+            accumulatedStats.failed += result.stats.failed;
+          }
+          setMessage(`Processed chunk ${chunkIndex + 1} of ${totalChunks}. Current totals - Inserted: ${accumulatedStats.inserted}, Failed: ${accumulatedStats.failed}`);
+        } else if (chunkIndex === totalChunks - 1 && completeLines.length === 0) {
+          setMessage(`Finalizing import... Processed chunk ${chunkIndex + 1} of ${totalChunks}. No new lines in the final segment.`);
         }
-        // Update message with progress, potentially using result.message
-        setMessage(result.message || `Chunk ${chunkIndex + 1}/${totalChunks} processed`); 
       }
 
-      setMessage('Database imported successfully');
-      fileInputRef.current.value = '';
+      setMessage(`Database import completed. Total Inserted: ${accumulatedStats.inserted}, Total Failed: ${accumulatedStats.failed}`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''; // Reset file input
+      }
     } catch (error) {
       setMessage(`Import failed: ${error.message}`);
       console.error('Import error:', error);
