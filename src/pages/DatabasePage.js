@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { getApiUrl } from '../utils/apiToUrl.js';
-import { GcdsContainer, GcdsText, GcdsButton } from '@cdssnc/gcds-components-react';
+import { GcdsContainer, GcdsHeading, GcdsText, GcdsButton } from '@cdssnc/gcds-components-react';
 import AuthService from '../services/AuthService.js';
+import DataStoreService from '../services/DataStoreService.js';
 import streamSaver from 'streamsaver';
 
 const DatabasePage = ({ lang }) => {
@@ -12,7 +13,24 @@ const DatabasePage = ({ lang }) => {
   const [message, setMessage] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [tableCounts, setTableCounts] = useState(null);
+  const [countsError, setCountsError] = useState('');
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchCounts() {
+      setCountsError('');
+      try {
+        const counts = await DataStoreService.getTableCounts();
+        if (isMounted) setTableCounts(counts);
+      } catch (e) {
+        if (isMounted) setCountsError(e.message);
+      }
+    }
+    fetchCounts();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleExport = async () => {
     try {
@@ -229,7 +247,32 @@ const DatabasePage = ({ lang }) => {
 
   return (
     <GcdsContainer  size="xl" centered>
-      <GcdsText tag="h2">Database Management</GcdsText>
+      <GcdsHeading tag="h1">Database Management</GcdsHeading>
+      {/* Table counts display */}
+      <div style={{ marginBottom: 24 }}>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Table Record Counts' : 'Nombre d\'enregistrements par table'}</GcdsHeading>
+        {countsError && <div style={{ color: 'red' }}>{countsError}</div>}
+        {tableCounts ? (
+          <table style={{ margin: '12px 0', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', paddingRight: 16 }}>{lang === 'en' ? 'Table' : 'Table'}</th>
+                <th style={{ textAlign: 'right' }}>{lang === 'en' ? 'Count' : 'Nombre'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(tableCounts).map(([table, count]) => (
+                <tr key={table}>
+                  <td style={{ paddingRight: 16 }}>{table}</td>
+                  <td style={{ textAlign: 'right' }}>{count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          !countsError && <div>{lang === 'en' ? 'Loading table counts...' : 'Chargement...'}</div>
+        )}
+      </div>
       <div style={{ marginBottom: 16 }}>
         <label>Start date:&nbsp;
           <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
@@ -243,7 +286,7 @@ const DatabasePage = ({ lang }) => {
         {isExporting ? 'Exporting...' : 'Export Database'}
       </GcdsButton>
       <div className="mb-400">
-        <h2>{lang === 'en' ? 'Import Database' : 'Importer la base de données'}</h2>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Import Database' : 'Importer la base de données'}</GcdsHeading>
         <GcdsText>
           {lang === 'en'
             ? 'Restore the database from a backup file. Warning: This will replace all existing data.'
@@ -270,7 +313,7 @@ const DatabasePage = ({ lang }) => {
       </div>
 
       <div className="mb-400">
-        <h2>{lang === 'en' ? 'Drop All Indexes' : 'Supprimer tous les index'}</h2>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Drop All Indexes' : 'Supprimer tous les index'}</GcdsHeading>
         <GcdsText>
           {lang === 'en'
             ? 'Remove all database indexes. This can be useful to fix database performance issues. Indexes will be automatically rebuilt by MongoDB as needed.'
@@ -289,7 +332,7 @@ const DatabasePage = ({ lang }) => {
       </div>
 
       <div className="mb-400">
-        <h2>{lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système'}</h2>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système'}</GcdsHeading>
         <GcdsText>
           {lang === 'en'
             ? 'Delete all logs where chatId = "system". This action cannot be undone.'
