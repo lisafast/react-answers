@@ -335,6 +335,21 @@ class DataStoreService {
       throw error;
     }
   }
+
+  static async getTableCounts() {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-table-counts'));
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to fetch table counts');
+      }
+      const data = await response.json();
+      return data.counts;
+    } catch (error) {
+      console.error('Error fetching table counts:', error);
+      throw error;
+    }
+  }
 }
 
 export default DataStoreService;

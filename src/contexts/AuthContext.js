@@ -22,7 +22,13 @@ export const AuthProvider = ({ children }) => {
     // Set up unauthorized callback
     AuthService.setUnauthorizedCallback(() => {
       setCurrentUser(null);
-      navigate('/login'); // Redirect to login on 401
+      // Determine language prefix from current location
+      let prefix = '/en';
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        if (path.startsWith('/fr')) prefix = '/fr';
+      }
+      navigate(`${prefix}/login`); // Redirect to language-specific login
     });
 
     // Cleanup on unmount
