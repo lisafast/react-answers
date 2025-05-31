@@ -41,7 +41,9 @@ async function databaseManagementHandler(req, res) {
       }
       // Build date filter if provided
       let dateFilter = {};
-      if (startDate || endDate) {
+      // Only apply date filter if the model schema has updatedAt
+      const hasUpdatedAt = model.schema && model.schema.paths && model.schema.paths.updatedAt;
+      if ((startDate || endDate) && hasUpdatedAt) {
         dateFilter[dateField] = {};
         if (startDate) dateFilter[dateField].$gte = new Date(startDate);
         if (endDate) dateFilter[dateField].$lte = new Date(endDate);
@@ -62,92 +64,35 @@ async function databaseManagementHandler(req, res) {
       });
     } else if (req.method === 'POST') {
       // Only support chunked upload
-      const { chunkIndex, totalChunks, fileName, uploadId: clientUploadId } = req.body; // Expect uploadId from client for subsequent chunks
+      const { chunkIndex, totalChunks, fileName } = req.body;
       const chunk = req.files?.chunk;
 
       if (chunk && chunkIndex !== undefined && totalChunks !== undefined && fileName) {
-        let uploadId = clientUploadId;
-        if (parseInt(chunkIndex) === 0 && !clientUploadId) {
-          uploadId = crypto.randomUUID(); // Generate a new uploadId for the first chunk
-        } else if (parseInt(chunkIndex) > 0 && !clientUploadId) {
-          return res.status(400).json({ message: 'Missing uploadId for subsequent chunks.' });
-        }
-        if (!uploadId) { // Should not happen if logic above is correct
-            return res.status(400).json({ message: 'Upload ID is missing or could not be established.' });
-        }
+        try {
+          // Assume chunk.data is a Buffer containing only complete lines (JSONL)
+          const chunkText = chunk.data.toString();
+          const lines = chunkText.split(/\r?\n/).filter(line => line.trim().startsWith('{'));
 
-        // Buffer to hold incomplete lines between chunks
-        if (!global._jsonlImportBuffers) global._jsonlImportBuffers = {};
-        if (!global._jsonlImportStats) global._jsonlImportStats = {};
-        
-        const bufferKey = uploadId; // Use uploadId as the key
-        let buffer = global._jsonlImportBuffers[bufferKey] || '';
-        let stats = global._jsonlImportStats[bufferKey] || { inserted: 0, failed: 0 };
-        
-        buffer += chunk.data.toString();
-        const lines = buffer.split(/\\r?\\n/);
-        
-        if (parseInt(chunkIndex) + 1 < parseInt(totalChunks)) {
-          buffer = lines.pop();
-        } else {
-          buffer = '';
-        }
+          // Initialize stats for this chunk
+          let stats = { inserted: 0, failed: 0 };
 
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const { collection, doc } = JSON.parse(line);
-            const model = collections[collection.toLowerCase()];
-            if (model && doc) {
-              // Use findOneAndUpdate with upsert instead of create
-              // This ensures we don't create duplicates and properly handle existing IDs
-              const docId = doc._id;
-              if (docId) {
-                await model.findOneAndUpdate(
-                  { _id: docId },
-                  doc,
-                  { upsert: true, new: true, overwrite: true }
-                );
-              } else {
-                await model.create(doc);
-              }
-              stats.inserted++;
-            }
-          } catch (err) {
-            stats.failed++;
-            console.error('Import error:', err.message);
+          // Process all complete lines in this chunk
+          await processLines(lines, collections, stats);
+
+          // If this is the last chunk, the client should have sent any remaining incomplete line as a complete line
+          const responsePayload = {
+            message: `Chunk ${parseInt(chunkIndex) + 1} of ${totalChunks} uploaded and processed`,
+            stats
+          };
+
+          if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
+            responsePayload.message = 'Database import completed.';
           }
-        }
-        // On the last chunk, if buffer is not empty, try to process it as a line
-        if (parseInt(chunkIndex) + 1 === parseInt(totalChunks) && buffer.trim()) {
-          try {
-            const { collection, doc } = JSON.parse(buffer);
-            const model = collections[collection.toLowerCase()];
-            if (model && doc) {
-              await model.create(doc);
-              stats.inserted++;
-            }
-          } catch (err) {
-            stats.failed++;
-          }
-        }
-        global._jsonlImportBuffers[bufferKey] = buffer;
-        global._jsonlImportStats[bufferKey] = stats;
-        
-        const responsePayload = { 
-            message: `Chunk ${parseInt(chunkIndex) + 1} uploaded and processed`,
-            uploadId: uploadId // Always return uploadId
-        };
-
-        if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
-          delete global._jsonlImportBuffers[bufferKey];
-          const finalStats = global._jsonlImportStats[bufferKey];
-          delete global._jsonlImportStats[bufferKey];
-          responsePayload.message = 'Database imported successfully (JSONL streaming)';
-          responsePayload.stats = finalStats;
           return res.status(200).json(responsePayload);
+        } catch (err) {
+          console.error('Error processing chunk:', err);
+          return res.status(500).json({ message: 'Error processing upload chunk', error: err.message });
         }
-        return res.status(200).json(responsePayload);
       }
       // If not chunked upload, return error
       return res.status(400).json({ message: 'Chunked upload required. Missing chunk, chunkIndex, totalChunks, or fileName.' });
@@ -183,6 +128,65 @@ async function databaseManagementHandler(req, res) {
       message: 'Database operation failed', 
       error: error.message 
     });
+  }
+}
+
+async function processLines(lines, collections, stats) {
+  // Group operations by collection for bulk processing
+  const operationsByCollection = {};
+  
+  // Prepare bulk operations
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    
+    try {
+      const { collection, doc } = JSON.parse(line);
+      const collectionName = collection.toLowerCase();
+      
+      if (!collections[collectionName]) {
+        stats.failed++;
+        continue;
+      }
+      
+      // Initialize operations array for this collection if needed
+      if (!operationsByCollection[collectionName]) {
+        operationsByCollection[collectionName] = [];
+      }
+      
+      // Add upsert operation (creates if not exists, updates if exists)
+      operationsByCollection[collectionName].push({
+        updateOne: {
+          filter: { _id: doc._id },
+          update: doc,
+          upsert: true
+        }
+      });
+      
+    } catch (err) {
+      stats.failed++;
+      console.error('Import parsing error:', err.message);
+    }
+  }
+  
+  // Execute bulk operations for each collection
+  const BATCH_SIZE = 500; // Optimal batch size for MongoDB
+  
+  for (const [collectionName, operations] of Object.entries(operationsByCollection)) {
+    const model = collections[collectionName];
+    
+    try {
+      // Process in optimized batches
+      for (let i = 0; i < operations.length; i += BATCH_SIZE) {
+        const batch = operations.slice(i, i + BATCH_SIZE);
+        const result = await model.bulkWrite(batch, { ordered: false });
+        
+        // Update stats with batch results
+        stats.inserted += (result.upsertedCount + result.modifiedCount);
+      }
+    } catch (err) {
+      stats.failed += operations.length;
+      console.error(`Bulk import error for ${collectionName}:`, err.message);
+    }
   }
 }
 
