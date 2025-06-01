@@ -1,18 +1,37 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { getApiUrl } from '../utils/apiToUrl.js';
-import { GcdsContainer, GcdsText, GcdsButton } from '@cdssnc/gcds-components-react';
+import { GcdsContainer, GcdsHeading, GcdsText, GcdsButton } from '@cdssnc/gcds-components-react';
 import AuthService from '../services/AuthService.js';
+import DataStoreService from '../services/DataStoreService.js';
 import streamSaver from 'streamsaver';
 
 const DatabasePage = ({ lang }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);
-  const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
+  const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);  const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
+  const [isRepairingTimestamps, setIsRepairingTimestamps] = useState(false);
+  const [isRepairingExpertFeedback, setIsRepairingExpertFeedback] = useState(false);
   const [message, setMessage] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [tableCounts, setTableCounts] = useState(null);
+  const [countsError, setCountsError] = useState('');
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchCounts() {
+      setCountsError('');
+      try {
+        const counts = await DataStoreService.getTableCounts();
+        if (isMounted) setTableCounts(counts);
+      } catch (e) {
+        if (isMounted) setCountsError(e.message);
+      }
+    }
+    fetchCounts();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleExport = async () => {
     try {
@@ -114,41 +133,69 @@ const DatabasePage = ({ lang }) => {
       return;
     }
 
-    try {
-      setIsImporting(true);
-      setMessage('');
+    setIsImporting(true);
+    setMessage('Starting import...');
+    let lineBuffer = '';
+    let accumulatedStats = { inserted: 0, failed: 0 };
 
-      const chunkSize = 5 * 1024 * 1024; // 5MB per chunk
+    try {
+      const chunkSize = 5 * 1024 * 1024; // 5MB chunks
       const totalChunks = Math.ceil(file.size / chunkSize);
       const fileName = file.name;
 
       for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
         const start = chunkIndex * chunkSize;
         const end = Math.min(start + chunkSize, file.size);
-        const chunk = file.slice(start, end);
+        const chunkBlob = file.slice(start, end);
+        const chunkText = await chunkBlob.text();
 
-        const formData = new FormData();
-        formData.append('chunk', chunk);
-        formData.append('chunkIndex', chunkIndex);
-        formData.append('totalChunks', totalChunks);
-        formData.append('fileName', fileName);
+        let textToProcess = lineBuffer + chunkText;
+        let lines = textToProcess.split(/\r?\n/);
 
-        const response = await fetch(getApiUrl('db-database-management'), {
-          method: 'POST',
-          headers: AuthService.getAuthHeader(),
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || `Failed to upload chunk ${chunkIndex + 1}`);
+        if (chunkIndex < totalChunks - 1) {
+          lineBuffer = lines.pop() || '';
+        } else {
+          lineBuffer = ''; // No more buffering after the last chunk
         }
 
-        setMessage(`Uploaded chunk ${chunkIndex + 1} of ${totalChunks}`);
+        const completeLines = lines.filter(line => line.trim().startsWith('{'));
+
+        if (completeLines.length > 0) {
+          const dataToSend = completeLines.join('\n');
+          const formData = new FormData();
+          formData.append('chunk', new Blob([dataToSend], { type: 'text/plain' }), fileName);
+          formData.append('chunkIndex', chunkIndex.toString());
+          formData.append('totalChunks', totalChunks.toString());
+          formData.append('fileName', fileName);
+
+          setMessage(`Uploading chunk ${chunkIndex + 1} of ${totalChunks}...`);
+
+          const response = await fetch(getApiUrl('db-database-management'), {
+            method: 'POST',
+            headers: AuthService.getAuthHeader(), // Assuming AuthService is available
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorResult = await response.json();
+            throw new Error(`Server error on chunk ${chunkIndex + 1}: ${errorResult.message || response.statusText}`);
+          }
+
+          const result = await response.json();
+          if (result.stats) {
+            accumulatedStats.inserted += result.stats.inserted;
+            accumulatedStats.failed += result.stats.failed;
+          }
+          setMessage(`Processed chunk ${chunkIndex + 1} of ${totalChunks}. Current totals - Inserted: ${accumulatedStats.inserted}, Failed: ${accumulatedStats.failed}`);
+        } else if (chunkIndex === totalChunks - 1 && completeLines.length === 0) {
+          setMessage(`Finalizing import... Processed chunk ${chunkIndex + 1} of ${totalChunks}. No new lines in the final segment.`);
+        }
       }
 
-      setMessage('Database imported successfully');
-      fileInputRef.current.value = '';
+      setMessage(`Database import completed. Total Inserted: ${accumulatedStats.inserted}, Total Failed: ${accumulatedStats.failed}`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''; // Reset file input
+      }
     } catch (error) {
       setMessage(`Import failed: ${error.message}`);
       console.error('Import error:', error);
@@ -221,15 +268,93 @@ const DatabasePage = ({ lang }) => {
         lang === 'en'
           ? `Delete system logs failed: ${error.message}`
           : `Échec de la suppression des journaux système: ${error.message}`
+      );    } finally {
+      setIsDeletingSystemLogs(false);
+    }
+  };
+
+  const handleRepairTimestamps = async () => {    if (!window.confirm(
+      lang === 'en'
+        ? 'This will add updatedAt timestamps to existing tool records without them. Are you sure you want to continue?'
+        : 'Cela ajoutera des horodatages updatedAt aux enregistrements d\'outils existants qui n\'en ont pas. Êtes-vous sûr de vouloir continuer?'
+    )) return;
+    
+    setIsRepairingTimestamps(true);
+    setMessage('');
+    
+    try {      const result = await DataStoreService.repairTimestamps();
+      setMessage(
+        lang === 'en'
+          ? `Tool timestamps repaired successfully. Tools: ${result.stats.tools.updated}/${result.stats.tools.total}`
+          : `Horodatages des outils réparés avec succès. Outils: ${result.stats.tools.updated}/${result.stats.tools.total}`
+      );
+    } catch (error) {
+      setMessage(
+        lang === 'en'
+          ? `Repair timestamps failed: ${error.message}`
+          : `Échec de la réparation des horodatages: ${error.message}`
       );
     } finally {
-      setIsDeletingSystemLogs(false);
+      setIsRepairingTimestamps(false);
+    }
+  };
+
+  const handleRepairExpertFeedback = async () => {
+    if (!window.confirm(
+      lang === 'en'
+        ? 'This will set the "type" field to "expert" for expert feedback records that have missing or empty type fields. Records with "public" or "ai" types will be left unchanged. Are you sure you want to continue?'
+        : 'Cela définira le champ "type" sur "expert" pour les enregistrements de commentaires d\'experts qui ont des champs de type manquants ou vides. Les enregistrements avec les types "public" ou "ai" resteront inchangés. Êtes-vous sûr de vouloir continuer?'
+    )) return;
+    
+    setIsRepairingExpertFeedback(true);
+    setMessage('');
+    
+    try {
+      const result = await DataStoreService.repairExpertFeedback();
+      setMessage(
+        lang === 'en'
+          ? `Expert feedback types repaired successfully. Updated: ${result.stats.expertFeedback.updated}/${result.stats.expertFeedback.total} (${result.stats.expertFeedback.alreadyCorrect} already correct)`
+          : `Types de commentaires d'experts réparés avec succès. Mis à jour: ${result.stats.expertFeedback.updated}/${result.stats.expertFeedback.total} (${result.stats.expertFeedback.alreadyCorrect} déjà corrects)`
+      );
+    } catch (error) {
+      setMessage(
+        lang === 'en'
+          ? `Repair expert feedback failed: ${error.message}`
+          : `Échec de la réparation des commentaires d'experts: ${error.message}`
+      );
+    } finally {
+      setIsRepairingExpertFeedback(false);
     }
   };
 
   return (
     <GcdsContainer  size="xl" centered>
-      <GcdsText tag="h2">Database Management</GcdsText>
+      <GcdsHeading tag="h1">Database Management</GcdsHeading>
+      {/* Table counts display */}
+      <div style={{ marginBottom: 24 }}>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Table Record Counts' : 'Nombre d\'enregistrements par table'}</GcdsHeading>
+        {countsError && <div style={{ color: 'red' }}>{countsError}</div>}
+        {tableCounts ? (
+          <table style={{ margin: '12px 0', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', paddingRight: 16 }}>{lang === 'en' ? 'Table' : 'Table'}</th>
+                <th style={{ textAlign: 'right' }}>{lang === 'en' ? 'Count' : 'Nombre'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(tableCounts).map(([table, count]) => (
+                <tr key={table}>
+                  <td style={{ paddingRight: 16 }}>{table}</td>
+                  <td style={{ textAlign: 'right' }}>{count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          !countsError && <div>{lang === 'en' ? 'Loading table counts...' : 'Chargement...'}</div>
+        )}
+      </div>
       <div style={{ marginBottom: 16 }}>
         <label>Start date:&nbsp;
           <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
@@ -243,7 +368,7 @@ const DatabasePage = ({ lang }) => {
         {isExporting ? 'Exporting...' : 'Export Database'}
       </GcdsButton>
       <div className="mb-400">
-        <h2>{lang === 'en' ? 'Import Database' : 'Importer la base de données'}</h2>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Import Database' : 'Importer la base de données'}</GcdsHeading>
         <GcdsText>
           {lang === 'en'
             ? 'Restore the database from a backup file. Warning: This will replace all existing data.'
@@ -270,7 +395,7 @@ const DatabasePage = ({ lang }) => {
       </div>
 
       <div className="mb-400">
-        <h2>{lang === 'en' ? 'Drop All Indexes' : 'Supprimer tous les index'}</h2>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Drop All Indexes' : 'Supprimer tous les index'}</GcdsHeading>
         <GcdsText>
           {lang === 'en'
             ? 'Remove all database indexes. This can be useful to fix database performance issues. Indexes will be automatically rebuilt by MongoDB as needed.'
@@ -289,7 +414,7 @@ const DatabasePage = ({ lang }) => {
       </div>
 
       <div className="mb-400">
-        <h2>{lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système'}</h2>
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système'}</GcdsHeading>
         <GcdsText>
           {lang === 'en'
             ? 'Delete all logs where chatId = "system". This action cannot be undone.'
@@ -303,7 +428,42 @@ const DatabasePage = ({ lang }) => {
         >
           {isDeletingSystemLogs
             ? (lang === 'en' ? 'Deleting...' : 'Suppression...')
-            : (lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système')}
+            : (lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système')}        </GcdsButton>
+      </div>
+
+      <div className="mb-400">        <GcdsHeading tag="h2">{lang === 'en' ? 'Repair Tool Timestamps' : 'Réparer les horodatages des outils'}</GcdsHeading>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Add updatedAt timestamps to existing tool records without them. This will use the createdAt date if available, or the current date as fallback.'
+            : 'Ajouter des horodatages updatedAt aux enregistrements d\'outils existants qui n\'en ont pas. Cela utilisera la date createdAt si disponible, ou la date actuelle comme solution de rechange.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={handleRepairTimestamps}
+          disabled={isRepairingTimestamps}
+          variant="secondary"
+          className="mb-200"
+        >          {isRepairingTimestamps
+            ? (lang === 'en' ? 'Repairing...' : 'Réparation...')
+            : (lang === 'en' ? 'Repair Tool Timestamps' : 'Réparer les horodatages des outils')}
+        </GcdsButton>
+      </div>
+
+      <div className="mb-400">
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Repair Expert Feedback Types' : 'Réparer les types de commentaires d\'experts'}</GcdsHeading>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Set the "type" field to "expert" for expert feedback records that have missing or empty type fields. Records with "public" or "ai" types will be left unchanged.'
+            : 'Définir le champ "type" sur "expert" pour les enregistrements de commentaires d\'experts qui ont des champs de type manquants ou vides. Les enregistrements avec les types "public" ou "ai" resteront inchangés.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={handleRepairExpertFeedback}
+          disabled={isRepairingExpertFeedback}
+          variant="secondary"
+          className="mb-200"
+        >
+          {isRepairingExpertFeedback
+            ? (lang === 'en' ? 'Repairing...' : 'Réparation...')
+            : (lang === 'en' ? 'Repair Expert Feedback Types' : 'Réparer les types de commentaires d\'experts')}
         </GcdsButton>
       </div>
 

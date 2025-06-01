@@ -7,6 +7,7 @@ import dbConnect from './db-connect.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 import mongoose from 'mongoose';
 import fs from 'fs';
+import crypto from 'crypto'; // Import crypto for generating UUIDs
 
 async function databaseManagementHandler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) {
@@ -40,13 +41,19 @@ async function databaseManagementHandler(req, res) {
       }
       // Build date filter if provided
       let dateFilter = {};
-      if (startDate || endDate) {
+      // Only apply date filter if the model schema has updatedAt
+      const hasUpdatedAt = model.schema && model.schema.paths && model.schema.paths.updatedAt;
+      if ((startDate || endDate) && hasUpdatedAt) {
         dateFilter[dateField] = {};
         if (startDate) dateFilter[dateField].$gte = new Date(startDate);
         if (endDate) dateFilter[dateField].$lte = new Date(endDate);
       }
       // Paginated export for a single collection with optional date filter
-      const docs = await model.find(dateFilter).skip(Number(skip)).limit(Number(limit)).lean();
+      const docs = await model.find(dateFilter)
+        .sort({ _id: 1 }) // Ensure consistent ordering between chunks
+        .skip(Number(skip))
+        .limit(Number(limit))
+        .lean();
       const total = await model.countDocuments(dateFilter);
       return res.status(200).json({
         collection,
@@ -61,57 +68,31 @@ async function databaseManagementHandler(req, res) {
       const chunk = req.files?.chunk;
 
       if (chunk && chunkIndex !== undefined && totalChunks !== undefined && fileName) {
-        // Buffer to hold incomplete lines between chunks
-        if (!global._jsonlImportBuffers) global._jsonlImportBuffers = {};
-        if (!global._jsonlImportStats) global._jsonlImportStats = {};
-        const bufferKey = `${fileName}`;
-        let buffer = global._jsonlImportBuffers[bufferKey] || '';
-        let stats = global._jsonlImportStats[bufferKey] || { inserted: 0, failed: 0 };
-        buffer += chunk.data.toString();
-        const lines = buffer.split(/\r?\n/);
-        // If this is not the last chunk, keep the last (possibly incomplete) line in buffer
-        if (parseInt(chunkIndex) + 1 < parseInt(totalChunks)) {
-          buffer = lines.pop();
-        } else {
-          // On the last chunk, process all lines including the last one
-          buffer = '';
-        }
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const { collection, doc } = JSON.parse(line);
-            const model = collections[collection.toLowerCase()];
-            if (model && doc) {
-              await model.create(doc);
-              stats.inserted++;
-            }
-          } catch (err) {
-            stats.failed++;
+        try {
+          // Assume chunk.data is a Buffer containing only complete lines (JSONL)
+          const chunkText = chunk.data.toString();
+          const lines = chunkText.split(/\r?\n/).filter(line => line.trim().startsWith('{'));
+
+          // Initialize stats for this chunk
+          let stats = { inserted: 0, failed: 0 };
+
+          // Process all complete lines in this chunk
+          await processLines(lines, collections, stats);
+
+          // If this is the last chunk, the client should have sent any remaining incomplete line as a complete line
+          const responsePayload = {
+            message: `Chunk ${parseInt(chunkIndex) + 1} of ${totalChunks} uploaded and processed`,
+            stats
+          };
+
+          if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
+            responsePayload.message = 'Database import completed.';
           }
+          return res.status(200).json(responsePayload);
+        } catch (err) {
+          console.error('Error processing chunk:', err);
+          return res.status(500).json({ message: 'Error processing upload chunk', error: err.message });
         }
-        // On the last chunk, if buffer is not empty, try to process it as a line
-        if (parseInt(chunkIndex) + 1 === parseInt(totalChunks) && buffer.trim()) {
-          try {
-            const { collection, doc } = JSON.parse(buffer);
-            const model = collections[collection.toLowerCase()];
-            if (model && doc) {
-              await model.create(doc);
-              stats.inserted++;
-            }
-          } catch (err) {
-            stats.failed++;
-          }
-        }
-        global._jsonlImportBuffers[bufferKey] = buffer;
-        global._jsonlImportStats[bufferKey] = stats;
-        // If last chunk, clean up and return stats
-        if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
-          delete global._jsonlImportBuffers[bufferKey];
-          const finalStats = global._jsonlImportStats[bufferKey];
-          delete global._jsonlImportStats[bufferKey];
-          return res.status(200).json({ message: 'Database imported successfully (JSONL streaming)', stats: finalStats });
-        }
-        return res.status(200).json({ message: `Chunk ${parseInt(chunkIndex) + 1} uploaded and processed` });
       }
       // If not chunked upload, return error
       return res.status(400).json({ message: 'Chunked upload required. Missing chunk, chunkIndex, totalChunks, or fileName.' });
@@ -147,6 +128,75 @@ async function databaseManagementHandler(req, res) {
       message: 'Database operation failed', 
       error: error.message 
     });
+  }
+}
+
+async function processLines(lines, collections, stats) {
+  // Group operations by collection for bulk processing
+  const operationsByCollection = {};
+  
+  // Prepare bulk operations
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    
+    try {
+      const { collection, doc } = JSON.parse(line);
+      const collectionName = collection.toLowerCase();
+      
+      if (!collections[collectionName]) {
+        stats.failed++;
+        continue;
+      }
+      
+      // Ensure createdAt and updatedAt are Date objects if they exist as strings
+      if (doc.createdAt && typeof doc.createdAt === 'string') {
+        doc.createdAt = new Date(doc.createdAt);
+      }
+      if (doc.updatedAt && typeof doc.updatedAt === 'string') {
+        doc.updatedAt = new Date(doc.updatedAt);
+      }
+
+      // Initialize operations array for this collection if needed
+      if (!operationsByCollection[collectionName]) {
+        operationsByCollection[collectionName] = [];
+      }
+      
+      // Use $set to preserve timestamps for all collections
+      operationsByCollection[collectionName].push({
+        updateOne: {
+          filter: { _id: doc._id },
+          update: { $set: doc }, // doc now has Date objects for timestamps if they were strings
+          upsert: true
+        }
+      });
+      
+    } catch (err) {
+      stats.failed++;
+      console.error('Import parsing error:', err.message);
+    }
+  }
+  
+  // Execute bulk operations for each collection
+  const BATCH_SIZE = 500; // Optimal batch size for MongoDB
+  
+  for (const [collectionName, operations] of Object.entries(operationsByCollection)) {
+    const model = collections[collectionName];
+    
+    try {
+      // Process in optimized batches
+      for (let i = 0; i < operations.length; i += BATCH_SIZE) {
+        const batch = operations.slice(i, i + BATCH_SIZE);
+        // Disable timestamps so createdAt/updatedAt are preserved for all collections
+        const bulkOptions = { ordered: false, timestamps: false };
+        const result = await model.bulkWrite(batch, bulkOptions);
+        
+        // Update stats with batch results
+        stats.inserted += (result.upsertedCount + result.modifiedCount);
+      }
+    } catch (err) {
+      stats.failed += operations.length;
+      console.error(`Bulk import error for ${collectionName}:`, err.message);
+    }
   }
 }
 

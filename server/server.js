@@ -45,6 +45,9 @@ import dbDeleteSystemLogsHandler from '../api/db/db-delete-system-logs.js';
 import dbSettingsHandler from '../api/db/db-settings.js';
 import dbPublicSiteStatusHandler from '../api/db/db-public-site-status.js';
 import dbExpertFeedbackCountHandler from '../api/db/db-expert-feedback-count.js';
+import dbTableCountsHandler from '../api/db/db-table-counts.js';
+import dbRepairTimestampsHandler from '../api/db/db-repair-timestamps.js';
+import dbRepairExpertFeedbackHandler from '../api/db/db-repair-expert-feedback.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -103,6 +106,9 @@ app.all('/api/db/db-database-management', dbDatabaseManagementHandler);
 app.delete('/api/db/db-delete-system-logs', dbDeleteSystemLogsHandler);
 app.all('/api/db/db-settings', dbSettingsHandler);
 app.get('/api/db/db-expert-feedback-count', dbExpertFeedbackCountHandler);
+app.get('/api/db/db-table-counts', dbTableCountsHandler);
+app.post('/api/db/db-repair-timestamps', dbRepairTimestampsHandler);
+app.post('/api/db/db-repair-expert-feedback', dbRepairExpertFeedbackHandler);
 
 app.post("/api/openai/openai-message", openAIHandler);
 app.post("/api/openai/openai-context", openAIContextAgentHandler);
