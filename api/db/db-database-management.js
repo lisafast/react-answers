@@ -148,16 +148,24 @@ async function processLines(lines, collections, stats) {
         continue;
       }
       
+      // Ensure createdAt and updatedAt are Date objects if they exist as strings
+      if (doc.createdAt && typeof doc.createdAt === 'string') {
+        doc.createdAt = new Date(doc.createdAt);
+      }
+      if (doc.updatedAt && typeof doc.updatedAt === 'string') {
+        doc.updatedAt = new Date(doc.updatedAt);
+      }
+
       // Initialize operations array for this collection if needed
       if (!operationsByCollection[collectionName]) {
         operationsByCollection[collectionName] = [];
       }
       
-      // Add upsert operation (creates if not exists, updates if exists)
+      // Use $set to preserve timestamps for all collections
       operationsByCollection[collectionName].push({
         updateOne: {
           filter: { _id: doc._id },
-          update: doc,
+          update: { $set: doc }, // doc now has Date objects for timestamps if they were strings
           upsert: true
         }
       });
@@ -178,7 +186,9 @@ async function processLines(lines, collections, stats) {
       // Process in optimized batches
       for (let i = 0; i < operations.length; i += BATCH_SIZE) {
         const batch = operations.slice(i, i + BATCH_SIZE);
-        const result = await model.bulkWrite(batch, { ordered: false });
+        // Disable timestamps so createdAt/updatedAt are preserved for all collections
+        const bulkOptions = { ordered: false, timestamps: false };
+        const result = await model.bulkWrite(batch, bulkOptions);
         
         // Update stats with batch results
         stats.inserted += (result.upsertedCount + result.modifiedCount);

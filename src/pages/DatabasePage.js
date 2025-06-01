@@ -8,8 +8,9 @@ import streamSaver from 'streamsaver';
 const DatabasePage = ({ lang }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);
-  const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
+  const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);  const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
+  const [isRepairingTimestamps, setIsRepairingTimestamps] = useState(false);
+  const [isRepairingExpertFeedback, setIsRepairingExpertFeedback] = useState(false);
   const [message, setMessage] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -267,9 +268,62 @@ const DatabasePage = ({ lang }) => {
         lang === 'en'
           ? `Delete system logs failed: ${error.message}`
           : `Échec de la suppression des journaux système: ${error.message}`
+      );    } finally {
+      setIsDeletingSystemLogs(false);
+    }
+  };
+
+  const handleRepairTimestamps = async () => {    if (!window.confirm(
+      lang === 'en'
+        ? 'This will add updatedAt timestamps to existing tool records without them. Are you sure you want to continue?'
+        : 'Cela ajoutera des horodatages updatedAt aux enregistrements d\'outils existants qui n\'en ont pas. Êtes-vous sûr de vouloir continuer?'
+    )) return;
+    
+    setIsRepairingTimestamps(true);
+    setMessage('');
+    
+    try {      const result = await DataStoreService.repairTimestamps();
+      setMessage(
+        lang === 'en'
+          ? `Tool timestamps repaired successfully. Tools: ${result.stats.tools.updated}/${result.stats.tools.total}`
+          : `Horodatages des outils réparés avec succès. Outils: ${result.stats.tools.updated}/${result.stats.tools.total}`
+      );
+    } catch (error) {
+      setMessage(
+        lang === 'en'
+          ? `Repair timestamps failed: ${error.message}`
+          : `Échec de la réparation des horodatages: ${error.message}`
       );
     } finally {
-      setIsDeletingSystemLogs(false);
+      setIsRepairingTimestamps(false);
+    }
+  };
+
+  const handleRepairExpertFeedback = async () => {
+    if (!window.confirm(
+      lang === 'en'
+        ? 'This will set the "type" field to "expert" for expert feedback records that have missing or empty type fields. Records with "public" or "ai" types will be left unchanged. Are you sure you want to continue?'
+        : 'Cela définira le champ "type" sur "expert" pour les enregistrements de commentaires d\'experts qui ont des champs de type manquants ou vides. Les enregistrements avec les types "public" ou "ai" resteront inchangés. Êtes-vous sûr de vouloir continuer?'
+    )) return;
+    
+    setIsRepairingExpertFeedback(true);
+    setMessage('');
+    
+    try {
+      const result = await DataStoreService.repairExpertFeedback();
+      setMessage(
+        lang === 'en'
+          ? `Expert feedback types repaired successfully. Updated: ${result.stats.expertFeedback.updated}/${result.stats.expertFeedback.total} (${result.stats.expertFeedback.alreadyCorrect} already correct)`
+          : `Types de commentaires d'experts réparés avec succès. Mis à jour: ${result.stats.expertFeedback.updated}/${result.stats.expertFeedback.total} (${result.stats.expertFeedback.alreadyCorrect} déjà corrects)`
+      );
+    } catch (error) {
+      setMessage(
+        lang === 'en'
+          ? `Repair expert feedback failed: ${error.message}`
+          : `Échec de la réparation des commentaires d'experts: ${error.message}`
+      );
+    } finally {
+      setIsRepairingExpertFeedback(false);
     }
   };
 
@@ -374,7 +428,42 @@ const DatabasePage = ({ lang }) => {
         >
           {isDeletingSystemLogs
             ? (lang === 'en' ? 'Deleting...' : 'Suppression...')
-            : (lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système')}
+            : (lang === 'en' ? 'Delete System Logs' : 'Supprimer les journaux système')}        </GcdsButton>
+      </div>
+
+      <div className="mb-400">        <GcdsHeading tag="h2">{lang === 'en' ? 'Repair Tool Timestamps' : 'Réparer les horodatages des outils'}</GcdsHeading>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Add updatedAt timestamps to existing tool records without them. This will use the createdAt date if available, or the current date as fallback.'
+            : 'Ajouter des horodatages updatedAt aux enregistrements d\'outils existants qui n\'en ont pas. Cela utilisera la date createdAt si disponible, ou la date actuelle comme solution de rechange.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={handleRepairTimestamps}
+          disabled={isRepairingTimestamps}
+          variant="secondary"
+          className="mb-200"
+        >          {isRepairingTimestamps
+            ? (lang === 'en' ? 'Repairing...' : 'Réparation...')
+            : (lang === 'en' ? 'Repair Tool Timestamps' : 'Réparer les horodatages des outils')}
+        </GcdsButton>
+      </div>
+
+      <div className="mb-400">
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Repair Expert Feedback Types' : 'Réparer les types de commentaires d\'experts'}</GcdsHeading>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Set the "type" field to "expert" for expert feedback records that have missing or empty type fields. Records with "public" or "ai" types will be left unchanged.'
+            : 'Définir le champ "type" sur "expert" pour les enregistrements de commentaires d\'experts qui ont des champs de type manquants ou vides. Les enregistrements avec les types "public" ou "ai" resteront inchangés.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={handleRepairExpertFeedback}
+          disabled={isRepairingExpertFeedback}
+          variant="secondary"
+          className="mb-200"
+        >
+          {isRepairingExpertFeedback
+            ? (lang === 'en' ? 'Repairing...' : 'Réparation...')
+            : (lang === 'en' ? 'Repair Expert Feedback Types' : 'Réparer les types de commentaires d\'experts')}
         </GcdsButton>
       </div>
 

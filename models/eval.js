@@ -25,7 +25,9 @@ const evalSchema = new Schema({
         sentences: [{ type: Number, required: false, default: 0 }],
         citation: { type: Number, required: false, default: 0 } // Added citation similarity
     },
-    sentenceMatchTrace: [sentenceMatchTraceSchema] // Added traceability field
+    sentenceMatchTrace: [sentenceMatchTraceSchema], // Added traceability field
+    processed: { type: Boolean, required: true, default: true }, // Flag to track if interaction has been processed
+    hasMatches: { type: Boolean, required: true, default: false } // Flag to track if matches were found
 }, { 
     timestamps: true, 
     versionKey: false,

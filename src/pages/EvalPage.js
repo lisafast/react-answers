@@ -79,16 +79,23 @@ const EvalPage = () => {
         if (regenerateAll) {
           setIsRegeneratingAll(true);
         }
-      }
-
-      setEvalProgress(prev => ({ ...prev, loading: true }));
+      }      setEvalProgress(prev => ({ ...prev, loading: true }));
       const result = await DataStoreService.generateEvals({ lastProcessedId: lastId, regenerateAll });
       // Only update progress if we got a valid response
       if (typeof result.remaining === 'number') {
         setEvalProgress({
           remaining: result.remaining,
-          lastProcessedId: result.lastProcessedId
+          lastProcessedId: result.lastProcessedId,
+          processed: result.processed || 0,
+          failed: result.failed || 0,
+          duration: result.duration || 0
         });
+        
+        // Show progress message for non-auto processes
+        if (!isAutoProcess && (result.processed > 0 || result.failed > 0)) {
+          console.log(`Evaluation batch completed: ${result.processed} successful, ${result.failed} failed in ${result.duration}s`);
+        }
+        
         // Only continue processing if there are actually items remaining
         if (result.remaining > 0) {
           handleGenerateEvals(true, false, result.lastProcessedId);
@@ -96,7 +103,7 @@ const EvalPage = () => {
           setIsAutoProcessingEvals(false);
           setIsRegeneratingAll(false);
           if (!isAutoProcess) {
-            alert('All evaluations have been generated!');
+            alert(`All evaluations have been generated! Final totals: ${result.processed || 0} successful, ${result.failed || 0} failed.`);
           }
         }
       } else {
@@ -254,15 +261,20 @@ const EvalPage = () => {
             {isRegeneratingAll ? 'Regenerating All...' : 'Regenerate All Evaluations'}
           </GcdsButton>
         </div>
-        
-        {evalProgress && (
+          {evalProgress && (
           <div className="mb-200">
             <p>
-              {evalProgress.successful !== undefined && (
-                <span> • Successful: {evalProgress.successful}</span>
+              {evalProgress.processed !== undefined && (
+                <span> • Processed: {evalProgress.processed}</span>
+              )}
+              {evalProgress.failed !== undefined && (
+                <span> • Failed: {evalProgress.failed}</span>
               )}
               {evalProgress.remaining !== undefined && (
                 <span> • Remaining: {evalProgress.remaining}</span>
+              )}
+              {evalProgress.duration !== undefined && (
+                <span> • Duration: {evalProgress.duration}s</span>
               )}
               {isAutoProcessingEvals && !isRegeneratingAll && (
                 <span> • <strong>Auto-processing active</strong></span>

@@ -18,13 +18,16 @@ async function validateInteractionAndCheckExisting(interaction, chatId) {
         ServerLoggingService.warn('Invalid interaction or missing question/answer (worker)', chatId);
         return null;
     }
-    const existingEval = await Eval.findOne({ interaction: interaction._id });
-    if (existingEval) {
+    
+    // Check if the interaction already has an autoEval reference
+    const existingInteraction = await Interaction.findById(interaction._id).populate('autoEval');
+    if (existingInteraction?.autoEval) {
         ServerLoggingService.info('Evaluation already exists for interaction (worker)', chatId, {
-            evaluationId: existingEval._id
+            evaluationId: existingInteraction.autoEval._id
         });
-        return existingEval;
+        return existingInteraction.autoEval;
     }
+    
     ServerLoggingService.debug('Interaction validation successful (worker)', chatId);
     return true;
 }
@@ -332,9 +335,10 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
         feedbackId: savedFeedback._id,
         totalScore: recalculatedScore,
         citationScore: bestCitationMatch.score
-    });
-    const newEval = new Eval({
+    });    const newEval = new Eval({
         expertFeedback: savedFeedback._id,
+        processed: true,
+        hasMatches: true,
         similarityScores: {
             sentences: sentenceSimilarities,
             citation: bestCitationMatch.similarity || 0
@@ -353,7 +357,34 @@ async function createEvaluation(interaction, sentenceMatches, chatId, bestCitati
         totalScore: recalculatedScore,
         similarityScores: newEval.similarityScores,
         traceCount: sentenceTrace.length
+    });    return savedEval;
+}
+
+// Create an evaluation record to mark that an interaction has been processed but no matches were found
+async function createNoMatchEvaluation(interaction, chatId, reason) {
+    const newEval = new Eval({
+        processed: true,
+        hasMatches: false,
+        similarityScores: {
+            sentences: [],
+            citation: 0
+        },
+        sentenceMatchTrace: []
     });
+    
+    const savedEval = await newEval.save();
+    
+    await Interaction.findByIdAndUpdate(
+        interaction._id,
+        { autoEval: savedEval._id },
+        { new: true }
+    );
+    
+    ServerLoggingService.info(`Created no-match evaluation record (worker) - ${reason}`, chatId, {
+        interactionId: interaction._id.toString(),
+        evaluationId: savedEval._id
+    });
+    
     return savedEval;
 }
 
@@ -372,27 +403,38 @@ export default async function ({ interactionId, chatId }) {
         if (!interaction) {
             ServerLoggingService.warn('Interaction not found (worker)', chatId, { interactionId });
             return null;
-        }
-        const validationResult = await validateInteractionAndCheckExisting(interaction, chatId);
+        }        const validationResult = await validateInteractionAndCheckExisting(interaction, chatId);
         if (validationResult !== true) return validationResult;
         const sourceEmbedding = await getEmbeddingForInteraction(interaction);
-        if (!sourceEmbedding) return null;
+        if (!sourceEmbedding) {
+            await createNoMatchEvaluation(interaction, chatId, 'no embeddings found');
+            return null;
+        }
         const similarEmbeddings = await findSimilarEmbeddingsWithFeedback(
             sourceEmbedding,
             config.thresholds.questionAnswerSimilarity
         );
-        if (!similarEmbeddings.length) return null;
+        if (!similarEmbeddings.length) {
+            await createNoMatchEvaluation(interaction, chatId, 'no similar embeddings found');
+            return null;
+        }
         const bestAnswerMatches = findBestAnswerMatches(
             sourceEmbedding,
             similarEmbeddings,
             config.searchLimits.topAnswerMatches
         );
-        if (!bestAnswerMatches.length) return null;
+        if (!bestAnswerMatches.length) {
+            await createNoMatchEvaluation(interaction, chatId, 'no answer matches found');
+            return null;
+        }
         const bestSentenceMatches = findBestSentenceMatches(
             sourceEmbedding,
             bestAnswerMatches
         );
-        if (!bestSentenceMatches.length || bestSentenceMatches.length !== sourceEmbedding.sentenceEmbeddings.length) return null;
+        if (!bestSentenceMatches.length || bestSentenceMatches.length !== sourceEmbedding.sentenceEmbeddings.length) {
+            await createNoMatchEvaluation(interaction, chatId, 'no sentence matches found or mismatch in sentence count');
+            return null;
+        }
         const bestCitationMatch = await findBestCitationMatch(
             interaction,
             bestAnswerMatches
