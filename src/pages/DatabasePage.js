@@ -142,54 +142,73 @@ const DatabasePage = ({ lang }) => {
       const chunkSize = 2 * 1024 * 1024; 
       const totalChunks = Math.ceil(file.size / chunkSize);
       const fileName = file.name;
-
-      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-        const start = chunkIndex * chunkSize;
-        const end = Math.min(start + chunkSize, file.size);
-        const chunkBlob = file.slice(start, end);
-        const chunkText = await chunkBlob.text();
-
-        let textToProcess = lineBuffer + chunkText;
-        let lines = textToProcess.split(/\r?\n/);
-
-        if (chunkIndex < totalChunks - 1) {
-          lineBuffer = lines.pop() || '';
-        } else {
-          lineBuffer = ''; // No more buffering after the last chunk
-        }
-
-        const completeLines = lines.filter(line => line.trim().startsWith('{'));
-
-        if (completeLines.length > 0) {
-          const dataToSend = completeLines.join('\n');
-          const formData = new FormData();
-          formData.append('chunk', new Blob([dataToSend], { type: 'text/plain' }), fileName);
-          formData.append('chunkIndex', chunkIndex.toString());
-          formData.append('totalChunks', totalChunks.toString());
-          formData.append('fileName', fileName);
-
-          setMessage(`Uploading chunk ${chunkIndex + 1} of ${totalChunks}...`);
-
+      let lineBuffer = '';
+      let chunkIndex = 0;
+      let offset = 0;
+      while (offset < file.size) {
+        const end = Math.min(offset + chunkSize, file.size);
+        const fileSlice = file.slice(offset, end);
+        const chunkText = await fileSlice.text();
+        // Prepend any leftover from previous chunk
+        const text = lineBuffer + chunkText;
+        const lines = text.split(/\r?\n/);
+        // All lines except the last are complete
+        const completeLines = lines.slice(0, -1);
+        lineBuffer = lines[lines.length - 1]; // May be incomplete
+        const payload = completeLines.join('\n');
+        if (payload.trim().length > 0) {
           const response = await fetch(getApiUrl('db-database-management'), {
             method: 'POST',
-            headers: AuthService.getAuthHeader(), // Assuming AuthService is available
-            body: formData,
+            headers: {
+              ...AuthService.getAuthHeader(),
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              chunkIndex,
+              totalChunks, // This is still the total number of file chunks, not payload chunks
+              fileName,
+              chunkPayload: payload
+            }),
           });
-
           if (!response.ok) {
             const errorResult = await response.json();
             throw new Error(`Server error on chunk ${chunkIndex + 1}: ${errorResult.message || response.statusText}`);
           }
-
           const result = await response.json();
           if (result.stats) {
             accumulatedStats.inserted += result.stats.inserted;
             accumulatedStats.failed += result.stats.failed;
           }
           setMessage(`Processed chunk ${chunkIndex + 1} of ${totalChunks}. Current totals - Inserted: ${accumulatedStats.inserted}, Failed: ${accumulatedStats.failed}`);
-        } else if (chunkIndex === totalChunks - 1 && completeLines.length === 0) {
-          setMessage(`Finalizing import... Processed chunk ${chunkIndex + 1} of ${totalChunks}. No new lines in the final segment.`);
         }
+        offset = end;
+        chunkIndex++;
+      }
+      // Send any remaining buffered line as the last chunk
+      if (lineBuffer.trim().length > 0) {
+        const response = await fetch(getApiUrl('db-database-management'), {
+          method: 'POST',
+          headers: {
+            ...AuthService.getAuthHeader(),
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chunkIndex,
+            totalChunks,
+            fileName,
+            chunkPayload: lineBuffer
+          }),
+        });
+        if (!response.ok) {
+          const errorResult = await response.json();
+          throw new Error(`Server error on chunk ${chunkIndex + 1}: ${errorResult.message || response.statusText}`);
+        }
+        const result = await response.json();
+        if (result.stats) {
+          accumulatedStats.inserted += result.stats.inserted;
+          accumulatedStats.failed += result.stats.failed;
+        }
+        setMessage(`Processed chunk ${chunkIndex + 1} of ${totalChunks}. Current totals - Inserted: ${accumulatedStats.inserted}, Failed: ${accumulatedStats.failed}`);
       }
 
       setMessage(`Database import completed. Total Inserted: ${accumulatedStats.inserted}, Total Failed: ${accumulatedStats.failed}`);

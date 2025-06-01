@@ -63,39 +63,36 @@ async function databaseManagementHandler(req, res) {
         data: docs
       });
     } else if (req.method === 'POST') {
-      // Only support chunked upload
-      const { chunkIndex, totalChunks, fileName } = req.body;
-      const chunk = req.files?.chunk;
-
-      if (chunk && chunkIndex !== undefined && totalChunks !== undefined && fileName) {
-        try {
-          // Assume chunk.data is a Buffer containing only complete lines (JSONL)
-          const chunkText = chunk.data.toString();
-          const lines = chunkText.split(/\r?\n/).filter(line => line.trim().startsWith('{'));
-
-          // Initialize stats for this chunk
-          let stats = { inserted: 0, failed: 0 };
-
-          // Process all complete lines in this chunk
-          await processLines(lines, collections, stats);
-
-          // If this is the last chunk, the client should have sent any remaining incomplete line as a complete line
-          const responsePayload = {
-            message: `Chunk ${parseInt(chunkIndex) + 1} of ${totalChunks} uploaded and processed`,
-            stats
-          };
-
-          if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
-            responsePayload.message = 'Database import completed.';
-          }
-          return res.status(200).json(responsePayload);
-        } catch (err) {
-          console.error('Error processing chunk:', err);
-          return res.status(500).json({ message: 'Error processing upload chunk', error: err.message });
-        }
+      // Support chunked upload via req.body.chunkPayload
+      const { chunkIndex, totalChunks, fileName, chunkPayload } = req.body;
+      if (!chunkPayload || typeof chunkPayload !== 'string' || chunkIndex === undefined || totalChunks === undefined || !fileName) {
+        return res.status(400).json({ message: 'Chunked upload required. Missing chunkPayload, chunkIndex, totalChunks, or fileName.' });
       }
-      // If not chunked upload, return error
-      return res.status(400).json({ message: 'Chunked upload required. Missing chunk, chunkIndex, totalChunks, or fileName.' });
+      try {
+        // Assume chunkPayload is a UTF-8 string containing only complete lines (JSONL)
+        const chunkText = chunkPayload;
+        const lines = chunkText.split(/\r?\n/).filter(line => line.trim().startsWith('{'));
+
+        // Initialize stats for this chunk
+        let stats = { inserted: 0, failed: 0 };
+
+        // Process all complete lines in this chunk
+        await processLines(lines, collections, stats);
+
+        // If this is the last chunk, the client should have sent any remaining incomplete line as a complete line
+        const responsePayload = {
+          message: `Chunk ${parseInt(chunkIndex) + 1} of ${totalChunks} uploaded and processed`,
+          stats
+        };
+
+        if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
+          responsePayload.message = 'Database import completed.';
+        }
+        return res.status(200).json(responsePayload);
+      } catch (err) {
+        console.error('Error processing chunk:', err);
+        return res.status(500).json({ message: 'Error processing upload chunk', error: err.message });
+      }
     } else if (req.method === 'DELETE') {
       // Drop all indexes
       const results = {
