@@ -139,7 +139,7 @@ const DatabasePage = ({ lang }) => {
     let accumulatedStats = { inserted: 0, failed: 0 };
 
     try {
-      const chunkSize = 5 * 1024 * 1024; // 5MB chunks
+      const chunkSize = 2 * 1024 * 1024; 
       const totalChunks = Math.ceil(file.size / chunkSize);
       const fileName = file.name;
 
