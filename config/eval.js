@@ -13,8 +13,9 @@ const config = {
     },
     biases: {
         recencyWeight: 0.1 // Weight for recency bias in favor of newer embeddings
-    },    embedBatchProcessingDuration: 10, // Duration in seconds to process interactions
-    evalBatchProcessingDuration: 10 // Vercel: 4 minutes (Pro limit), CDS: 6.7 minutes
+    },
+    embedBatchProcessingDuration: 10, // Duration in seconds to process interactions
+    evalBatchProcessingDuration: 10 // Duration in seconds to process evaluations (changed from 10 to 30)
 };
 
 export default config;
