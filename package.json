@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "proxy": "https://api.anthropic.com",
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
@@ -97,6 +97,7 @@
     "dotenv-cli": "^7.4.4",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.2",
+    "get-port": "^7.1.0",
     "mongodb-memory-server": "^10.1.4"
   }
 }
