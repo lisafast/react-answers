@@ -37,7 +37,7 @@ async function start() {
           stdio: "inherit",
           env: {
             ...process.env,
-            REACT_APP_API_URL: `${apiUrl}/api`,
+            REACT_APP_API_URL: `${apiUrl}`,
           },
         });
         build.on("exit", (code) => {
