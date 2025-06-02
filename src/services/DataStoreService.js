@@ -99,7 +99,8 @@ class DataStoreService {
         citationScore: expertFeedback.citationScore ?? null,
         answerImprovement: expertFeedback.answerImprovement || '',
         expertCitationUrl: expertFeedback.expertCitationUrl || '',
-        feedback: expertFeedback.isPositive ? 'positive' : 'negative'
+        feedback: expertFeedback.isPositive ? 'positive' : 'negative',
+        publicFeedbackReason: expertFeedback.publicFeedbackReason || ''
       };
     }
     console.log('User feedback:', JSON.stringify(formattedExpertFeedback, null, 2));
