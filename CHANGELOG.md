@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.5.0](https://github.com/cds-snc/ai-answers/compare/v1.4.1...v1.5.0) (2025-06-02)
+
+
+### Features
+
+* add API for fetching table record counts and integrate into Dat… ([1bde77b](https://github.com/cds-snc/ai-answers/commit/1bde77b9fd083d96f18e24a8a931539f5ac52e80))
+* add API for fetching table record counts and integrate into DatabasePage ([d731c05](https://github.com/cds-snc/ai-answers/commit/d731c053f46816e57c82c16f1ef5b3e2b7f7ca93))
+* add in-memory MongoDB setup and Azure context agent test scripts ([89ad041](https://github.com/cds-snc/ai-answers/commit/89ad041ca163d949697c03ca5b66973bb4739420))
+* add repair functionality for timestamps and expert feedback types in DatabasePage and DataStoreService ([8127bc2](https://github.com/cds-snc/ai-answers/commit/8127bc2d1693c110dd525950db18453fd4b6289c))
+* enhance chunked upload handling with uploadId support and consi… ([824e51c](https://github.com/cds-snc/ai-answers/commit/824e51cc32d7c6b5a26c6a464ed51487ac8caeb8))
+* enhance chunked upload handling with uploadId support and consistent response messages ([dc8f3f1](https://github.com/cds-snc/ai-answers/commit/dc8f3f18e18902457e7b567a740cec94120331f1))
+* enhance database import process with chunk handling and improve… ([eb77e4e](https://github.com/cds-snc/ai-answers/commit/eb77e4ef12abd55af51c465c2d3e0be515485f5d))
+* enhance database import process with chunk handling and improved error reporting ([d0c713a](https://github.com/cds-snc/ai-answers/commit/d0c713a78d847bcbd325702490feab0282baee68))
+* reduce chunk size for file import process to improve performance ([2eec02b](https://github.com/cds-snc/ai-answers/commit/2eec02b84989c594c0fb8b70226cdfaa663bb34f))
+* reduce chunk size for file import process to improve performance ([8753383](https://github.com/cds-snc/ai-answers/commit/8753383943dd175f510a1f465e183a0ee75a99a3))
+* update chunked upload handling and remove express-fileupload dependency ([b8d482b](https://github.com/cds-snc/ai-answers/commit/b8d482b1eed0f2fb7cb73602eab20b06d158f360))
+
+
+### Bug Fixes
+
+* change default AI selection from 'azure' to 'openai' ([5ec188c](https://github.com/cds-snc/ai-answers/commit/5ec188c50e7e4e531236520b27605fed95879a13))
+* correct API URL handling in development and test environments ([c58feb1](https://github.com/cds-snc/ai-answers/commit/c58feb17dbc71797bd30564eb2d22fa4b117f92f))
+* correct API URL handling in development and test environments ([4b980a8](https://github.com/cds-snc/ai-answers/commit/4b980a893d7ed435807b51295315f5dea4e3618a))
+* correct API URL handling in development and test environments ([2e41d9e](https://github.com/cds-snc/ai-answers/commit/2e41d9ef07c7410d67887478511bf2665a3f22a3))
+* remove @babel/plugin-proposal-private-property-in-object from package.json ([2e561b5](https://github.com/cds-snc/ai-answers/commit/2e561b513ef610c9f0262a920b4a969b3b65522c))
+* remove duplicate entry for @babel/plugin-proposal-private-property-in-object in package.json ([ac303dc](https://github.com/cds-snc/ai-answers/commit/ac303dcc72fc69e41c3d5fc98987e208ac5774be))
+* update Azure OpenAI client creation to use correct model configuration and add logging ([83e082b](https://github.com/cds-snc/ai-answers/commit/83e082b59d28051d139a061075bb29e86a5655b0))
+* update development server URL to include '/api' path ([019e051](https://github.com/cds-snc/ai-answers/commit/019e0512ff7e26a91778653d9eeecb0f265333a5))
+
+
+### Miscellaneous Chores
+
+* update dependencies and configuration files for improved stabi… ([1fb7ad0](https://github.com/cds-snc/ai-answers/commit/1fb7ad0c55c847e845b7cdba33618ac66fda1be3))
+* update dependencies and configuration files for improved stability ([b152f55](https://github.com/cds-snc/ai-answers/commit/b152f55ae81cb369c0b1186f2b425052475a983f))
+
 ## [1.4.1](https://github.com/cds-snc/ai-answers/compare/v1.4.0...v1.4.1) (2025-05-23)
 
 
