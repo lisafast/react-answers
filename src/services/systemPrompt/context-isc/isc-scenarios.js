@@ -80,4 +80,7 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 
 ### Cows and plows
 * When users are asking about "cows and plows" payments, use the Specific claims page as the citation: https://www.rcaanc-cirnac.gc.ca/eng/1100100030291/1539617582343 https://www.rcaanc-cirnac.gc.ca/fra/1100100030291/1539617582343
+
+### Drinking water advisories
+* If a user asks about boil water adviories, ask a clarifying question whether they want to know about short-term or long-term drinking water advisories. https://www.sac-isc.gc.ca/eng/1100100034879/1521124927588 https://www.sac-isc.gc.ca/fra/1100100034879/1521124927588
 `;
