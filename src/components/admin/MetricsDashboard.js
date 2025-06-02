@@ -47,6 +47,12 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         twoQuestions: 0,
         threeQuestions: 0
       },
+      answerTypes: {
+        normal: 0,
+        'clarifying-question': 0,
+        'pt-muni': 0,
+        'not-gc': 0
+      },
       expertScored: {
         total: 0,
         correct: 0,
@@ -88,6 +94,14 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       chat.interactions?.forEach(interaction => {
         // Count total questions
         metrics.totalQuestions++;
+        
+        // Count answer types
+        if (interaction.answer?.answerType) {
+          const answerType = interaction.answer.answerType;
+          if (metrics.answerTypes.hasOwnProperty(answerType)) {
+            metrics.answerTypes[answerType]++;
+          }
+        }
         
         // Get department
         const department = interaction.context?.department || 'Unknown';
@@ -262,12 +276,67 @@ const MetricsDashboard = ({ lang = 'en' }) => {
             <h2 className="mt-400 mb-400">{t('metrics.dashboard.title')}</h2>
             <div>
               <h3 className="mb-300">{t('metrics.dashboard.usageMetrics')}</h3>
-              <div>
-                <GcdsText>{t('metrics.dashboard.totalSessions')}: {metrics.totalConversations}</GcdsText>
-                <GcdsText>{t('metrics.dashboard.totalQuestions')}: {metrics.totalQuestions}</GcdsText>
-                <GcdsText>{t('metrics.dashboard.sessionsByQuestionCount.singleQuestion')}: {metrics.sessionsByQuestionCount.singleQuestion} ({metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.singleQuestion / metrics.totalConversations) * 100) : 0}%)</GcdsText>
-                <GcdsText>{t('metrics.dashboard.sessionsByQuestionCount.twoQuestions')}: {metrics.sessionsByQuestionCount.twoQuestions} ({metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.twoQuestions / metrics.totalConversations) * 100) : 0}%)</GcdsText>
-                <GcdsText>{t('metrics.dashboard.sessionsByQuestionCount.threeQuestions')}: {metrics.sessionsByQuestionCount.threeQuestions} ({metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.threeQuestions / metrics.totalConversations) * 100) : 0}%)</GcdsText>
+              <div className="bg-gray-50 p-4 rounded-lg mb-600">
+                <DataTable
+                  data={[
+                    {
+                      metric: t('metrics.dashboard.totalSessions'),
+                      count: metrics.totalConversations,
+                      percentage: '100%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.totalQuestions'),
+                      count: metrics.totalQuestions,
+                      percentage: metrics.totalConversations ? Math.round((metrics.totalQuestions / metrics.totalConversations) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.sessionsByQuestionCount.singleQuestion'),
+                      count: metrics.sessionsByQuestionCount.singleQuestion,
+                      percentage: metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.singleQuestion / metrics.totalConversations) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.sessionsByQuestionCount.twoQuestions'),
+                      count: metrics.sessionsByQuestionCount.twoQuestions,
+                      percentage: metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.twoQuestions / metrics.totalConversations) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.sessionsByQuestionCount.threeQuestions'),
+                      count: metrics.sessionsByQuestionCount.threeQuestions,
+                      percentage: metrics.totalConversations ? Math.round((metrics.sessionsByQuestionCount.threeQuestions / metrics.totalConversations) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.answerTypes.normal'),
+                      count: metrics.answerTypes.normal,
+                      percentage: metrics.totalQuestions ? Math.round((metrics.answerTypes.normal / metrics.totalQuestions) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.answerTypes.clarifyingQuestion'),
+                      count: metrics.answerTypes['clarifying-question'],
+                      percentage: metrics.totalQuestions ? Math.round((metrics.answerTypes['clarifying-question'] / metrics.totalQuestions) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.answerTypes.ptMuni'),
+                      count: metrics.answerTypes['pt-muni'],
+                      percentage: metrics.totalQuestions ? Math.round((metrics.answerTypes['pt-muni'] / metrics.totalQuestions) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.answerTypes.notGc'),
+                      count: metrics.answerTypes['not-gc'],
+                      percentage: metrics.totalQuestions ? Math.round((metrics.answerTypes['not-gc'] / metrics.totalQuestions) * 100) + '%' : '0%'
+                    }
+                  ]}
+                  columns={[
+                    { title: t('metrics.dashboard.metric'), data: 'metric' },
+                    { title: t('metrics.dashboard.count'), data: 'count' },
+                    { title: t('metrics.dashboard.percentage'), data: 'percentage' }
+                  ]}
+                  options={{
+                    paging: false,
+                    searching: false,
+                    ordering: false,
+                    info: false
+                  }}
+                />
               </div>
             </div>
             <div>

@@ -283,7 +283,7 @@
       "downloadExcel": "Télécharger Excel",
       "found": "Trouvé",
       "interactionsFound": "interactions de chat. Téléchargez les journaux pour voir l'ensemble complet et les détails.",
-      "selectRange": "Sélectionnez une plage de temps et cliquez sur « Obtenir les journaux » pour voir l’historique des conversations",
+      "selectRange": "Sélectionnez une plage de temps et cliquez sur « Obtenir les journaux » pour voir l'historique des conversations",
       "date": "Date",
       "chatId": "ID de chat",
       "interactions": "Interactions"
@@ -371,13 +371,22 @@
       "totalSessions": "Total des sessions",
       "totalQuestions": "Total des questions",
       "sessionsByQuestionCount": {
-        "singleQuestion": "Sessions avec 1 question",
-        "twoQuestions": "Sessions avec 2 questions",
-        "threeQuestions": "Sessions avec 3 questions"
+        "singleQuestion": "Sessions à une question",
+        "twoQuestions": "Sessions à deux questions",
+        "threeQuestions": "Sessions à trois questions"
       },
+      "answerTypes": {
+        "normal": "Réponses normales",
+        "clarifyingQuestion": "Questions de clarification",
+        "ptMuni": "Provincial/Municipal",
+        "notGc": "Non gouvernement du Canada"
+      },
+      "metric": "Métrique",
+      "count": "Nombre",
+      "percentage": "Pourcentage",
       "expertScored": {
-        "title": "Évaluations d'experts",
-        "description": "Évaluations par des experts en la matière des départements connectés",
+        "title": "Évaluations des partenaires",
+        "description": "Évaluations par des partenaires ministériels connectés",
         "total": "Total des questions évaluées",
         "correct": "Correct",
         "needsImprovement": "Nécessite une amélioration",
