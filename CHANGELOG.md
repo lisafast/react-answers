@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.0](https://github.com/cds-snc/ai-answers/compare/v1.5.0...v1.6.0) (2025-06-02)
+
+
+### Features
+
+* add public feedback component and integrate into feedback flow ([30fe0c0](https://github.com/cds-snc/ai-answers/commit/30fe0c078aabbdc6b3027f1416bc0438a58daea0))
+* add total score to expert feedback and include public feedback fields in export ([38de1e6](https://github.com/cds-snc/ai-answers/commit/38de1e6f860d5a9e20ed1c55ec7a19b601d69d8e))
+* enhance feedback handling with explicit feedback types and scores ([8d02892](https://github.com/cds-snc/ai-answers/commit/8d02892b1f3a5cab7987baccf6ea893ec255da55))
+
 ## [1.5.0](https://github.com/cds-snc/ai-answers/compare/v1.4.1...v1.5.0) (2025-06-02)
 
 
