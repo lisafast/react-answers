@@ -32,6 +32,7 @@ const FeedbackComponent = ({
           // totalScore: 100, // Retained for now, can be re-evaluated if it causes issues
           type: 'expert',
           feedback: 'positive', // Explicitly 'positive' for expert "Useful" click
+          totalScore: 100, // Assuming a default score of 100 for positive feedback
         };
         DataStoreService.persistFeedback(feedbackPayload, chatId, userMessageId);
         setFeedbackGiven(true);
