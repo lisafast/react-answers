@@ -3,6 +3,7 @@ import { getApiUrl } from '../utils/apiToUrl.js';
 import { GcdsContainer, GcdsText, GcdsButton, GcdsDetails, GcdsLink } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
 import { usePageContext } from '../hooks/usePageParam.js';
+import DataStoreService from '../services/DataStoreService.js';
 
 const EvalPage = () => {
   const { t } = useTranslations();
@@ -15,6 +16,13 @@ const EvalPage = () => {
   const [isRegeneratingEmbeddings] = useState(false);
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const [isEvalRequestInProgress, setIsEvalRequestInProgress] = useState(false);
+  const [expertFeedbackCount, setExpertFeedbackCount] = useState(null);
+
+  React.useEffect(() => {
+    DataStoreService.getExpertFeedbackCount()
+      .then(setExpertFeedbackCount)
+      .catch(() => setExpertFeedbackCount('Error'));
+  }, []);
 
   const handleGenerateEmbeddings = async (isAutoProcess = false, regenerateAll = false, lastId = null) => {
     if (isRequestInProgress) {
@@ -27,30 +35,13 @@ const EvalPage = () => {
         setIsAutoProcessingEmbeddings(true);
       }
 
-      const response = await fetch(getApiUrl('db-generate-embeddings'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          lastProcessedId: lastId,
-          regenerateAll: regenerateAll 
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate embeddings');
-      }
-
-      const result = await response.json();
-      
+      const result = await DataStoreService.generateEmbeddings({ lastProcessedId: lastId, regenerateAll });
       // Only update progress if we got a valid response
       if (typeof result.remaining === 'number') {
         setEmbeddingProgress({
           remaining: result.remaining,
           lastProcessedId: result.lastProcessedId
         });
-        
         // Only continue processing if there are actually items remaining
         if (result.remaining > 0) {
           handleGenerateEmbeddings(true, false, result.lastProcessedId);
@@ -88,32 +79,22 @@ const EvalPage = () => {
         if (regenerateAll) {
           setIsRegeneratingAll(true);
         }
-      }
-
-      setEvalProgress(prev => ({ ...prev, loading: true }));
-      const response = await fetch(getApiUrl('db-generate-evals'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          lastProcessedId: lastId,
-          regenerateAll: regenerateAll 
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate evals');
-      }
-
-      const result = await response.json();
-      
+      }      setEvalProgress(prev => ({ ...prev, loading: true }));
+      const result = await DataStoreService.generateEvals({ lastProcessedId: lastId, regenerateAll });
       // Only update progress if we got a valid response
       if (typeof result.remaining === 'number') {
         setEvalProgress({
           remaining: result.remaining,
-          lastProcessedId: result.lastProcessedId
+          lastProcessedId: result.lastProcessedId,
+          processed: result.processed || 0,
+          failed: result.failed || 0,
+          duration: result.duration || 0
         });
+        
+        // Show progress message for non-auto processes
+        if (!isAutoProcess && (result.processed > 0 || result.failed > 0)) {
+          console.log(`Evaluation batch completed: ${result.processed} successful, ${result.failed} failed in ${result.duration}s`);
+        }
         
         // Only continue processing if there are actually items remaining
         if (result.remaining > 0) {
@@ -122,7 +103,7 @@ const EvalPage = () => {
           setIsAutoProcessingEvals(false);
           setIsRegeneratingAll(false);
           if (!isAutoProcess) {
-            alert('All evaluations have been generated!');
+            alert(`All evaluations have been generated! Final totals: ${result.processed || 0} successful, ${result.failed || 0} failed.`);
           }
         }
       } else {
@@ -176,6 +157,11 @@ const EvalPage = () => {
 
       <div className="mb-400">
         <h2>Generate Embeddings</h2>
+        {expertFeedbackCount !== null && (
+          <GcdsText>
+            <strong>Expert Evaluations in System:</strong> {expertFeedbackCount}
+          </GcdsText>
+        )}
         <GcdsText>
           Process interactions to generate embeddings.
         </GcdsText>
@@ -275,15 +261,20 @@ const EvalPage = () => {
             {isRegeneratingAll ? 'Regenerating All...' : 'Regenerate All Evaluations'}
           </GcdsButton>
         </div>
-        
-        {evalProgress && (
+          {evalProgress && (
           <div className="mb-200">
             <p>
-              {evalProgress.successful !== undefined && (
-                <span> • Successful: {evalProgress.successful}</span>
+              {evalProgress.processed !== undefined && (
+                <span> • Processed: {evalProgress.processed}</span>
+              )}
+              {evalProgress.failed !== undefined && (
+                <span> • Failed: {evalProgress.failed}</span>
               )}
               {evalProgress.remaining !== undefined && (
                 <span> • Remaining: {evalProgress.remaining}</span>
+              )}
+              {evalProgress.duration !== undefined && (
+                <span> • Duration: {evalProgress.duration}s</span>
               )}
               {isAutoProcessingEvals && !isRegeneratingAll && (
                 <span> • <strong>Auto-processing active</strong></span>

@@ -13,49 +13,50 @@ dotenv.config();
 
 // Direct OpenAI client creation for non-LangChain usage
 const createDirectOpenAIClient = () => {
-    try {
-        if (!process.env.OPENAI_API_KEY) {
-            return null;
-        }
-        const modelConfig = getModelConfig('openai');
-        return new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-            maxRetries: 3,
-            timeout: modelConfig.timeoutMs,
-        });
-    } catch (error) {
-        console.error('Error creating OpenAI client:', error);
-        return null;
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      return null;
     }
+    const modelConfig = getModelConfig('openai');
+    return new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      maxRetries: 3,
+      timeout: modelConfig.timeoutMs,
+    });
+  } catch (error) {
+    console.error('Error creating OpenAI client:', error);
+    return null;
+  }
 };
 
 // Direct Azure OpenAI client creation for non-LangChain usage
 const createDirectAzureOpenAIClient = () => {
-    try {
-        if (!process.env.AZURE_OPENAI_API_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
-            return null;
-        }
-        const modelConfig = getModelConfig('openai');
-        const azureConfig = modelConfig.azure;
-        return new OpenAI({
-
-          apiKey: process.env.AZURE_OPENAI_API_KEY,
-          azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
-          azureOpenAIEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
-          azureOpenAIApiDeploymentName: 'openai-gpt4o-mini',
-          
-            maxRetries: 3,
-            timeout: modelConfig.timeoutMs,
-        });
-    } catch (error) {
-        console.error('Error creating Azure OpenAI client:', error);
-        return null;
+  try {
+    if (!process.env.AZURE_OPENAI_API_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
+      return null;
     }
+    const modelConfig = getModelConfig('azure');
+    console.log('Creating Azure OpenAI client with model:', modelConfig.name);
+    return new OpenAI({
+
+      apiKey: process.env.AZURE_OPENAI_API_KEY,
+      azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
+      azureOpenAIEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
+      azureOpenAIApiDeploymentName: modelConfig.name,
+
+      maxRetries: 3,
+      timeout: modelConfig.timeoutMs,
+    });
+    
+  } catch (error) {
+    console.error('Error creating Azure OpenAI client:', error);
+    return null;
+  }
 };
 
 const createTools = (chatId = 'system') => {
   const callbacks = [new ToolTrackingHandler(chatId)];
-  
+
   // Wrap tools with callbacks to ensure consistent tracking
   const wrapToolWithCallbacks = (tool) => ({
     ...tool,
@@ -74,7 +75,7 @@ const createTools = (chatId = 'system') => {
     tools: [
       wrapToolWithCallbacks(downloadWebPageTool),
       wrapToolWithCallbacks(checkUrlStatusTool),
-      
+
     ],
     callbacks
   };
@@ -83,17 +84,25 @@ const createTools = (chatId = 'system') => {
 const createAzureOpenAIAgent = async (chatId = 'system') => {
   const modelConfig = getModelConfig('azure');
   const openai = new AzureChatOpenAI({
-    azureApiKey: process.env.AZURE_OPENAI_API_KEY,  // Azure API Key
-    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT, // Azure endpoint
+    azureApiKey: process.env.AZURE_OPENAI_API_KEY,  
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT, 
     apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
-    azureOpenAIApiDeploymentName: modelConfig.name, // Hardcoded deployment name
+    azureOpenAIApiDeploymentName: modelConfig.name, 
     temperature: modelConfig.temperature,
     maxTokens: modelConfig.maxTokens,
     timeout: modelConfig.timeoutMs,
   });
 
   const { tools, callbacks } = createTools(chatId);
-  const agent = await createReactAgent({ llm: openai, tools });
+  const agent = await createReactAgent({
+    llm: openai, tools,
+    agentConfig: {
+      handleParsingErrors: true,
+      maxIterations: 25,
+      returnIntermediateSteps: true,
+      parallel_tool_calls: false
+    }
+  });
   agent.callbacks = callbacks;
   return agent;
 };
@@ -106,24 +115,24 @@ const createOpenAIAgent = async (chatId = 'system') => {
     temperature: modelConfig.temperature,
     maxTokens: modelConfig.maxTokens,
     timeout: modelConfig.timeoutMs,
-    
+
   });
 
   const { tools, callbacks } = createTools(chatId);
-  
-  
-  const agent = await createReactAgent({ 
-    llm: openai, 
+
+
+  const agent = await createReactAgent({
+    llm: openai,
     tools,
-    // Add agent configuration to enforce sequential execution
     agentConfig: {
       handleParsingErrors: true,
-      maxIterations: 10,
+      maxIterations: 25,
       returnIntermediateSteps: true,
       parallel_tool_calls: false
     }
   });
   agent.callbacks = callbacks;
+  console.log('Creating Azure OpenAI context agent with model:', modelConfig.name);
   return agent;
 };
 
@@ -178,11 +187,12 @@ const createContextAgent = async (agentType, chatId = 'system') => {
         azureApiKey: process.env.AZURE_OPENAI_API_KEY,
         azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
         apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-06-01',
-        azureOpenAIApiDeploymentName: azureConfig.name, // Hardcoded deployment name
+        azureOpenAIApiDeploymentName: azureConfig.name, 
         temperature: azureConfig.temperature,
         maxTokens: azureConfig.maxTokens,
         timeout: azureConfig.timeoutMs,
       });
+      console.log('Creating Azure OpenAI context agent with model:', azureConfig.name);
       break;
     case 'cohere':
       llm = new CohereClient({

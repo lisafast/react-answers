@@ -16,42 +16,46 @@ async function chatLogsHandler(req, res) {
 
         let chats;
         const daysParam = req.query.days;
-        if (daysParam === 'all') {
-            // Return all logs
-            chats = await Chat.find({})
-                .populate({
-                    path: 'interactions',
-                    populate: [
-                        { path: 'context' },
-                        { 
+        const chatPopulate = [
+            { path: 'user', select: 'email' }, // <-- populate user email
+            {
+                path: 'interactions',
+                populate: [
+                    { path: 'context' },
+                    { 
+                        path: 'expertFeedback',
+                        model: 'ExpertFeedback',
+                        select: '-__v'
+                    },
+                    { 
+                        path: 'question',
+                        select: '-embedding'
+                    },
+                    {
+                        path: 'answer',
+                        select: '-embedding -sentenceEmbeddings',
+                        populate: [
+                            { path: 'sentences' },
+                            { path: 'citation' },
+                            { path: 'tools' },
+                        ]
+                    },
+                    {
+                        path: 'autoEval',
+                        model: 'Eval',
+                        populate: {
                             path: 'expertFeedback',
                             model: 'ExpertFeedback',
                             select: '-__v'
-                        },
-                        { 
-                            path: 'question',
-                            select: '-embedding'
-                        },
-                        {
-                            path: 'answer',
-                            select: '-embedding -sentenceEmbeddings',
-                            populate: [
-                                { path: 'sentences' },
-                                { path: 'citation' },
-                                { path: 'tools' },
-                            ]
-                        },
-                        {
-                            path: 'autoEval',
-                            model: 'Eval',
-                            populate: {
-                                path: 'expertFeedback',
-                                model: 'ExpertFeedback',
-                                select: '-__v'
-                            }
                         }
-                    ]
-                })
+                    }
+                ]
+            }
+        ];
+        if (daysParam === 'all') {
+            // Return all logs
+            chats = await Chat.find({})
+                .populate(chatPopulate)
                 .sort({ createdAt: -1 });
         } else {
             const days = parseInt(daysParam) || 1;
@@ -60,39 +64,7 @@ async function chatLogsHandler(req, res) {
             chats = await Chat.find({
                 createdAt: { $gte: startDate }
             })
-                .populate({
-                    path: 'interactions',
-                    populate: [
-                        { path: 'context' },
-                        { 
-                            path: 'expertFeedback',
-                            model: 'ExpertFeedback',
-                            select: '-__v'
-                        },
-                        { 
-                            path: 'question',
-                            select: '-embedding'
-                        },
-                        {
-                            path: 'answer',
-                            select: '-embedding -sentenceEmbeddings',
-                            populate: [
-                                { path: 'sentences' },
-                                { path: 'citation' },
-                                { path: 'tools' },
-                            ]
-                        },
-                        {
-                            path: 'autoEval',
-                            model: 'Eval',
-                            populate: {
-                                path: 'expertFeedback',
-                                model: 'ExpertFeedback',
-                                select: '-__v'
-                            }
-                        }
-                    ]
-                })
+                .populate(chatPopulate)
                 .sort({ createdAt: -1 });
         }
 

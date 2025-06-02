@@ -5,9 +5,11 @@ import DataStoreService from '../../services/DataStoreService.js';
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import ExportService from '../../services/ExportService.js';
+import { useTranslations } from '../../hooks/useTranslations.js';
 DataTable.use(DT);
 
-const ChatLogsDashboard = () => {
+const ChatLogsDashboard = ({ lang = 'en' }) => {
+  const { t } = useTranslations(lang);
   const [timeRange, setTimeRange] = useState('1');
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -58,7 +60,7 @@ const ChatLogsDashboard = () => {
       <div className="flex items-center gap-4 flex-wrap">
         <div className="w-48">
           <label htmlFor="timeRange" className="block text-sm font-medium text-gray-700 mb-1">
-            Time range
+            {t('admin.chatLogs.timeRange')}
           </label>
           <select
             id="timeRange"
@@ -67,12 +69,12 @@ const ChatLogsDashboard = () => {
             onChange={(e) => setTimeRange(e.target.value)}
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            <option value="1">Last 1 day</option>
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="60">Last 60 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="all">All logs</option>
+            <option value="1">{t('admin.chatLogs.last1Day')}</option>
+            <option value="7">{t('admin.chatLogs.last7Days')}</option>
+            <option value="30">{t('admin.chatLogs.last30Days')}</option>
+            <option value="60">{t('admin.chatLogs.last60Days')}</option>
+            <option value="90">{t('admin.chatLogs.last90Days')}</option>
+            <option value="all">{t('admin.chatLogs.allLogs')}</option>
           </select>
         </div>
 
@@ -81,7 +83,7 @@ const ChatLogsDashboard = () => {
           disabled={loading}
           className="me-400 hydrated mrgn-tp-1r"
         >
-          {loading ? 'Loading...' : 'Get logs'}
+          {loading ? t('admin.chatLogs.loading') : t('admin.chatLogs.getLogs')}
         </GcdsButton>
 
         {logs.length > 0 && (
@@ -91,7 +93,7 @@ const ChatLogsDashboard = () => {
               disabled={loading}
               className="me-400 hydrated mrgn-tp-1r"
             >
-              Download JSON
+              {t('admin.chatLogs.downloadJson')}
             </GcdsButton>
 
             <GcdsButton
@@ -99,14 +101,14 @@ const ChatLogsDashboard = () => {
               disabled={loading}
               className="me-400 hydrated mrgn-tp-1r"
             >
-              Download CSV
+              {t('admin.chatLogs.downloadCsv')}
             </GcdsButton>
             <GcdsButton
               onClick={downloadExcel}
               disabled={loading}
               className="me-400 hydrated mrgn-tp-1r"
             >
-              Download Excel
+              {t('admin.chatLogs.downloadExcel')}
             </GcdsButton>
           </>
         )}
@@ -115,21 +117,20 @@ const ChatLogsDashboard = () => {
       <div className="bg-white shadow rounded-lg">
         {loading ? (
           <div className="p-4">
-            <p className="text-gray-500">Loading logs...</p>
+            <p className="text-gray-500">{t('admin.chatLogs.loadingLogs')}</p>
           </div>
         ) : logs.length > 0 ? (
           <div className="p-4">
             <p className="mb-4 text-gray-600">
-              Found {logs.length} chat interactions. Download the logs to see the full set and
-              details.
+              {t('admin.chatLogs.found')} {logs.length} {t('admin.chatLogs.interactionsFound')}
             </p>
             <DataTable
               data={logs}
               columns={[
-                { title: 'Date', data: 'createdAt', render: (data) => (data ? data : '') },
-                { title: 'Chat ID', data: 'chatId', render: (data) => (data ? data : '') },
+                { title: t('admin.chatLogs.date'), data: 'createdAt', render: (data) => (data ? data : '') },
+                { title: t('admin.chatLogs.chatId'), data: 'chatId', render: (data) => (data ? data : '') },
                 {
-                  title: 'Interactions',
+                  title: t('admin.chatLogs.interactions'),
                   data: 'interactions',
                   render: (data) => (data ? data.length : 0),
                 },
@@ -145,7 +146,7 @@ const ChatLogsDashboard = () => {
         ) : (
           <div className="p-4">
             <p className="text-gray-500">
-              Select a time range and click 'Get logs' to view chat history
+              {t('admin.chatLogs.selectRange')}
             </p>
           </div>
         )}

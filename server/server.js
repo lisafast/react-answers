@@ -2,7 +2,6 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import fileUpload from 'express-fileupload';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
@@ -43,6 +42,11 @@ import generateEvalsHandler from '../api/db/db-generate-evals.js';
 import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 import dbDeleteSystemLogsHandler from '../api/db/db-delete-system-logs.js';
 import dbSettingsHandler from '../api/db/db-settings.js';
+import dbPublicSiteStatusHandler from '../api/db/db-public-site-status.js';
+import dbExpertFeedbackCountHandler from '../api/db/db-expert-feedback-count.js';
+import dbTableCountsHandler from '../api/db/db-table-counts.js';
+import dbRepairTimestampsHandler from '../api/db/db-repair-timestamps.js';
+import dbRepairExpertFeedbackHandler from '../api/db/db-repair-expert-feedback.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,8 +56,15 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
-app.use(fileUpload());
 app.use(express.static(path.join(__dirname, "../build")));
+
+// Set higher timeout limits for all routes
+app.use((req, res, next) => {
+  // Set timeout to 5 minutes
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+});
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -72,7 +83,7 @@ app.get("*", (req, res, next) => {
   }
   res.sendFile(path.join(__dirname, "../build", "index.html"));
 });
-
+app.get('/api/db/db-public-site-status', dbPublicSiteStatusHandler);
 app.post('/api/db/db-persist-feedback', dbPersistFeedback);
 app.post('/api/db/db-persist-interaction', dbPersistInteraction);
 app.get('/api/db/db-chat-session', dbChatSessionHandler);
@@ -92,6 +103,10 @@ app.post('/api/db/db-generate-evals', generateEvalsHandler);
 app.all('/api/db/db-database-management', dbDatabaseManagementHandler);
 app.delete('/api/db/db-delete-system-logs', dbDeleteSystemLogsHandler);
 app.all('/api/db/db-settings', dbSettingsHandler);
+app.get('/api/db/db-expert-feedback-count', dbExpertFeedbackCountHandler);
+app.get('/api/db/db-table-counts', dbTableCountsHandler);
+app.post('/api/db/db-repair-timestamps', dbRepairTimestampsHandler);
+app.post('/api/db/db-repair-expert-feedback', dbRepairExpertFeedbackHandler);
 
 app.post("/api/openai/openai-message", openAIHandler);
 app.post("/api/openai/openai-context", openAIContextAgentHandler);
@@ -118,6 +133,7 @@ app.post("/api/azure/azure-context", azureContextHandler);
 //app.get('/api/azure-batch-process-results', azureBatchProcessResultsHandler);
 
 app.post('/api/search/search-context', contextSearchHandler);
+
 
 const PORT = process.env.PORT || 3001;
 

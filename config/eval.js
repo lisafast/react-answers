@@ -2,7 +2,7 @@ const config = {
     thresholds: {
         questionAnswerSimilarity: 0.85, // Minimum similarity score for question-answer pairs to be considered similar
         answerSimilarity: 0.8, // Minimum similarity score for answers to be considered similar
-        sentenceSimilarity: 0.7 // Minimum similarity score for individual sentences to be considered similar
+        sentenceSimilarity: 0.9 // Minimum similarity score for individual sentences to be considered similar
     },
     searchLimits: {
         similarEmbeddings: 20, // Maximum number of similar embeddings to retrieve
@@ -15,7 +15,7 @@ const config = {
         recencyWeight: 0.1 // Weight for recency bias in favor of newer embeddings
     },
     embedBatchProcessingDuration: 10, // Duration in seconds to process interactions
-    evalBatchProcessingDuration: 10 // Duration in seconds to process evaluations
+    evalBatchProcessingDuration: 10 // Duration in seconds to process evaluations (changed from 10 to 30)
 };
 
 export default config;

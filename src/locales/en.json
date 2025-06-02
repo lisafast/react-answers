@@ -53,7 +53,11 @@
         "message": "Reload the page to try again.",
         "button": "Reload"
       },
-      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then."
+      "serviceUnavailable": "AI Answers is unavailable until tomorrow due to reaching daily usage limits. Please check back then.",
+      "statusUnknown": {
+        "title": "Service Status Unknown",
+        "message": "The service status could not be determined. Please try again later."
+      }
     },
     "chat": {
       "chatId": "Chat ID",
@@ -99,8 +103,8 @@
         "error": "Sorry, we're having a problem connecting to the service right now. Please try again in a few minutes.",
         "blockedContent": "Your question used words that aren't accepted. Please ask it differently below.",
         "blockedMessage": "Your question was not sent to the AI service.",
-        "privateContent": "To protect your privacy, your question was not sent to the AI service. Please ask your question again below without this personal information.",
-        "privacyMessage": "Personal information you cannot include in your question is identified as XXX.",
+        "privateContent": "To protect your privacy, your question was not sent to the AI service. Ask it differently below without any personal information.",
+        "privacyMessage": "Personal information in your question is marked as XXX.",
         "characterWarning": "{count} {unit} remaining",
         "characterLimit": "Your message is {count} {unit} too long. Please simplify your question.",
         "character": "character",
@@ -236,23 +240,43 @@
     "start": "Start",
     "pause": "Pause"
   },  "admin": {
-    "title": "Admin Dashboard",
+    "title": "AI Answers Admin dashboard",
     "navigation": {
       "ariaLabel": "Admin Navigation",
       "title": "Admin Menu",
-      "aiAnswers": "AI Answers",
-      "batches": "Batches",
-      "users": "User Management",
-      "chatViewer": "Chat Viewer",
-      "database": "Database Management",
-      "eval": "Evaluation Tools",
-      "logout": "Logout"
+      "aiAnswers": "Use AI Answers with expert feedback options",
+      "batches": "View and manage batches",
+      "users": "Manage user accounts",
+      "chatViewer": "View full interaction for a Chat ID",
+      "database": "Manage the database",
+      "eval": "Control evaluation embeddings",
+      "metrics": "View performance metrics",
+      "logout": "Sign out"
     },
     "chatLogs": {
-      "title": "Recent Chat Interactions"
+      "title": "Download recent chat logs",
+      "timeRange": "Time range",
+      "last1Day": "Last 1 day",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last60Days": "Last 60 days",
+      "last90Days": "Last 90 days",
+      "allLogs": "All logs",
+      "getLogs": "Get logs",
+      "loading": "Loading...",
+      "loadingLogs": "Loading logs...",
+      "downloadJson": "Download JSON",
+      "downloadCsv": "Download CSV",
+      "downloadExcel": "Download Excel",
+      "found": "Found",
+      "interactionsFound": "chat interactions. Download the logs to see the full set and details.",
+      "selectRange": "Select a time range and click 'Get logs' to view chat history",
+      "date": "Date",
+      "chatId": "Chat ID",
+      "interactions": "Interactions"
     },
     "deleteChat": {
-      "title": "Delete Chat",
+      "title": "Delete a chat with incorrect feedback",
       "idLabel": "Chat ID",
       "button": "Delete Chat",
       "confirm": "Confirm Delete",
@@ -263,39 +287,39 @@
     }
   },
   "login": {
-    "title": "Login",
+    "title": "Sign in to AI Answers Admin",
     "email": "Email",
     "password": "Password",
-    "submit": "Log In",
+    "submit": "Sign in",
     "invalidCredentials": "Invalid email or password",
     "form": {
-      "submitting": "Logging in...",
-      "signupLink": "Need an account? Sign up here"
+      "submitting": "Signing in...",
+      "signupLink": "Create an account"
     }
   },
   "signup": {
-    "title": "Sign Up",
+    "title": "Create an account",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "submit": "Sign Up",
+    "submit": "Submit",
     "passwordMismatch": "Passwords do not match",
-    "errorOccurred": "An error occurred during signup",
+    "errorOccurred": "An error occurred creating your account",
     "form": {
       "username": "Username:",
       "password": "Password:",
-      "submit": "Sign Up",
-      "submitting": "Creating account..."
+      "submit": "Submit",
+      "submitting": "Creating account...wait for approval"
     },
     "messages": {
-      "success": "Signup successful! You can now",
-      "error": "An error occurred during signup",
+      "success": "Success! You can now ",
+      "error": "An error occurred creating your account",
       "failed": "Signup failed",
-      "loginLink": "log in to your account"
+      "loginLink": "sign in to AI Answers Admin"
     }
   },
   "users": {
-    "title": "User Management",
+    "title": "Manage user accounts",
     "columns": {
       "email": "Email",
       "role": "Role",
@@ -321,6 +345,11 @@
     "statuses": {
       "available": "Available",
       "unavailable": "Unavailable"
+    },
+    "deploymentModeLabel": "Deployment Mode",
+    "deploymentMode": {
+      "cds": "CDS (Background worker)",
+      "vercel": "Vercel (Wait for completion)"
     }
   },
   "outage": {
@@ -329,5 +358,49 @@
   },
   "common": {
     "backToAdmin": "Back to Admin"
+  },
+  "metrics": {
+    "title": "Metrics dashboard",
+    "timeRangeTitle": "Get usage and evaluation metrics",
+    "dashboard": {
+      "title": "Results",
+      "usageMetrics": "Usage metrics",
+      "totalSessions": "Total sessions",
+      "totalQuestions": "Total questions",
+      "sessionsByQuestionCount": {
+        "singleQuestion": "Sessions with 1 question",
+        "twoQuestions": "Sessions with 2 questions",
+        "threeQuestions": "Sessions with 3 questions"
+      },
+      "expertScored": {
+        "title": "Expert evaluations",
+        "description": "Evaluations by signed-in departmental subject matter experts",
+        "total": "Total questions evaluated",
+        "correct": "Correct",
+        "needsImprovement": "Needs improvement",
+        "hasError": "Has error"
+      },
+      "aiScored": {
+        "title": "AI evaluations",
+        "description": "Automated AI evaluations based on expert evaluations of similar questions",
+        "total": "Total questions evaluated",
+        "correct": "Correct",
+        "needsImprovement": "Needs improvement",
+        "hasError": "Has error"
+      },
+      "userScored": {
+        "title": "End-user feedback",
+        "description": "Yes-no feedback from end-users",
+        "total": "Total questions with feedback",
+        "helpful": "Helpful (yes)",
+        "unhelpful": "Unhelpful (no)"
+      },
+      "byDepartment": {
+        "title": "Department breakdown",
+        "totalQuestions": "Total questions",
+        "totalSessions": "Total sessions",
+        "expertTotal": "Expert evaluations"
+      }
+    }
   }
 }

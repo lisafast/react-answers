@@ -1,4 +1,4 @@
-import  { useEffect, useMemo, useState } from 'react';
+import  { useEffect, useMemo } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
 import AdminPage from './pages/AdminPage.js';
@@ -13,10 +13,9 @@ import UsersPage from './pages/UsersPage.js';
 import EvalPage from './pages/EvalPage.js';
 import DatabasePage from './pages/DatabasePage.js';
 import SettingsPage from './pages/SettingsPage.js';
-import OutagePage from './pages/OutagePage.js';
-import { AuthProvider, useAuth } from './contexts/AuthContext.js';
+import { AuthProvider } from './contexts/AuthContext.js';
 import { AdminRoute, RoleProtectedRoute } from './components/RoleProtectedRoute.js';
-import DataStoreService from './services/DataStoreService.js';
+import MetricsPage from './pages/MetricsPage.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -29,14 +28,11 @@ const getAlternatePath = (currentPath, currentLang) => {
   return `/${newLang}${pathWithoutLang}`;
 };
 
-// We're now using the ProtectedRoute component from components/ProtectedRoute.js
-
 const AppLayout = () => {
   const location = useLocation();
   const currentLang = location.pathname.startsWith('/fr') ? 'fr' : 'en';
   const alternateLangHref = getAlternatePath(location.pathname, currentLang);
 
-  // Set up token expiration checker when the app layout mounts
   useEffect(() => {
     // Removed the auth expiration checker setup
   }, []);
@@ -72,25 +68,9 @@ const AppLayout = () => {
 };
 
 export default function App() {
-  const [siteStatus, setSiteStatus] = useState('available');
-
-  useEffect(() => {
-    DataStoreService.getSiteStatus().then(setSiteStatus);
-  }, []);
-
   const router = useMemo(() => {
-    const HomeWrapper = ({ lang }) => {
-      const { currentUser } = useAuth();
-      const allowed = currentUser && ['admin', 'partner'].includes(currentUser.role);
-      if (siteStatus === 'unavailable' && !allowed) {
-        return <OutagePage lang={lang} />;
-      }
-      return <HomePage lang={lang} />;
-    };
-
-    const homeEn = <HomeWrapper lang="en" />;
-    const homeFr = <HomeWrapper lang="fr" />;
-
+    const homeEn = <HomePage lang="en" />;
+    const homeFr = <HomePage lang="fr" />;
     const publicRoutes = [
       { path: '/', element: homeEn },
       { path: '/en', element: homeEn },
@@ -116,13 +96,19 @@ export default function App() {
       { path: '/fr/eval', element: <AdminRoute lang="fr"><EvalPage lang="fr" /></AdminRoute> },
       { path: '/en/database', element: <AdminRoute lang="en"><DatabasePage lang="en" /></AdminRoute> },
       { path: '/fr/database', element: <AdminRoute lang="fr"><DatabasePage lang="fr" /></AdminRoute> },
+      { path: '/en/metrics', element: <AdminRoute lang="en"><MetricsPage lang="en" /></AdminRoute> },
+      { path: '/fr/metrics', element: <AdminRoute lang="fr"><MetricsPage lang="fr" /></AdminRoute> },
       { path: '/en/settings', element: <AdminRoute lang="en"><SettingsPage lang="en" /></AdminRoute> },
       { path: '/fr/settings', element: <AdminRoute lang="fr"><SettingsPage lang="fr" /></AdminRoute> }
     ];
 
     return createBrowserRouter([
       {
-        element: <AppLayout />,
+        element: (
+          <AuthProvider>
+            <AppLayout />
+          </AuthProvider>
+        ),
         children: [
           ...publicRoutes,
           ...protectedRoutes.map(route => ({
@@ -136,11 +122,9 @@ export default function App() {
         ]
       }
     ]);
-  }, [siteStatus]);
+  }, []);
 
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   );
 }

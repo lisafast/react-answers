@@ -1,8 +1,13 @@
 // config/ai-models.js
 const AI_MODELS = {
   azure: {
-    default: "gpt-4o",
+    default: "openai-gpt41-mini",
     models: {
+      "openai-gpt41-mini": { 
+        maxTokens: 1024,
+        temperature: 0.0,
+        timeoutMs: 60000,
+      },
       "gpt-4o": {
         maxTokens: 1024,
         temperature: 0.0,
@@ -15,8 +20,16 @@ const AI_MODELS = {
       },
     },
     embeddings: {
-      default: 'text-embedding-ada-002',
+      default: 'text-embedding-3-large',
       models: {
+        'text-embedding-3-large': {
+          dimensions: 3072,
+          timeoutMs: 30000,
+        },
+        'text-embedding-3-small': {
+          dimensions: 1536,
+          timeoutMs: 30000,
+        },
         'text-embedding-ada-002': {
           dimensions: 1536,
           timeoutMs: 30000,
@@ -25,8 +38,13 @@ const AI_MODELS = {
     }
   },
   openai: {
-    default: 'gpt-4.1-2025-04-14',
+    default: 'gpt-4.1-mini',
     models: {
+      'gpt-4.1-mini': { 
+        maxTokens: 1024,
+        temperature: 0.0,
+        timeoutMs: 60000,
+      },
       'gpt-4.1-2025-04-14': {
         maxTokens: 1024,
         temperature: 0.0,
