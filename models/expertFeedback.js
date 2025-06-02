@@ -20,8 +20,9 @@ const expertFeedbackSchema = new Schema({
     citationExplanation: { type: String, required: false, default: '' },
     answerImprovement: { type: String, required: false, default: '' },
     expertCitationUrl: { type: String, required: false, default: '' },
-    feedback: { type: String, required: false, default: '' },
-    publicFeedbackReason: { type: String, required: false, default: '' }
+    feedback: { type: String, required: false, default: '' }, // 'positive'/'negative' for expert, 'yes'/'no' for public
+    publicFeedbackReason: { type: String, required: false, default: '' },
+    publicFeedbackScore: { type: Number, required: false, default: null }
 }, {
     timestamps: true, versionKey: false,
     id: false,

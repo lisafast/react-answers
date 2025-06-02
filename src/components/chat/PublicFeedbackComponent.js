@@ -38,15 +38,15 @@ const PublicFeedbackComponent = ({
     if (!selected) return;
 
     const option = options.find((o) => o.id === selected);
-    const feedback = {
+    const feedbackPayload = {
       type: 'public',
-      isPositive,
-      totalScore: option.score,
-      publicFeedbackReason: selected,
+      feedback: isPositive ? 'yes' : 'no', // Set 'yes' or 'no'
+      publicFeedbackReason: option.label,   // Use the option's label
+      publicFeedbackScore: option.score,    // Use the option's score
     };
-    DataStoreService.persistFeedback(feedback, chatId, userMessageId);
+    DataStoreService.persistFeedback(feedbackPayload, chatId, userMessageId);
     setSubmitted(true);
-    onSubmit(feedback);
+    onSubmit(feedbackPayload);
   };
 
   if (submitted) {

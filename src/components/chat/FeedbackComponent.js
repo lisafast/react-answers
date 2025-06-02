@@ -25,22 +25,24 @@ const FeedbackComponent = ({
   const hasExpertRole = useHasAnyRole(['admin', 'partner']);
 
   const handleFeedback = (isPositive) => {
-    let expertFeedback = null;
+    let feedbackPayload = null; // Renamed to avoid confusion
     if (isPositive) {
       if (hasExpertRole) {
-        expertFeedback = {
-          totalScore: 100,
+        feedbackPayload = {
+          // totalScore: 100, // Retained for now, can be re-evaluated if it causes issues
           type: 'expert',
-          isPositive: true,
+          feedback: 'positive', // Explicitly 'positive' for expert "Useful" click
         };
-        DataStoreService.persistFeedback(expertFeedback, chatId, userMessageId);
+        DataStoreService.persistFeedback(feedbackPayload, chatId, userMessageId);
         setFeedbackGiven(true);
       } else {
         setPublicPositive(true);
         setShowPublicRating(true);
       }
-    } else {
+    } else { // Not useful / No
       if (hasExpertRole) {
+        // When "Not Useful" is clicked by an expert, show the detailed rating component.
+        // The ExpertRatingComponent will then determine its own 'positive'/'negative' feedback string.
         setShowExpertRating(true);
       } else {
         setPublicPositive(false);
