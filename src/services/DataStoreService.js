@@ -335,6 +335,57 @@ class DataStoreService {
       throw error;
     }
   }
+  static async getTableCounts() {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-table-counts'));
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to fetch table counts');
+      }
+      const data = await response.json();
+      return data.counts;
+    } catch (error) {
+      console.error('Error fetching table counts:', error);
+      throw error;
+    }
+  }
+  static async repairTimestamps() {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-repair-timestamps'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to repair timestamps');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error repairing timestamps:', error);
+      throw error;
+    }
+  }
+
+  static async repairExpertFeedback() {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-repair-expert-feedback'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to repair expert feedback');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error repairing expert feedback:', error);
+      throw error;
+    }
+  }
 }
 
 export default DataStoreService;

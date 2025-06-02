@@ -154,20 +154,41 @@ class EvaluationService {
             const interactions = await Interaction.find(query)
                 .sort({ _id: 1 })
                 .limit(100) // Process in batches of 100
-                .populate('question answer');
-
-            // Process each interaction until time runs out
+                .populate('question answer');            // Process each interaction until time runs out with resilience
+            let processedCount = 0;
+            let failedCount = 0;
+            
             for (const interaction of interactions) {
                 if ((Date.now() - startTime) / 1000 >= duration) {
                     break;
                 }
-                const chats = await Chat.find({ interactions: interaction._id });
-                const chatId = chats.length > 0 ? chats[0].chatId : null;
-                await this.evaluateInteraction(interaction, chatId, deploymentMode);
-                lastId = interaction._id.toString();
+                
+                try {
+                    const chats = await Chat.find({ interactions: interaction._id });
+                    const chatId = chats.length > 0 ? chats[0].chatId : null;
+                    await this.evaluateInteraction(interaction, chatId, deploymentMode);
+                    processedCount++;
+                    ServerLoggingService.debug(`Successfully evaluated interaction ${interaction._id}`, 'eval-service');
+                } catch (error) {
+                    failedCount++;
+                    ServerLoggingService.error(
+                        `Failed to evaluate interaction ${interaction._id}, continuing with next interaction`, 
+                        'eval-service', 
+                        error
+                    );
+                    // Continue processing other interactions even if one fails
+                } finally {
+                    // Always update lastId to ensure progress, even if evaluation failed
+                    lastId = interaction._id.toString();
+                }
             }
 
-            // Calculate and return only remaining count
+            ServerLoggingService.info(
+                `Evaluation batch completed: ${processedCount} successful, ${failedCount} failed`, 
+                'eval-service'
+            );
+
+            // Calculate and return remaining count and stats
             const remainingQuery = {
                 ...query,
                 _id: { $gt: new mongoose.Types.ObjectId(lastId || '000000000000000000000000') }
@@ -175,7 +196,10 @@ class EvaluationService {
             
             return {
                 remaining: await Interaction.countDocuments(remainingQuery),
-                lastProcessedId: lastId
+                lastProcessedId: lastId,
+                processed: processedCount,
+                failed: failedCount,
+                duration: Math.round((Date.now() - startTime) / 1000)
             };
         } catch (error) {
             ServerLoggingService.error('Error processing evaluations for duration', 'system', error);

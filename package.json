@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "proxy": "https://api.anthropic.com",
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
@@ -37,7 +37,6 @@
     "dotenv": "^16.5.0",
     "duck-duck-scrape": "^2.2.6",
     "express": "^4.21.1",
-    "express-fileupload": "^1.5.1",
     "flat": "^6.0.1",
     "googleapis": "^144.0.0",
     "install": "^0.13.0",
@@ -62,8 +61,7 @@
     "uuid": "^11.0.5",
     "vitest": "^3.1.4",
     "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -99,6 +97,7 @@
     "dotenv-cli": "^7.4.4",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.2",
+    "get-port": "^7.1.0",
     "mongodb-memory-server": "^10.1.4"
   }
 }
