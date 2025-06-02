@@ -40,6 +40,32 @@
       "or": "or",
       "thankYou": "Thank you for your feedback!"
     },
+    "publicFeedback": {
+      "surveyLink": "Tell us more! AI Answers feedback survey (opens in new tab)",
+      "send": "Send",
+      "question": "Was this helpful?",
+      "yes": {
+        "question": "Why was it helpful? Select the best option below. (required)",
+        "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=y",
+        "options": {
+          "noCall": "I don't need to call the government",
+          "noVisit": "I don't need to visit an office",
+          "savedTime": "Saved me time searching and reading",
+          "other": "Other - please fill out the survey"
+        }
+      },
+      "no": {
+        "question": "Why wasn't it helpful? Select the best option below. (required)",
+        "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=n",
+        "options": {
+          "irrelevant": "Irrelevant or off topic",
+          "confusing": "Too complex or confusing",
+          "notDetailed": "Not detailed enough",
+          "notWanted": "Answer is clear, but is not what I wanted to hear",
+          "other": "Other - please fill out the survey"
+        }
+      }
+    },
     "privacy": {
       "title": "Privacy and AI terms of use",
       "storage": "To protect your privacy, questions containing personal information (like phone numbers or email addresses) are blocked. You'll see sensitive content marked with XXX and be asked to rephrase. Blocked questions are not sent to our AI service or stored. All other questions, answers and your feedback are stored to improve system performance.",
@@ -357,7 +383,9 @@
     "message": "This service is currently unavailable."
   },
   "common": {
-    "backToAdmin": "Back to Admin"
+    "backToAdmin": "Back to Admin",
+    "yes": "Yes",
+    "no": "No"
   },
   "metrics": {
     "title": "Metrics dashboard",

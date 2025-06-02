@@ -40,6 +40,32 @@
       "or": "ou",
       "thankYou": "Merci d'avoir donné votre avis!"
     },
+    "publicFeedback": {
+      "surveyLink": "Dites-nous en plus! Enquête d'évaluation (s'ouvre dans un nouvel onglet)",
+      "send": "Envoyer",
+      "question": "Est-ce que cela vous a été utile?",
+      "yes": {
+        "question": "Pourquoi était-ce utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
+        "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=y",
+        "options": {
+          "noCall": "Je n'ai pas besoin d'appeler le gouvernement",
+          "noVisit": "Je n'ai pas besoin de me rendre dans un bureau",
+          "savedTime": "J'ai gagné du temps en cherchant et en lisant",
+          "other": "Autre - veuillez remplir l'enquête"
+        }
+      },
+      "no": {
+        "question": "Pourquoi n'était-ce pas utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
+        "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=n",
+        "options": {
+          "irrelevant": "Non pertinent ou hors sujet",
+          "confusing": "Trop complexe ou déroutant",
+          "notDetailed": "Pas assez détaillé",
+          "notWanted": "La réponse est claire, mais ce n'est pas ce que je voulais entendre",
+          "other": "Autre - veuillez remplir l'enquête"
+        }
+      }
+    },
     "privacy": {
       "title": "Confidentialité et conditions d'utilisation de l'IA",
       "storage": "Pour protéger votre vie privée, les questions contenant des renseignements personnels (comme des numéros de téléphone ou des adresses courriel) sont bloquées. Vous verrez le contenu sensible marqué avec XXX et il vous sera demandé de reformuler. Les questions bloquées ne sont pas envoyées à notre service d'IA ni stockées. Toutes les autres questions, réponses et vos commentaires sont stockés pour améliorer les performances du système.",
@@ -360,7 +386,9 @@
     "message": "Ce service est actuellement indisponible."
   },
   "common": {
-    "backToAdmin": "Retour à l'administration"
+    "backToAdmin": "Retour à l'administration",
+    "yes": "Oui",
+    "no": "Non"
   },
   "metrics": {
     "title": "Tableau de bord des métriques",

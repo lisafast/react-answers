@@ -90,7 +90,7 @@ class DataStoreService {
     let formattedExpertFeedback = null;
     if (expertFeedback) {
       formattedExpertFeedback = {
-        ...expertFeedback,
+        ...expertFeedback, // Spread the incoming feedback object
         totalScore: expertFeedback.totalScore ?? null,
         sentence1Score: expertFeedback.sentence1Score ?? null,
         sentence2Score: expertFeedback.sentence2Score ?? null,
@@ -99,8 +99,13 @@ class DataStoreService {
         citationScore: expertFeedback.citationScore ?? null,
         answerImprovement: expertFeedback.answerImprovement || '',
         expertCitationUrl: expertFeedback.expertCitationUrl || '',
-        feedback: expertFeedback.isPositive ? 'positive' : 'negative'
+        feedback: expertFeedback.feedback, // Directly use the feedback string provided by the component
+        publicFeedbackReason: expertFeedback.publicFeedbackReason || '',
+        publicFeedbackScore: expertFeedback.publicFeedbackScore ?? null
+        // Remove isPositive if it was part of expertFeedback object, as 'feedback' string is now canonical
       };
+      // Ensure isPositive is not part of the final object if feedback string exists
+      
     }
     console.log('User feedback:', JSON.stringify(formattedExpertFeedback, null, 2));
 
