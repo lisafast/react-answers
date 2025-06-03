@@ -390,7 +390,8 @@
         "total": "Total des questions évaluées",
         "correct": "Correct",
         "needsImprovement": "Nécessite une amélioration",
-        "hasError": "Contient une erreur"
+        "hasError": "Contient une erreur",
+        "harmful": "Codé comme nuisible"
       },
       "aiScored": {
         "title": "Évaluations IA",

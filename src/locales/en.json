@@ -387,7 +387,8 @@
         "total": "Total questions evaluated",
         "correct": "Correct",
         "needsImprovement": "Needs improvement",
-        "hasError": "Has error"
+        "hasError": "Has error",
+        "harmful": "Coded as harmful"
       },
       "aiScored": {
         "title": "AI evaluations",
