@@ -57,7 +57,8 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         total: 0,
         correct: 0,
         needsImprovement: 0,
-        hasError: 0
+        hasError: 0,
+        harmful: 0
       },
       userScored: {
         total: 0,
@@ -134,6 +135,15 @@ const MetricsDashboard = ({ lang = 'en' }) => {
           if (type === 'expert') {
             metrics.expertScored.total++;
             metrics.byDepartment[department].expertScored.total++;
+            
+            // Check for harmful content in any sentence
+            const isHarmful = ['sentence1Harmful', 'sentence2Harmful', 'sentence3Harmful', 'sentence4Harmful', 'sentence5Harmful']
+              .some(field => interaction.expertFeedback[field] === true);
+            
+            if (isHarmful) {
+              metrics.expertScored.harmful++;
+            }
+            
             if (score === 100) {
               metrics.expertScored.correct++;
               metrics.byDepartment[department].expertScored.correct++;
@@ -340,33 +350,127 @@ const MetricsDashboard = ({ lang = 'en' }) => {
               </div>
             </div>
             <div>
-              <div>
-                <h3>{t('metrics.dashboard.expertScored.title')}</h3>
+              <div className="mb-600">
+                <h3 className="mb-300">{t('metrics.dashboard.expertScored.title')}</h3>
                 <GcdsText className="mb-300">{t('metrics.dashboard.expertScored.description')}</GcdsText>
-                <div>
-                  <GcdsText>{t('metrics.dashboard.expertScored.total')}: {metrics.expertScored.total}</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.expertScored.correct')}: {metrics.expertScored.correct} ({metrics.expertScored.total ? Math.round((metrics.expertScored.correct / metrics.expertScored.total) * 100) : 0}%)</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.expertScored.needsImprovement')}: {metrics.expertScored.needsImprovement} ({metrics.expertScored.total ? Math.round((metrics.expertScored.needsImprovement / metrics.expertScored.total) * 100) : 0}%)</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.expertScored.hasError')}: {metrics.expertScored.hasError} ({metrics.expertScored.total ? Math.round((metrics.expertScored.hasError / metrics.expertScored.total) * 100) : 0}%)</GcdsText>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <DataTable
+                    data={[
+                      {
+                        metric: t('metrics.dashboard.expertScored.total'),
+                        count: metrics.expertScored.total,
+                        percentage: '100%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.expertScored.correct'),
+                        count: metrics.expertScored.correct,
+                        percentage: metrics.expertScored.total ? Math.round((metrics.expertScored.correct / metrics.expertScored.total) * 100) + '%' : '0%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.expertScored.needsImprovement'),
+                        count: metrics.expertScored.needsImprovement,
+                        percentage: metrics.expertScored.total ? Math.round((metrics.expertScored.needsImprovement / metrics.expertScored.total) * 100) + '%' : '0%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.expertScored.hasError'),
+                        count: metrics.expertScored.hasError,
+                        percentage: metrics.expertScored.total ? Math.round((metrics.expertScored.hasError / metrics.expertScored.total) * 100) + '%' : '0%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.expertScored.harmful'),
+                        count: metrics.expertScored.harmful,
+                        percentage: metrics.expertScored.total ? Math.round((metrics.expertScored.harmful / metrics.expertScored.total) * 100) + '%' : '0%'
+                      }
+                    ]}
+                    columns={[
+                      { title: t('metrics.dashboard.metric'), data: 'metric' },
+                      { title: t('metrics.dashboard.count'), data: 'count' },
+                      { title: t('metrics.dashboard.percentage'), data: 'percentage' }
+                    ]}
+                    options={{
+                      paging: false,
+                      searching: false,
+                      ordering: false,
+                      info: false
+                    }}
+                  />
                 </div>
               </div>
-              <div>
-                <h3>{t('metrics.dashboard.aiScored.title')}</h3>
+              <div className="mb-600">
+                <h3 className="mb-300">{t('metrics.dashboard.aiScored.title')}</h3>
                 <GcdsText className="mb-300">{t('metrics.dashboard.aiScored.description')}</GcdsText>
-                <div>
-                  <GcdsText>{t('metrics.dashboard.aiScored.total')}: {metrics.aiScored.total}</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.aiScored.correct')}: {metrics.aiScored.correct} ({metrics.aiScored.total ? Math.round((metrics.aiScored.correct / metrics.aiScored.total) * 100) : 0}%)</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.aiScored.needsImprovement')}: {metrics.aiScored.needsImprovement} ({metrics.aiScored.total ? Math.round((metrics.aiScored.needsImprovement / metrics.aiScored.total) * 100) : 0}%)</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.aiScored.hasError')}: {metrics.aiScored.hasError} ({metrics.aiScored.total ? Math.round((metrics.aiScored.hasError / metrics.aiScored.total) * 100) : 0}%)</GcdsText>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <DataTable
+                    data={[
+                      {
+                        metric: t('metrics.dashboard.aiScored.total'),
+                        count: metrics.aiScored.total,
+                        percentage: '100%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.aiScored.correct'),
+                        count: metrics.aiScored.correct,
+                        percentage: metrics.aiScored.total ? Math.round((metrics.aiScored.correct / metrics.aiScored.total) * 100) + '%' : '0%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.aiScored.needsImprovement'),
+                        count: metrics.aiScored.needsImprovement,
+                        percentage: metrics.aiScored.total ? Math.round((metrics.aiScored.needsImprovement / metrics.aiScored.total) * 100) + '%' : '0%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.aiScored.hasError'),
+                        count: metrics.aiScored.hasError,
+                        percentage: metrics.aiScored.total ? Math.round((metrics.aiScored.hasError / metrics.aiScored.total) * 100) + '%' : '0%'
+                      }
+                    ]}
+                    columns={[
+                      { title: t('metrics.dashboard.metric'), data: 'metric' },
+                      { title: t('metrics.dashboard.count'), data: 'count' },
+                      { title: t('metrics.dashboard.percentage'), data: 'percentage' }
+                    ]}
+                    options={{
+                      paging: false,
+                      searching: false,
+                      ordering: false,
+                      info: false
+                    }}
+                  />
                 </div>
               </div>
-              <div>
-                <h3>{t('metrics.dashboard.userScored.title')}</h3>
+              <div className="mb-600">
+                <h3 className="mb-300">{t('metrics.dashboard.userScored.title')}</h3>
                 <GcdsText className="mb-300">{t('metrics.dashboard.userScored.description')}</GcdsText>
-                <div>
-                  <GcdsText>{t('metrics.dashboard.userScored.total')}: {metrics.userScored.total}</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.userScored.helpful')}: {metrics.userScored.helpful} ({metrics.userScored.total ? Math.round((metrics.userScored.helpful / metrics.userScored.total) * 100) : 0}%)</GcdsText>
-                  <GcdsText>{t('metrics.dashboard.userScored.unhelpful')}: {metrics.userScored.unhelpful} ({metrics.userScored.total ? Math.round((metrics.userScored.unhelpful / metrics.userScored.total) * 100) : 0}%)</GcdsText>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <DataTable
+                    data={[
+                      {
+                        metric: t('metrics.dashboard.userScored.total'),
+                        count: metrics.userScored.total,
+                        percentage: '100%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.userScored.helpful'),
+                        count: metrics.userScored.helpful,
+                        percentage: metrics.userScored.total ? Math.round((metrics.userScored.helpful / metrics.userScored.total) * 100) + '%' : '0%'
+                      },
+                      {
+                        metric: t('metrics.dashboard.userScored.unhelpful'),
+                        count: metrics.userScored.unhelpful,
+                        percentage: metrics.userScored.total ? Math.round((metrics.userScored.unhelpful / metrics.userScored.total) * 100) + '%' : '0%'
+                      }
+                    ]}
+                    columns={[
+                      { title: t('metrics.dashboard.metric'), data: 'metric' },
+                      { title: t('metrics.dashboard.count'), data: 'count' },
+                      { title: t('metrics.dashboard.percentage'), data: 'percentage' }
+                    ]}
+                    options={{
+                      paging: false,
+                      searching: false,
+                      ordering: false,
+                      info: false
+                    }}
+                  />
                 </div>
               </div>
             </div>
