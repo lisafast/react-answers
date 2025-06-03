@@ -383,7 +383,11 @@
       },
       "metric": "Métrique",
       "count": "Nombre",
-      "percentage": "Pourcentage",
+      "percentage": "%",
+      "enCount": "Nombre EN",
+      "enPercentage": "% EN",
+      "frCount": "Nombre FR",
+      "frPercentage": "% FR",
       "expertScored": {
         "title": "Évaluations des partenaires",
         "description": "Évaluations par des partenaires ministériels connectés",

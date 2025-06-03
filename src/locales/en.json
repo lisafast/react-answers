@@ -380,7 +380,11 @@
       },
       "metric": "Metric",
       "count": "Count",
-      "percentage": "Percentage",
+      "percentage": "%",
+      "enCount": "EN Count",
+      "enPercentage": "EN %",
+      "frCount": "FR Count",
+      "frPercentage": "FR %",
       "expertScored": {
         "title": "Partner evaluations",
         "description": "Evaluations by signed-in departmental partners",
