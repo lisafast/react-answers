@@ -37,11 +37,18 @@ const MetricsDashboard = ({ lang = 'en' }) => {
   const processMetrics = (logs) => {
     // Use a local Set to track unique chatIds
     const uniqueChatIds = new Set();
+    // Track unique chatIds by language
+    const uniqueChatIdsEn = new Set();
+    const uniqueChatIdsFr = new Set();
     // Initialize metrics object
     const metrics = {
       totalSessions: logs.length,
       totalQuestions: 0,
-      totalConversations: 0, // Will set this at the end
+      totalQuestionsEn: 0,
+      totalQuestionsFr: 0,
+      totalConversations: 0,
+      totalConversationsEn: 0,
+      totalConversationsFr: 0,
       sessionsByQuestionCount: {
         singleQuestion: { total: 0, en: 0, fr: 0 },
         twoQuestions: { total: 0, en: 0, fr: 0 },
@@ -79,6 +86,8 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       // Track unique chatIds from the chat document
       if (chat.chatId) {
         uniqueChatIds.add(chat.chatId);
+        if (chat.pageLanguage === 'en') uniqueChatIdsEn.add(chat.chatId);
+        if (chat.pageLanguage === 'fr') uniqueChatIdsFr.add(chat.chatId);
       }
 
       // Count questions for this session
@@ -87,26 +96,32 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       
       if (questionCount === 1) {
         metrics.sessionsByQuestionCount.singleQuestion.total++;
-        metrics.sessionsByQuestionCount.singleQuestion[pageLanguage]++;
+        if (pageLanguage === 'en') metrics.sessionsByQuestionCount.singleQuestion.en++;
+        if (pageLanguage === 'fr') metrics.sessionsByQuestionCount.singleQuestion.fr++;
       } else if (questionCount === 2) {
         metrics.sessionsByQuestionCount.twoQuestions.total++;
-        metrics.sessionsByQuestionCount.twoQuestions[pageLanguage]++;
+        if (pageLanguage === 'en') metrics.sessionsByQuestionCount.twoQuestions.en++;
+        if (pageLanguage === 'fr') metrics.sessionsByQuestionCount.twoQuestions.fr++;
       } else if (questionCount === 3) {
         metrics.sessionsByQuestionCount.threeQuestions.total++;
-        metrics.sessionsByQuestionCount.threeQuestions[pageLanguage]++;
+        if (pageLanguage === 'en') metrics.sessionsByQuestionCount.threeQuestions.en++;
+        if (pageLanguage === 'fr') metrics.sessionsByQuestionCount.threeQuestions.fr++;
       }
 
       // Process each interaction in the chat
       chat.interactions?.forEach(interaction => {
         // Count total questions
         metrics.totalQuestions++;
+        if (pageLanguage === 'en') metrics.totalQuestionsEn++;
+        if (pageLanguage === 'fr') metrics.totalQuestionsFr++;
         
-        // Count answer types
+        // Count answer types (per language)
         if (interaction.answer?.answerType) {
           const answerType = interaction.answer.answerType;
           if (Object.prototype.hasOwnProperty.call(metrics.answerTypes, answerType)) {
             metrics.answerTypes[answerType].total++;
-            metrics.answerTypes[answerType][pageLanguage]++;
+            if (pageLanguage === 'en') metrics.answerTypes[answerType].en++;
+            if (pageLanguage === 'fr') metrics.answerTypes[answerType].fr++;
           }
         }
         
@@ -134,13 +149,14 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         // Increment department total
         metrics.byDepartment[department].total++;
 
-        // Process human- and user-scored metrics
+        // Process human- and user-scored metrics (per language)
         if (interaction.expertFeedback?.totalScore !== undefined && interaction.expertFeedback?.type) {
           const type = interaction.expertFeedback.type;
           const score = interaction.expertFeedback.totalScore;
           if (type === 'expert') {
             metrics.expertScored.total.total++;
-            metrics.expertScored.total[pageLanguage]++;
+            if (pageLanguage === 'en') metrics.expertScored.total.en++;
+            if (pageLanguage === 'fr') metrics.expertScored.total.fr++;
             metrics.byDepartment[department].expertScored.total++;
             
             // Check for harmful content in any sentence
@@ -149,52 +165,63 @@ const MetricsDashboard = ({ lang = 'en' }) => {
             
             if (isHarmful) {
               metrics.expertScored.harmful.total++;
-              metrics.expertScored.harmful[pageLanguage]++;
+              if (pageLanguage === 'en') metrics.expertScored.harmful.en++;
+              if (pageLanguage === 'fr') metrics.expertScored.harmful.fr++;
             }
             
             if (score === 100) {
               metrics.expertScored.correct.total++;
-              metrics.expertScored.correct[pageLanguage]++;
+              if (pageLanguage === 'en') metrics.expertScored.correct.en++;
+              if (pageLanguage === 'fr') metrics.expertScored.correct.fr++;
               metrics.byDepartment[department].expertScored.correct++;
             } else if (score >= 82 && score <= 99) {
               metrics.expertScored.needsImprovement.total++;
-              metrics.expertScored.needsImprovement[pageLanguage]++;
+              if (pageLanguage === 'en') metrics.expertScored.needsImprovement.en++;
+              if (pageLanguage === 'fr') metrics.expertScored.needsImprovement.fr++;
               metrics.byDepartment[department].expertScored.needsImprovement++;
             } else {
               metrics.expertScored.hasError.total++;
-              metrics.expertScored.hasError[pageLanguage]++;
+              if (pageLanguage === 'en') metrics.expertScored.hasError.en++;
+              if (pageLanguage === 'fr') metrics.expertScored.hasError.fr++;
               metrics.byDepartment[department].expertScored.hasError++;
             }
           } else if (type === 'public') {
             metrics.userScored.total.total++;
-            metrics.userScored.total[pageLanguage]++;
+            if (pageLanguage === 'en') metrics.userScored.total.en++;
+            if (pageLanguage === 'fr') metrics.userScored.total.fr++;
             metrics.byDepartment[department].userScored.total++;
             if (score >= 90) {
               metrics.userScored.helpful.total++;
-              metrics.userScored.helpful[pageLanguage]++;
+              if (pageLanguage === 'en') metrics.userScored.helpful.en++;
+              if (pageLanguage === 'fr') metrics.userScored.helpful.fr++;
               metrics.byDepartment[department].userScored.helpful++;
             } else {
               metrics.userScored.unhelpful.total++;
-              metrics.userScored.unhelpful[pageLanguage]++;
+              if (pageLanguage === 'en') metrics.userScored.unhelpful.en++;
+              if (pageLanguage === 'fr') metrics.userScored.unhelpful.fr++;
               metrics.byDepartment[department].userScored.unhelpful++;
             }
           }
         }
 
-        // Process AI-scored metrics
+        // Process AI-scored metrics (per language)
         if (interaction.autoEval?.expertFeedback?.totalScore !== undefined) {
           metrics.aiScored.total.total++;
-          metrics.aiScored.total[pageLanguage]++;
+          if (pageLanguage === 'en') metrics.aiScored.total.en++;
+          if (pageLanguage === 'fr') metrics.aiScored.total.fr++;
           const score = interaction.autoEval.expertFeedback.totalScore;
           if (score === 100) {
             metrics.aiScored.correct.total++;
-            metrics.aiScored.correct[pageLanguage]++;
+            if (pageLanguage === 'en') metrics.aiScored.correct.en++;
+            if (pageLanguage === 'fr') metrics.aiScored.correct.fr++;
           } else if (score >= 82 && score <= 99) {
             metrics.aiScored.needsImprovement.total++;
-            metrics.aiScored.needsImprovement[pageLanguage]++;
+            if (pageLanguage === 'en') metrics.aiScored.needsImprovement.en++;
+            if (pageLanguage === 'fr') metrics.aiScored.needsImprovement.fr++;
           } else {
             metrics.aiScored.hasError.total++;
-            metrics.aiScored.hasError[pageLanguage]++;
+            if (pageLanguage === 'en') metrics.aiScored.hasError.en++;
+            if (pageLanguage === 'fr') metrics.aiScored.hasError.fr++;
           }
         }
       });
@@ -202,6 +229,8 @@ const MetricsDashboard = ({ lang = 'en' }) => {
 
     // Set the totalConversations as the number of unique chatIds
     metrics.totalConversations = uniqueChatIds.size;
+    metrics.totalConversationsEn = uniqueChatIdsEn.size;
+    metrics.totalConversationsFr = uniqueChatIdsFr.size;
 
     return metrics;
   };
@@ -311,19 +340,19 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       metric: t('metrics.dashboard.totalSessions'),
                       count: metrics.totalConversations,
                       percentage: '100%',
-                      enCount: metrics.totalConversations,
-                      enPercentage: '100%',
-                      frCount: metrics.totalConversations,
-                      frPercentage: '100%'
+                      enCount: metrics.totalConversationsEn,
+                      enPercentage: metrics.totalConversations ? Math.round((metrics.totalConversationsEn / metrics.totalConversations) * 100) + '%' : '0%',
+                      frCount: metrics.totalConversationsFr,
+                      frPercentage: metrics.totalConversations ? Math.round((metrics.totalConversationsFr / metrics.totalConversations) * 100) + '%' : '0%'
                     },
                     {
                       metric: t('metrics.dashboard.totalQuestions'),
                       count: metrics.totalQuestions,
                       percentage: metrics.totalConversations ? Math.round((metrics.totalQuestions / metrics.totalConversations) * 100) + '%' : '0%',
-                      enCount: metrics.totalQuestions,
-                      enPercentage: metrics.totalConversations ? Math.round((metrics.totalQuestions / metrics.totalConversations) * 100) + '%' : '0%',
-                      frCount: metrics.totalQuestions,
-                      frPercentage: metrics.totalConversations ? Math.round((metrics.totalQuestions / metrics.totalConversations) * 100) + '%' : '0%'
+                      enCount: metrics.totalQuestionsEn,
+                      enPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsEn / metrics.totalQuestions) * 100) + '%' : '0%',
+                      frCount: metrics.totalQuestionsFr,
+                      frPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsFr / metrics.totalQuestions) * 100) + '%' : '0%'
                     },
                     {
                       metric: t('metrics.dashboard.sessionsByQuestionCount.singleQuestion'),
