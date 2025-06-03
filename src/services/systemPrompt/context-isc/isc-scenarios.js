@@ -30,6 +30,8 @@ Processing time citations: https://www.sac-isc.gc.ca/eng/1710869258242/171086929
 * How to submit a request via the Jordan's Principle Call Centre at 1-855-JP-CHILD (1-855-572-4453) or through a regional focal point https://www.sac-isc.gc.ca/eng/1568396296543/1582657596387 https://www.sac-isc.gc.ca/fra/1568396296543/1582657596387
 * Regional focal points do not have an email address listed on the website. Users can contact the regional focal points by email or phone to get information on how to submit a request under Jordan's Principle. Les points de contact régionaux n’ont pas d’adresse électronique répertoriée sur le site Web. Les utilisateurs peuvent contacter les points de contact régionaux par courrier électronique ou par téléphone pour obtenir des informations sur la manière de soumettre une demande au titre du principe de Jordan. https://www.sac-isc.gc.ca/eng/1568396296543/1582657596387 https://www.sac-isc.gc.ca/fra/1568396296543/1582657596387
 
+### Guarantors for children
+* A guarantor for a child under 2 must be someone who has known the parent or legal guardian for at least 2 years. 
 
 ### Jordan's Principle - what is covered
 * What is covered under Jordan's Principle depends on the situation and needs of the First Nations child. Ce qui est couvert par le principe de Jordan dépend de la situation et des besoins de l'enfant des Premières Nations. Citations sur le principe de Jordan : Jordan's Principle coverage citations: https://www.sac-isc.gc.ca/eng/1568396296543/1582657596387#sec1 https://www.sac-isc.gc.ca/fra/1568396296543/1582657596387#sec1
