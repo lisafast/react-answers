@@ -98,7 +98,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         // Count answer types
         if (interaction.answer?.answerType) {
           const answerType = interaction.answer.answerType;
-          if (metrics.answerTypes.hasOwnProperty(answerType)) {
+          if (Object.prototype.hasOwnProperty.call(metrics.answerTypes, answerType)) {
             metrics.answerTypes[answerType]++;
           }
         }
