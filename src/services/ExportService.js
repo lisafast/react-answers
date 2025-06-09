@@ -296,7 +296,9 @@ class ExportService {
       {
         dataLabel: 'expertFeedback.expertCitationUrl',
         outputLabel: 'expertFeedback.expertCitationUrl',
-      }
+      },
+      { dataLabel: 'expertFeedback.publicFeedbackReason', outputLabel: 'expertFeedback.publicFeedbackReason' },
+      { dataLabel: 'expertFeedback.publicFeedbackScore', outputLabel: 'expertFeedback.publicFeedbackScore' }
     ];
     const type = filename.endsWith('.csv') ? 'csv' : filename.endsWith('.xlsx') ? 'xlsx' : 'xlsx';
     return ExportService.toSpreadsheet(items, headerOrder, type, filename);
