@@ -52,7 +52,8 @@
           "noVisit": "Je n'ai pas besoin de me rendre dans un bureau",
           "savedTime": "J'ai gagné du temps en cherchant et en lisant",
           "other": "Autre - veuillez remplir l'enquête"
-        }
+        },
+        "shortQuestion": "Est-ce que cela vous a été utile?"
       },
       "no": {
         "question": "Pourquoi n'était-ce pas utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
@@ -63,7 +64,8 @@
           "notDetailed": "Pas assez détaillé",
           "notWanted": "La réponse est claire, mais ce n'est pas ce que je voulais entendre",
           "other": "Autre - veuillez remplir l'enquête"
-        }
+        },
+        "shortQuestion": "Est-ce que cela ne vous a pas été utile?"
       }
     },
     "privacy": {

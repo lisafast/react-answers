@@ -52,7 +52,8 @@
           "noVisit": "I don't need to visit an office",
           "savedTime": "Saved me time searching and reading",
           "other": "Other - please fill out the survey"
-        }
+        },
+        "shortQuestion": "Was this helpful?"
       },
       "no": {
         "question": "Why wasn't it helpful? Select the best option below. (required)",
@@ -63,7 +64,8 @@
           "notDetailed": "Not detailed enough",
           "notWanted": "Answer is clear, but is not what I wanted to hear",
           "other": "Other - please fill out the survey"
-        }
+        },
+        "shortQuestion": "Was this not helpful?"
       }
     },
     "privacy": {

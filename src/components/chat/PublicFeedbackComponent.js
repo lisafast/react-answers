@@ -73,7 +73,7 @@ const PublicFeedbackComponent = ({
       <fieldset className="gc-chckbxrdio sm-v">
         <h2>{isPositive ? t('homepage.publicFeedback.yes.question') : t('homepage.publicFeedback.no.question')}</h2>
         <details className="answer-details" open>
-          <summary>{t('homepage.publicFeedback.question')}</summary>
+          <summary>{isPositive ? t('homepage.publicFeedback.yes.shortQuestion') : t('homepage.publicFeedback.no.shortQuestion')}</summary>
           <ul className="list-unstyled lst-spcd-2">
             {options.map((opt) => (
               <li className="radio" key={opt.id}>
