@@ -119,12 +119,12 @@ const HomePage = ({ lang = 'en' }) => {
         <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600" tabIndex={0}>
           <GcdsText>
             <a
-              href={t('homepage.feedback.surveyUrl')}
+              href={t('homepage.publicFeedback.surveyUrl')}
               className="feedback-survey-link"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t('homepage.feedback.surveyLink')}
+              {t('homepage.publicFeedback.surveyLink')}
             </a>
           </GcdsText>
           <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex={0}>

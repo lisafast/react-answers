@@ -6,6 +6,8 @@ import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import ExportService from '../../services/ExportService.js';
 import { useTranslations } from '../../hooks/useTranslations.js';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import EndUserFeedbackSection from '../metrics/EndUserFeedbackSection.js';
 
 DataTable.use(DT);
 
@@ -78,7 +80,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         needsImprovement: { total: 0, en: 0, fr: 0 },
         hasError: { total: 0, en: 0, fr: 0 }
       },
-      byDepartment: {}
+      byDepartment: {},
+      publicFeedbackReasons: {},
+      publicFeedbackScores: {}
     };
 
     // Process each chat document
@@ -231,6 +235,22 @@ const MetricsDashboard = ({ lang = 'en' }) => {
     metrics.totalConversations = uniqueChatIds.size;
     metrics.totalConversationsEn = uniqueChatIdsEn.size;
     metrics.totalConversationsFr = uniqueChatIdsFr.size;
+
+    // Add to metrics: publicFeedback breakdown by reason and score
+    const publicFeedbackReasons = {};
+    const publicFeedbackScores = {};
+    logs.forEach(chat => {
+      chat.interactions?.forEach(interaction => {
+        if (interaction.expertFeedback?.type === 'public') {
+          const reason = interaction.expertFeedback.publicFeedbackReason || 'Other';
+          const score = interaction.expertFeedback.publicFeedbackScore || 'Other';
+          publicFeedbackReasons[reason] = (publicFeedbackReasons[reason] || 0) + 1;
+          publicFeedbackScores[score] = (publicFeedbackScores[score] || 0) + 1;
+        }
+      });
+    });
+    metrics.publicFeedbackReasons = publicFeedbackReasons;
+    metrics.publicFeedbackScores = publicFeedbackScores;
 
     return metrics;
   };
@@ -568,58 +588,6 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                   />
                 </div>
               </div>
-              <div className="mb-600">
-                <h3 className="mb-300">{t('metrics.dashboard.userScored.title')}</h3>
-                <GcdsText className="mb-300">{t('metrics.dashboard.userScored.description')}</GcdsText>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <DataTable
-                    data={[
-                      {
-                        metric: t('metrics.dashboard.userScored.total'),
-                        count: metrics.userScored.total.total,
-                        percentage: '100%',
-                        enCount: metrics.userScored.total.en,
-                        enPercentage: metrics.userScored.total.total ? Math.round((metrics.userScored.total.en / metrics.userScored.total.total) * 100) + '%' : '0%',
-                        frCount: metrics.userScored.total.fr,
-                        frPercentage: metrics.userScored.total.total ? Math.round((metrics.userScored.total.fr / metrics.userScored.total.total) * 100) + '%' : '0%'
-                      },
-                      {
-                        metric: t('metrics.dashboard.userScored.helpful'),
-                        count: metrics.userScored.helpful.total,
-                        percentage: metrics.userScored.total.total ? Math.round((metrics.userScored.helpful.total / metrics.userScored.total.total) * 100) + '%' : '0%',
-                        enCount: metrics.userScored.helpful.en,
-                        enPercentage: metrics.userScored.total.total ? Math.round((metrics.userScored.helpful.en / metrics.userScored.total.total) * 100) + '%' : '0%',
-                        frCount: metrics.userScored.helpful.fr,
-                        frPercentage: metrics.userScored.total.total ? Math.round((metrics.userScored.helpful.fr / metrics.userScored.total.total) * 100) + '%' : '0%'
-                      },
-                      {
-                        metric: t('metrics.dashboard.userScored.unhelpful'),
-                        count: metrics.userScored.unhelpful.total,
-                        percentage: metrics.userScored.total.total ? Math.round((metrics.userScored.unhelpful.total / metrics.userScored.total.total) * 100) + '%' : '0%',
-                        enCount: metrics.userScored.unhelpful.en,
-                        enPercentage: metrics.userScored.total.total ? Math.round((metrics.userScored.unhelpful.en / metrics.userScored.total.total) * 100) + '%' : '0%',
-                        frCount: metrics.userScored.unhelpful.fr,
-                        frPercentage: metrics.userScored.total.total ? Math.round((metrics.userScored.unhelpful.fr / metrics.userScored.total.total) * 100) + '%' : '0%'
-                      }
-                    ]}
-                    columns={[
-                      { title: t('metrics.dashboard.metric'), data: 'metric' },
-                      { title: t('metrics.dashboard.count'), data: 'count' },
-                      { title: t('metrics.dashboard.percentage'), data: 'percentage' },
-                      { title: t('metrics.dashboard.enCount'), data: 'enCount' },
-                      { title: t('metrics.dashboard.enPercentage'), data: 'enPercentage' },
-                      { title: t('metrics.dashboard.frCount'), data: 'frCount' },
-                      { title: t('metrics.dashboard.frPercentage'), data: 'frPercentage' }
-                    ]}
-                    options={{
-                      paging: false,
-                      searching: false,
-                      ordering: false,
-                      info: false
-                    }}
-                  />
-                </div>
-              </div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg mb-600">
               <h3 className="mb-300">{t('metrics.dashboard.byDepartment.title')}</h3>
@@ -659,6 +627,8 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                 }}
               />
             </div>
+
+            <EndUserFeedbackSection t={t} metrics={metrics} />
           </div>
         ) : (
           <div className="p-4">
@@ -672,4 +642,4 @@ const MetricsDashboard = ({ lang = 'en' }) => {
   );
 };
 
-export default MetricsDashboard; 
+export default MetricsDashboard;
