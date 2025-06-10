@@ -130,12 +130,12 @@ const HomePage = ({ lang = 'en' }) => {
           <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex={0}>
             <GcdsText>{t('homepage.about.builtBy')}</GcdsText>
             <GcdsText>{t('homepage.about.aiServices.azure')}</GcdsText>
+            <GcdsText>{t('homepage.about.contact')}</GcdsText>
             <GcdsText>
               <GcdsLink href={lang === 'fr' ? 'https://numerique.canada.ca/' : 'https://digital.canada.ca/'}>
                 {t('homepage.about.cdslink')}
               </GcdsLink>
             </GcdsText>
-            <GcdsText>{t('homepage.about.contact')}</GcdsText>
           </GcdsDetails>
         </GcdsContainer>
       </WrappedErrorBoundary>
