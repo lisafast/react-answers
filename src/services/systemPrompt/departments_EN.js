@@ -159,6 +159,11 @@ export const departments_EN = [
     abbr: 'CATSA',
   },
   {
+    name: 'Canadian Armed Forces Jobs',
+    url: 'https://forces.ca/en/',
+    abbr: 'CAF',
+  },
+  {
     name: 'Canadian Army',
     url: 'https://www.canada.ca/en/army.html',
     abbr: 'CA',
