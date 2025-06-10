@@ -28,7 +28,7 @@
         "azure": "Service d'IA Azure : Microsoft Azure OpenAI"
       },
       "cdslink": "Service numérique canadien",
-      "contact": "Contactez mailto:CDS.DTO-BTN.SNC@servicecanada.gc.ca pour plus d'informations."
+      "contact": "Contact cds.dto-btn.snc@servicecanada.gc.ca pour plus d'informations."
     },
     "feedback": {
       "title": "",
@@ -53,7 +53,7 @@
           "savedTime": "J'ai gagné du temps en cherchant et en lisant",
           "other": "Autre - veuillez remplir l'enquête"
         },
-        "shortQuestion": "Est-ce que cela vous a été utile?"
+        "shortQuestion": "Pourquoi était-ce utile ?"
       },
       "no": {
         "question": "Pourquoi n'était-ce pas utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
@@ -65,7 +65,7 @@
           "notWanted": "La réponse est claire, mais ce n'est pas ce que je voulais entendre",
           "other": "Autre - veuillez remplir l'enquête"
         },
-        "shortQuestion": "Est-ce que cela ne vous a pas été utile?"
+        "shortQuestion": "Pourquoi n'était-ce pas utile ?"
       }
     },
     "privacy": {

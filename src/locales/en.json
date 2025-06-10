@@ -28,11 +28,11 @@
         "azure": "AI service: Microsoft Azure OpenAI"
       },
       "cdslink": "Canadian Digital Service",
-      "contact": "Contact mailto:CDS.DTO-BTN.SNC@servicecanada.gc.ca for information."
+      "contact": "Contact cds.dto-btn.snc@servicecanada.gc.ca for information."
     },
     "feedback": {
       "title": "",
-      "surveyLink": "Share your feedback (opens in new tab)",
+      "surveyLink": "Share your feedback (survey opens in new tab)",
       "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs",
       "question": "How was this answer?",
       "useful": "Good",
@@ -41,7 +41,7 @@
       "thankYou": "Thank you for your feedback!"
     },
     "publicFeedback": {
-      "surveyLink": "Tell us more! AI Answers feedback survey (opens in new tab)",
+      "surveyLink": "AI Answers feedback survey (opens in new tab)",
       "send": "Send",
       "question": "Was this helpful?",
       "yes": {
@@ -53,7 +53,7 @@
           "savedTime": "Saved me time searching and reading",
           "other": "Other - please fill out the survey"
         },
-        "shortQuestion": "Was this helpful?"
+        "shortQuestion": "Why helpful?"
       },
       "no": {
         "question": "Why wasn't it helpful? Select the best option below. (required)",
@@ -65,7 +65,7 @@
           "notWanted": "Answer is clear, but is not what I wanted to hear",
           "other": "Other - please fill out the survey"
         },
-        "shortQuestion": "Was this not helpful?"
+        "shortQuestion": "Why not helpful?"
       }
     },
     "privacy": {
