@@ -21,14 +21,14 @@
     },
     "about": {
       "title": "À propos de Réponses IA",
-      "privacyNote": "Réponses IA est conçu, exploité et maintenu par le Service numérique canadien.",
+      "builtBy": "Réponses IA est conçu, exploité et maintenu par le Service numérique canadien.",
       "aiServices": {
         "claude": "Service d'IA Claude : Claude 3.7 Sonnet d'Anthropic, connaissances jusqu'en février 2025",
         "chatgpt": "Service d'IA ChatGPT : GPT-4.1 d'OpenAI, connaissances jusqu'en mai 2025",
         "azure": "Service d'IA Azure : Microsoft Azure OpenAI"
       },
-      "systemPrompt": "Réponses IA sur Github",
-      "contact": "Le développement est toujours en cours — Contactez lisa.fast@cds-snc.ca pour plus d'informations."
+      "cdslink": "Service numérique canadien",
+      "contact": "Contactez dto@cds-snc.ca pour plus d'informations."
     },
     "feedback": {
       "title": "",
