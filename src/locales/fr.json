@@ -294,6 +294,11 @@
       "success": "Conversation supprimée avec succès",
       "error": "Échec de la suppression de la conversation : "
     },
+    "sessionManagement": {
+      "title": "Gestion des sessions",
+      "concurrentSessions": "Nombre de sessions simultanées :",
+      "requestsPerMinute": "Requêtes par minute :"
+    },
     "chatLogs": {
       "title": "Télécharger les journaux de chat récents",
       "timeRange": "Plage de temps",

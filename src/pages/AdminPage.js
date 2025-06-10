@@ -57,6 +57,11 @@ const AdminPage = ({ lang = 'en' }) => {
             </GcdsLink>
           </li>
           <li>
+            <GcdsLink href={`/${lang}/session-management`}>
+              {t('admin.sessionManagement.title', 'Session Management')}
+            </GcdsLink>
+          </li>
+          <li>
             <GcdsLink href={`/${lang}/settings`}>
               {t('settings.title', 'Settings')}
             </GcdsLink>

@@ -16,6 +16,7 @@ import SettingsPage from './pages/SettingsPage.js';
 import { AuthProvider } from './contexts/AuthContext.js';
 import { AdminRoute, RoleProtectedRoute } from './components/RoleProtectedRoute.js';
 import MetricsPage from './pages/MetricsPage.js';
+import SessionManagementPage from './pages/SessionManagementPage.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -99,7 +100,9 @@ export default function App() {
       { path: '/en/metrics', element: <AdminRoute lang="en"><MetricsPage lang="en" /></AdminRoute> },
       { path: '/fr/metrics', element: <AdminRoute lang="fr"><MetricsPage lang="fr" /></AdminRoute> },
       { path: '/en/settings', element: <AdminRoute lang="en"><SettingsPage lang="en" /></AdminRoute> },
-      { path: '/fr/settings', element: <AdminRoute lang="fr"><SettingsPage lang="fr" /></AdminRoute> }
+      { path: '/fr/settings', element: <AdminRoute lang="fr"><SettingsPage lang="fr" /></AdminRoute> },
+      { path: '/en/session-management', element: <AdminRoute lang="en"><SessionManagementPage lang="en" /></AdminRoute> },
+      { path: '/fr/session-management', element: <AdminRoute lang="fr"><SessionManagementPage lang="fr" /></AdminRoute> }
     ];
 
     return createBrowserRouter([

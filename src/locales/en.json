@@ -312,6 +312,11 @@
       "loading": "Deleting...",
       "success": "Chat deleted successfully",
       "error": "Failed to delete chat: "
+    },
+    "sessionManagement": {
+      "title": "Session Management",
+      "concurrentSessions": "Number Concurrent Sessions:",
+      "requestsPerMinute": "Requests per minute:"
     }
   },
   "login": {
