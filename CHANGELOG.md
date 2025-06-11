@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/cds-snc/ai-answers/compare/v1.6.0...v1.6.1) (2025-06-11)
+
+
+### Bug Fixes
+
+* Update ai-models.js ([a08143e](https://github.com/cds-snc/ai-answers/commit/a08143ead00d5e3e5872c65ada2224078ac5e005))
+
 ## [1.6.0](https://github.com/cds-snc/ai-answers/compare/v1.5.0...v1.6.0) (2025-06-02)
 
 
