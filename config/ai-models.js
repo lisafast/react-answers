@@ -1,5 +1,5 @@
 // config/ai-models.js
-const AI_MODELS = {   
+const AI_MODELS = {
   azure: {
     default: "gpt-4o",
     models: {
