@@ -43,7 +43,7 @@
     "publicFeedback": {
       "surveyLink": "Take a 3 minute feedback survey (opens in new tab)",
       "send": "Send",
-      "question": "Why was this helpful?",
+      "question": "Was this helpful?",
       "yes": {
         "question": "Tell us more. Select the best option below. (required)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=y",

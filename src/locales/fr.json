@@ -43,7 +43,7 @@
     "publicFeedback": {
       "surveyLink": "Répondez à une enquête de rétroaction de 3 minutes (s'ouvre dans un nouvel onglet)",
       "send": "Envoyer",
-      "question": "Est-ce que cela vous a été utile?",
+      "question": "C'était utile?",
       "yes": {
         "question": "Dites-nous plus. Sélectionnez la meilleure option ci-dessous. (obligatoire)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=y",
