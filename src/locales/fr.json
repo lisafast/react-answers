@@ -32,7 +32,7 @@
     },
     "feedback": {
       "title": "",
-      "surveyLink": "Donnez votre avis (s'ouvre dans un nouvel onglet)",
+      "surveyLink": "Répondez à une enquête de rétroaction de 3 minutes (s'ouvre dans un nouvel onglet)",
       "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA",
       "question": "Cette réponse était-elle utile?",
       "useful": "Bonne",
@@ -41,7 +41,7 @@
       "thankYou": "Merci d'avoir donné votre avis!"
     },
     "publicFeedback": {
-      "surveyLink": "Dites-nous en plus! Enquête d'évaluation (s'ouvre dans un nouvel onglet)",
+      "surveyLink": "Prenez l'enquête d'évaluation (s'ouvre dans un nouvel onglet)",
       "send": "Envoyer",
       "question": "Est-ce que cela vous a été utile?",
       "yes": {
