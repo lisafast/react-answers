@@ -88,6 +88,15 @@ const PublicFeedbackComponent = ({
               </li>
             ))}
           </ul>
+          <a
+              href={surveyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="feedback-survey-link"
+              style={{ display: 'block', marginTop: '1em' }}
+            >
+              {t('homepage.publicFeedback.surveyLink')}
+            </a>
         </details>
       </fieldset>
       <button type="submit" className="btn-primary mrgn-lft-sm">
