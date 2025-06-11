@@ -1,5 +1,5 @@
 // src/pages/HomePage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import ChatAppContainer from '../components/chat/ChatAppContainer.js';
 import { GcdsContainer, GcdsDetails, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
@@ -48,47 +48,69 @@ const HomePage = ({ lang = 'en' }) => {
   const [serviceStatus, setServiceStatus] = useState({ isAvailable: false, message: '' });
   const [chatId, setChatId] = useState(null);
   const [isLoadingSiteStatus, setIsLoadingSiteStatus] = useState(true);
+  const [isSessionFetched, setIsSessionFetched] = useState(false);
+  const [showOutageOnError, setShowOutageOnError] = useState(false); // Renamed and initialized
 
-  // By default, show outage until DB check completes
-  useEffect(() => {
-    DataStoreService.getSiteStatus().then(status => {
+  const handleChatError = useCallback(() => { // New callback for chat errors
+    setShowOutageOnError(true);
+  }, []);
+
+  async function fetchSessionAndSiteStatus() {
+    setIsLoadingSiteStatus(true); // Ensure loading state is true at the start
+    let sessionOk = false;
+    try {
+      const sessionData = await DataStoreService.getChatSession();
+      setChatId(sessionData.chatId);
+      localStorage.setItem('chatId', sessionData.chatId);
+      sessionOk = true; // Session fetch was successful
+    } catch (error) {
+      console.error('Failed to get or create chat session:', error);
+      setShowOutageOnError(true); // Show outage on session fetch error
+      // No need to set sessionOk to false, it's already false
+    }
+    setIsSessionFetched(true);
+
+    // Only proceed to get site status if session was okay, or if we decide it's not strictly dependent
+    // For now, let's assume site status can be checked even if session fails,
+    // but an error in session *OR* site status should show outage.
+    try {
+      const status = await DataStoreService.getSiteStatus();
       if (status === 'available') {
         setServiceStatus({ isAvailable: true, message: '' });
       } else {
         setServiceStatus({ isAvailable: false, message: t('homepage.errors.serviceUnavailable') });
+        setShowOutageOnError(true); // Show outage if service is unavailable
       }
-      setIsLoadingSiteStatus(false);
-    }).catch(() => {
-      setServiceStatus({ isAvailable: false, message: t('homepage.errors.serviceUnavailable') });
-      setIsLoadingSiteStatus(false);
-    });
-  }, [t]);
-
-  async function fetchSession() {
-    try {
-      const data = await DataStoreService.getChatSession();
-      setChatId(data.chatId);
-      localStorage.setItem('chatId', data.chatId);
     } catch (error) {
-      // If chat session fails, just leave chatId null, outage will already be shown if site is unavailable
-      console.error('Failed to get chat session:', error);
+      console.error('Failed to get site status:', error);
+      setServiceStatus({ isAvailable: false, message: t('homepage.errors.serviceUnavailable') });
+      setShowOutageOnError(true); // Show outage on site status fetch error
+    } finally {
+      setIsLoadingSiteStatus(false);
     }
   }
 
   useEffect(() => {
-    if (serviceStatus.isAvailable === true || isPrivileged) {
-      fetchSession();
-    }
-  }, [serviceStatus.isAvailable, isPrivileged]);
+    fetchSessionAndSiteStatus();
+  }, [t, isPrivileged]); // Dependencies remain the same
 
   const WrappedErrorBoundary = ({ children }) => <ErrorBoundary t={t}>{children}</ErrorBoundary>;
 
-  // Show outage by default, and if DB check fails, unless privileged
-  if ((isLoadingSiteStatus || serviceStatus.isAvailable === false) && !isPrivileged) {
+  // If a critical error occurred (either during initial fetch or from ChatAppContainer),
+  // show OutageComponent to all users.
+  if (showOutageOnError) {
     return <OutageComponent />;
   }
 
-  // Show chat if DB check passes or user is privileged
+  // If no critical error, then check for initial loading or service unavailability for non-privileged users.
+  // This is only reached if showOutageOnError is false.
+  if (!isPrivileged && (isLoadingSiteStatus || !isSessionFetched || !serviceStatus.isAvailable)) {
+    return <OutageComponent />;
+  }
+
+  // If no critical error AND (service is available OR user is privileged),
+  // show the main application content.
+  // This is only reached if showOutageOnError is false AND the above condition for non-privileged users is false.
   if (serviceStatus.isAvailable === true || isPrivileged) {
     return (
       <WrappedErrorBoundary>
@@ -114,7 +136,7 @@ const HomePage = ({ lang = 'en' }) => {
               </GcdsLink>
             </GcdsText>
           </GcdsDetails>
-          <ChatAppContainer lang={lang} chatId={chatId} />
+          <ChatAppContainer lang={lang} chatId={chatId} onChatError={handleChatError} /> {/* Pass onChatError prop */}
         </GcdsContainer>
         <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600" tabIndex={0}>
           <GcdsText>
@@ -142,7 +164,9 @@ const HomePage = ({ lang = 'en' }) => {
     );
   }
 
-  // Fallback: show outage if status is unknown
+  // Fallback: show outage if status is unknown or error occurred (and not privileged)
+  // This condition is largely covered by the first 'if' block now.
+  // If it's reached, it implies !isPrivileged and some error/unavailable state.
   return <OutageComponent />;
 };
 
