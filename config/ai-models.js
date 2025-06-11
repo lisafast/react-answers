@@ -1,7 +1,7 @@
 // config/ai-models.js
 const AI_MODELS = {
   azure: {
-    default: "openai-gpt41-mini",
+    default: "gpt-4o",
     models: {
       "openai-gpt41-mini": { 
         maxTokens: 1024,
