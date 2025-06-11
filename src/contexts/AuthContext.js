@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
         const path = window.location.pathname;
         if (path.startsWith('/fr')) prefix = '/fr';
       }
-      navigate(`${prefix}/login`); // Redirect to language-specific login
+      navigate(`${prefix}/signin`); // Redirect to language-specific signin
     });
 
     // Cleanup on unmount

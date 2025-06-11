@@ -21,18 +21,18 @@
     },
     "about": {
       "title": "About AI Answers",
-      "privacyNote": "AI Answers is designed, operated and maintained by the Canadian Digital Service.",
+      "builtBy": "AI Answers is designed, operated and maintained by the Canadian Digital Service.",
       "aiServices": {
         "claude": "AI service Claude: Anthropic Claude Sonnet 3.7, knowledge to February 2025",
         "chatgpt": "AI service ChatGPT: OpenAI 4.1, knowledge to May 31 2025",
         "azure": "AI service: Microsoft Azure OpenAI"
       },
-      "systemPrompt": "AI Answers on Github",
-      "contact": "Development is still in progress - contact lisa.fast@cds-snc.ca for information."
+      "cdslink": "Canadian Digital Service",
+      "contact": "Contact cds.dto-btn.snc@servicecanada.gc.ca for information."
     },
     "feedback": {
       "title": "",
-      "surveyLink": "Share your feedback (opens in new tab)",
+      "surveyLink": "Take a 3 minute feedback survey (opens in new tab)",
       "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs",
       "question": "How was this answer?",
       "useful": "Good",
@@ -41,21 +41,22 @@
       "thankYou": "Thank you for your feedback!"
     },
     "publicFeedback": {
-      "surveyLink": "Tell us more! AI Answers feedback survey (opens in new tab)",
+      "surveyLink": "Take a 3 minute feedback survey (opens in new tab)",
       "send": "Send",
       "question": "Was this helpful?",
       "yes": {
-        "question": "Why was it helpful? Select the best option below. (required)",
+        "question": "Tell us more. Select the best option below. (required)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=y",
         "options": {
           "noCall": "I don't need to call the government",
           "noVisit": "I don't need to visit an office",
           "savedTime": "Saved me time searching and reading",
           "other": "Other - please fill out the survey"
-        }
+        },
+        "shortQuestion": "Why was this helpful?"
       },
       "no": {
-        "question": "Why wasn't it helpful? Select the best option below. (required)",
+        "question": "Help us improve. Select the best option below. (required)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=n",
         "options": {
           "irrelevant": "Irrelevant or off topic",
@@ -63,7 +64,8 @@
           "notDetailed": "Not detailed enough",
           "notWanted": "Answer is clear, but is not what I wanted to hear",
           "other": "Other - please fill out the survey"
-        }
+        },
+        "shortQuestion": "Why wasn't this helpful?"
       }
     },
     "privacy": {
@@ -392,21 +394,35 @@
     "timeRangeTitle": "Get usage and evaluation metrics",
     "dashboard": {
       "title": "Results",
-      "usageMetrics": "Usage metrics",
-      "totalSessions": "Total sessions",
-      "totalQuestions": "Total questions",
+      "usageMetrics": "Usage Metrics",
+      "totalSessions": "Total Sessions",
+      "totalQuestions": "Total Questions",
       "sessionsByQuestionCount": {
-        "singleQuestion": "Sessions with 1 question",
-        "twoQuestions": "Sessions with 2 questions",
-        "threeQuestions": "Sessions with 3 questions"
+        "singleQuestion": "Single Question Sessions",
+        "twoQuestions": "Two Question Sessions",
+        "threeQuestions": "Three Question Sessions"
       },
+      "answerTypes": {
+        "normal": "Normal Answers",
+        "clarifyingQuestion": "Clarifying Questions",
+        "ptMuni": "Provincial/Municipal",
+        "notGc": "Not Government of Canada"
+      },
+      "metric": "Metric",
+      "count": "Count",
+      "percentage": "%",
+      "enCount": "EN Count",
+      "enPercentage": "EN %",
+      "frCount": "FR Count",
+      "frPercentage": "FR %",
       "expertScored": {
-        "title": "Expert evaluations",
-        "description": "Evaluations by signed-in departmental subject matter experts",
+        "title": "Partner evaluations",
+        "description": "Evaluations by signed-in departmental partners",
         "total": "Total questions evaluated",
         "correct": "Correct",
         "needsImprovement": "Needs improvement",
-        "hasError": "Has error"
+        "hasError": "Has error",
+        "harmful": "Coded as harmful"
       },
       "aiScored": {
         "title": "AI evaluations",

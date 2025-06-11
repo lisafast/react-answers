@@ -109,7 +109,7 @@ const HomePage = ({ lang = 'en' }) => {
             <GcdsText>{t('homepage.privacy.disclaimer')}</GcdsText>
             <GcdsText>
               {t('homepage.privacy.terms')}{' '}
-              <GcdsLink href="https://www.canada.ca/en/transparency/terms.html">
+              <GcdsLink href={lang === 'fr' ? 'https://www.canada.ca/fr/transparence/avis.html' : 'https://www.canada.ca/en/transparency/terms.html'}>
                 {t('homepage.privacy.termsLink')}
               </GcdsLink>
             </GcdsText>
@@ -119,23 +119,23 @@ const HomePage = ({ lang = 'en' }) => {
         <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600" tabIndex={0}>
           <GcdsText>
             <a
-              href={t('homepage.feedback.surveyUrl')}
+              href={t('homepage.publicFeedback.surveyUrl')}
               className="feedback-survey-link"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t('homepage.feedback.surveyLink')}
+              {t('homepage.publicFeedback.surveyLink')}
             </a>
           </GcdsText>
           <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex={0}>
-            <GcdsText>{t('homepage.about.privacyNote')}</GcdsText>
+            <GcdsText>{t('homepage.about.builtBy')}</GcdsText>
             <GcdsText>{t('homepage.about.aiServices.azure')}</GcdsText>
+            <GcdsText>{t('homepage.about.contact')}</GcdsText>
             <GcdsText>
-              <GcdsLink href="https://github.com/cds-snc/ai-answers">
-                {t('homepage.about.systemPrompt')}
+              <GcdsLink href={lang === 'fr' ? 'https://numerique.canada.ca/' : 'https://digital.canada.ca/'}>
+                {t('homepage.about.cdslink')}
               </GcdsLink>
             </GcdsText>
-            <GcdsText>{t('homepage.about.contact')}</GcdsText>
           </GcdsDetails>
         </GcdsContainer>
       </WrappedErrorBoundary>

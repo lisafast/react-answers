@@ -21,18 +21,18 @@
     },
     "about": {
       "title": "À propos de Réponses IA",
-      "privacyNote": "Réponses IA est conçu, exploité et maintenu par le Service numérique canadien.",
+      "builtBy": "Réponses IA est conçu, exploité et maintenu par le Service numérique canadien.",
       "aiServices": {
         "claude": "Service d'IA Claude : Claude 3.7 Sonnet d'Anthropic, connaissances jusqu'en février 2025",
         "chatgpt": "Service d'IA ChatGPT : GPT-4.1 d'OpenAI, connaissances jusqu'en mai 2025",
         "azure": "Service d'IA Azure : Microsoft Azure OpenAI"
       },
-      "systemPrompt": "Réponses IA sur Github",
-      "contact": "Le développement est toujours en cours — Contactez lisa.fast@cds-snc.ca pour plus d'informations."
+      "cdslink": "Service numérique canadien",
+      "contact": "Écrivez à cds.dto-btn.snc@servicecanada.gc.ca pour plus d'informations."
     },
     "feedback": {
       "title": "",
-      "surveyLink": "Donnez votre avis (s'ouvre dans un nouvel onglet)",
+      "surveyLink": "Répondez à une enquête de rétroaction de 3 minutes (s'ouvre dans un nouvel onglet)",
       "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA",
       "question": "Cette réponse était-elle utile?",
       "useful": "Bonne",
@@ -41,21 +41,22 @@
       "thankYou": "Merci d'avoir donné votre avis!"
     },
     "publicFeedback": {
-      "surveyLink": "Dites-nous en plus! Enquête d'évaluation (s'ouvre dans un nouvel onglet)",
+      "surveyLink": "Répondez à une enquête de rétroaction de 3 minutes (s'ouvre dans un nouvel onglet)",
       "send": "Envoyer",
-      "question": "Est-ce que cela vous a été utile?",
+      "question": "C'était utile?",
       "yes": {
-        "question": "Pourquoi était-ce utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
+        "question": "Dites-nous plus. Sélectionnez la meilleure option ci-dessous. (obligatoire)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=y",
         "options": {
           "noCall": "Je n'ai pas besoin d'appeler le gouvernement",
           "noVisit": "Je n'ai pas besoin de me rendre dans un bureau",
           "savedTime": "J'ai gagné du temps en cherchant et en lisant",
           "other": "Autre - veuillez remplir l'enquête"
-        }
+        },
+        "shortQuestion": "Pourquoi était-ce utile ?"
       },
       "no": {
-        "question": "Pourquoi n'était-ce pas utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
+        "question": "Aidez-nous à améliorer. Sélectionnez la meilleure option ci-dessous. (obligatoire)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=n",
         "options": {
           "irrelevant": "Non pertinent ou hors sujet",
@@ -63,7 +64,8 @@
           "notDetailed": "Pas assez détaillé",
           "notWanted": "La réponse est claire, mais ce n'est pas ce que je voulais entendre",
           "other": "Autre - veuillez remplir l'enquête"
-        }
+        },
+        "shortQuestion": "Pourquoi n'était-ce pas utile ?"
       }
     },
     "privacy": {
@@ -309,7 +311,7 @@
       "downloadExcel": "Télécharger Excel",
       "found": "Trouvé",
       "interactionsFound": "interactions de chat. Téléchargez les journaux pour voir l'ensemble complet et les détails.",
-      "selectRange": "Sélectionnez une plage de temps et cliquez sur « Obtenir les journaux » pour voir l’historique des conversations",
+      "selectRange": "Sélectionnez une plage de temps et cliquez sur « Obtenir les journaux » pour voir l'historique des conversations",
       "date": "Date",
       "chatId": "ID de chat",
       "interactions": "Interactions"
@@ -399,17 +401,31 @@
       "totalSessions": "Total des sessions",
       "totalQuestions": "Total des questions",
       "sessionsByQuestionCount": {
-        "singleQuestion": "Sessions avec 1 question",
-        "twoQuestions": "Sessions avec 2 questions",
-        "threeQuestions": "Sessions avec 3 questions"
+        "singleQuestion": "Sessions à une question",
+        "twoQuestions": "Sessions à deux questions",
+        "threeQuestions": "Sessions à trois questions"
       },
+      "answerTypes": {
+        "normal": "Réponses normales",
+        "clarifyingQuestion": "Questions de clarification",
+        "ptMuni": "Provincial/Municipal",
+        "notGc": "Non gouvernement du Canada"
+      },
+      "metric": "Métrique",
+      "count": "Nombre",
+      "percentage": "%",
+      "enCount": "Nombre EN",
+      "enPercentage": "% EN",
+      "frCount": "Nombre FR",
+      "frPercentage": "% FR",
       "expertScored": {
-        "title": "Évaluations d'experts",
-        "description": "Évaluations par des experts en la matière des départements connectés",
+        "title": "Évaluations des partenaires",
+        "description": "Évaluations par des partenaires ministériels connectés",
         "total": "Total des questions évaluées",
         "correct": "Correct",
         "needsImprovement": "Nécessite une amélioration",
-        "hasError": "Contient une erreur"
+        "hasError": "Contient une erreur",
+        "harmful": "Codé comme nuisible"
       },
       "aiScored": {
         "title": "Évaluations IA",

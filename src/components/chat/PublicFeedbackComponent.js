@@ -73,7 +73,7 @@ const PublicFeedbackComponent = ({
       <fieldset className="gc-chckbxrdio sm-v">
         <h2>{isPositive ? t('homepage.publicFeedback.yes.question') : t('homepage.publicFeedback.no.question')}</h2>
         <details className="answer-details" open>
-          <summary>{t('homepage.publicFeedback.question')}</summary>
+          <summary>{isPositive ? t('homepage.publicFeedback.yes.shortQuestion') : t('homepage.publicFeedback.no.shortQuestion')}</summary>
           <ul className="list-unstyled lst-spcd-2">
             {options.map((opt) => (
               <li className="radio" key={opt.id}>
@@ -88,8 +88,7 @@ const PublicFeedbackComponent = ({
               </li>
             ))}
           </ul>
-          {selected === 'other' && (
-            <a
+          <a
               href={surveyUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -98,7 +97,6 @@ const PublicFeedbackComponent = ({
             >
               {t('homepage.publicFeedback.surveyLink')}
             </a>
-          )}
         </details>
       </fieldset>
       <button type="submit" className="btn-primary mrgn-lft-sm">

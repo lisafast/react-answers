@@ -38,7 +38,7 @@ const AI_MODELS = {
     }
   },
   openai: {
-    default: 'gpt-4.1-mini',
+    default: 'gpt-4.1-2025-04-14',
     models: {
       'gpt-4.1-mini': { 
         maxTokens: 1024,
