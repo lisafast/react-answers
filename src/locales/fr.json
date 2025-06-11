@@ -28,7 +28,7 @@
         "azure": "Service d'IA Azure : Microsoft Azure OpenAI"
       },
       "cdslink": "Service numérique canadien",
-      "contact": "Contact cds.dto-btn.snc@servicecanada.gc.ca pour plus d'informations."
+      "contact": "Écrivez à cds.dto-btn.snc@servicecanada.gc.ca pour plus d'informations."
     },
     "feedback": {
       "title": "",
@@ -41,11 +41,11 @@
       "thankYou": "Merci d'avoir donné votre avis!"
     },
     "publicFeedback": {
-      "surveyLink": "Prenez l'enquête d'évaluation (s'ouvre dans un nouvel onglet)",
+      "surveyLink": "Répondez à une enquête de rétroaction de 3 minutes (s'ouvre dans un nouvel onglet)",
       "send": "Envoyer",
       "question": "Est-ce que cela vous a été utile?",
       "yes": {
-        "question": "Pourquoi était-ce utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
+        "question": "Dites-nous plus. Sélectionnez la meilleure option ci-dessous. (obligatoire)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=y",
         "options": {
           "noCall": "Je n'ai pas besoin d'appeler le gouvernement",
@@ -56,7 +56,7 @@
         "shortQuestion": "Pourquoi était-ce utile ?"
       },
       "no": {
-        "question": "Pourquoi n'était-ce pas utile ? Sélectionnez la meilleure option ci-dessous. (obligatoire)",
+        "question": "Aidez-nous à améliorer. Sélectionnez la meilleure option ci-dessous. (obligatoire)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=n",
         "options": {
           "irrelevant": "Non pertinent ou hors sujet",

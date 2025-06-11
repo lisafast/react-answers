@@ -32,7 +32,7 @@
     },
     "feedback": {
       "title": "",
-      "surveyLink": "Share your feedback (survey opens in new tab)",
+      "surveyLink": "Take a 3 minute feedback survey (opens in new tab)",
       "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs",
       "question": "How was this answer?",
       "useful": "Good",
@@ -43,9 +43,9 @@
     "publicFeedback": {
       "surveyLink": "Take a 3 minute feedback survey (opens in new tab)",
       "send": "Send",
-      "question": "Was this helpful?",
+      "question": "Why was this helpful?",
       "yes": {
-        "question": "Why was it helpful? Select the best option below. (required)",
+        "question": "Tell us more. Select the best option below. (required)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=y",
         "options": {
           "noCall": "I don't need to call the government",
@@ -53,10 +53,10 @@
           "savedTime": "Saved me time searching and reading",
           "other": "Other - please fill out the survey"
         },
-        "shortQuestion": "Why helpful?"
+        "shortQuestion": "Why was this helpful?"
       },
       "no": {
-        "question": "Why wasn't it helpful? Select the best option below. (required)",
+        "question": "Help us improve. Select the best option below. (required)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=n",
         "options": {
           "irrelevant": "Irrelevant or off topic",
@@ -65,7 +65,7 @@
           "notWanted": "Answer is clear, but is not what I wanted to hear",
           "other": "Other - please fill out the survey"
         },
-        "shortQuestion": "Why not helpful?"
+        "shortQuestion": "Why wasn't this helpful?"
       }
     },
     "privacy": {
