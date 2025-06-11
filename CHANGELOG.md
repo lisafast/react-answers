@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.2](https://github.com/cds-snc/ai-answers/compare/v1.6.1...v1.6.2) (2025-06-11)
+
+
+### Bug Fixes
+
+* poke to infra ([553e758](https://github.com/cds-snc/ai-answers/commit/553e758d875e982e7696fd91496b10c6b903f987))
+* Update ai-models.js ([9c4aec1](https://github.com/cds-snc/ai-answers/commit/9c4aec10231219a8928909a377a48d3f72d5ad16))
+* Update ai-models.js ([553e758](https://github.com/cds-snc/ai-answers/commit/553e758d875e982e7696fd91496b10c6b903f987))
+
 ## [1.6.1](https://github.com/cds-snc/ai-answers/compare/v1.6.0...v1.6.1) (2025-06-11)
 
 
