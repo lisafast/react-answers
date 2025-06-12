@@ -118,7 +118,7 @@ class AuthService {
 
   static isPublicRoute(pathname) {
     // Define public routes that do not require authentication
-    const publicRoutes = ['/', '/login', '/signup', '/about', '/contact'];
+    const publicRoutes = ['/', '/signin', '/signup', '/about', '/contact'];
     return publicRoutes.some(route => pathname.startsWith(route));
   }
 

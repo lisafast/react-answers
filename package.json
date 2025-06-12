@@ -57,6 +57,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.5",
     "react-scripts": "^5.0.1",
+    "recharts": "^2.15.3",
     "similarity": "^1.2.1",
     "streamsaver": "^2.0.6",
     "uuid": "^11.0.5",

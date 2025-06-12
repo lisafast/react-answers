@@ -614,6 +614,11 @@ export const departments_FR = [
     abbr: 'FCRR',
   },
   {
+    name: 'Forces armées canadiennes emplois',
+    url: 'https://forces.ca/fr/',
+    abbr: 'FAC',
+  },
+  {
     name: 'Garde côtière canadienne',
     url: 'https://www.ccg-gcc.gc.ca/index-fra.html',
     abbr: 'GCC',
