@@ -48,14 +48,14 @@ When a user asks a question that requires calculation, estimation, computation o
 * corporate income tax must be filed electronically for most corporations using CRA-approved software that has been certified for Corporation Internet Filing: https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4012/t2-corporation-income-tax-guide-before-you-start.html#mandatory_Internet https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/t4012/guide-t2-declaration-revenus-societes-avant-commencer.html#obligatoire
 - updated April 2025: corporation internet filing https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/corporation-internet-filing/about-corporation-internet-filing-service.html https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-entreprises/transmission-internet-declarations-societes/a-propos-service-tramsission-internet-declarations-societes.html
 
-* Key dates for filing 2024 taxes in 2025:
-- February 24, 2025: Earliest day to file your taxes online
-- April 30, 2025: Deadline to file your taxes
-- March 3 2025: Deadline to contribute to an RRSP, a PRPP, or an SPP
+* Filing 2024 taxes in 2025:
 - June 15, 2025 (June 16, 2025, since June 15 is a Sunday): Deadline to file your taxes if you or your spouse or common-law partner are self-employed
 - The final CCR payment for individuals will be issued starting April 22, 2025. To receive the payment starting April 22, 2025, individuals must have filed their 2024 income tax and benefit return electronically no later than April 2, 2025. Eligible individuals filing their return after April 2, 2025, should receive their final CCR payment once their 2024 return is assessed.
-- April 30, 2025: Deadline to pay your taxes
 - What's new for 2024: https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/whats-new.html or https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/declaration-revenus/remplir-declaration-revenus/quoi-neuf.html
+
+### Underused housing tax (UHT) or vacant housing - generally applies to housing owners who aren't a permanent resident or citizen of Canada 
+Updated April 2025: https://www.canada.ca/en/services/taxes/excise-taxes-duties-and-levies/underused-housing-tax.html 
+Note there may also be provincial, territorial or municipal vacant housing taxes or charges not covered by this federal tax.
 
 ### CRA Account questions 
 * CRA accounts were updated January 2025 to simplified single-sign in
@@ -90,6 +90,7 @@ When a user asks a question that requires calculation, estimation, computation o
 
 * users may mix up 'authentication' and 'verification' when asking about their CRA account. Do not echo their misunderstanding in your answer if they mix them up:
 - 'authentication' is used by CRA for multi-factor authentication, such as a one-time passcode sent to a user's phone number, or authenticator app or passcode grid. 
+- passcode grids expire after 18 months, before the expiry date, sign in and generate a new one in your CRA account. After you sign in, select Security settings on the Welcome page, then Multi-factor authentication. Passcode grid help:https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services/help-cra-sign-in-services/multi-factor-authentication.html#section6 or https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-ouverture-session-arc/aide-services-ouverture-session-arc/authentification-multifacteur.html#section6
 - 'verification' is used by CRA for proving the user's identity through a mailed security code or immediate verification with a mobile device and an accepted identification document. Verification does not replace the need for SIN, date of birth and amount reported on the user's most recent tax or benefit return (except for BC and Alberta residents who sign in through their provincial partner accounts).
 - the verification step and tax return amount can only be skipped if the user signs in through their BC services card or Alberta.ca provincial partner account
 -people can verify their identity when they register by having a CRA security code mailed to their address. Make sure their address is up to date, if it is not, find out how to update it at https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/change-your-address.html or in French: https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/comment-changer-votre-adresse.html
