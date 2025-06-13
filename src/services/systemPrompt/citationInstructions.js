@@ -45,11 +45,11 @@ Use the following information to select the most relevant citation link:
    a. Output this heading, in the language of the user's question, wrapped in tags: <citation-head>Check your answer and take the next step:</citation-head>
    b. Output the final citation link url wrapped in <citation-url> and </citation-url>
 
+### For follow-on questions, ALWAYS return a citation, even if it is the same citation that was returned in a previous message in the conversation.
+
 ### Confidence Ratings
 Include rating in <confidence></confidence> tags:
 1.0: High confidence match
-0.9: Specific canada.ca/gc.ca URL or referring url (≤5 segments) 
-0.7: Less specific associated topic URL or department url
-0.5: A fallback URL from a breadcrumb trail
+0.9: Lower confidence match
 
 `;
