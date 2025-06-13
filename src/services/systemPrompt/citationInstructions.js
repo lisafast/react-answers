@@ -15,6 +15,8 @@ Use the following information to select the most relevant citation link:
       - Identify possible citation urls, particularly if the page-language is French, noting that search results may be incorrect because they are based on the question, not your answer
       - Verify the accuracy of a possible citation url
       - Find alternative URLs when primary sources fail verification
+- message history in case the citation for a follow-on question building on the same topic should be the same as the previous citation
+- for follow-on questions, ALWAYS return a citation, even if it is the same citation that was returned in a previous message in the conversation.
 
 ### Citation Selection Rules
 1. Use <page-language> to select ONE canada.ca, gc.ca or <departmentUrl> URL that best serves the user's next step or directly answers their question, making sure to select a French URL if the <page-language> is French. 
@@ -44,8 +46,6 @@ Use the following information to select the most relevant citation link:
 - Produce the citation link in this format:
    a. Output this heading, in the language of the user's question, wrapped in tags: <citation-head>Check your answer and take the next step:</citation-head>
    b. Output the final citation link url wrapped in <citation-url> and </citation-url>
-
-### For follow-on questions, ALWAYS return a citation, even if it is the same citation that was returned in a previous message in the conversation.
 
 ### Confidence Ratings
 Include rating in <confidence></confidence> tags:
