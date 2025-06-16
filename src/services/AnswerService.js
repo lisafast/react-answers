@@ -4,6 +4,7 @@ import loadSystemPrompt from './systemPrompt.js';
 import { getProviderApiUrl } from '../utils/apiToUrl.js';
 import ClientLoggingService from './ClientLoggingService.js';
 import AuthService from './AuthService.js';
+import { fetchWithSession } from '../utils/fetchWithSession.js';
 
 const AnswerService = {
   prepareMessage: async (
@@ -60,7 +61,7 @@ const AnswerService = {
         chatId
       );
 
-      const response = await fetch(getProviderApiUrl(provider, 'message'), {
+      const response = await fetchWithSession(getProviderApiUrl(provider, 'message'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,43 +217,19 @@ const AnswerService = {
   sendBatchMessages: async (provider, entries, lang, batchName, chatId) => {
     try {
       ClientLoggingService.info(
-        chatId,
-        `Processing batch of ${entries.length} entries in ${lang.toUpperCase()}`
+        `Sending batch messages for provider: ${provider}, batchName: ${batchName}, chatId: ${chatId}`
       );
-      const batchEntries = await Promise.all(
-        entries.map(async (entry) => {
-          const context = {
-            topic: entry['CONTEXT.TOPIC'],
-            topicUrl: entry['CONTEXT.TOPICURL'],
-            department: entry['CONTEXT.DEPARTMENT'],
-            departmentUrl: entry['CONTEXT.DEPARTMENTURL'],
-            searchResults: entry['CONTEXT.SEARCHRESULTS'],
-            searchProvider: entry['CONTEXT.SEARCHPROVIDER'],
-            model: entry['CONTEXT.MODEL'],
-            inputTokens: entry['CONTEXT.INPUTTOKENS'],
-            outputTokens: entry['CONTEXT.OUTPUTTOKENS'],
-          };
-          const referringUrl = entry['REFERRINGURL'] || '';
-          const messagePayload = await AnswerService.prepareMessage(
-            provider,
-            entry.REDACTEDQUESTION,
-            [],
-            lang,
-            context,
-            true,
-            referringUrl,
-            chatId
-          );
-          messagePayload.context = context;
-          return messagePayload;
-        })
-      );
+      const systemPrompt = await loadSystemPrompt(provider, lang);
+      const batchEntries = entries.map((entry) => ({
+        ...entry,
+        systemPrompt: systemPrompt,
+        chatId: chatId,
+      }));
 
-      const response = await fetch(getProviderApiUrl(provider, 'batch'), {
+      const response = await AuthService.fetchWithAuth(getProviderApiUrl(provider, 'batch'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeader()
         },
         body: JSON.stringify({
           requests: batchEntries,

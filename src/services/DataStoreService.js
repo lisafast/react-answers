@@ -1,5 +1,6 @@
 import { getApiUrl, getProviderApiUrl } from '../utils/apiToUrl.js';
 import AuthService from './AuthService.js';
+import { fetchWithSession } from '../utils/fetchWithSession.js';
 
 class DataStoreService {
   static async checkDatabaseConnection() {
@@ -9,7 +10,7 @@ class DataStoreService {
     }
 
     try {
-      const response = await fetch(getApiUrl('db-check'));
+      const response = await fetchWithSession(getApiUrl('db-check'));
       if (!response.ok) {
         throw new Error('Database connection failed');
       }
@@ -67,11 +68,11 @@ class DataStoreService {
   static async persistInteraction(interactionData) {
     try {
       
-      const response = await fetch(getApiUrl('db-persist-interaction'), {
+      const response = await fetchWithSession(getApiUrl('db-persist-interaction'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeader()
+          ...AuthService.getAuthHeader() // Add Authorization header
         },
         body: JSON.stringify(interactionData)
       });
@@ -102,15 +103,12 @@ class DataStoreService {
         feedback: expertFeedback.feedback, // Directly use the feedback string provided by the component
         publicFeedbackReason: expertFeedback.publicFeedbackReason || '',
         publicFeedbackScore: expertFeedback.publicFeedbackScore ?? null
-        // Remove isPositive if it was part of expertFeedback object, as 'feedback' string is now canonical
       };
-      // Ensure isPositive is not part of the final object if feedback string exists
-      
     }
     console.log('User feedback:', JSON.stringify(formattedExpertFeedback, null, 2));
 
     try {
-      const response = await fetch(getApiUrl('db-persist-feedback'), {
+      const response = await fetchWithSession(getApiUrl('db-persist-feedback'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +134,7 @@ class DataStoreService {
   }
   static async getChatSession(sessionId) {
     try {
-      const response = await fetch(getApiUrl(`db-chat-session?sessionId=${sessionId}`));
+      const response = await fetchWithSession(getApiUrl(`db-chat-session?sessionId=${sessionId}`));
       if (!response.ok) throw new Error('Failed to get chat session');
       return await response.json();
     } catch (error) {
@@ -238,7 +236,7 @@ class DataStoreService {
 
   static async getSiteStatus() {
     try {
-      const response = await fetch(getApiUrl('db-public-site-status'));
+      const response = await fetchWithSession(getApiUrl('db-public-site-status'));
       if (!response.ok) throw new Error('Failed to get site status');
       const data = await response.json();
       return data.value || 'unavailable';
@@ -388,6 +386,36 @@ class DataStoreService {
       return await response.json();
     } catch (error) {
       console.error('Error repairing expert feedback:', error);
+      throw error;
+    }
+  }
+
+  // Generic settings methods
+  static async getSetting(key) {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl(`db-settings?key=${key}`));
+      if (!response.ok) throw new Error('Failed to get setting');
+      const data = await response.json();
+      return data.value;
+    } catch (error) {
+      console.error(`Error getting setting ${key}:`, error);
+      return null;
+    }
+  }
+
+  static async setSetting(key, value) {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-settings'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ key, value })
+      });
+      if (!response.ok) throw new Error('Failed to set setting');
+      return await response.json();
+    } catch (error) {
+      console.error(`Error setting ${key}:`, error);
       throw error;
     }
   }

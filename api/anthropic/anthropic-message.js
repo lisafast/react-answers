@@ -1,6 +1,7 @@
 // api/claude.js
 import { createClaudeAgent } from '../../agents/AgentService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
+import { withSessionRenewal } from '../../middleware/sessionRenewal.js'; // Updated import
 
 const NUM_RETRIES = 3;
 const BASE_DELAY = 1000; // 1 second
@@ -24,6 +25,8 @@ const convertInteractionsToMessages = (interactions) => {
 };
 
 async function invokeHandler(req, res) {
+ 
+
   if (req.method === 'POST') {
     try {
       const { message, systemPrompt, conversationHistory, chatId = 'system' } = req.body;
@@ -86,12 +89,20 @@ async function invokeHandler(req, res) {
   }
 }
 
-export default async function handler(req, res) {
+// Wrap the main handler logic, not the retry handler, with session renewal
+async function mainAnthropicMessageHandler(req, res) {
   let lastError;
 
   for (let attempt = 0; attempt < NUM_RETRIES; attempt++) {
     try {
-      return await invokeHandler(req, res);
+      // We need to ensure invokeHandler can be awaited and its result (if it sends response) is handled
+      await invokeHandler(req, res); 
+      if (res.headersSent) return; // If invokeHandler sent a response, we are done.
+      
+      // This part should ideally not be reached if invokeHandler always sends a response on success/failure.
+      // If it can complete without sending a response (e.g. an unexpected path), this is a fallback.
+      lastError = new Error('invokeHandler completed without sending a response');
+
     } catch (error) {
       lastError = error;
       ServerLoggingService.error(`Attempt ${attempt + 1} failed:`, req.body?.chatId || 'system', error);
@@ -99,13 +110,27 @@ export default async function handler(req, res) {
       if (attempt < NUM_RETRIES - 1) {
         const delay = Math.pow(2, attempt) * BASE_DELAY;
         await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        // This else block is for when all retries are exhausted
+        ServerLoggingService.error('All retry attempts failed', req.body?.chatId || 'system', lastError);
+        if (!res.headersSent) {
+          return res.status(500).json({
+            error: 'Failed after retries',
+            details: lastError?.message
+          });
+        }
+        return; // Ensure we don't fall through if headers were somehow sent by error handling
       }
     }
   }
-
-  ServerLoggingService.error('All retry attempts failed', req.body?.chatId || 'system', lastError);
-  return res.status(500).json({
-    error: 'Failed after retries',
-    details: lastError?.message
-  });
+  // Fallback if loop finishes and no response sent (should be rare)
+  if (!res.headersSent) {
+     ServerLoggingService.error('Fell through anthropic message handler without sending response', req.body?.chatId || 'system', lastError);
+     return res.status(500).json({
+        error: 'Internal server error after retries',
+        details: lastError?.message || 'Unknown error'
+    });
+  }
 }
+
+export default withSessionRenewal(mainAnthropicMessageHandler);

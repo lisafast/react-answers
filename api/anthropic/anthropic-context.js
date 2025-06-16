@@ -1,7 +1,10 @@
 import { invokeContextAgent } from '../../services/ContextAgentService.js';
 import { exponentialBackoff } from '../../src/utils/backoff.js';
+import { withSessionRenewal } from '../../middleware/sessionRenewal.js'; // Updated import
 
-export default async function handler(req, res) {
+async function anthropicContextHandler(req, res) {
+  
+
   if (req.method === 'POST') {
     console.log('Request body:', req.body);
     
@@ -17,3 +20,5 @@ export default async function handler(req, res) {
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
+
+export default withSessionRenewal(anthropicContextHandler);

@@ -21,18 +21,18 @@
     },
     "about": {
       "title": "About AI Answers",
-      "privacyNote": "AI Answers is designed, operated and maintained by the Canadian Digital Service.",
+      "builtBy": "AI Answers is designed, operated and maintained by the Canadian Digital Service.",
       "aiServices": {
         "claude": "AI service Claude: Anthropic Claude Sonnet 3.7, knowledge to February 2025",
         "chatgpt": "AI service ChatGPT: OpenAI 4.1, knowledge to May 31 2025",
         "azure": "AI service: Microsoft Azure OpenAI"
       },
-      "systemPrompt": "AI Answers on Github",
-      "contact": "Development is still in progress - contact lisa.fast@cds-snc.ca for information."
+      "cdslink": "Canadian Digital Service",
+      "contact": "Contact cds.dto-btn.snc@servicecanada.gc.ca for information."
     },
     "feedback": {
       "title": "",
-      "surveyLink": "Share your feedback (opens in new tab)",
+      "surveyLink": "Take a 3 minute feedback survey (opens in new tab)",
       "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs",
       "question": "How was this answer?",
       "useful": "Good",
@@ -41,11 +41,11 @@
       "thankYou": "Thank you for your feedback!"
     },
     "publicFeedback": {
-      "surveyLink": "Tell us more! AI Answers feedback survey (opens in new tab)",
+      "surveyLink": "Take a 3 minute feedback survey (opens in new tab)",
       "send": "Send",
       "question": "Was this helpful?",
       "yes": {
-        "question": "Why was it helpful? Select the best option below. (required)",
+        "question": "Tell us more. Select the best option below. (required)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=y",
         "options": {
           "noCall": "I don't need to call the government",
@@ -53,10 +53,10 @@
           "savedTime": "Saved me time searching and reading",
           "other": "Other - please fill out the survey"
         },
-        "shortQuestion": "Was this helpful?"
+        "shortQuestion": "Why was this helpful?"
       },
       "no": {
-        "question": "Why wasn't it helpful? Select the best option below. (required)",
+        "question": "Help us improve. Select the best option below. (required)",
         "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs/?so=pub&cl=n",
         "options": {
           "irrelevant": "Irrelevant or off topic",
@@ -65,7 +65,7 @@
           "notWanted": "Answer is clear, but is not what I wanted to hear",
           "other": "Other - please fill out the survey"
         },
-        "shortQuestion": "Was this not helpful?"
+        "shortQuestion": "Why wasn't this helpful?"
       }
     },
     "privacy": {
@@ -316,7 +316,8 @@
     "sessionManagement": {
       "title": "Session Management",
       "concurrentSessions": "Number Concurrent Sessions:",
-      "requestsPerMinute": "Requests per minute:"
+      "requestsPerMinute": "Requests per minute:",
+      "sessionDuration": "Session Duration (minutes):"
     }
   },
   "login": {

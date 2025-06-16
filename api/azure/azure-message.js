@@ -1,6 +1,7 @@
 import { createAzureOpenAIAgent } from '../../agents/AgentService.js';
 import ServerLoggingService from '../../services/ServerLoggingService.js';
 import { ToolTrackingHandler } from '../../agents/ToolTrackingHandler.js';
+import { withSessionRenewal } from '../../middleware/sessionRenewal.js';
 
 const NUM_RETRIES = 3;
 const BASE_DELAY = 1000; // 1 second
@@ -23,6 +24,7 @@ const convertInteractionsToMessages = (interactions) => {
 };
 
 async function invokeHandler(req, res) {
+ 
   if (req.method === 'POST') {
     try {
       console.log('Azure OpenAI API request received');
@@ -96,23 +98,38 @@ async function invokeHandler(req, res) {
   }
 }
 
-export default async function handler(req, res) {
+async function mainAzureMessageHandler(req, res) {
   let lastError;
   for (let attempt = 0; attempt < NUM_RETRIES; attempt++) {
     try {
-      return await invokeHandler(req, res);
+      await invokeHandler(req, res);
+      if (res.headersSent) return;
+      lastError = new Error('invokeHandler completed without sending a response');
     } catch (error) {
       lastError = error;
       ServerLoggingService.error(`Attempt ${attempt + 1} failed:`, req.body?.chatId || 'system', error);
       if (attempt < NUM_RETRIES - 1) {
         const delay = Math.pow(2, attempt) * BASE_DELAY;
         await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        ServerLoggingService.error('All retry attempts failed', req.body?.chatId || 'system', lastError);
+        if (!res.headersSent) {
+          return res.status(500).json({
+            error: 'Failed after retries',
+            details: lastError?.message
+          });
+        }
+        return;
       }
     }
   }
-  ServerLoggingService.error('All retry attempts failed', req.body?.chatId || 'system', lastError);
-  return res.status(500).json({
-    error: 'Failed after retries',
-    details: lastError?.message
-  });
+  if (!res.headersSent) {
+    ServerLoggingService.error('Fell through Azure message handler without sending response', req.body?.chatId || 'system', lastError);
+    return res.status(500).json({
+      error: 'Internal server error after retries',
+      details: lastError?.message || 'Unknown error'
+    });
+  }
 }
+
+export default withSessionRenewal(mainAzureMessageHandler);

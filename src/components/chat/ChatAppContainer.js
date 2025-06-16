@@ -17,7 +17,7 @@ const extractSentences = (paragraph) => {
   return sentences.length > 0 ? sentences : [paragraph];
 };
 
-const ChatAppContainer = ({ lang = 'en', chatId }) => {
+const ChatAppContainer = ({ lang = 'en', chatId, onChatError }) => {
   const MAX_CONVERSATION_TURNS = 3;
   const MAX_CHAR_LIMIT = 400;
   const { t } = useTranslations(lang);
@@ -295,6 +295,9 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
           ]);
           clearInput();
           setIsLoading(false);
+          if (onChatError) { // Call the passed-in error handler
+            onChatError();
+          }
         }
       }
 
@@ -312,7 +315,8 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
     isLoading,
     messages,
     updateStatusWithTimer,
-    safeT
+    safeT,
+    onChatError // Add onChatError to dependencies
   ]);
 
   useEffect(() => {

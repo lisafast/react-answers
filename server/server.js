@@ -54,7 +54,34 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
-app.use(cors());
+
+// Unified CORS setup for all environments
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests from your frontend development server and your production frontend URL
+    // In development, with the proxy, the 'origin' header might be that of the proxy itself or undefined.
+    // For proxied requests, the browser sees it as same-origin, so this check might be more relevant for direct API calls if any.
+    // If you have a specific production frontend URL, add it to the allowedOrigins array.
+    // Example: const allowedOrigins = ['http://localhost:3000', 'https://your-production-frontend.com'];
+    // For now, reflecting the origin if it exists, or allowing if no origin (e.g. server-to-server, or proxied same-origin)
+    if (!origin || (origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000')) { // Adjust if your prod frontend URL is known
+      callback(null, true);
+    } else {
+      // For a stricter approach, define allowedOrigins and check against them:
+      // const allowedOrigins = ['https://your-production-frontend.com']; // Add your actual production frontend URL
+      // if (allowedOrigins.includes(origin)) {
+      //   callback(null, true);
+      // } else {
+      //   callback(new Error('Not allowed by CORS'));
+      // }
+      // Temporarily using a more permissive approach for proxied dev and general prod:
+      callback(null, true); // Reflect origin
+    }
+  },
+  credentials: true
+}));
+console.log('CORS configured with credentials support.');
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.static(path.join(__dirname, "../build")));
 

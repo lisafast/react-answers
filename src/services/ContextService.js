@@ -3,6 +3,7 @@ import loadContextSystemPrompt from './contextSystemPrompt.js';
 import { getProviderApiUrl, getApiUrl } from '../utils/apiToUrl.js';
 import LoggingService from './ClientLoggingService.js';
 import AuthService from './AuthService.js';
+import { fetchWithSession } from '../utils/fetchWithSession.js';
 
 const ContextService = {
   prepareMessage: async (
@@ -57,7 +58,7 @@ const ContextService = {
         chatId
       );
       let url = getProviderApiUrl(aiProvider, 'context');
-      const response = await fetch(url, {
+      const response = await fetchWithSession(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ const ContextService = {
 
   contextSearch: async (message, searchProvider, lang = 'en', chatId = 'system') => {
     try {
-      const searchResponse = await fetch(getApiUrl('search-context'), {
+      const searchResponse = await fetchWithSession(getApiUrl('search-context'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,11 +231,10 @@ const ContextService = {
   sendBatch: async (requests, aiService, batchName, lang) => {
     try {
       await LoggingService.info('batch', `Context Service: Sending batch to ${aiService}`);
-      const response = await fetch(getProviderApiUrl(aiService, 'batch-context'), {
+      const response = await AuthService.fetchWithAuth(getProviderApiUrl(aiService, 'batch-context'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeader()
         },
         body: JSON.stringify({
           requests,

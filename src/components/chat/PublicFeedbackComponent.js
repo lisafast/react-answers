@@ -88,8 +88,7 @@ const PublicFeedbackComponent = ({
               </li>
             ))}
           </ul>
-          {selected === 'other' && (
-            <a
+          <a
               href={surveyUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -98,7 +97,6 @@ const PublicFeedbackComponent = ({
             >
               {t('homepage.publicFeedback.surveyLink')}
             </a>
-          )}
         </details>
       </fieldset>
       <button type="submit" className="btn-primary mrgn-lft-sm">
