@@ -123,10 +123,10 @@
         }
       },
       "messages": {
-        "startingToThink": "Thinking...",
-        "thinking": "Thinking...",
+        "startingToThink": "Generating answer...",
+        "thinking": "Generating answer...",
         "thinkingWithContext": "Deriving answer from search results and department.",
-        "thinkingMore": "Thinking some more...",
+        "thinkingMore": "Generating answer...",
         "limitReached": "You've reached the limit of 3 questions per conversation.\nReload to start a new conversation.",
         "error": "Sorry, we're having a problem connecting to the service right now. Please try again in a few minutes.",
         "blockedContent": "Your question used words that aren't accepted. Please ask it differently below.",
@@ -138,7 +138,7 @@
         "character": "character",
         "characters": "characters",
         "searching": "Searching for relevant information...",
-        "generatingAnswer": "Thinking...",
+        "generatingAnswer": "Generating answer...",
         "verifyingCitation": "Testing citation link",
         "moderatingAnswer": "Moderating answer...",
         "moderatingQuestion": "Assessing question",
