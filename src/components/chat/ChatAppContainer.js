@@ -355,7 +355,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
             {message.interaction.answer.citationHead && <p key={`${messageId}-head`} className="citation-head">{message.interaction.answer.citationHead}</p>}
             {displayUrl && (
               <p key={`${messageId}-link`} className="citation-link">
-                <a href={displayUrl} target="_blank" rel="noopener noreferrer" tabIndex="0">
+                <a href={displayUrl} target="_blank" rel="noopener" tabIndex="0">
                   {displayUrl}
                 </a>
               </p>
