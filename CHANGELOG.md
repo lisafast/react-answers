@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/cds-snc/ai-answers/compare/v1.6.2...v1.7.0) (2025-06-16)
+
+
+### Features
+
+* add context agent as tool ([72556c7](https://github.com/cds-snc/ai-answers/commit/72556c7f7fb6eb3da81ea27625bfbbcc585e3e05))
+
+
+### Bug Fixes
+
+* update default AI model name and add new model configuration ([ae92cd1](https://github.com/cds-snc/ai-answers/commit/ae92cd1be8646e066f5d3f53bb6163cffdd9e0ac))
+
 ## [1.6.2](https://github.com/cds-snc/ai-answers/compare/v1.6.1...v1.6.2) (2025-06-11)
 
 
