@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/cds-snc/ai-answers/compare/v1.7.0...v1.7.1) (2025-06-17)
+
+
+### Bug Fixes
+
+* renew passport online ([76eb7aa](https://github.com/cds-snc/ai-answers/commit/76eb7aaa7f4acefe8157a5c16f7f757b2a3c5032))
+
 ## [1.7.0](https://github.com/cds-snc/ai-answers/compare/v1.6.2...v1.7.0) (2025-06-16)
 
 
