@@ -123,10 +123,10 @@
         }
       },
       "messages": {
-        "startingToThink": "Réflexion...",
-        "thinking": "Réflexion...",
-        "thinkingWithContext": "Tirant la réponse à partir de ",
-        "thinkingMore": "Réflexion prolongée...",
+        "startingToThink": "Génération de la réponse...",
+        "thinking": "Génération de la réponse...",
+        "thinkingWithContext": "Génération de la réponse à partir de ",
+        "thinkingMore": "Génération de la réponse en cours...",
         "limitReached": "Votre limite de 3 questions par conversation a été atteinte. Actualisez la page pour commencer une nouvelle conversation.",
         "error": "Désolé, nous avons un problème de connexion au service en ce moment. Veuillez réessayer dans quelques minutes.",
         "blockedContent": "Votre question contenait des mots qui ne sont pas acceptés.\nVeuillez la reformuler différemment ci-dessous.",
@@ -138,7 +138,7 @@
         "character": "caractère",
         "characters": "caractères",
         "searching": "Recherche d'informations pertinentes...",
-        "generatingAnswer": "Réflexion...",
+        "generatingAnswer": "Génération de la réponse...",
         "verifyingCitation": "Test du lien de citation",
         "moderatingAnswer": "Modération de la réponse...",
         "moderatingQuestion": "Évaluation de la question",
