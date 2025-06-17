@@ -51,6 +51,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       totalConversations: 0,
       totalConversationsEn: 0,
       totalConversationsFr: 0,
+      totalOutputTokens: 0,
+      totalOutputTokensEn: 0,
+      totalOutputTokensFr: 0,
       sessionsByQuestionCount: {
         singleQuestion: { total: 0, en: 0, fr: 0 },
         twoQuestions: { total: 0, en: 0, fr: 0 },
@@ -118,6 +121,13 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         metrics.totalQuestions++;
         if (pageLanguage === 'en') metrics.totalQuestionsEn++;
         if (pageLanguage === 'fr') metrics.totalQuestionsFr++;
+        
+        // Count output tokens
+        if (interaction.context?.outputTokens) {
+          metrics.totalOutputTokens += interaction.context.outputTokens;
+          if (pageLanguage === 'en') metrics.totalOutputTokensEn += interaction.context.outputTokens;
+          if (pageLanguage === 'fr') metrics.totalOutputTokensFr += interaction.context.outputTokens;
+        }
         
         // Count answer types (per language)
         if (interaction.answer?.answerType) {
@@ -354,6 +364,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
             <div>
               <h3 className="mb-300">{t('metrics.dashboard.usageMetrics')}</h3>
               <div className="bg-gray-50 p-4 rounded-lg mb-600">
+                {/* TODO: Add a department filter */}
                 <DataTable
                   data={[
                     {
@@ -364,6 +375,15 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       enPercentage: metrics.totalConversations ? Math.round((metrics.totalConversationsEn / metrics.totalConversations) * 100) + '%' : '0%',
                       frCount: metrics.totalConversationsFr,
                       frPercentage: metrics.totalConversations ? Math.round((metrics.totalConversationsFr / metrics.totalConversations) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.outputTokens'),
+                      count: metrics.totalOutputTokens,
+                      percentage: '100%',
+                      enCount: metrics.totalOutputTokensEn,
+                      enPercentage: metrics.totalOutputTokens ? Math.round((metrics.totalOutputTokensEn / metrics.totalOutputTokens) * 100) + '%' : '0%',
+                      frCount: metrics.totalOutputTokensFr,
+                      frPercentage: metrics.totalOutputTokens ? Math.round((metrics.totalOutputTokensFr / metrics.totalOutputTokens) * 100) + '%' : '0%'
                     },
                     {
                       metric: t('metrics.dashboard.totalQuestions'),
@@ -451,7 +471,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                     paging: false,
                     searching: false,
                     ordering: false,
-                    info: false
+                    info: false,
+                    stripe: true,
+                    className: 'stripe hover'
                   }}
                 />
               </div>
@@ -522,7 +544,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       paging: false,
                       searching: false,
                       ordering: false,
-                      info: false
+                      info: false,
+                      stripe: true,
+                      className: 'stripe hover'
                     }}
                   />
                 </div>
@@ -583,12 +607,17 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       paging: false,
                       searching: false,
                       ordering: false,
-                      info: false
+                      info: false,
+                      stripe: true,
+                      className: 'stripe hover'
                     }}
                   />
                 </div>
               </div>
             </div>
+      
+
+            <EndUserFeedbackSection t={t} metrics={metrics} />
             <div className="bg-gray-50 p-4 rounded-lg mb-600">
               <h3 className="mb-300">{t('metrics.dashboard.byDepartment.title')}</h3>
               <DataTable
@@ -623,12 +652,12 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                   pageLength: 25,
                   searching: true,
                   ordering: true,
-                  order: [[1, 'desc']]
+                  order: [[1, 'desc']],
+                  stripe: true,
+                  className: 'stripe hover'
                 }}
               />
             </div>
-
-            <EndUserFeedbackSection t={t} metrics={metrics} />
           </div>
         ) : (
           <div className="p-4">

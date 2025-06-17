@@ -1873,3 +1873,20 @@ fieldset.gc-chckbxrdio {
   background: #f8f9fa;
   border-radius: 4px;
 }
+
+/* DataTables styling */
+.dataTables_wrapper table.dataTable tbody tr td:first-child {
+  font-weight: bold;
+}
+
+.dataTables_wrapper table.dataTable.stripe tbody tr.odd {
+  background-color: #f9fafb;
+}
+
+.dataTables_wrapper table.dataTable.stripe tbody tr.even {
+  background-color: #ffffff;
+}
+
+.dataTables_wrapper table.dataTable.hover tbody tr:hover {
+  background-color: #f3f4f6;
+}

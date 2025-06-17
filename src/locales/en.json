@@ -396,6 +396,7 @@
       "title": "Results",
       "usageMetrics": "Usage Metrics",
       "totalSessions": "Total Sessions",
+      "outputTokens": "Output Tokens",
       "totalQuestions": "Total Questions",
       "sessionsByQuestionCount": {
         "singleQuestion": "Single Question Sessions",
