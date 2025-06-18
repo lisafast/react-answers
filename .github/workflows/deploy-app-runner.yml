@@ -39,7 +39,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy to App Runner
+      - name: Deploy to App Runner    
         id: deploy-apprunner
         uses: awslabs/amazon-app-runner-deploy@main
         with:
