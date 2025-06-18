@@ -1,27 +1,24 @@
 name: Deploy to App Runner
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
-  id-token: write      
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write   # ✅ Crucial — enables OIDC token generation
+      id-token: write
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          persist-credentials: false
 
       - name: 🔍 Debug OIDC token claims
         run: |
-          # Get the raw token response
           curl -s -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL" \
             -H "Accept: application/json;api-version=2.0" | jq .
@@ -39,14 +36,11 @@ jobs:
           source-connection-arn: ${{ secrets.AWS_CONNECTION_SOURCE_ARN }}
           repo: https://github.com/${{ github.repository }}
           branch: main
-          runtime: NODEJS_22
-          build-command: npm install && npm run build       
-          start-command: npm run start
-          port: 8080
+          # Build/run commands are now handled in apprunner.yaml
           region: ${{ secrets.AWS_REGION }}
           cpu: 1
           memory: 2
-          wait-for-service-stability-seconds: 600
+          wait-for-service-stability-seconds: 180
 
       - name: Show App Runner URL
         run: echo "✅ Deployed to ${{ steps.deploy-apprunner.outputs.service-url }}"
