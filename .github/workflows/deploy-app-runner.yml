@@ -39,7 +39,7 @@ jobs:
           runtime: NODEJS_18              # Placeholder required by the action
           build-command: npm install && npm run build
           start-command: npm run start
-          port: 8080
+          port: 3001
           region: ${{ secrets.AWS_REGION }}
           cpu: 1
           memory: 2
