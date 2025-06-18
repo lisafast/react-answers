@@ -29,14 +29,11 @@ jobs:
           aws apprunner update-service \
             --cli-input-yaml file://apprunner-update.yaml \
             --region ${{ secrets.AWS_REGION }}
-
-
       - name: Wait for service running
         run: |
           aws apprunner wait service-running \
             --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
             --region ${{ secrets.AWS_REGION }}
-
       - name: Retrieve service URL
         id: svc
         run: |
@@ -45,6 +42,5 @@ jobs:
             --query 'Service.ServiceUrl' \
             --output text \
             --region ${{ secrets.AWS_REGION }})" >> $GITHUB_ENV
-
       - name: Deployment complete
-        run: echo "✅ App Runner URL: ${{ env.service-url }}"
+        run: echo "App Runner URL:${{ env.service-url }}"
