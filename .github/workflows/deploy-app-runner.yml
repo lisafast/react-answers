@@ -26,7 +26,7 @@ jobs:
           echo "🔑 SUB claim:"
           echo "$ID_TOKEN" | jq -r .sub
 
-      - name: Configure AWS credentials via OIDC
+      - name: Configure AWS credentials via OIDC    
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
