@@ -1,0 +1,41 @@
+name: Deploy to App Runner
+on:
+  push:
+    branches: [ main ]
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to App Runner
+        id: deploy-apprunner
+        uses: awslabs/amazon-app-runner-deploy@main
+        with:
+          service: ai-answers
+          source-connection-arn: ${{ secrets.AWS_CONNECTION_SOURCE_ARN }}
+          repo: https://github.com/${{ github.repository }}
+          branch: main
+          runtime: NODEJS_18    # adjust to your runtime or image format
+          build-command: npm run install
+          start-command: npm run start
+          port: 8080
+          region: ${{ secrets.AWS_REGION }}
+          cpu: 1
+          memory: 2
+          wait-for-service-stability-seconds: 600
+
+      - name: Show App Runner URL
+        run: echo "✅ Deployed to ${{ steps.deploy-apprunner.outputs.service-url }}"
