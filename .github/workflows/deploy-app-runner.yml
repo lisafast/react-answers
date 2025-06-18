@@ -1,4 +1,4 @@
-name: Deploy to AWS
+name: Deploy to App Runner
 on:
   push:
     branches: [main]
@@ -17,17 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: 🔍 Debug OIDC token claims
-        run: |
-          curl -s -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL" \
-            -H "Accept: application/json;api-version=2.0" | jq .
-
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}    
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to App Runner
         uses: awslabs/amazon-app-runner-deploy@main
@@ -36,7 +30,7 @@ jobs:
           source-connection-arn: ${{ secrets.AWS_CONNECTION_SOURCE_ARN }}
           repo: https://github.com/${{ github.repository }}
           branch: main
-          runtime: NODEJS_18              # Placeholder required by the action
+          runtime: NODEJS_18               # placeholder for Action requirements
           build-command: npm install && npm run build
           start-command: npm run start
           port: 3001

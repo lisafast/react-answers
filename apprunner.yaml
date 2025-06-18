@@ -11,4 +11,12 @@ run:
   runtime-version: 22.14.0
   command: npm run start
   network:
-    port: 8080
+    port: 3001
+
+health:
+  protocol: HTTP
+  path: /health
+  interval: 10          # default is 5s
+  timeout: 5            # default is 2s
+  healthyThreshold: 1
+  unhealthyThreshold: 10
