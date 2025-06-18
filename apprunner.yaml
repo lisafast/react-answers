@@ -19,4 +19,4 @@ health:
   interval: 10
   timeout: 5
   healthyThreshold: 1
-  unhealthyThreshold: 10
+  unhealthyThreshold: 10 
