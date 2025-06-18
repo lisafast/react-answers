@@ -440,7 +440,9 @@
         "description": "Rétroaction oui-non des utilisateurs finaux",
         "total": "Total des questions avec rétroaction",
         "helpful": "Utile (oui)",
-        "unhelpful": "Inutile (non)"
+        "unhelpful": "Inutile (non)",
+        "reasonTableTitle": "Répartition des raisons des commentaires publics",
+        "reason": "Raison"
       },
       "byDepartment": {
         "title": "Répartition par département",

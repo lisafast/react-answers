@@ -209,13 +209,13 @@ const EndUserFeedbackSection = ({ t, metrics }) => {
               }).filter(row => row.total > 0);
             })()}
             columns={[
+              { title: t('metrics.dashboard.count'), data: 'total' },
+              { title: t('metrics.dashboard.percentage'), data: 'totalPercentage' },
               { title: t('metrics.dashboard.userScored.reason'), data: 'reason' },
               { title: t('metrics.dashboard.enCount'), data: 'enCount' },
               { title: t('metrics.dashboard.enPercentage'), data: 'enPercentage' },
               { title: t('metrics.dashboard.frCount'), data: 'frCount' },
-              { title: t('metrics.dashboard.frPercentage'), data: 'frPercentage' },
-              { title: t('metrics.dashboard.count'), data: 'total' },
-              { title: t('metrics.dashboard.percentage'), data: 'totalPercentage' }
+              { title: t('metrics.dashboard.frPercentage'), data: 'frPercentage' }
             ]}
             options={{
               paging: false,
