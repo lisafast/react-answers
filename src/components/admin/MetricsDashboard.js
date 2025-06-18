@@ -4,7 +4,6 @@ import '../../styles/App.css';
 import DataStoreService from '../../services/DataStoreService.js';
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
-import 'datatables.net-dt/css/jquery.dataTables.css';
 import ExportService from '../../services/ExportService.js';
 import { useTranslations } from '../../hooks/useTranslations.js';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
