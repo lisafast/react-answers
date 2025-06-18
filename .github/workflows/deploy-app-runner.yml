@@ -40,7 +40,7 @@ jobs:
           repo: https://github.com/${{ github.repository }}
           branch: main
           runtime: NODEJS_18
-          build-command: npm run install
+          build-command: npm run install       
           start-command: npm run start
           port: 8080
           region: ${{ secrets.AWS_REGION }}
