@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Debug OIDC token claims
+      - name: 🔍 Debug OIDC token claims
         run: |
           curl -s -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL" \
@@ -36,7 +36,10 @@ jobs:
           source-connection-arn: ${{ secrets.AWS_CONNECTION_SOURCE_ARN }}
           repo: https://github.com/${{ github.repository }}
           branch: main
-          runtime: NODEJS_18
+          runtime: NODEJS_18              # Placeholder required by the action
+          build-command: npm install && npm run build
+          start-command: npm run start
+          port: 8080
           region: ${{ secrets.AWS_REGION }}
           cpu: 1
           memory: 2
