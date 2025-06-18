@@ -10,14 +10,11 @@ build:
 run:
   runtime-version: 22.14.0
   command: npm run start
+  network:
+    port: 3001
+    env: PORT
 
-network:
-  port: 3001
-
-health:
-  protocol: HTTP
-  path: /health
-  interval: 10
-  timeout: 5
-  healthyThreshold: 1
-  unhealthyThreshold: 10
+  # Any environment variables you need at runtime:
+  env:
+    - name: NODE_ENV
+      value: "production"
