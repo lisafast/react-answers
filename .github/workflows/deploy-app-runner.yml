@@ -2,38 +2,42 @@ name: Deploy to App Runner
 on:
   push:
     branches: [ main ]
+
 permissions:
-  id-token: write
   contents: read
+  id-token: write   # workflow-level (optional)
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # ✅ crucial! needed inside job to fetch OIDC token
     steps:
       - uses: actions/checkout@v3
         with:
           persist-credentials: false
 
       - name: 🔍 Dump OIDC token claims for debug
+        id: dump
         run: |
-          ID_TOKEN=$(curl -s \
-            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+          echo "#### REQUEST URL:"
+          echo "$ACTIONS_ID_TOKEN_REQUEST_URL"
+
+          echo "#### REQUEST TOKEN:"
+          echo "$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+
+          echo "#### RAW ID TOKEN:"
+          curl -s -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL" \
             -H "Accept: application/json;api-version=2.0" \
-            | jq .)
-          echo "OIDC token payload:"
-          echo "$ID_TOKEN"
-          echo "🔑 SUB claim:"
-          echo "$ID_TOKEN" | jq -r .sub
+            | jq .
 
-      - name: Configure AWS credentials via OIDC    
+      - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
-          # audience defaults to sts.amazonaws.com; only override if your trust policy uses a different audience
-        env:
-          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ steps.dump.outputs.AID_TOKEN }}
 
       - name: Deploy to App Runner
         id: deploy-apprunner
