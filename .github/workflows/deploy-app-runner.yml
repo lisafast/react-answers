@@ -10,9 +10,6 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout code
@@ -24,23 +21,34 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy via AWS CLI (Repository mode)
+      - name: Switch to Repository mode
         run: |
           aws apprunner update-service \
-            --cli-input-yaml file://apprunner-update.yaml \
+            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
+            --source-configuration "{
+              \"CodeRepository\": {
+                \"RepositoryUrl\": \"https://github.com/${{ github.repository }}\",
+                \"SourceCodeVersion\": {\"Type\":\"BRANCH\",\"Value\":\"main\"},
+                \"CodeConfiguration\": {\"ConfigurationSource\":\"REPOSITORY\"}
+              }
+            }" \
             --region ${{ secrets.AWS_REGION }}
-      - name: Wait for service running
+
+      - name: Wait for service to be running
         run: |
           aws apprunner wait service-running \
             --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
             --region ${{ secrets.AWS_REGION }}
-      - name: Retrieve service URL
-        id: svc
+
+      - name: Get App Runner URL
+        id: get-url
         run: |
-          echo "service-url=$(aws apprunner describe-service \
+          URL=$(aws apprunner describe-service \
             --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
             --query 'Service.ServiceUrl' \
             --output text \
-            --region ${{ secrets.AWS_REGION }})" >> $GITHUB_ENV
+            --region ${{ secrets.AWS_REGION }})
+          echo "service-url=$URL" >> $GITHUB_ENV
+
       - name: Deployment complete
-        run: echo "App Runner URL:${{ env.service-url }}"
+        run: echo "✅ App Runner URL: ${{ env.service-url }}"
