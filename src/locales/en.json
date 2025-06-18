@@ -396,6 +396,7 @@
       "title": "Results",
       "usageMetrics": "Usage Metrics",
       "totalSessions": "Total Sessions",
+      "outputTokens": "Output Tokens",
       "totalQuestions": "Total Questions",
       "sessionsByQuestionCount": {
         "singleQuestion": "Single Question Sessions",
@@ -437,7 +438,9 @@
         "description": "Yes-no feedback from end-users",
         "total": "Total questions with feedback",
         "helpful": "Helpful (yes)",
-        "unhelpful": "Unhelpful (no)"
+        "unhelpful": "Unhelpful (no)",
+        "reasonTableTitle": "Public Feedback Reasons Breakdown",
+        "reason": "Reason"
       },
       "byDepartment": {
         "title": "Department breakdown",
