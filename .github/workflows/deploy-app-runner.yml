@@ -1,4 +1,4 @@
-name: Deploy to App Runner
+name: Deploy to AWS
 on:
   push:
     branches: [main]
