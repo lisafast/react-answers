@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.3](https://github.com/cds-snc/ai-answers/compare/v1.7.2...v1.7.3) (2025-06-18)
+
+
+### Bug Fixes
+
+* update feedback survey URLs for English and French locales ([a19a6c0](https://github.com/cds-snc/ai-answers/commit/a19a6c099ae12324e2b248c6caf528c546363de9))
+* update feedback survey URLs for English and French locales ([11f49aa](https://github.com/cds-snc/ai-answers/commit/11f49aaabf5ebd93abfc94b84d6b4a975c6850bb))
+
 ## [1.7.2](https://github.com/cds-snc/ai-answers/compare/v1.7.1...v1.7.2) (2025-06-18)
 
 
