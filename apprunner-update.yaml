@@ -1,9 +1,0 @@
-# apprunner-update.yaml
-ServiceArn: arn:aws:apprunner:us-east-2:788741120184:service/ai-answers/84ba7ebd86e64e39b75ce148a67e00d6
-SourceConfiguration:
-  CodeRepository:
-    ConfigurationSource: REPOSITORY
-    RepositoryUrl: https://github.com/lisafast/react-answers
-    SourceCodeVersion:
-      Type: BRANCH
-      Value: main
