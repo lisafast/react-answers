@@ -27,9 +27,9 @@ jobs:
       - name: Deploy via AWS CLI (Repository mode)
         run: |
           aws apprunner update-service \
-            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
-            --source-configuration '{"CodeRepository": {"ConfigurationSource":"REPOSITORY","RepositoryUrl":"https://github.com/${{ github.repository }}","SourceCodeVersion":{"Type":"BRANCH","Value":"main"}}}' \
+            --cli-input-yaml file://apprunner-update.yaml \
             --region ${{ secrets.AWS_REGION }}
+
 
       - name: Wait for service running
         run: |
