@@ -1,4 +1,4 @@
-name: Deploy to App Runner (Repository mode)
+name: Deploy to App Runner (Repo mode)
 on:
   push:
     branches: [main]
@@ -15,7 +15,8 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v1
@@ -23,28 +24,27 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy using AWS CLI (repository mode)
+      - name: Deploy via AWS CLI (Repository mode)
         run: |
           aws apprunner update-service \
             --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
-            --source-configuration "CodeRepository={ConfigurationSource=REPOSITORY}" \
+            --source-configuration '{"CodeRepository": {"ConfigurationSource":"REPOSITORY","RepositoryUrl":"https://github.com/${{ github.repository }}","SourceCodeVersion":{"Type":"BRANCH","Value":"main"}}}' \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: Wait for service to stabilize
+      - name: Wait for service running
         run: |
           aws apprunner wait service-running \
             --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: Get App Runner URL
-        id: get-url
+      - name: Retrieve service URL
+        id: svc
         run: |
-          URL=$(aws apprunner describe-service \
+          echo "service-url=$(aws apprunner describe-service \
             --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
             --query 'Service.ServiceUrl' \
             --output text \
-            --region ${{ secrets.AWS_REGION }})
-          echo "service-url=$URL" >> $GITHUB_ENV
+            --region ${{ secrets.AWS_REGION }})" >> $GITHUB_ENV
 
-      - name: 🎉 Deployment complete
-        run: echo "✅ App Runner URL is ${{ env.service-url }}"
+      - name: Deployment complete
+        run: echo "✅ App Runner URL: ${{ env.service-url }}"
