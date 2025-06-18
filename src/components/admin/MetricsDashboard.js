@@ -4,6 +4,7 @@ import '../../styles/App.css';
 import DataStoreService from '../../services/DataStoreService.js';
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
+import 'datatables.net-dt/css/jquery.dataTables.css';
 import ExportService from '../../services/ExportService.js';
 import { useTranslations } from '../../hooks/useTranslations.js';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -123,10 +124,11 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         if (pageLanguage === 'fr') metrics.totalQuestionsFr++;
         
         // Count output tokens
-        if (interaction.context?.outputTokens) {
-          metrics.totalOutputTokens += interaction.context.outputTokens;
-          if (pageLanguage === 'en') metrics.totalOutputTokensEn += interaction.context.outputTokens;
-          if (pageLanguage === 'fr') metrics.totalOutputTokensFr += interaction.context.outputTokens;
+        const tokens = Number(interaction.context?.outputTokens);
+        if (!isNaN(tokens)) {
+          metrics.totalOutputTokens += tokens;
+          if (pageLanguage === 'en') metrics.totalOutputTokensEn += tokens;
+          if (pageLanguage === 'fr') metrics.totalOutputTokensFr += tokens;
         }
         
         // Count answer types (per language)
@@ -473,7 +475,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                     ordering: false,
                     info: false,
                     stripe: true,
-                    className: 'stripe hover'
+                    className: 'display'
                   }}
                 />
               </div>
@@ -546,7 +548,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       ordering: false,
                       info: false,
                       stripe: true,
-                      className: 'stripe hover'
+                      className: 'display'
                     }}
                   />
                 </div>
@@ -609,7 +611,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       ordering: false,
                       info: false,
                       stripe: true,
-                      className: 'stripe hover'
+                      className: 'display'
                     }}
                   />
                 </div>
@@ -654,7 +656,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                   ordering: true,
                   order: [[1, 'desc']],
                   stripe: true,
-                  className: 'stripe hover'
+                  className: 'display'
                 }}
               />
             </div>
