@@ -136,7 +136,7 @@ const HomePage = ({ lang = 'en' }) => {
       <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600" tabIndex={0}>
         <GcdsText>
           <a
-            href={t('homepage.publicFeedback.surveyUrl')}
+            href={t('homepage.feedback.surveyUrl')}
             className="feedback-survey-link"
             target="_blank"
             rel="noopener noreferrer"
