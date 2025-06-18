@@ -85,7 +85,8 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       },
       byDepartment: {},
       publicFeedbackReasons: {},
-      publicFeedbackScores: {}
+      publicFeedbackScores: {},
+      publicFeedbackReasonsByLang: { en: {}, fr: {} }
     };
 
     // Process each chat document
@@ -250,6 +251,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
     // Add to metrics: publicFeedback breakdown by reason and score
     const publicFeedbackReasons = {};
     const publicFeedbackScores = {};
+    const publicFeedbackReasonsByLang = { en: {}, fr: {} };
     logs.forEach(chat => {
       chat.interactions?.forEach(interaction => {
         if (interaction.expertFeedback?.type === 'public') {
@@ -257,11 +259,14 @@ const MetricsDashboard = ({ lang = 'en' }) => {
           const score = interaction.expertFeedback.publicFeedbackScore || 'Other';
           publicFeedbackReasons[reason] = (publicFeedbackReasons[reason] || 0) + 1;
           publicFeedbackScores[score] = (publicFeedbackScores[score] || 0) + 1;
+          const lang = chat.pageLanguage === 'fr' ? 'fr' : 'en';
+          publicFeedbackReasonsByLang[lang][reason] = (publicFeedbackReasonsByLang[lang][reason] || 0) + 1;
         }
       });
     });
     metrics.publicFeedbackReasons = publicFeedbackReasons;
     metrics.publicFeedbackScores = publicFeedbackScores;
+    metrics.publicFeedbackReasonsByLang = publicFeedbackReasonsByLang;
 
     return metrics;
   };
