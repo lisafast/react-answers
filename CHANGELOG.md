@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.2](https://github.com/cds-snc/ai-answers/compare/v1.7.1...v1.7.2) (2025-06-18)
+
+
+### Bug Fixes
+
+* add output tokens ([df12568](https://github.com/cds-snc/ai-answers/commit/df125689873d30127e4a04c7fb3047bea3ffd9e7))
+* add table for reasons ([b1ec332](https://github.com/cds-snc/ai-answers/commit/b1ec3321661227908dda73ccdbad726b93c67c61))
+* add token count ([df12568](https://github.com/cds-snc/ai-answers/commit/df125689873d30127e4a04c7fb3047bea3ffd9e7))
+* add translation keys ([f56757e](https://github.com/cds-snc/ai-answers/commit/f56757e653e20134ca0dcf874f4d0bb99c28f31e))
+* output tokens ([79a1c96](https://github.com/cds-snc/ai-answers/commit/79a1c96209f15d4cf99f3a8621edbed8c1abf6d4))
+* remove datatables css ([1351bf3](https://github.com/cds-snc/ai-answers/commit/1351bf393587ab53655188bd0d9464646837e03a))
+
 ## [1.7.1](https://github.com/cds-snc/ai-answers/compare/v1.7.0...v1.7.1) (2025-06-17)
 
 
