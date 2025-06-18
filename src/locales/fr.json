@@ -398,6 +398,7 @@
       "title": "Résultats",
       "usageMetrics": "Métriques d'utilisation",
       "totalSessions": "Total des sessions",
+      "outputTokens": "Jetons de sortie",
       "totalQuestions": "Total des questions",
       "sessionsByQuestionCount": {
         "singleQuestion": "Sessions à une question",
@@ -439,7 +440,9 @@
         "description": "Rétroaction oui-non des utilisateurs finaux",
         "total": "Total des questions avec rétroaction",
         "helpful": "Utile (oui)",
-        "unhelpful": "Inutile (non)"
+        "unhelpful": "Inutile (non)",
+        "reasonTableTitle": "Répartition des raisons des commentaires publics",
+        "reason": "Raison"
       },
       "byDepartment": {
         "title": "Répartition par département",

@@ -51,6 +51,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       totalConversations: 0,
       totalConversationsEn: 0,
       totalConversationsFr: 0,
+      totalOutputTokens: 0,
+      totalOutputTokensEn: 0,
+      totalOutputTokensFr: 0,
       sessionsByQuestionCount: {
         singleQuestion: { total: 0, en: 0, fr: 0 },
         twoQuestions: { total: 0, en: 0, fr: 0 },
@@ -82,7 +85,8 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       },
       byDepartment: {},
       publicFeedbackReasons: {},
-      publicFeedbackScores: {}
+      publicFeedbackScores: {},
+      publicFeedbackReasonsByLang: { en: {}, fr: {} }
     };
 
     // Process each chat document
@@ -118,6 +122,14 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         metrics.totalQuestions++;
         if (pageLanguage === 'en') metrics.totalQuestionsEn++;
         if (pageLanguage === 'fr') metrics.totalQuestionsFr++;
+        
+        // Count output tokens
+        const tokens = Number(interaction.context?.outputTokens);
+        if (!isNaN(tokens)) {
+          metrics.totalOutputTokens += tokens;
+          if (pageLanguage === 'en') metrics.totalOutputTokensEn += tokens;
+          if (pageLanguage === 'fr') metrics.totalOutputTokensFr += tokens;
+        }
         
         // Count answer types (per language)
         if (interaction.answer?.answerType) {
@@ -239,6 +251,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
     // Add to metrics: publicFeedback breakdown by reason and score
     const publicFeedbackReasons = {};
     const publicFeedbackScores = {};
+    const publicFeedbackReasonsByLang = { en: {}, fr: {} };
     logs.forEach(chat => {
       chat.interactions?.forEach(interaction => {
         if (interaction.expertFeedback?.type === 'public') {
@@ -246,11 +259,14 @@ const MetricsDashboard = ({ lang = 'en' }) => {
           const score = interaction.expertFeedback.publicFeedbackScore || 'Other';
           publicFeedbackReasons[reason] = (publicFeedbackReasons[reason] || 0) + 1;
           publicFeedbackScores[score] = (publicFeedbackScores[score] || 0) + 1;
+          const lang = chat.pageLanguage === 'fr' ? 'fr' : 'en';
+          publicFeedbackReasonsByLang[lang][reason] = (publicFeedbackReasonsByLang[lang][reason] || 0) + 1;
         }
       });
     });
     metrics.publicFeedbackReasons = publicFeedbackReasons;
     metrics.publicFeedbackScores = publicFeedbackScores;
+    metrics.publicFeedbackReasonsByLang = publicFeedbackReasonsByLang;
 
     return metrics;
   };
@@ -354,6 +370,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
             <div>
               <h3 className="mb-300">{t('metrics.dashboard.usageMetrics')}</h3>
               <div className="bg-gray-50 p-4 rounded-lg mb-600">
+                {/* TODO: Add a department filter */}
                 <DataTable
                   data={[
                     {
@@ -364,6 +381,15 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       enPercentage: metrics.totalConversations ? Math.round((metrics.totalConversationsEn / metrics.totalConversations) * 100) + '%' : '0%',
                       frCount: metrics.totalConversationsFr,
                       frPercentage: metrics.totalConversations ? Math.round((metrics.totalConversationsFr / metrics.totalConversations) * 100) + '%' : '0%'
+                    },
+                    {
+                      metric: t('metrics.dashboard.outputTokens'),
+                      count: metrics.totalOutputTokens,
+                      percentage: '100%',
+                      enCount: metrics.totalOutputTokensEn,
+                      enPercentage: metrics.totalOutputTokens ? Math.round((metrics.totalOutputTokensEn / metrics.totalOutputTokens) * 100) + '%' : '0%',
+                      frCount: metrics.totalOutputTokensFr,
+                      frPercentage: metrics.totalOutputTokens ? Math.round((metrics.totalOutputTokensFr / metrics.totalOutputTokens) * 100) + '%' : '0%'
                     },
                     {
                       metric: t('metrics.dashboard.totalQuestions'),
@@ -451,7 +477,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                     paging: false,
                     searching: false,
                     ordering: false,
-                    info: false
+                    info: false,
+                    stripe: true,
+                    className: 'display'
                   }}
                 />
               </div>
@@ -522,7 +550,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       paging: false,
                       searching: false,
                       ordering: false,
-                      info: false
+                      info: false,
+                      stripe: true,
+                      className: 'display'
                     }}
                   />
                 </div>
@@ -583,12 +613,17 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       paging: false,
                       searching: false,
                       ordering: false,
-                      info: false
+                      info: false,
+                      stripe: true,
+                      className: 'display'
                     }}
                   />
                 </div>
               </div>
             </div>
+      
+
+            <EndUserFeedbackSection t={t} metrics={metrics} />
             <div className="bg-gray-50 p-4 rounded-lg mb-600">
               <h3 className="mb-300">{t('metrics.dashboard.byDepartment.title')}</h3>
               <DataTable
@@ -623,12 +658,12 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                   pageLength: 25,
                   searching: true,
                   ordering: true,
-                  order: [[1, 'desc']]
+                  order: [[1, 'desc']],
+                  stripe: true,
+                  className: 'display'
                 }}
               />
             </div>
-
-            <EndUserFeedbackSection t={t} metrics={metrics} />
           </div>
         ) : (
           <div className="p-4">
