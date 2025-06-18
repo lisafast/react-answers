@@ -51,4 +51,4 @@ jobs:
           echo "service-url=$URL" >> $GITHUB_ENV
 
       - name: Deployment complete
-        run: echo "✅ App Runner URL: ${{ env.service-url }}"
+        run: echo "✅ App Runner URL:${{ env.service-url }}"
