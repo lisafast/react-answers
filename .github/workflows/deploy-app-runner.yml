@@ -5,33 +5,26 @@ on:
 
 permissions:
   contents: read
-  id-token: write   # workflow-level (optional)
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write   # ✅ crucial! needed inside job to fetch OIDC token
+      id-token: write   # ✅ Crucial — enables OIDC token generation
+
     steps:
       - uses: actions/checkout@v3
         with:
           persist-credentials: false
 
-      - name: 🔍 Dump OIDC token claims for debug
-        id: dump
+      - name: 🔍 Debug OIDC token claims
         run: |
-          echo "#### REQUEST URL:"
-          echo "$ACTIONS_ID_TOKEN_REQUEST_URL"
-
-          echo "#### REQUEST TOKEN:"
-          echo "$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
-
-          echo "#### RAW ID TOKEN:"
+          # Get the raw token response
           curl -s -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL" \
-            -H "Accept: application/json;api-version=2.0" \
-            | jq .
+            -H "Accept: application/json;api-version=2.0" | jq .
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v1
@@ -39,8 +32,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy to App Runner    
-        id: deploy-apprunner
+      - name: Deploy to App Runner
         uses: awslabs/amazon-app-runner-deploy@main
         with:
           service: ai-answers
