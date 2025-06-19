@@ -41,6 +41,42 @@
   margin: 0 auto;
   padding-left: 1.5rem;
 }
+
+.container-gcweb {
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto
+}
+
+.container-gcweb :after,
+.container-gcweb :before {
+	display: table;
+	content: " "
+}
+
+.container-gcweb :after {
+	clear: both
+}
+
+@media (min-width:768px) {
+	.container-gcweb  {
+		width: 750px
+	}
+}
+
+@media (min-width:992px) {
+	.container-gcweb  {
+		width: 970px
+	}
+}
+
+@media (min-width:1200px) {
+	.container-gcweb  {
+		width: 1170px
+	}
+}
+
 .referring-url-container {
   max-width: 600px;
   margin: 20px auto;

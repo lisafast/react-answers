@@ -110,7 +110,7 @@ const HomePage = ({ lang = 'en' }) => {
   return (
     <WrappedErrorBoundary>
       <div
-        className="mb-600 container"
+        className="mb-600 container-gcweb"
       >
         <h1 className="mb-400">{t('homepage.title')}</h1>
         <h2 className="mt-400 mb-400" aria-label={t('homepage.subtitle.ariaLabel')}>
