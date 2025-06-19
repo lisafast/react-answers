@@ -42,6 +42,10 @@
   padding-left: 1.5rem;
 }
 
+.container-gcweb:first-of-type {
+  margin-bottom: 0px !important;
+}
+
 .container-gcweb {
 	padding-right: 15px;
 	padding-left: 15px;
@@ -706,9 +710,9 @@ h2:first-of-type {
   color: #333 !important;
 }
 
-gcds-container:first-of-type {
+/* gcds-container:first-of-type {
   margin-bottom: 0px !important;
-}
+} */
 
 .loading-container {
   border: 1px solid #d9d9d9;
