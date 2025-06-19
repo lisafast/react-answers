@@ -446,6 +446,7 @@ code {
 /* expert rating */
 .expert-rating-container {
   margin-top: 10px;
+  margin-bottom: 10px;
   padding: 20px 20px 20px 20px;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
