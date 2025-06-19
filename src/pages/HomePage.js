@@ -109,12 +109,12 @@ const HomePage = ({ lang = 'en' }) => {
   // In both cases, chat session is attempted. If chat session fails, outage will be shown on next render.
   return (
     <WrappedErrorBoundary>
-      <GcdsContainer
+      <div
         size="xl"
         mainContainer
         centered
         tag="main"
-        className="mb-600"
+        className="mb-600 container"
       >
         <h1 className="mb-400">{t('homepage.title')}</h1>
         <h2 className="mt-400 mb-400" aria-label={t('homepage.subtitle.ariaLabel')}>
@@ -132,7 +132,7 @@ const HomePage = ({ lang = 'en' }) => {
           </GcdsText>
         </GcdsDetails>
         <ChatAppContainer lang={lang} chatId={chatId} />
-      </GcdsContainer>
+      </div>
       <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600" tabIndex={0}>
         <GcdsText>
           <a
