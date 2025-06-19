@@ -166,10 +166,10 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         metrics.byDepartment[department].total++;
 
         // Process human- and user-scored metrics (per language)
-        if (interaction.expertFeedback?.totalScore !== undefined && interaction.expertFeedback?.type) {
+        if (interaction.expertFeedback?.type) {
           const type = interaction.expertFeedback.type;
-          const score = interaction.expertFeedback.totalScore;
-          if (type === 'expert') {
+          if (type === 'expert' && interaction.expertFeedback?.totalScore !== undefined) {
+            const score = interaction.expertFeedback.totalScore;
             metrics.expertScored.total.total++;
             if (pageLanguage === 'en') metrics.expertScored.total.en++;
             if (pageLanguage === 'fr') metrics.expertScored.total.fr++;
@@ -201,12 +201,13 @@ const MetricsDashboard = ({ lang = 'en' }) => {
               if (pageLanguage === 'fr') metrics.expertScored.hasError.fr++;
               metrics.byDepartment[department].expertScored.hasError++;
             }
-          } else if (type === 'public') {
+          } else if (type === 'public' && interaction.expertFeedback?.publicFeedbackScore !== undefined) {
             metrics.userScored.total.total++;
             if (pageLanguage === 'en') metrics.userScored.total.en++;
             if (pageLanguage === 'fr') metrics.userScored.total.fr++;
             metrics.byDepartment[department].userScored.total++;
-            if (score >= 90) {
+            const publicScore = interaction.expertFeedback.publicFeedbackScore;
+            if (publicScore <= 4) {
               metrics.userScored.helpful.total++;
               if (pageLanguage === 'en') metrics.userScored.helpful.en++;
               if (pageLanguage === 'fr') metrics.userScored.helpful.fr++;
