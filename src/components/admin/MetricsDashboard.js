@@ -207,7 +207,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
             if (pageLanguage === 'fr') metrics.userScored.total.fr++;
             metrics.byDepartment[department].userScored.total++;
             const publicScore = interaction.expertFeedback.publicFeedbackScore;
-            if (publicScore <= 4) {
+            if (publicScore <= 5) {
               metrics.userScored.helpful.total++;
               if (pageLanguage === 'en') metrics.userScored.helpful.en++;
               if (pageLanguage === 'fr') metrics.userScored.helpful.fr++;
