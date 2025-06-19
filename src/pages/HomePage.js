@@ -110,10 +110,6 @@ const HomePage = ({ lang = 'en' }) => {
   return (
     <WrappedErrorBoundary>
       <div
-        size="xl"
-        mainContainer
-        centered
-        tag="main"
         className="mb-600 container"
       >
         <h1 className="mb-400">{t('homepage.title')}</h1>
