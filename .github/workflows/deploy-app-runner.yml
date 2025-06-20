@@ -36,19 +36,19 @@ jobs:
 
       - name: Write source-config.json
         run: |
-          cat > source-config.json <<EOF
+          cat > source-config.json <<-EOF
           {
             "CodeRepository": {
-              "RepositoryUrl":     "https://github.com/${{ github.repository }}",
-              "SourceCodeVersion": { "Type":"BRANCH", "Value":"main" },
-              "CodeConfiguration": { "ConfigurationSource":"REPOSITORY" }
+              "RepositoryUrl": "https://github.com/${{ github.repository }}",
+              "SourceCodeVersion": { "Type": "BRANCH", "Value": "main" },
+              "CodeConfiguration": { "ConfigurationSource": "REPOSITORY" }
             }
           }
           EOF
 
       - name: Write health-check.json
         run: |
-          cat > health-check.json <<EOF
+          cat > health-check.json <<-EOF
           {
             "Protocol": "HTTP",
             "Path": "/health",
@@ -61,7 +61,7 @@ jobs:
 
       - name: Write instance-config.json
         run: |
-          cat > instance-config.json <<EOF
+          cat > instance-config.json <<-EOF
           {
             "Cpu": "1024",
             "Memory": "2048",
