@@ -7,7 +7,7 @@
       "CodeConfiguration": {
         "ConfigurationSource": "API",
         "CodeConfigurationValues": {
-          "Runtime": "NODEJS_18",
+          "Runtime": "NODEJS_22",
           "BuildCommand": "npm install && npm run build",
           "StartCommand": "npm start",
           "RuntimeEnvironmentVariables": {
