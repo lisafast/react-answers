@@ -2,11 +2,12 @@ name: Deploy to AWS App Runner
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 permissions:
-  contents: read
-  id-token:  write
+  contents: read    # allow checkout
+  id-token: write   # allow OIDC for AWS credentials
 
 jobs:
   deploy:
@@ -42,7 +43,7 @@ jobs:
             "SourceConfiguration": {
               "CodeRepository": {
                 "RepositoryUrl": "https://github.com/${{ github.repository }}",
-                "SourceCodeVersion": { "Type":"BRANCH", "Value":"main" },
+                "SourceCodeVersion": { "Type": "BRANCH", "Value": "main" },
                 "CodeConfiguration": {
                   "ConfigurationSource": "API",
                   "CodeConfigurationValues": {
@@ -77,8 +78,28 @@ jobs:
           }
           EOF
 
-      - name: Validate JSON
-        run: jq -e . update-input.json
+      - name: Validate update-input.json
+        run: |
+          echo "---- update-input.json ----"
+          cat update-input.json
+          echo "---- jq validation ----"
+          jq -e . update-input.json
+
+      - name: Wait for any in-progress App Runner operation to finish
+        run: |
+          echo "Waiting for App Runner to be idle..."
+          for i in {1..30}; do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.OperationSummary.Status' --output text)
+            echo "Operation status: $STATUS"
+            if [[ "$STATUS" != "IN_PROGRESS" ]]; then
+              echo "Service is now idle."
+              break
+            fi
+            sleep 10
+          done
 
       - name: Update App Runner via JSON
         run: |
@@ -86,22 +107,31 @@ jobs:
             --cli-input-json file://update-input.json \
             --region ${{ env.AWS_REGION }}
 
-      - name: Wait for RUNNING status
+      - name: Wait for service to reach RUNNING
         run: |
+          echo "Waiting for App Runner service to reach RUNNING status..."
           for i in {1..30}; do
-            S=$(aws apprunner describe-service \
+            STATUS=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            [[ "$S" == "RUNNING" ]] && exit 0
-            [[ "$S" == "FAILED" ]] && exit 1
+            echo "Status: $STATUS"
+            if [[ "$STATUS" == "RUNNING" ]]; then
+              echo "Service is RUNNING."
+              exit 0
+            fi
+            if [[ "$STATUS" == "FAILED" ]]; then
+              echo "Deployment failed."
+              exit 1
+            fi
             sleep 10
           done
-          exit 1
+          echo "Timed out waiting for RUNNING status." && exit 1
 
-      - name: Echo App Runner URL
+      - name: Output App Runner URL
         run: |
-          aws apprunner describe-service \
+          URL=$(aws apprunner describe-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
             --region ${{ env.AWS_REGION }} \
-            --query 'Service.ServiceUrl' --output text
+            --query 'Service.ServiceUrl' --output text)
+          echo "✅ App Runner URL: $URL"
