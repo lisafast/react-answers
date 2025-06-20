@@ -423,6 +423,7 @@
         "correct": "Correct",
         "needsImprovement": "Needs improvement",
         "hasError": "Has error",
+        "hasErrorPercent": "Has error (%)",
         "harmful": "Coded as harmful"
       },
       "aiScored": {
@@ -438,12 +439,13 @@
         "description": "Yes-no feedback from end-users",
         "total": "Total questions with feedback",
         "helpful": "Helpful (yes)",
-        "unhelpful": "Unhelpful (no)",
+        "unhelpful": "Issue (no)",
         "reasonTableTitle": "Public Feedback Reasons Breakdown",
         "reason": "Reason"
       },
       "byDepartment": {
         "title": "Department breakdown",
+        "department": "Department",
         "totalQuestions": "Total questions",
         "totalSessions": "Total sessions",
         "expertTotal": "Expert evaluations"

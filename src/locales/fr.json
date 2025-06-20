@@ -425,6 +425,7 @@
         "correct": "Correct",
         "needsImprovement": "Nécessite une amélioration",
         "hasError": "Contient une erreur",
+        "hasErrorPercent": "Contient une erreur (%)",
         "harmful": "Codé comme nuisible"
       },
       "aiScored": {
@@ -440,12 +441,13 @@
         "description": "Rétroaction oui-non des utilisateurs finaux",
         "total": "Total des questions avec rétroaction",
         "helpful": "Utile (oui)",
-        "unhelpful": "Inutile (non)",
+        "unhelpful": "Problème (non)",
         "reasonTableTitle": "Répartition des raisons des commentaires publics",
         "reason": "Raison"
       },
       "byDepartment": {
         "title": "Répartition par département",
+        "department": "Département",
         "totalQuestions": "Total des questions",
         "totalSessions": "Sessions totales",
         "expertTotal": "Évaluations d'experts"
