@@ -6,33 +6,29 @@ on:
       - main
 
 permissions:
-  contents: read    # allow checkout
-  id-token: write   # allow OIDC for AWS creds
+  contents: read
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:                   ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:          ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN:       ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:            ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:               ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:               ${{ secrets.GOOGLE_API_KEY }}
-      GOOGLE_SEARCH_ENGINE_ID:      ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:                    ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:               ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:                     ${{ secrets.NODE_ENV }}
+      AWS_REGION:               ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:      ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      AWS_INSTANCE_ROLE_ARN:    ${{ secrets.AWS_INSTANCE_ROLE_ARN }}  # make sure you’ve set this in GitHub
+      APP_RUNNER_SERVICE_ARN:   ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:        ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:           ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:           ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID:  ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:                ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:           ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                 ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Download RDS global truststore
-        run: |
-          wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
-               -O ./global-bundle.pem
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
@@ -42,7 +38,7 @@ jobs:
 
       - name: Write update-input.json
         run: |
-          cat > update-input.json <<EOF
+          cat > update-input.json <<-EOF
           {
             "ServiceArn": "${{ env.APP_RUNNER_SERVICE_ARN }}",
             "SourceConfiguration": {
@@ -70,7 +66,8 @@ jobs:
             },
             "InstanceConfiguration": {
               "Cpu": "1024",
-              "Memory": "2048"
+              "Memory": "2048",
+              "InstanceRoleArn": "${{ env.AWS_INSTANCE_ROLE_ARN }}"
             },
             "HealthCheckConfiguration": {
               "Protocol": "HTTP",
@@ -83,18 +80,12 @@ jobs:
           }
           EOF
 
-      - name: Wait for any in-progress operation to finish
+      - name: Validate JSON
         run: |
-          echo "Waiting for App Runner to be idle..."
-          for i in {1..30}; do
-            STATUS=$(aws apprunner describe-service \
-              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-              --region ${{ env.AWS_REGION }} \
-              --query 'Service.OperationSummary.Status' --output text)
-            echo "Operation status: $STATUS"
-            [[ "$STATUS" != "IN_PROGRESS" ]] && break
-            sleep 5
-          done
+          echo "---- contents of update-input.json ----"
+          cat update-input.json
+          echo "---- jq validation ----"
+          jq -e . update-input.json
 
       - name: Update App Runner via JSON
         run: |
@@ -102,21 +93,22 @@ jobs:
             --cli-input-json file://update-input.json \
             --region ${{ env.AWS_REGION }}
 
-      - name: Wait for service to be RUNNING
+      - name: Wait for RUNNING status
         run: |
-          echo "Waiting for App Runner service to reach RUNNING status..."
+          echo "Waiting for service to reach RUNNING..."
           for i in {1..30}; do
-            S=$(aws apprunner describe-service \
+            STATUS=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            echo "Status: $S"
-            [[ "$S" == "RUNNING" ]] && break
-            [[ "$S" == "FAILED" ]] && exit 1
+            echo "  Status: $STATUS"
+            [[ "$STATUS" == "RUNNING" ]] && exit 0
+            [[ "$STATUS" == "FAILED" ]] && exit 1
             sleep 10
           done
+          echo "Timed out waiting for RUNNING." && exit 1
 
-      - name: Get App Runner URL
+      - name: Echo App Runner URL
         run: |
           URL=$(aws apprunner describe-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
