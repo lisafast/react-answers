@@ -12,18 +12,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Pull in all your GitHub secrets as environment variables
     env:
-      AWS_REGION:                   ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:          ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN:       ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:            ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:               ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:               ${{ secrets.GOOGLE_API_KEY }}
-      GOOGLE_SEARCH_ENGINE_ID:      ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:                    ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:               ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:                     ${{ secrets.NODE_ENV }}
+      AWS_REGION:              ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:     ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN:  ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:       ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:          ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:          ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:               ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:          ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Checkout code
@@ -40,32 +39,41 @@ jobs:
           role-to-assume: ${{ env.AWS_ASSUME_ROLE_ARN }}
           aws-region:     ${{ env.AWS_REGION }}
 
+      - name: Write health-check.json
+        run: |
+          cat > health-check.json <<EOF
+          {
+            "Protocol": "HTTP",
+            "Path": "/health",
+            "Interval": 10,
+            "Timeout": 5,
+            "HealthyThreshold": 1,
+            "UnhealthyThreshold": 10
+          }
+          EOF
+
       - name: Switch to Repository mode & Update Health Check
         run: |
           aws apprunner update-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-            --source-configuration "{
-              \"CodeRepository\": {
-                \"RepositoryUrl\":     \"https://github.com/${{ github.repository }}\",
-                \"SourceCodeVersion\": {\"Type\":\"BRANCH\",\"Value\":\"main\"},
-                \"CodeConfiguration\": {\"ConfigurationSource\":\"REPOSITORY\"}
-              }
-            }" \
-            --health-check-configuration '{
-              \"Protocol\":\"HTTP\",
-              \"Path\":\"/health\",
-              \"Interval\":10,
-              \"Timeout\":5,
-              \"HealthyThreshold\":1,
-              \"UnhealthyThreshold\":10
-            }' \
+            --source-configuration file://<(cat <<EOF
+          {
+            "CodeRepository": {
+              "RepositoryUrl":     "https://github.com/${{ github.repository }}",
+              "SourceCodeVersion": {"Type":"BRANCH","Value":"main"},
+              "CodeConfiguration": {"ConfigurationSource":"REPOSITORY"}
+            }
+          }
+          EOF
+            ) \
+            --health-check-configuration file://health-check.json \
             --region ${{ env.AWS_REGION }}
 
       - name: Debug DOCDB_URI
         run: |
           echo ">> DOCDB_URI is '${{ env.DOCDB_URI }}'"
 
-      - name: Generate env-vars.json
+      - name: Write env-vars.json
         run: |
           cat > env-vars.json <<EOF
           [
