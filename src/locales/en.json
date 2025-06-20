@@ -438,7 +438,7 @@
         "description": "Yes-no feedback from end-users",
         "total": "Total questions with feedback",
         "helpful": "Helpful (yes)",
-        "unhelpful": "Unhelpful (no)",
+        "unhelpful": "Issue (no)",
         "reasonTableTitle": "Public Feedback Reasons Breakdown",
         "reason": "Reason"
       },

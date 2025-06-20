@@ -101,7 +101,7 @@ const EndUserFeedbackSection = ({ t, metrics }) => {
           </div>
           {/* Pie chart for NO (unhelpful) reasons */}
           <div style={{ flex: 1, minWidth: 300, height: 300 }}>
-            <h4>Unhelpful (No) - Reason Breakdown</h4>
+            <h4>{t('metrics.dashboard.userScored.unhelpful')} - Reason Breakdown</h4>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
@@ -139,8 +139,8 @@ const EndUserFeedbackSection = ({ t, metrics }) => {
             }).filter(row => row.total > 0)}
             columns={[
               { title: t('metrics.dashboard.userScored.reason'), data: 'reason' },
-              { title: 'Helpful (Yes)', data: 'helpful' },
-              { title: 'Unhelpful (No)', data: 'unhelpful' },
+              { title: t('metrics.dashboard.userScored.helpful'), data: 'helpful' },
+              { title: t('metrics.dashboard.userScored.unhelpful'), data: 'unhelpful' },
               { title: t('metrics.dashboard.count'), data: 'total' }
             ]}
             options={{
