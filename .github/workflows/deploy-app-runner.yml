@@ -49,7 +49,7 @@ jobs:
                   "CodeConfigurationValues": {
                     "Runtime": "NODEJS_22",
                     "BuildCommand": "npm install && npm run build",
-                    "StartCommand": "npm start-server",
+                    "StartCommand": "npm run start-server",
                     "RuntimeEnvironmentVariables": {
                       "ANTHROPIC_API_KEY":       "${{ env.ANTHROPIC_API_KEY }}",
                       "OPENAI_API_KEY":          "${{ env.OPENAI_API_KEY }}",
