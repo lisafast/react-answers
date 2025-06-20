@@ -52,6 +52,10 @@ async function dbConnect() {
     const connectionString = process.env.MONGODB_URI || process.env.DOCDB_URI;
     const opts = process.env.MONGODB_URI ? mongoDbOpts : docDbOpts;
 
+    // Output the final options and connection string to the console
+    console.log('DB Connection String:', connectionString);
+    console.log('DB Connection Options:', opts);
+
     cached.promise = mongoose.connect(connectionString, opts).then((mongoose) => {
       return mongoose;
     });
