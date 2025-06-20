@@ -5,24 +5,24 @@ on:
     branches: [main]
 
 permissions:
-  contents: read    # allow checking out code
-  id-token: write   # allow OIDC flow for AWS credentials
+  contents: read
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:              ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:     ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN:  ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:       ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:          ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:          ${{ secrets.GOOGLE_API_KEY }}
-      GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:               ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:          ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:                ${{ secrets.NODE_ENV }}
+      AWS_REGION:                   ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:          ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN:       ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:            ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:               ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:               ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID:      ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:                    ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:               ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                     ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Checkout code
@@ -52,27 +52,6 @@ jobs:
           }
           EOF
 
-      - name: Switch to Repository mode & Update Health Check
-        run: |
-          aws apprunner update-service \
-            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-            --source-configuration file://<(cat <<EOF
-          {
-            "CodeRepository": {
-              "RepositoryUrl":     "https://github.com/${{ github.repository }}",
-              "SourceCodeVersion": {"Type":"BRANCH","Value":"main"},
-              "CodeConfiguration": {"ConfigurationSource":"REPOSITORY"}
-            }
-          }
-          EOF
-            ) \
-            --health-check-configuration file://health-check.json \
-            --region ${{ env.AWS_REGION }}
-
-      - name: Debug DOCDB_URI
-        run: |
-          echo ">> DOCDB_URI is '${{ env.DOCDB_URI }}'"
-
       - name: Write env-vars.json
         run: |
           cat > env-vars.json <<EOF
@@ -87,10 +66,37 @@ jobs:
           ]
           EOF
 
-      - name: Inject Environment Variables via JSON
+      - name: Wait for any in-progress operation to finish
+        run: |
+          echo "Waiting for App Runner to be idle..."
+          for i in {1..30}; do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.OperationSummary.Status' --output text)
+            echo "Operation status: $STATUS"
+            if [[ "$STATUS" != "IN_PROGRESS" ]]; then
+              echo "Service is idle."
+              break
+            fi
+            sleep 10
+          done
+
+      - name: Switch to Repository mode & Update Health Check + Env-vars
         run: |
           aws apprunner update-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+            --source-configuration file://<(cat <<EOF
+          {
+            "CodeRepository": {
+              "RepositoryUrl":     "https://github.com/${{ github.repository }}",
+              "SourceCodeVersion": {"Type":"BRANCH","Value":"main"},
+              "CodeConfiguration": {"ConfigurationSource":"REPOSITORY"}
+            }
+          }
+          EOF
+            ) \
+            --health-check-configuration file://health-check.json \
             --environment-variables file://env-vars.json \
             --region ${{ env.AWS_REGION }}
 
@@ -103,8 +109,14 @@ jobs:
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
             echo "Status: $STATUS"
-            [[ "$STATUS" == "RUNNING" ]] && break
-            [[ "$STATUS" == "FAILED"  ]] && exit 1
+            if [[ "$STATUS" == "RUNNING" ]]; then
+              echo "Service is RUNNING."
+              break
+            fi
+            if [[ "$STATUS" == "FAILED" ]]; then
+              echo "Deployment failed."
+              exit 1
+            fi
             sleep 10
           done
 
