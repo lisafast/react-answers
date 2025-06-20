@@ -14,17 +14,17 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:                  ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:         ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN:      ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      APP_RUNNER_CONNECTION_ARN:   ${{ secrets.APP_RUNNER_CONNECTION_ARN }}
-      ANTHROPIC_API_KEY:           ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:              ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:              ${{ secrets.GOOGLE_API_KEY }}
-      GOOGLE_SEARCH_ENGINE_ID:     ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:                   ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:              ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:                    ${{ secrets.NODE_ENV }}
+      AWS_REGION:                ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:       ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN:    ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      APP_RUNNER_CONNECTION_ARN: ${{ secrets.APP_RUNNER_CONNECTION_ARN }}
+      ANTHROPIC_API_KEY:         ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:            ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:            ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID:   ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:                 ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:            ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                  ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Configure AWS credentials via OIDC
@@ -39,14 +39,14 @@ jobs:
           {
             "ServiceArn": "${{ env.APP_RUNNER_SERVICE_ARN }}",
             "SourceConfiguration": {
+              "AuthenticationConfiguration": {
+                "ConnectionArn": "${{ env.APP_RUNNER_CONNECTION_ARN }}"
+              },
               "CodeRepository": {
                 "RepositoryUrl": "https://github.com/${{ github.repository }}",
                 "SourceCodeVersion": {
                   "Type": "COMMIT",
                   "Value": "${{ github.sha }}"
-                },
-                "AuthenticationConfiguration": {
-                  "ConnectionArn": "${{ env.APP_RUNNER_CONNECTION_ARN }}"
                 },
                 "CodeConfiguration": {
                   "ConfigurationSource": "API",
@@ -67,7 +67,10 @@ jobs:
                 }
               }
             },
-            "InstanceConfiguration": { "Cpu": "1024", "Memory": "2048" },
+            "InstanceConfiguration": {
+              "Cpu": "1024",
+              "Memory": "2048"
+            },
             "HealthCheckConfiguration": {
               "Protocol": "HTTP",
               "Path": "/health",
@@ -117,15 +120,4 @@ jobs:
               --query 'Service.Status' --output text)
             echo "  [$i] State: $STATE"
             [[ "$STATE" == "RUNNING" ]] && { echo "Service is RUNNING."; exit 0; }
-            [[ "$STATE" == "FAILED"  ]] && { echo "Deployment FAILED!"; exit 1; }
-            sleep 60
-          done
-          echo "Timed out waiting for RUNNING."; exit 1
-
-      - name: Output App Runner URL
-        run: |
-          URL=$(aws apprunner describe-service \
-            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-            --region ${{ env.AWS_REGION }} \
-            --query 'Service.ServiceUrl' --output text)
-          echo "✅ App Runner URL: $URL"
+            [[ "$STATE" == "FAILED
