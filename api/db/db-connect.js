@@ -38,7 +38,7 @@ async function dbConnect() {
 
     const docDbOpts = {
       tls: true,
-      tlsCAFile: '/app/global-bundle.pem',
+      tlsCAFile: '/app/global-bundle.pem',   
       retryWrites: false,
       bufferCommands: false,
       connectTimeoutMS: 60000,        // 60 seconds timeout
