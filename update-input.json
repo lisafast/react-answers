@@ -1,0 +1,39 @@
+{
+  "ServiceArn": "arn:aws:apprunner:us-east-1:123456789012:service/your-service/abcd1234",
+  "SourceConfiguration": {
+    "CodeRepository": {
+      "RepositoryUrl": "https://github.com/your-org/your-repo",
+      "SourceCodeVersion": { "Type": "BRANCH", "Value": "main" },
+      "CodeConfiguration": {
+        "ConfigurationSource": "API",
+        "CodeConfigurationValues": {
+          "Runtime": "NODEJS_18",
+          "BuildCommand": "npm install && npm run build",
+          "StartCommand": "npm start",
+          "RuntimeEnvironmentVariables": {
+            "ANTHROPIC_API_KEY":       "${{ env.ANTHROPIC_API_KEY }}",
+            "OPENAI_API_KEY":          "${{ env.OPENAI_API_KEY }}",
+            "GOOGLE_API_KEY":          "${{ env.GOOGLE_API_KEY }}",
+            "GOOGLE_SEARCH_ENGINE_ID": "${{ env.GOOGLE_SEARCH_ENGINE_ID }}",
+            "DOCDB_URI":               "${{ env.DOCDB_URI }}",
+            "JWT_SECRET_KEY":          "${{ env.JWT_SECRET_KEY }}",
+            "NODE_ENV":                "${{ env.NODE_ENV }}"
+          }
+        }
+      }
+    }
+  },
+  "InstanceConfiguration": {
+    "Cpu": "1024",
+    "Memory": "2048",
+    "InstanceRoleArn": "${{ env.AWS_INSTANCE_ROLE_ARN }}"
+  },
+  "HealthCheckConfiguration": {
+    "Protocol": "HTTP",
+    "Path": "/health",
+    "Interval": 10,
+    "Timeout": 5,
+    "HealthyThreshold": 1,
+    "UnhealthyThreshold": 10
+  }
+}

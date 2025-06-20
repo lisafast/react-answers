@@ -2,11 +2,12 @@ name: Deploy to AWS App Runner
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
-  contents: read
-  id-token: write
+  contents: read    # allow checkout
+  id-token: write   # allow OIDC for AWS creds
 
 jobs:
   deploy:
@@ -28,92 +29,94 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Download RDS global truststore
+        run: |
+          wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+               -O ./global-bundle.pem
+
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ env.AWS_ASSUME_ROLE_ARN }}
           aws-region:     ${{ env.AWS_REGION }}
 
-      - name: Write source-config.json
+      - name: Write update-input.json
         run: |
-          cat > source-config.json <<-EOF
+          cat > update-input.json <<EOF
           {
-            "CodeRepository": {
-              "RepositoryUrl": "https://github.com/${{ github.repository }}",
-              "SourceCodeVersion": { "Type": "BRANCH", "Value": "main" },
-              "CodeConfiguration": { "ConfigurationSource": "REPOSITORY" }
+            "ServiceArn": "${{ env.APP_RUNNER_SERVICE_ARN }}",
+            "SourceConfiguration": {
+              "CodeRepository": {
+                "RepositoryUrl": "https://github.com/${{ github.repository }}",
+                "SourceCodeVersion": { "Type": "BRANCH", "Value": "main" },
+                "CodeConfiguration": {
+                  "ConfigurationSource": "API",
+                  "CodeConfigurationValues": {
+                    "Runtime": "NODEJS_18",
+                    "BuildCommand": "npm install && npm run build",
+                    "StartCommand": "npm start",
+                    "RuntimeEnvironmentVariables": {
+                      "ANTHROPIC_API_KEY":       "${{ env.ANTHROPIC_API_KEY }}",
+                      "OPENAI_API_KEY":          "${{ env.OPENAI_API_KEY }}",
+                      "GOOGLE_API_KEY":          "${{ env.GOOGLE_API_KEY }}",
+                      "GOOGLE_SEARCH_ENGINE_ID": "${{ env.GOOGLE_SEARCH_ENGINE_ID }}",
+                      "DOCDB_URI":               "${{ env.DOCDB_URI }}",
+                      "JWT_SECRET_KEY":          "${{ env.JWT_SECRET_KEY }}",
+                      "NODE_ENV":                "${{ env.NODE_ENV }}"
+                    }
+                  }
+                }
+              }
+            },
+            "InstanceConfiguration": {
+              "Cpu": "1024",
+              "Memory": "2048"
+            },
+            "HealthCheckConfiguration": {
+              "Protocol": "HTTP",
+              "Path": "/health",
+              "Interval": 10,
+              "Timeout": 5,
+              "HealthyThreshold": 1,
+              "UnhealthyThreshold": 10
             }
           }
           EOF
 
-      - name: Write health-check.json
+      - name: Wait for any in-progress operation to finish
         run: |
-          cat > health-check.json <<-EOF
-          {
-            "Protocol": "HTTP",
-            "Path": "/health",
-            "Interval": 10,
-            "Timeout": 5,
-            "HealthyThreshold": 1,
-            "UnhealthyThreshold": 10
-          }
-          EOF
-
-      - name: Write instance-config.json
-        run: |
-          cat > instance-config.json <<-EOF
-          {
-            "Cpu": "1024",
-            "Memory": "2048",
-            "EnvironmentVariables": [
-              { "Name": "ANTHROPIC_API_KEY",       "Value": "${{ env.ANTHROPIC_API_KEY }}" },
-              { "Name": "OPENAI_API_KEY",          "Value": "${{ env.OPENAI_API_KEY }}" },
-              { "Name": "GOOGLE_API_KEY",          "Value": "${{ env.GOOGLE_API_KEY }}" },
-              { "Name": "GOOGLE_SEARCH_ENGINE_ID", "Value": "${{ env.GOOGLE_SEARCH_ENGINE_ID }}" },
-              { "Name": "DOCDB_URI",               "Value": "${{ env.DOCDB_URI }}" },
-              { "Name": "JWT_SECRET_KEY",          "Value": "${{ env.JWT_SECRET_KEY }}" },
-              { "Name": "NODE_ENV",                "Value": "${{ env.NODE_ENV }}" }
-            ]
-          }
-          EOF
-
-      - name: Wait for any existing operation to finish
-        run: |
+          echo "Waiting for App Runner to be idle..."
           for i in {1..30}; do
             STATUS=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.OperationSummary.Status' --output text)
-            echo "Current operation: $STATUS"
+            echo "Operation status: $STATUS"
             [[ "$STATUS" != "IN_PROGRESS" ]] && break
             sleep 5
           done
 
-      - name: Update App Runner service
+      - name: Update App Runner via JSON
         run: |
           aws apprunner update-service \
-            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-            --source-configuration file://source-config.json \
-            --instance-configuration file://instance-config.json \
-            --health-check-configuration file://health-check.json \
+            --cli-input-json file://update-input.json \
             --region ${{ env.AWS_REGION }}
 
-      - name: Wait for RUNNING status
+      - name: Wait for service to be RUNNING
         run: |
-          echo "Waiting for service to reach RUNNING…"
+          echo "Waiting for App Runner service to reach RUNNING status..."
           for i in {1..30}; do
             S=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            echo "  Status: $S"
-            [[ "$S" == "RUNNING" ]] && exit 0
+            echo "Status: $S"
+            [[ "$S" == "RUNNING" ]] && break
             [[ "$S" == "FAILED" ]] && exit 1
             sleep 10
           done
-          echo "Timed out waiting for RUNNING." && exit 1
 
-      - name: Get and echo App Runner URL
+      - name: Get App Runner URL
         run: |
           URL=$(aws apprunner describe-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
