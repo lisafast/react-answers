@@ -4,13 +4,21 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: read
-  id-token: write
-
+# Bring all of your secrets into the job environment
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION:                   ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:          ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN:       ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:            ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:               ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:               ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID:      ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:                    ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:               ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                     ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Checkout code
@@ -24,13 +32,13 @@ jobs:
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-          aws-region:     ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_ASSUME_ROLE_ARN }}
+          aws-region:     ${{ env.AWS_REGION }}
 
       - name: Switch to Repository mode & Update Health Check
         run: |
           aws apprunner update-service \
-            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
+            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
             --source-configuration "{
               \"CodeRepository\": {
                 \"RepositoryUrl\":     \"https://github.com/${{ github.repository }}\",
@@ -46,29 +54,40 @@ jobs:
               \"HealthyThreshold\":1,
               \"UnhealthyThreshold\":10
             }' \
-            --region ${{ secrets.AWS_REGION }}
+            --region ${{ env.AWS_REGION }}
 
-      - name: Inject Environment Variables
+      - name: Debug DOCDB_URI
+        run: |
+          echo ">> DOCDB_URI is '${{ env.DOCDB_URI }}'"
+
+      - name: Write env-vars.json
+        run: |
+          cat > env-vars.json <<EOF
+          [
+            { "Name": "ANTHROPIC_API_KEY",       "Value": "${{ env.ANTHROPIC_API_KEY }}" },
+            { "Name": "OPENAI_API_KEY",          "Value": "${{ env.OPENAI_API_KEY }}" },
+            { "Name": "GOOGLE_API_KEY",          "Value": "${{ env.GOOGLE_API_KEY }}" },
+            { "Name": "GOOGLE_SEARCH_ENGINE_ID", "Value": "${{ env.GOOGLE_SEARCH_ENGINE_ID }}" },
+            { "Name": "DOCDB_URI",               "Value": "${{ env.DOCDB_URI }}" },
+            { "Name": "JWT_SECRET_KEY",          "Value": "${{ env.JWT_SECRET_KEY }}" },
+            { "Name": "NODE_ENV",                "Value": "${{ env.NODE_ENV }}" }
+          ]
+          EOF
+
+      - name: Inject Environment Variables via JSON
         run: |
           aws apprunner update-service \
-            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
-            --environment-variables \
-              Key=ANTHROPIC_API_KEY,Value=${{ secrets.ANTHROPIC_API_KEY }} \
-              Key=OPENAI_API_KEY,Value=${{ secrets.OPENAI_API_KEY }} \
-              Key=GOOGLE_API_KEY,Value=${{ secrets.GOOGLE_API_KEY }} \
-              Key=GOOGLE_SEARCH_ENGINE_ID,Value=${{ secrets.GOOGLE_SEARCH_ENGINE_ID }} \
-              Key=DOCDB_URI,Value=${{ secrets.DOCDB_URI }} \
-              Key=JWT_SECRET_KEY,Value=${{ secrets.JWT_SECRET_KEY }} \
-              Key=NODE_ENV,Value=${{ secrets.NODE_ENV }} \
-            --region ${{ secrets.AWS_REGION }}
+            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+            --environment-variables file://env-vars.json \
+            --region ${{ env.AWS_REGION }}
 
       - name: Wait for App Runner service to be RUNNING
         run: |
           echo "Waiting for App Runner service to reach RUNNING status..."
           for i in {1..30}; do
             STATUS=$(aws apprunner describe-service \
-              --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
-              --region ${{ secrets.AWS_REGION }} \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
             echo "Status: $STATUS"
             [[ "$STATUS" == "RUNNING" ]] && break
@@ -80,10 +99,9 @@ jobs:
         id: get-url
         run: |
           URL=$(aws apprunner describe-service \
-            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
-            --query 'Service.ServiceUrl' \
-            --output text \
-            --region ${{ secrets.AWS_REGION }})
+            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+            --query 'Service.ServiceUrl' --output text \
+            --region ${{ env.AWS_REGION }})
           echo "service-url=$URL" >> $GITHUB_ENV
 
       - name: Deployment complete
