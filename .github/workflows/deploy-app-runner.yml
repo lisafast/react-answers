@@ -1,0 +1,90 @@
+name: Deploy to AWS App Runner
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download RDS global truststore
+        run: |
+          wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+               -O ./global-bundle.pem
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+          aws-region:     ${{ secrets.AWS_REGION }}
+
+      - name: Switch to Repository mode & Update Health Check
+        run: |
+          aws apprunner update-service \
+            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
+            --source-configuration "{
+              \"CodeRepository\": {
+                \"RepositoryUrl\":     \"https://github.com/${{ github.repository }}\",
+                \"SourceCodeVersion\": {\"Type\":\"BRANCH\",\"Value\":\"main\"},
+                \"CodeConfiguration\": {\"ConfigurationSource\":\"REPOSITORY\"}
+              }
+            }" \
+            --health-check-configuration '{
+              \"Protocol\":\"HTTP\",
+              \"Path\":\"/health\",
+              \"Interval\":10,
+              \"Timeout\":5,
+              \"HealthyThreshold\":1,
+              \"UnhealthyThreshold\":10
+            }' \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Inject Environment Variables
+        run: |
+          aws apprunner update-service \
+            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
+            --environment-variables \
+              Key=ANTHROPIC_API_KEY,Value=${{ secrets.ANTHROPIC_API_KEY }} \
+              Key=OPENAI_API_KEY,Value=${{ secrets.OPENAI_API_KEY }} \
+              Key=GOOGLE_API_KEY,Value=${{ secrets.GOOGLE_API_KEY }} \
+              Key=GOOGLE_SEARCH_ENGINE_ID,Value=${{ secrets.GOOGLE_SEARCH_ENGINE_ID }} \
+              Key=DOCDB_URI,Value=${{ secrets.DOCDB_URI }} \
+              Key=JWT_SECRET_KEY,Value=${{ secrets.JWT_SECRET_KEY }} \
+              Key=NODE_ENV,Value=${{ secrets.NODE_ENV }} \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Wait for App Runner service to be RUNNING
+        run: |
+          echo "Waiting for App Runner service to reach RUNNING status..."
+          for i in {1..30}; do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ secrets.AWS_REGION }} \
+              --query 'Service.Status' --output text)
+            echo "Status: $STATUS"
+            [[ "$STATUS" == "RUNNING" ]] && break
+            [[ "$STATUS" == "FAILED"  ]] && exit 1
+            sleep 10
+          done
+
+      - name: Get App Runner URL
+        id: get-url
+        run: |
+          URL=$(aws apprunner describe-service \
+            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
+            --query 'Service.ServiceUrl' \
+            --output text \
+            --region ${{ secrets.AWS_REGION }})
+          echo "service-url=$URL" >> $GITHUB_ENV
+
+      - name: Deployment complete
+        run: echo "✅ App Runner URL ${{ env.service-url }}"
