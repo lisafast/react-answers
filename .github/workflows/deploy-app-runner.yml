@@ -4,10 +4,15 @@ on:
   push:
     branches: [main]
 
-# Bring all of your secrets into the job environment
+permissions:
+  contents: read    # allow checking out code
+  id-token: write   # allow OIDC flow for AWS credentials
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    # Pull in all your GitHub secrets as environment variables
     env:
       AWS_REGION:                   ${{ secrets.AWS_REGION }}
       AWS_ASSUME_ROLE_ARN:          ${{ secrets.AWS_ASSUME_ROLE_ARN }}
@@ -60,7 +65,7 @@ jobs:
         run: |
           echo ">> DOCDB_URI is '${{ env.DOCDB_URI }}'"
 
-      - name: Write env-vars.json
+      - name: Generate env-vars.json
         run: |
           cat > env-vars.json <<EOF
           [
@@ -100,7 +105,8 @@ jobs:
         run: |
           URL=$(aws apprunner describe-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-            --query 'Service.ServiceUrl' --output text \
+            --query 'Service.ServiceUrl' \
+            --output text \
             --region ${{ env.AWS_REGION }})
           echo "service-url=$URL" >> $GITHUB_ENV
 
