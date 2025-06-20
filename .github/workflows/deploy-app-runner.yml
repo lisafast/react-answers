@@ -66,6 +66,14 @@ jobs:
             "InstanceConfiguration": {
               "Cpu":    "1024",
               "Memory": "2048"
+            },
+            "HealthCheckConfiguration": {
+              "Protocol":         "HTTP",
+              "Path":             "/health",
+              "Interval":         20,
+              "Timeout":          15,
+              "HealthyThreshold": 1,
+              "UnhealthyThreshold": 10
             }
           }
           EOF
