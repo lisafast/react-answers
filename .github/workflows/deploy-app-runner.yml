@@ -39,9 +39,6 @@ jobs:
           {
             "ServiceArn": "${{ env.APP_RUNNER_SERVICE_ARN }}",
             "SourceConfiguration": {
-              "AuthenticationConfiguration": {
-                "ConnectionArn": "${{ env.APP_RUNNER_CONNECTION_ARN }}"
-              },
               "CodeRepository": {
                 "RepositoryUrl": "https://github.com/${{ github.repository }}",
                 "SourceCodeVersion": {
