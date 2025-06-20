@@ -2,29 +2,27 @@ name: Deploy to AWS App Runner
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 permissions:
   contents: read
-  id-token: write
+  id-token:  write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:               ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:      ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      AWS_INSTANCE_ROLE_ARN:    ${{ secrets.AWS_INSTANCE_ROLE_ARN }}    # <-- make sure this is set
-      APP_RUNNER_SERVICE_ARN:   ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:        ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:           ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:           ${{ secrets.GOOGLE_API_KEY }}
-      GOOGLE_SEARCH_ENGINE_ID:  ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:                ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:           ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:                 ${{ secrets.NODE_ENV }}
+      AWS_REGION:             ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:    ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:         ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:         ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:              ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:         ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:               ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Checkout code
@@ -44,7 +42,7 @@ jobs:
             "SourceConfiguration": {
               "CodeRepository": {
                 "RepositoryUrl": "https://github.com/${{ github.repository }}",
-                "SourceCodeVersion": { "Type": "BRANCH", "Value": "main" },
+                "SourceCodeVersion": { "Type":"BRANCH", "Value":"main" },
                 "CodeConfiguration": {
                   "ConfigurationSource": "API",
                   "CodeConfigurationValues": {
@@ -66,8 +64,7 @@ jobs:
             },
             "InstanceConfiguration": {
               "Cpu": "1024",
-              "Memory": "2048",
-              "InstanceRoleArn": "${{ env.AWS_INSTANCE_ROLE_ARN }}"
+              "Memory": "2048"
             },
             "HealthCheckConfiguration": {
               "Protocol": "HTTP",
@@ -81,8 +78,7 @@ jobs:
           EOF
 
       - name: Validate JSON
-        run: |
-          jq -e . update-input.json
+        run: jq -e . update-input.json
 
       - name: Update App Runner via JSON
         run: |
