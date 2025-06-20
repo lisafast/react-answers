@@ -1,4 +1,4 @@
-name: Deploy to AWS App Runner   
+name: Deploy to AWS App Runner
 
 on:
   push:
@@ -14,16 +14,17 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:             ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:    ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:         ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:         ${{ secrets.GOOGLE_API_KEY }}
-      GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:              ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:         ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:               ${{ secrets.NODE_ENV }}
+      AWS_REGION:                  ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:         ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN:      ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      APP_RUNNER_CONNECTION_ARN:   ${{ secrets.APP_RUNNER_CONNECTION_ARN }}
+      ANTHROPIC_API_KEY:           ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:              ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:              ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID:     ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:                   ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:              ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                    ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Configure AWS credentials via OIDC
@@ -40,7 +41,13 @@ jobs:
             "SourceConfiguration": {
               "CodeRepository": {
                 "RepositoryUrl": "https://github.com/${{ github.repository }}",
-                "SourceCodeVersion": { "Type":"BRANCH", "Value":"main" },
+                "SourceCodeVersion": {
+                  "Type": "COMMIT",
+                  "Value": "${{ github.sha }}"
+                },
+                "AuthenticationConfiguration": {
+                  "ConnectionArn": "${{ env.APP_RUNNER_CONNECTION_ARN }}"
+                },
                 "CodeConfiguration": {
                   "ConfigurationSource": "API",
                   "CodeConfigurationValues": {
@@ -60,15 +67,12 @@ jobs:
                 }
               }
             },
-            "InstanceConfiguration": {
-              "Cpu":    "1024",
-              "Memory": "2048"
-            },
+            "InstanceConfiguration": { "Cpu": "1024", "Memory": "2048" },
             "HealthCheckConfiguration": {
-              "Protocol":         "HTTP",
-              "Path":             "/health",
-              "Interval":         20,
-              "Timeout":          15,
+              "Protocol": "HTTP",
+              "Path": "/health",
+              "Interval": 20,
+              "Timeout": 15,
               "HealthyThreshold": 1,
               "UnhealthyThreshold": 10
             }
