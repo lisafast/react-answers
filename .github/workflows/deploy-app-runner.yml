@@ -16,7 +16,7 @@ jobs:
     env:
       AWS_REGION:               ${{ secrets.AWS_REGION }}
       AWS_ASSUME_ROLE_ARN:      ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      AWS_INSTANCE_ROLE_ARN:    ${{ secrets.AWS_INSTANCE_ROLE_ARN }}  # make sure you’ve set this in GitHub
+      AWS_INSTANCE_ROLE_ARN:    ${{ secrets.AWS_INSTANCE_ROLE_ARN }}    # <-- make sure this is set
       APP_RUNNER_SERVICE_ARN:   ${{ secrets.APP_RUNNER_SERVICE_ARN }}
       ANTHROPIC_API_KEY:        ${{ secrets.ANTHROPIC_API_KEY }}
       OPENAI_API_KEY:           ${{ secrets.OPENAI_API_KEY }}
@@ -82,9 +82,6 @@ jobs:
 
       - name: Validate JSON
         run: |
-          echo "---- contents of update-input.json ----"
-          cat update-input.json
-          echo "---- jq validation ----"
           jq -e . update-input.json
 
       - name: Update App Runner via JSON
@@ -95,23 +92,20 @@ jobs:
 
       - name: Wait for RUNNING status
         run: |
-          echo "Waiting for service to reach RUNNING..."
           for i in {1..30}; do
-            STATUS=$(aws apprunner describe-service \
+            S=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            echo "  Status: $STATUS"
-            [[ "$STATUS" == "RUNNING" ]] && exit 0
-            [[ "$STATUS" == "FAILED" ]] && exit 1
+            [[ "$S" == "RUNNING" ]] && exit 0
+            [[ "$S" == "FAILED" ]] && exit 1
             sleep 10
           done
-          echo "Timed out waiting for RUNNING." && exit 1
+          exit 1
 
       - name: Echo App Runner URL
         run: |
-          URL=$(aws apprunner describe-service \
+          aws apprunner describe-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
             --region ${{ env.AWS_REGION }} \
-            --query 'Service.ServiceUrl' --output text)
-          echo "✅ App Runner URL: $URL"
+            --query 'Service.ServiceUrl' --output text
