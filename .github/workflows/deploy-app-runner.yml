@@ -6,8 +6,8 @@ on:
       - main
 
 permissions:
-  contents: read    # allow checkout
-  id-token: write   # allow OIDC for AWS creds
+  contents: read
+  id-token: write
 
 jobs:
   deploy:
@@ -64,67 +64,67 @@ jobs:
               }
             },
             "InstanceConfiguration": {
-              "Cpu": "1024",
+              "Cpu":    "1024",
               "Memory": "2048"
             },
             "HealthCheckConfiguration": {
-              "Protocol": "HTTP",
-              "Path": "/health",
-              "Interval": 10,
-              "Timeout": 5,
+              "Protocol":         "HTTP",
+              "Path":             "/health",
+              "Interval":         10,
+              "Timeout":          5,
               "HealthyThreshold": 1,
               "UnhealthyThreshold": 10
             }
           }
           EOF
 
-      - name: Wait for any in-progress operation to finish
+      - name: Wait up to 4h for idle
         run: |
-          echo "Waiting for App Runner to be idle..."
-          for i in {1..30}; do
+          echo "Waiting up to 4h for App Runner to be idle..."
+          for i in {1..240}; do
             STATUS=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.OperationSummary.Status' --output text)
-            echo "  Operation status: $STATUS"
-            [[ "$STATUS" != "IN_PROGRESS" ]] && { echo "Idle!"; break; }
-            sleep 10
-          done  # OPERATION_IN_PROGRESS means blocked by prior deploy or maintenance :contentReference[oaicite:2]{index=2}
+            echo "  [$i] Operation status: $STATUS"
+            [[ "$STATUS" != "IN_PROGRESS" ]] && { echo "Idle detected."; break; }
+            sleep 60
+          done
 
-      - name: Attempt App Runner update with retries
+      - name: Attempt update with retries (up to ~10m)
         run: |
           set -e
-          for attempt in {1..5}; do
-            echo "Update attempt #$attempt"
+          for attempt in {1..10}; do
+            echo "Update attempt #$attempt..."
             if aws apprunner update-service \
                 --cli-input-json file://update-input.json \
                 --region ${{ env.AWS_REGION }}; then
-              echo "Update succeeded."; break
+              echo "Update succeeded"; break
             else
-              echo "Update failed (maybe still in progress). Retrying in 15s..."
-              sleep 15
+              echo "Update blocked, retrying in 60s..."
+              sleep 60
             fi
-          done  # This handles transient OPERATION_IN_PROGRESS errors :contentReference[oaicite:3]{index=3}
+          done
 
-      - name: Wait for service to reach RUNNING
+      - name: Wait up to 4h for RUNNING
         run: |
-          echo "Polling for RUNNING status..."
-          for i in {1..30}; do
+          echo "Waiting up to 4h for service RUNNING..."
+          for i in {1..240}; do
             STATE=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            echo "  State: $STATE"
+            echo "  [$i] State: $STATE"
             [[ "$STATE" == "RUNNING" ]] && { echo "Service is RUNNING."; exit 0; }
             [[ "$STATE" == "FAILED"  ]] && { echo "Deployment FAILED!"; exit 1; }
-            sleep 10
+            sleep 60
           done
           echo "Timed out waiting for RUNNING."; exit 1
 
       - name: Output App Runner URL
         run: |
-          echo "✅ App Runner URL:" \
-            $(aws apprunner describe-service \
-              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-              --region ${{ env.AWS_REGION }} \
-              --query 'Service.ServiceUrl' --output text)
+          URL=$(aws apprunner describe-service \
+            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Service.ServiceUrl' --output text)
+          echo "✅ App Runner URL: $URL"
