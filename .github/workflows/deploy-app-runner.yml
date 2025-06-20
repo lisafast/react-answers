@@ -1,6 +1,7 @@
 name: Deploy to AWS App Runner
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -17,7 +18,6 @@ jobs:
       AWS_REGION:                ${{ secrets.AWS_REGION }}
       AWS_ASSUME_ROLE_ARN:       ${{ secrets.AWS_ASSUME_ROLE_ARN }}
       APP_RUNNER_SERVICE_ARN:    ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      APP_RUNNER_CONNECTION_ARN: ${{ secrets.APP_RUNNER_CONNECTION_ARN }}
       ANTHROPIC_API_KEY:         ${{ secrets.ANTHROPIC_API_KEY }}
       OPENAI_API_KEY:            ${{ secrets.OPENAI_API_KEY }}
       GOOGLE_API_KEY:            ${{ secrets.GOOGLE_API_KEY }}
@@ -41,10 +41,7 @@ jobs:
             "SourceConfiguration": {
               "CodeRepository": {
                 "RepositoryUrl": "https://github.com/${{ github.repository }}",
-                "SourceCodeVersion": {
-                  "Type": "BRANCH",
-                  "Value": "main"
-                },
+                "SourceCodeVersion": { "Type": "BRANCH", "Value": "main" },
                 "CodeConfiguration": {
                   "ConfigurationSource": "API",
                   "CodeConfigurationValues": {
@@ -64,10 +61,7 @@ jobs:
                 }
               }
             },
-            "InstanceConfiguration": {
-              "Cpu": "1024",
-              "Memory": "2048"
-            },
+            "InstanceConfiguration": { "Cpu": "1024", "Memory": "2048" },
             "HealthCheckConfiguration": {
               "Protocol": "HTTP",
               "Path": "/health",
@@ -81,40 +75,34 @@ jobs:
 
       - name: Wait up to 4h for idle
         run: |
-          echo "Waiting up to 4h for App Runner to be idle..."
           for i in {1..240}; do
-            STATUS=$(aws apprunner describe-service \
-              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-              --region ${{ env.AWS_REGION }} \
-              --query 'Service.OperationSummary.Status' --output text)
-            echo "  [$i] Operation status: $STATUS"
-            [[ "$STATUS" != "IN_PROGRESS" ]] && { echo "Idle detected."; break; }
+            STATUS=$(aws apprunner describe-service --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" --region ${{ env.AWS_REGION }} --query 'Service.OperationSummary.Status' --output text)
+            [[ "$STATUS" != "IN_PROGRESS" ]] && break
             sleep 60
           done
 
-      - name: Attempt update with retries (up to ~10m)
+      - name: Attempt update with retries
         run: |
           set -e
-          for attempt in {1..10}; do
-            echo "Update attempt #$attempt..."
-            if aws apprunner update-service \
-                --cli-input-json file://update-input.json \
-                --region ${{ env.AWS_REGION }}; then
-              echo "Update succeeded"; break
+          for i in {1..10}; do
+            if aws apprunner update-service --cli-input-json file://update-input.json --region ${{ env.AWS_REGION }}; then
+              echo "✅ Update succeeded" && break
             else
-              echo "Update blocked, retrying in 60s..."
               sleep 60
             fi
           done
 
       - name: Wait up to 4h for RUNNING
         run: |
-          echo "Waiting up to 4h for service RUNNING..."
           for i in {1..240}; do
-            STATE=$(aws apprunner describe-service \
-              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-              --region ${{ env.AWS_REGION }} \
-              --query 'Service.Status' --output text)
-            echo "  [$i] State: $STATE"
-            [[ "$STATE" == "RUNNING" ]] && { echo "Service is RUNNING."; exit 0; }
-            [[ "$STATE" == "FAILED
+            STATE=$(aws apprunner describe-service --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" --region ${{ env.AWS_REGION }} --query 'Service.Status' --output text)
+            [[ "$STATE" == "RUNNING" ]] && exit 0
+            [[ "$STATE" == "FAILED" ]] && exit 1
+            sleep 60
+          done
+          exit 1
+
+      - name: Output App Runner URL
+        run: |
+          URL=$(aws apprunner describe-service --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" --region ${{ env.AWS_REGION }} --query 'Service.ServiceUrl' --output text)
+          echo "✅ App Runner URL: $URL"
