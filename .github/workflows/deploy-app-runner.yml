@@ -42,8 +42,8 @@ jobs:
               "CodeRepository": {
                 "RepositoryUrl": "https://github.com/${{ github.repository }}",
                 "SourceCodeVersion": {
-                  "Type": "COMMIT",
-                  "Value": "${{ github.sha }}"
+                  "Type": "BRANCH",
+                  "Value": "main"
                 },
                 "CodeConfiguration": {
                   "ConfigurationSource": "API",
