@@ -15,16 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:                ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:       ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN:    ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:         ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:            ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:            ${{ secrets.GOOGLE_API_KEY }}
-      GOOGLE_SEARCH_ENGINE_ID:   ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:                 ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:            ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:                  ${{ secrets.NODE_ENV }}
+      AWS_REGION:             ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:    ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:       ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:          ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:          ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_SEARCH_ENGINE_ID:${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
+      DOCDB_URI:               ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:          ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Configure AWS credentials via OIDC
@@ -49,13 +49,14 @@ jobs:
                     "BuildCommand": "npm install && npm run build",
                     "StartCommand": "npm run start-server",
                     "RuntimeEnvironmentVariables": {
-                      "ANTHROPIC_API_KEY":       "${{ env.ANTHROPIC_API_KEY }}",
-                      "OPENAI_API_KEY":          "${{ env.OPENAI_API_KEY }}",
-                      "GOOGLE_API_KEY":          "${{ env.GOOGLE_API_KEY }}",
+                      "DEPLOY_RUN_ID":         "${{ github.run_id }}",
+                      "ANTHROPIC_API_KEY":     "${{ env.ANTHROPIC_API_KEY }}",
+                      "OPENAI_API_KEY":        "${{ env.OPENAI_API_KEY }}",
+                      "GOOGLE_API_KEY":        "${{ env.GOOGLE_API_KEY }}",
                       "GOOGLE_SEARCH_ENGINE_ID": "${{ env.GOOGLE_SEARCH_ENGINE_ID }}",
-                      "DOCDB_URI":               "${{ env.DOCDB_URI }}",
-                      "JWT_SECRET_KEY":          "${{ env.JWT_SECRET_KEY }}",
-                      "NODE_ENV":                "${{ env.NODE_ENV }}"
+                      "DOCDB_URI":             "${{ env.DOCDB_URI }}",
+                      "JWT_SECRET_KEY":        "${{ env.JWT_SECRET_KEY }}",
+                      "NODE_ENV":              "${{ env.NODE_ENV }}"
                     }
                   }
                 }
@@ -63,46 +64,63 @@ jobs:
             },
             "InstanceConfiguration": { "Cpu": "1024", "Memory": "2048" },
             "HealthCheckConfiguration": {
-              "Protocol": "HTTP",
-              "Path": "/health",
-              "Interval": 20,
-              "Timeout": 15,
-              "HealthyThreshold": 1,
-              "UnhealthyThreshold": 10
+              "Protocol": "HTTP", "Path": "/health",
+              "Interval": 20, "Timeout": 15,
+              "HealthyThreshold": 1, "UnhealthyThreshold": 10
             }
           }
           EOF
 
       - name: Wait up to 4h for idle
         run: |
+          echo "Waiting for App Runner to be idle..."
           for i in {1..240}; do
-            STATUS=$(aws apprunner describe-service --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" --region ${{ env.AWS_REGION }} --query 'Service.OperationSummary.Status' --output text)
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.OperationSummary.Status' --output text)
             [[ "$STATUS" != "IN_PROGRESS" ]] && break
             sleep 60
           done
 
-      - name: Attempt update with retries
+      - name: Update service (retries)
         run: |
           set -e
           for i in {1..10}; do
-            if aws apprunner update-service --cli-input-json file://update-input.json --region ${{ env.AWS_REGION }}; then
-              echo "✅ Update succeeded" && break
+            if aws apprunner update-service \
+                --cli-input-json file://update-input.json \
+                --region ${{ env.AWS_REGION }}; then
+              echo "✅ update-service succeeded"; break
             else
+              echo "Retrying in 60s..."
               sleep 60
             fi
           done
 
-      - name: Wait up to 4h for RUNNING
+      - name: Force deployment if needed
         run: |
+          aws apprunner start-deployment \
+            --cli-input-json file://update-input.json \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait up to 4h for service RUNNING
+        run: |
+          echo "Waiting for service RUNNING..."
           for i in {1..240}; do
-            STATE=$(aws apprunner describe-service --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" --region ${{ env.AWS_REGION }} --query 'Service.Status' --output text)
-            [[ "$STATE" == "RUNNING" ]] && exit 0
-            [[ "$STATE" == "FAILED" ]] && exit 1
+            STATE=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.Status' --output text)
+            [[ "$STATE" == "RUNNING" ]] && { echo "Service is RUNNING."; exit 0; }
+            [[ "$STATE" == "FAILED"  ]] && { echo "Deployment FAILED!"; exit 1; }
             sleep 60
           done
-          exit 1
+          echo "Timed out"; exit 1
 
       - name: Output App Runner URL
         run: |
-          URL=$(aws apprunner describe-service --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" --region ${{ env.AWS_REGION }} --query 'Service.ServiceUrl' --output text)
+          URL=$(aws apprunner describe-service \
+            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Service.ServiceUrl' --output text)
           echo "✅ App Runner URL: $URL"
