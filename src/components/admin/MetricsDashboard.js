@@ -643,7 +643,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                   expertScoredHasErrorPercent: data.expertScored.total ? Math.round((data.expertScored.hasError / data.expertScored.total) * 100) : 0
                 }))}
                 columns={[
-                  { title: t('metrics.dashboard.department'), data: 'department' },
+                  { title: t('metrics.dashboard.byDepartment.department'), data: 'department' },
                   { title: t('metrics.dashboard.totalQuestions'), data: 'totalQuestions' },
                   { title: t('metrics.dashboard.expertScored.total'), data: 'expertScoredTotal' },
                   { title: t('metrics.dashboard.expertScored.correct'), data: 'expertScoredCorrect' },

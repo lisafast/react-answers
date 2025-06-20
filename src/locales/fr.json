@@ -425,6 +425,7 @@
         "correct": "Correct",
         "needsImprovement": "Nécessite une amélioration",
         "hasError": "Contient une erreur",
+        "hasErrorPercent": "Contient une erreur (%)",
         "harmful": "Codé comme nuisible"
       },
       "aiScored": {
@@ -446,6 +447,7 @@
       },
       "byDepartment": {
         "title": "Répartition par département",
+        "department": "Département",
         "totalQuestions": "Total des questions",
         "totalSessions": "Sessions totales",
         "expertTotal": "Évaluations d'experts"

@@ -423,6 +423,7 @@
         "correct": "Correct",
         "needsImprovement": "Needs improvement",
         "hasError": "Has error",
+        "hasErrorPercent": "Has error (%)",
         "harmful": "Coded as harmful"
       },
       "aiScored": {
@@ -444,6 +445,7 @@
       },
       "byDepartment": {
         "title": "Department breakdown",
+        "department": "Department",
         "totalQuestions": "Total questions",
         "totalSessions": "Total sessions",
         "expertTotal": "Expert evaluations"
