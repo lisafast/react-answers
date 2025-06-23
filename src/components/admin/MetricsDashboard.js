@@ -250,23 +250,48 @@ const MetricsDashboard = ({ lang = 'en' }) => {
     metrics.totalConversationsFr = uniqueChatIdsFr.size;
 
     // Add to metrics: publicFeedback breakdown by reason and score
-    // --- FIX: Separate yes/no feedback for reasons and scores ---
     const publicFeedbackReasons = { yes: {}, no: {} };
     const publicFeedbackScores = { yes: {}, no: {} };
     const publicFeedbackReasonsByLang = { en: { yes: {}, no: {} }, fr: { yes: {}, no: {} } };
+    // New: userScored metrics from publicFeedback
+    metrics.userScored = {
+      total: { total: 0, en: 0, fr: 0 },
+      helpful: { total: 0, en: 0, fr: 0 },
+      unhelpful: { total: 0, en: 0, fr: 0 }
+    };
     logs.forEach(chat => {
       chat.interactions?.forEach(interaction => {
-        if (interaction.expertFeedback?.type === 'public') {
-          const feedbackType = interaction.expertFeedback.feedback === 'yes' ? 'yes' : 'no';
-          const reason = interaction.expertFeedback.publicFeedbackReason || 'Other';
-          const score = interaction.expertFeedback.publicFeedbackScore || 'Other';
-          // Count by feedback type
-          publicFeedbackReasons[feedbackType][reason] = (publicFeedbackReasons[feedbackType][reason] || 0) + 1;
-          publicFeedbackScores[feedbackType][score] = (publicFeedbackScores[feedbackType][score] || 0) + 1;
-          // Count by lang and feedback type
+        if (interaction.publicFeedback) {
+          const reason = interaction.publicFeedback.publicFeedbackReason || 'Other';
+          const score = interaction.publicFeedback.publicFeedbackScore;
           const lang = chat.pageLanguage === 'fr' ? 'fr' : 'en';
-          if (!publicFeedbackReasonsByLang[lang][feedbackType][reason]) publicFeedbackReasonsByLang[lang][feedbackType][reason] = 0;
-          publicFeedbackReasonsByLang[lang][feedbackType][reason]++;
+          // Bucket into yes/no
+          let bucket;
+          if (score === true || String(score).toLowerCase() === 'yes' || (typeof score === 'number' && score <= 4)) {
+            bucket = 'yes';
+          } else if (score === false || String(score).toLowerCase() === 'no' || (typeof score === 'number' && score > 4)) {
+            bucket = 'no';
+          } else {
+            bucket = null;
+          }
+          if (bucket) {
+            // Reasons
+            publicFeedbackReasons[bucket][reason] = (publicFeedbackReasons[bucket][reason] || 0) + 1;
+            // Scores
+            publicFeedbackScores[bucket][score] = (publicFeedbackScores[bucket][score] || 0) + 1;
+            // Reasons by lang
+            publicFeedbackReasonsByLang[lang][bucket][reason] = (publicFeedbackReasonsByLang[lang][bucket][reason] || 0) + 1;
+            // userScored
+            metrics.userScored.total.total++;
+            metrics.userScored.total[lang]++;
+            if (bucket === 'yes') {
+              metrics.userScored.helpful.total++;
+              metrics.userScored.helpful[lang]++;
+            } else if (bucket === 'no') {
+              metrics.userScored.unhelpful.total++;
+              metrics.userScored.unhelpful[lang]++;
+            }
+          }
         }
       });
     });
@@ -402,7 +427,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       count: metrics.totalQuestions,
                       percentage: metrics.totalConversations ? Math.round((metrics.totalQuestions / metrics.totalConversations) * 100) + '%' : '0%',
                       enCount: metrics.totalQuestionsEn,
-                      enPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsEn / metrics.totalQuestions) * 100) + '%' : '0%',
+                      enPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsEn / metrics.totalQuestions) + 100) + '%' : '0%',
                       frCount: metrics.totalQuestionsFr,
                       frPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsFr / metrics.totalQuestions) * 100) + '%' : '0%'
                     },
