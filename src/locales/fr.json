@@ -32,8 +32,8 @@
     },
     "feedback": {
       "title": "",
-      "surveyLink": "Répondez à une enquête de rétroaction de 3 minutes (s'ouvre dans un nouvel onglet)",
-      "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA&so=pub&cl=y",
+      "surveyLink": "Fini ? Répondez à une enquête de rétroaction de 3 minutes (s'ouvre dans un nouvel onglet)",
+      "surveyUrl": "https://cdssnc.qualtrics.com/jfe/form/SV_4N2YTcAHkcBEGfs?Q_Language=FR-CA",
       "question": "Cette réponse était-elle utile?",
       "useful": "Bonne",
       "notUseful": "Nécessite une amélioration",

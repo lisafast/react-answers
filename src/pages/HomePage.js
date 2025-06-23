@@ -141,7 +141,7 @@ const HomePage = ({ lang = 'en' }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {t('homepage.publicFeedback.surveyLink')}
+            {t('homepage.feedback.surveyLink')}
           </a>
         </GcdsText>
         <GcdsDetails detailsTitle={t('homepage.about.title')} className="mb-400" tabIndex={0}>
