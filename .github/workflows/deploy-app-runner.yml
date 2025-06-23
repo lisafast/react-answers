@@ -35,18 +35,20 @@ jobs:
 
       - name: Create GitHub Deployment
         id: deployment
-        uses: actions/create-deployment@v1
+        uses: tibdex/github-create-deployment@v1
         with:
           ref: ${{ github.sha }}
           environment: experimentation
           transient_environment: false
           auto_inactive: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set deployment status to in_progress
-        uses: actions/deployment-status@v1
+        uses: tibdex/github-set-deployment-status@v1
         with:
-          state: in_progress
+          token: ${{ secrets.GITHUB_TOKEN }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          state: in_progress
 
       - name: Write update-input.json
         run: |
@@ -165,15 +167,17 @@ jobs:
 
       - name: Set deployment status to success
         if: success()
-        uses: actions/deployment-status@v1
+        uses: tibdex/github-set-deployment-status@v1
         with:
-          state: success
+          token: ${{ secrets.GITHUB_TOKEN }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          state: success
           environment_url: https://ai-answers.experimentation.ca
 
       - name: Set deployment status to failure
         if: failure()
-        uses: actions/deployment-status@v1
+        uses: tibdex/github-set-deployment-status@v1
         with:
-          state: failure
+          token: ${{ secrets.GITHUB_TOKEN }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          state: failure
