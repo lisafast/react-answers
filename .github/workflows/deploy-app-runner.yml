@@ -102,16 +102,33 @@ jobs:
             fi
           done
 
-      - name: Wait up to 4h for RUNNING
+      - name: Wait up to 4h for RUNNING (force if not deploying)
         run: |
-          echo "Waiting for service RUNNING..."
+          echo "Waiting for service RUNNING or IN_PROGRESS..."
           for i in {1..240}; do
             STATE=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            [[ "$STATE" == "RUNNING" ]] && { echo "🟢 Service is RUNNING."; exit 0; }
-            [[ "$STATE" == "FAILED" ]] && { echo "❌ Deployment FAILED!"; exit 1; }
+            OP_STATUS=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.OperationSummary.Status' --output text)
+            if [[ "$STATE" == "RUNNING" ]]; then
+              echo "🟢 Service is RUNNING."
+              exit 0
+            fi
+            if [[ "$STATE" == "FAILED" ]]; then
+              echo "❌ Deployment FAILED!"
+              exit 1
+            fi
+            if [[ "$OP_STATUS" != "IN_PROGRESS" ]]; then
+              echo "⚠️ No deployment in progress, forcing deployment..."
+              aws apprunner start-deployment \
+                --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+                --region ${{ env.AWS_REGION }}
+              sleep 10
+            fi
             sleep 60
           done
           echo "❌ Timed out"; exit 1
