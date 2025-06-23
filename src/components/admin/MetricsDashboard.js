@@ -166,10 +166,10 @@ const MetricsDashboard = ({ lang = 'en' }) => {
         metrics.byDepartment[department].total++;
 
         // Process human- and user-scored metrics (per language)
-        if (interaction.expertFeedback?.totalScore !== undefined && interaction.expertFeedback?.type) {
+        if (interaction.expertFeedback?.type) {
           const type = interaction.expertFeedback.type;
-          const score = interaction.expertFeedback.totalScore;
-          if (type === 'expert') {
+          if (type === 'expert' && interaction.expertFeedback?.totalScore !== undefined) {
+            const score = interaction.expertFeedback.totalScore;
             metrics.expertScored.total.total++;
             if (pageLanguage === 'en') metrics.expertScored.total.en++;
             if (pageLanguage === 'fr') metrics.expertScored.total.fr++;
@@ -201,12 +201,13 @@ const MetricsDashboard = ({ lang = 'en' }) => {
               if (pageLanguage === 'fr') metrics.expertScored.hasError.fr++;
               metrics.byDepartment[department].expertScored.hasError++;
             }
-          } else if (type === 'public') {
+          } else if (type === 'public' && interaction.expertFeedback?.publicFeedbackScore !== undefined) {
             metrics.userScored.total.total++;
             if (pageLanguage === 'en') metrics.userScored.total.en++;
             if (pageLanguage === 'fr') metrics.userScored.total.fr++;
             metrics.byDepartment[department].userScored.total++;
-            if (score >= 90) {
+            const publicScore = interaction.expertFeedback.publicFeedbackScore;
+            if (publicScore <= 4) {
               metrics.userScored.helpful.total++;
               if (pageLanguage === 'en') metrics.userScored.helpful.en++;
               if (pageLanguage === 'fr') metrics.userScored.helpful.fr++;
@@ -249,18 +250,48 @@ const MetricsDashboard = ({ lang = 'en' }) => {
     metrics.totalConversationsFr = uniqueChatIdsFr.size;
 
     // Add to metrics: publicFeedback breakdown by reason and score
-    const publicFeedbackReasons = {};
-    const publicFeedbackScores = {};
-    const publicFeedbackReasonsByLang = { en: {}, fr: {} };
+    const publicFeedbackReasons = { yes: {}, no: {} };
+    const publicFeedbackScores = { yes: {}, no: {} };
+    const publicFeedbackReasonsByLang = { en: { yes: {}, no: {} }, fr: { yes: {}, no: {} } };
+    // New: userScored metrics from publicFeedback
+    metrics.userScored = {
+      total: { total: 0, en: 0, fr: 0 },
+      helpful: { total: 0, en: 0, fr: 0 },
+      unhelpful: { total: 0, en: 0, fr: 0 }
+    };
     logs.forEach(chat => {
       chat.interactions?.forEach(interaction => {
-        if (interaction.expertFeedback?.type === 'public') {
-          const reason = interaction.expertFeedback.publicFeedbackReason || 'Other';
-          const score = interaction.expertFeedback.publicFeedbackScore || 'Other';
-          publicFeedbackReasons[reason] = (publicFeedbackReasons[reason] || 0) + 1;
-          publicFeedbackScores[score] = (publicFeedbackScores[score] || 0) + 1;
+        if (interaction.publicFeedback) {
+          const reason = interaction.publicFeedback.publicFeedbackReason || 'Other';
+          const score = interaction.publicFeedback.publicFeedbackScore;
           const lang = chat.pageLanguage === 'fr' ? 'fr' : 'en';
-          publicFeedbackReasonsByLang[lang][reason] = (publicFeedbackReasonsByLang[lang][reason] || 0) + 1;
+          // Bucket into yes/no
+          let bucket;
+          if (score === true || String(score).toLowerCase() === 'yes' || (typeof score === 'number' && score <= 4)) {
+            bucket = 'yes';
+          } else if (score === false || String(score).toLowerCase() === 'no' || (typeof score === 'number' && score > 4)) {
+            bucket = 'no';
+          } else {
+            bucket = null;
+          }
+          if (bucket) {
+            // Reasons
+            publicFeedbackReasons[bucket][reason] = (publicFeedbackReasons[bucket][reason] || 0) + 1;
+            // Scores
+            publicFeedbackScores[bucket][score] = (publicFeedbackScores[bucket][score] || 0) + 1;
+            // Reasons by lang
+            publicFeedbackReasonsByLang[lang][bucket][reason] = (publicFeedbackReasonsByLang[lang][bucket][reason] || 0) + 1;
+            // userScored
+            metrics.userScored.total.total++;
+            metrics.userScored.total[lang]++;
+            if (bucket === 'yes') {
+              metrics.userScored.helpful.total++;
+              metrics.userScored.helpful[lang]++;
+            } else if (bucket === 'no') {
+              metrics.userScored.unhelpful.total++;
+              metrics.userScored.unhelpful[lang]++;
+            }
+          }
         }
       });
     });
@@ -396,7 +427,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       count: metrics.totalQuestions,
                       percentage: metrics.totalConversations ? Math.round((metrics.totalQuestions / metrics.totalConversations) * 100) + '%' : '0%',
                       enCount: metrics.totalQuestionsEn,
-                      enPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsEn / metrics.totalQuestions) * 100) + '%' : '0%',
+                      enPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsEn / metrics.totalQuestions) + 100) + '%' : '0%',
                       frCount: metrics.totalQuestionsFr,
                       frPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsFr / metrics.totalQuestions) * 100) + '%' : '0%'
                     },
@@ -637,28 +668,19 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                   expertScoredHasErrorPercent: data.expertScored.total ? Math.round((data.expertScored.hasError / data.expertScored.total) * 100) : 0
                 }))}
                 columns={[
-                  { title: t('metrics.dashboard.byDepartment.title'), data: 'department' },
-                  { title: t('metrics.dashboard.byDepartment.totalQuestions'), data: 'totalQuestions' },
-                  { title: t('metrics.dashboard.byDepartment.expertTotal'), data: 'expertScoredTotal' },
+                  { title: t('metrics.dashboard.byDepartment.department'), data: 'department' },
+                  { title: t('metrics.dashboard.totalQuestions'), data: 'totalQuestions' },
+                  { title: t('metrics.dashboard.expertScored.total'), data: 'expertScoredTotal' },
                   { title: t('metrics.dashboard.expertScored.correct'), data: 'expertScoredCorrect' },
                   { title: t('metrics.dashboard.expertScored.needsImprovement'), data: 'expertScoredNeedsImprovement' },
-                  { 
-                    title: t('metrics.dashboard.expertScored.hasError'), 
-                    data: 'expertScoredHasError',
-                    render: (data, type, row) => {
-                      if (type === 'display') {
-                        return `${data} (${row.expertScoredHasErrorPercent}%)`;
-                      }
-                      return data;
-                    }
-                  }
+                  { title: t('metrics.dashboard.expertScored.hasError'), data: 'expertScoredHasError' },
+                  { title: t('metrics.dashboard.expertScored.hasErrorPercent'), data: 'expertScoredHasErrorPercent' }
                 ]}
                 options={{
-                  paging: true,
-                  pageLength: 25,
-                  searching: true,
-                  ordering: true,
-                  order: [[1, 'desc']],
+                  paging: false,
+                  searching: false,
+                  ordering: false,
+                  info: false,
                   stripe: true,
                   className: 'display'
                 }}
@@ -667,9 +689,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
           </div>
         ) : (
           <div className="p-4">
-            <GcdsText>
-              Select a time range and click 'Get metrics' to view performance metrics
-            </GcdsText>
+            <GcdsText>No metrics found for the selected time range.</GcdsText>
           </div>
         )}
       </GcdsContainer>

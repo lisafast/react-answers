@@ -22,9 +22,14 @@ async function chatLogsHandler(req, res) {
                 path: 'interactions',
                 populate: [
                     { path: 'context' },
-                    { 
+                    {
                         path: 'expertFeedback',
                         model: 'ExpertFeedback',
+                        select: '-__v'
+                    },
+                    {
+                        path: 'publicFeedback',
+                        model: 'PublicFeedback',
                         select: '-__v'
                     },
                     { 
