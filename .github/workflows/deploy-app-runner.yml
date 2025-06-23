@@ -15,16 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:             ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:    ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:         ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:         ${{ secrets.GOOGLE_API_KEY }}
+      AWS_REGION:              ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:     ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN:  ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:       ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:          ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:          ${{ secrets.GOOGLE_API_KEY }}
       GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:              ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:         ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:               ${{ secrets.NODE_ENV }}
+      DOCDB_URI:               ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:          ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                ${{ secrets.NODE_ENV }}
 
     steps:
       - name: Configure AWS credentials via OIDC
@@ -43,7 +43,7 @@ jobs:
           auto_inactive: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set deployment status to in_progress
+      - name: Set deployment status to “in_progress”
         uses: tibdex/github-set-deployment-status@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -96,7 +96,7 @@ jobs:
 
       - name: Wait up to 4h for idle
         run: |
-          echo "Waiting for App Runner to be idle..."
+          echo "Waiting for App Runner to be idle…"
           for i in {1..240}; do
             STATUS=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
@@ -114,14 +114,14 @@ jobs:
               echo "✅ update-service succeeded"
               break
             else
-              echo "🔁 Retrying in 60s..."
+              echo "🔁 Retrying in 60s…"
               sleep 60
             fi
           done
 
       - name: Wait up to 4h for RUNNING (force if not deploying)
         run: |
-          echo "Waiting for service to deploy or forcing deployment if idle..."
+          echo "Waiting for service to deploy or forcing deployment if idle…"
           FORCED_FLAG=".forced_deployment"
           for i in {1..240}; do
             STATE=$(aws apprunner describe-service \
@@ -134,47 +134,46 @@ jobs:
               --query 'Service.OperationSummary.Status' --output text)
             if [[ "$STATE" == "RUNNING" && "$OP_STATUS" != "IN_PROGRESS" ]]; then
               if [[ ! -f "$FORCED_FLAG" ]]; then
-                echo "⚠️ Service is RUNNING but no deployment in progress, forcing deployment..."
+                echo "⚠️ Forcing a fresh deployment…"
                 aws apprunner start-deployment \
                   --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
                   --region ${{ env.AWS_REGION }}
                 touch "$FORCED_FLAG"
-                # After forcing, wait for deployment to start
                 sleep 10
-              else
-                echo "⚠️ Already forced deployment once, waiting..."
               fi
             elif [[ "$STATE" == "RUNNING" && "$OP_STATUS" == "IN_PROGRESS" ]]; then
-              echo "🟢 Service is RUNNING and deployment is in progress."
+              echo "🟢 Deployment in progress."
               exit 0
             elif [[ "$STATE" == "FAILED" ]]; then
               echo "❌ Deployment FAILED!"
               exit 1
             else
-              echo "⏳ Service state: $STATE, operation: $OP_STATUS. Waiting..."
+              echo "⏳ State: $STATE, Op: $OP_STATUS… waiting."
             fi
             sleep 60
           done
           echo "❌ Timed out"; exit 1
 
-      - name: Output App Runner URL
+      - name: Fetch App Runner URL
+        id: get-url
         run: |
+          echo "Fetching live URL…"
           URL=$(aws apprunner describe-service \
             --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
             --region ${{ env.AWS_REGION }} \
             --query 'Service.ServiceUrl' --output text)
-          echo "✅ App Runner URL: $URL"
+          echo "::set-output name=url::$URL"
 
-      - name: Set deployment status to success
+      - name: Set deployment status to “success”
         if: success()
         uses: tibdex/github-set-deployment-status@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           state: success
-          environment_url: https://ai-answers.experimentation.ca
+          environment_url: ${{ steps.get-url.outputs.url }}
 
-      - name: Set deployment status to failure
+      - name: Set deployment status to “failure”
         if: failure()
         uses: tibdex/github-set-deployment-status@v1
         with:
