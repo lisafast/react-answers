@@ -252,15 +252,35 @@ const MetricsDashboard = ({ lang = 'en' }) => {
     const publicFeedbackReasons = {};
     const publicFeedbackScores = {};
     const publicFeedbackReasonsByLang = { en: {}, fr: {} };
+    // New: userScored metrics from publicFeedback
+    metrics.userScored = {
+      total: { total: 0, en: 0, fr: 0 },
+      helpful: { total: 0, en: 0, fr: 0 },
+      unhelpful: { total: 0, en: 0, fr: 0 }
+    };
     logs.forEach(chat => {
       chat.interactions?.forEach(interaction => {
-        if (interaction.expertFeedback?.type === 'public') {
-          const reason = interaction.expertFeedback.publicFeedbackReason || 'Other';
-          const score = interaction.expertFeedback.publicFeedbackScore || 'Other';
+        if (interaction.publicFeedback) {
+          const reason = interaction.publicFeedback.publicFeedbackReason || 'Other';
+          const score = interaction.publicFeedback.publicFeedbackScore || 'Other';
           publicFeedbackReasons[reason] = (publicFeedbackReasons[reason] || 0) + 1;
           publicFeedbackScores[score] = (publicFeedbackScores[score] || 0) + 1;
           const lang = chat.pageLanguage === 'fr' ? 'fr' : 'en';
           publicFeedbackReasonsByLang[lang][reason] = (publicFeedbackReasonsByLang[lang][reason] || 0) + 1;
+
+          // Count userScored metrics from publicFeedbackScore
+          if (score && score !== 'Other' && score !== 'undefined' && score !== 'null') {
+            metrics.userScored.total.total++;
+            metrics.userScored.total[lang]++;
+            const scoreStr = String(score).toLowerCase();
+            if (scoreStr === 'yes' || score === true) {
+              metrics.userScored.helpful.total++;
+              metrics.userScored.helpful[lang]++;
+            } else if (scoreStr === 'no' || score === false) {
+              metrics.userScored.unhelpful.total++;
+              metrics.userScored.unhelpful[lang]++;
+            }
+          }
         }
       });
     });
