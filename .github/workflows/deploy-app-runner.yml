@@ -33,6 +33,21 @@ jobs:
           role-to-assume: ${{ env.AWS_ASSUME_ROLE_ARN }}
           aws-region:     ${{ env.AWS_REGION }}
 
+      - name: Create GitHub Deployment
+        id: deployment
+        uses: actions/create-deployment@v1
+        with:
+          ref: ${{ github.sha }}
+          environment: experimentation
+          transient_environment: false
+          auto_inactive: true
+
+      - name: Set deployment status to in_progress
+        uses: actions/deployment-status@v1
+        with:
+          state: in_progress
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+
       - name: Write update-input.json
         run: |
           cat > update-input.json <<-EOF
@@ -147,3 +162,18 @@ jobs:
             --region ${{ env.AWS_REGION }} \
             --query 'Service.ServiceUrl' --output text)
           echo "✅ App Runner URL: $URL"
+
+      - name: Set deployment status to success
+        if: success()
+        uses: actions/deployment-status@v1
+        with:
+          state: success
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          environment_url: https://ai-answers.experimentation.ca
+
+      - name: Set deployment status to failure
+        if: failure()
+        uses: actions/deployment-status@v1
+        with:
+          state: failure
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
