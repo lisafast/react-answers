@@ -28,6 +28,12 @@ jobs:
       NODE_ENV:                ${{ secrets.NODE_ENV }}
 
     steps:
+      - name: Exit if not lisafast/react-answers
+        if: github.repository != 'lisafast/react-answers'
+        run: |
+          echo "Not running on lisafast/react-answers, exiting."
+          exit 0
+
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -126,11 +132,9 @@ jobs:
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            OP_STATUS=$(aws apprunner describe-service \
-              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-              --region ${{ env.AWS_REGION }} \
-              --query 'Service.OperationSummary.Status' --output text)
-            if [[ "$STATE" == "RUNNING" && "$OP_STATUS" != "IN_PROGRESS" ]]; then
+            if [[ "$STATE" == "OPERATION_IN_PROGRESS" ]]; then
+              echo "⏳ State: $STATE… waiting."
+            elif [[ "$STATE" == "RUNNING" ]]; then
               if [[ ! -f "$FORCED_FLAG" ]]; then
                 echo "⚠️ Forcing a fresh deployment…"
                 aws apprunner start-deployment \
@@ -142,14 +146,11 @@ jobs:
                 echo "✅ Service is RUNNING and deployment was already forced. Exiting."
                 exit 0
               fi
-            elif [[ "$STATE" == "RUNNING" && "$OP_STATUS" == "IN_PROGRESS" ]]; then
-              echo "🟢 Deployment in progress."
-              exit 0
             elif [[ "$STATE" == "FAILED" ]]; then
               echo "❌ Deployment FAILED!"
               exit 1
             else
-              echo "⏳ State: $STATE, Op: $OP_STATUS… waiting."
+              echo "⏳ State: $STATE… waiting."
             fi
             sleep 60
           done
