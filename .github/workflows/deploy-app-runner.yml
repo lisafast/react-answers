@@ -104,7 +104,8 @@ jobs:
 
       - name: Wait up to 4h for RUNNING (force if not deploying)
         run: |
-          echo "Waiting for service RUNNING or IN_PROGRESS..."
+          echo "Waiting for service to deploy or forcing deployment if idle..."
+          FORCED_FLAG=".forced_deployment"
           for i in {1..240}; do
             STATE=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
@@ -114,17 +115,21 @@ jobs:
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.OperationSummary.Status' --output text)
-            if [[ "$STATE" == "RUNNING" ]]; then
-              if [[ "$OP_STATUS" != "IN_PROGRESS" ]]; then
-                echo "⚠️ No deployment in progress, forcing deployment..."
+            if [[ "$STATE" == "RUNNING" && "$OP_STATUS" != "IN_PROGRESS" ]]; then
+              if [[ ! -f "$FORCED_FLAG" ]]; then
+                echo "⚠️ Service is RUNNING but no deployment in progress, forcing deployment..."
                 aws apprunner start-deployment \
                   --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
                   --region ${{ env.AWS_REGION }}
+                touch "$FORCED_FLAG"
+                # After forcing, wait for deployment to start
                 sleep 10
               else
-                echo "🟢 Service is RUNNING and deployment is in progress."
-                exit 0
+                echo "⚠️ Already forced deployment once, waiting..."
               fi
+            elif [[ "$STATE" == "RUNNING" && "$OP_STATUS" == "IN_PROGRESS" ]]; then
+              echo "🟢 Service is RUNNING and deployment is in progress."
+              exit 0
             elif [[ "$STATE" == "FAILED" ]]; then
               echo "❌ Deployment FAILED!"
               exit 1
