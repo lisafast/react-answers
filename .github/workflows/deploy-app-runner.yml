@@ -115,19 +115,21 @@ jobs:
               --region ${{ env.AWS_REGION }} \
               --query 'Service.OperationSummary.Status' --output text)
             if [[ "$STATE" == "RUNNING" ]]; then
-              echo "🟢 Service is RUNNING."
-              exit 0
-            fi
-            if [[ "$STATE" == "FAILED" ]]; then
+              if [[ "$OP_STATUS" != "IN_PROGRESS" ]]; then
+                echo "⚠️ No deployment in progress, forcing deployment..."
+                aws apprunner start-deployment \
+                  --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+                  --region ${{ env.AWS_REGION }}
+                sleep 10
+              else
+                echo "🟢 Service is RUNNING and deployment is in progress."
+                exit 0
+              fi
+            elif [[ "$STATE" == "FAILED" ]]; then
               echo "❌ Deployment FAILED!"
               exit 1
-            fi
-            if [[ "$OP_STATUS" != "IN_PROGRESS" ]]; then
-              echo "⚠️ No deployment in progress, forcing deployment..."
-              aws apprunner start-deployment \
-                --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-                --region ${{ env.AWS_REGION }}
-              sleep 10
+            else
+              echo "⏳ Service state: $STATE, operation: $OP_STATUS. Waiting..."
             fi
             sleep 60
           done
