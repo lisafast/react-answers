@@ -1,5 +1,104 @@
 # Changelog
 
+## [1.8.0](https://github.com/cds-snc/ai-answers/compare/v1.7.3...v1.8.0) (2025-06-23)
+
+
+### Features
+
+* add .gitattributes for YAML file handling and ensure newline at end of apprunner.yaml ([6de9888](https://github.com/cds-snc/ai-answers/commit/6de9888fb927e6155730cefd55dd0e2306846b1a))
+* add deployment workflow for AWS App Runner ([9ebfcb3](https://github.com/cds-snc/ai-answers/commit/9ebfcb34592f5cfa3e7dfda54222a19729ea546e))
+* add GitHub Actions workflow for deploying to AWS App Runner ([7636696](https://github.com/cds-snc/ai-answers/commit/7636696ded7e916d8cf2dd8f69c1f80cd993ace9))
+* add initial App Runner configuration file ([7dee23f](https://github.com/cds-snc/ai-answers/commit/7dee23f18d079c036603fa2ad41a7c30cd50ed07))
+* add initial App Runner configuration YAML file ([2a7a013](https://github.com/cds-snc/ai-answers/commit/2a7a01358f800d48dbd8e8b4fb7b6067b5d530b4))
+* add update-input.json for AWS App Runner configuration ([7836808](https://github.com/cds-snc/ai-answers/commit/783680824f2ee522671f362e2b9975b34b33f676))
+* implement public feedback migration and integrate into existing workflows ([2a54f22](https://github.com/cds-snc/ai-answers/commit/2a54f22948896c990158f499eca5d59464e9c831))
+
+
+### Bug Fixes
+
+* add console logs for database connection string and options ([f1a402b](https://github.com/cds-snc/ai-answers/commit/f1a402bdd3923274ca4577f6bffbeab7622e1a60))
+* add HealthCheckConfiguration to update-input.json and deploy-app-runner.yml ([64c192b](https://github.com/cds-snc/ai-answers/commit/64c192b4bb36295a347ea2249185b32f6ca4fe7e))
+* add HealthCheckConfiguration to update-input.json and deploy-app-runner.yml ([dbec5fd](https://github.com/cds-snc/ai-answers/commit/dbec5fd71c9c20daccdcd5388c3a1a0c8f741a32))
+* adjust formatting in apprunner.yaml for consistency ([5f1d5d5](https://github.com/cds-snc/ai-answers/commit/5f1d5d53260b195360c87f745951aef5b8624070))
+* adjust formatting of workflow name in deploy-app-runner.yml ([e4764d4](https://github.com/cds-snc/ai-answers/commit/e4764d44f52ad160560dae444ec0e9407c4e00e2))
+* clean up AWS App Runner deployment workflow by removing unnecessary echo statements and improving variable usage ([82fd5b1](https://github.com/cds-snc/ai-answers/commit/82fd5b1295f581b04306026aefe8d8483b1830c4))
+* correct formatting of tlsCAFile in db-connect.js ([5ec29cd](https://github.com/cds-snc/ai-answers/commit/5ec29cd997ccda5f3e7c9ef41ce4084c4777c29c))
+* correct formatting of unhealthyThreshold in apprunner.yaml ([75d3271](https://github.com/cds-snc/ai-answers/commit/75d32718124c83045638257631f65df7d4ad9e02))
+* correct whitespace in connection string assignment in db-connect.js ([fdacd98](https://github.com/cds-snc/ai-answers/commit/fdacd98588200dfcfad3a7bf285b5fc0593cc6ec))
+* enhance AWS App Runner deployment workflow by adding instance role ARN and improving JSON validation ([b272abf](https://github.com/cds-snc/ai-answers/commit/b272abfe71aba71879678a7d91c3d3468ad69690))
+* enhance AWS App Runner deployment workflow with improved logging and added deployment run ID ([51f44ca](https://github.com/cds-snc/ai-answers/commit/51f44ca5c41f4ab8eaa8575f779e216562263cd5))
+* enhance OIDC token debugging and improve permissions structure in deployment workflow ([5855fb6](https://github.com/cds-snc/ai-answers/commit/5855fb6573df1a5724053dba22fbf4293e496d00))
+* enhance public feedback metrics handling and visualization in MetricsDashboard and EndUserFeedbackSection ([1402f31](https://github.com/cds-snc/ai-answers/commit/1402f319f6f1bebfae30f2d24615dd7eb718533f))
+* improve AWS App Runner deployment workflow with better logging and retries ([b4e6f39](https://github.com/cds-snc/ai-answers/commit/b4e6f39154a5f32dbcf7e8a80aa34b7f973bc186))
+* improve command structure and formatting in apprunner.yaml ([cddb1e5](https://github.com/cds-snc/ai-answers/commit/cddb1e58b0791347f29c5fda70353b5b50c45ffd))
+* improve formatting and add deployment run ID in App Runner workflow ([4e61818](https://github.com/cds-snc/ai-answers/commit/4e618188ecb8bb869e570b5cfa2e07f674bb0442))
+* improve formatting and enhance AWS App Runner deployment workflow ([88c7afd](https://github.com/cds-snc/ai-answers/commit/88c7afdcfa4d7e2bb453ad4e95549c7ed7996103))
+* improve formatting and streamline AWS App Runner deployment workflow ([2c77f12](https://github.com/cds-snc/ai-answers/commit/2c77f1284407e06a3f9c3e63427282fe333d83ca))
+* improve OIDC token debugging and clarify permissions in deployment workflow ([cc399e2](https://github.com/cds-snc/ai-answers/commit/cc399e2c468c8a69b80dc22fbe6a2300a5eb998c))
+* improve OIDC token debugging and clean up AWS credentials configuration ([6ffb9e1](https://github.com/cds-snc/ai-answers/commit/6ffb9e10e2e9061fd92dbbcc3bf28c238429d6ad))
+* prompts ([e4450db](https://github.com/cds-snc/ai-answers/commit/e4450db33189b704c4ea0e685db9f0f8ab18780f))
+* refine expert and public feedback score checks in MetricsDashboard ([e54a730](https://github.com/cds-snc/ai-answers/commit/e54a730f26ae324d7124c44c95d66492d07171cf))
+* refine expert and public feedback score checks in MetricsDashboard ([dd8e273](https://github.com/cds-snc/ai-answers/commit/dd8e273c1a8d5a1557bfdf05ca6b15d7787ed037))
+* refine public feedback metrics handling and categorization ([a549c6a](https://github.com/cds-snc/ai-answers/commit/a549c6a370916555558578b21fb11c154e549c7c))
+* remove apprunner.yaml configuration file ([0c17bab](https://github.com/cds-snc/ai-answers/commit/0c17babe82a3bac7cfae4eec636f650767e8dd39))
+* remove commented default values from health check configuration ([b488e80](https://github.com/cds-snc/ai-answers/commit/b488e802a241cd9dc4e6e9d51f42e9e9ff665ffe))
+* remove HealthCheckConfiguration from update-input.json and deploy-app-runner.yml ([b76b2bf](https://github.com/cds-snc/ai-answers/commit/b76b2bfab9ae1284a41ef8581160255053e00b01))
+* remove HealthCheckConfiguration from update-input.json and deploy-app-runner.yml ([dc6ed10](https://github.com/cds-snc/ai-answers/commit/dc6ed10d6c623ac5f820cf4453a223318738857b))
+* remove obsolete authentication configuration from App Runner deployment ([ac90b07](https://github.com/cds-snc/ai-answers/commit/ac90b072a8930ef67d7a6937b4d52c51a3b7ca27))
+* remove space in deployment completion message for App Runner URL ([13d5c0f](https://github.com/cds-snc/ai-answers/commit/13d5c0fad328d9a7f06529dbced6cf29a547966c))
+* remove unnecessary checkout step from deploy workflow ([452f39b](https://github.com/cds-snc/ai-answers/commit/452f39bfd5ee74270730d92fe27c61c27dcbac56))
+* remove unnecessary steps from AWS App Runner deployment workflow ([4534aa1](https://github.com/cds-snc/ai-answers/commit/4534aa1b6113ce00a4d2efe6c50dd3a065480f3a))
+* remove unnecessary whitespace in runtime declaration of apprunner.yaml ([4000f29](https://github.com/cds-snc/ai-answers/commit/4000f29b0b2c6a31f7dc93f251a3a2d838510bdb))
+* remove unused echo statements and improve formatting in AWS App Runner deployment workflow ([73bcb30](https://github.com/cds-snc/ai-answers/commit/73bcb30ba13e1772c9ff79064433fc2a2756812c))
+* remove unused environment variable declaration in apprunner.yaml ([4a7595e](https://github.com/cds-snc/ai-answers/commit/4a7595ea8a9b70c568268a693faa0a0c3e9349f6))
+* remove unused update-input.json generation step from deployment workflow ([020ed7d](https://github.com/cds-snc/ai-answers/commit/020ed7dd7c3eeadee15db46ea239da6e22c110b9))
+* reorganize network configuration and health settings in apprunner.yaml ([dd936e2](https://github.com/cds-snc/ai-answers/commit/dd936e2028a65b988666669483220ccb8c261c72))
+* streamline AWS App Runner deployment workflow and enhance health check handling ([b80c059](https://github.com/cds-snc/ai-answers/commit/b80c059e971758cefa5b15468c9230add493d562))
+* streamline AWS App Runner deployment workflow by removing unused instance role ARN and improving formatting ([9a3c1e8](https://github.com/cds-snc/ai-answers/commit/9a3c1e8d835c6dc5f45decedb258395424caafcc))
+* streamline commands formatting in apprunner.yaml ([d1e8dcf](https://github.com/cds-snc/ai-answers/commit/d1e8dcf0289e8c7533dde47fc8f8d0f820f66d50))
+* update App Runner deployment port from 8080 to 3001 ([ab363ce](https://github.com/cds-snc/ai-answers/commit/ab363ce7be4179cfc2f2770e2ac7ff842a956300))
+* update App Runner workflow and configuration for environment variables ([cce8a7d](https://github.com/cds-snc/ai-answers/commit/cce8a7d3040857bbf9b8753fa14d251f8b859424))
+* update AWS App Runner deployment configuration and remove obsolete update-input.json ([23c4ae2](https://github.com/cds-snc/ai-answers/commit/23c4ae26b8f67a99a758ef560b29399fc1197575))
+* update AWS App Runner deployment workflow for improved reliability ([7eb2486](https://github.com/cds-snc/ai-answers/commit/7eb2486c0a749ed5e90514d9ea39721f15fde564))
+* update AWS App Runner deployment workflow to streamline configuration and improve health check handling ([2a0cbbe](https://github.com/cds-snc/ai-answers/commit/2a0cbbe9520c8b1e967caa6621e90f51b54b9656))
+* update build command to include 'npm install' before building ([fa4617a](https://github.com/cds-snc/ai-answers/commit/fa4617add0095acd845a0b27ea76a6d33e91d9d5))
+* update build command to use 'npm run build' for App Runner deployment ([05710ff](https://github.com/cds-snc/ai-answers/commit/05710ffbce3ec8accbcd9d1193ba5bb41175dd77))
+* update commands formatting in apprunner.yaml for consistency ([46c355d](https://github.com/cds-snc/ai-answers/commit/46c355d5bba85321d1efc43378535d812b4030ab))
+* update deployment command to use YAML input for App Runner service ([f6acd86](https://github.com/cds-snc/ai-answers/commit/f6acd86e42848ae37b353ef86e86e0810048bd67))
+* update deployment workflow for App Runner service ([31d5216](https://github.com/cds-snc/ai-answers/commit/31d52160cd213bf1a2857ff0b0c7ce817d31378f))
+* update deployment workflow for AWS App Runner service ([70edeff](https://github.com/cds-snc/ai-answers/commit/70edeffcdcdba212b596587347e4264f2cb0187e))
+* update deployment workflow name and add health check configuration ([a9bce85](https://github.com/cds-snc/ai-answers/commit/a9bce85696b4016c95aa9fa7123b93e0526743a7))
+* update deployment workflow to include debug step and clarify runtime and commands ([da84644](https://github.com/cds-snc/ai-answers/commit/da846445585ec8eafb288a3fc4f0dc2ac6f67f04))
+* update deployment workflow to use AWS CLI for App Runner service ([bab7491](https://github.com/cds-snc/ai-answers/commit/bab7491b4e04991f5068f78684ad54ab6aef1720))
+* update JSON configuration files to use consistent formatting and improve readability ([105ae2d](https://github.com/cds-snc/ai-answers/commit/105ae2dba830c415d0ef82743624ec293f45c681))
+* update localization for department metrics in English and French ([ff6a508](https://github.com/cds-snc/ai-answers/commit/ff6a5081301f14de2d581c164b015d45b03b850e))
+* update Node.js runtime version to 22 in AWS App Runner configuration ([24454dc](https://github.com/cds-snc/ai-answers/commit/24454dc97195abf6b3a535de39ac7d7a2f0744c4))
+* update Node.js runtime version to 22 in AWS App Runner configuration ([e235f36](https://github.com/cds-snc/ai-answers/commit/e235f36148591a3b0a8164b70a9384c357e5d2b2))
+* update public feedback scoring threshold and improve localization for helpful/unhelpful labels ([397cb6b](https://github.com/cds-snc/ai-answers/commit/397cb6b263fd5709172bd992410a20f97c4968f2))
+* update run command and network port in apprunner.yaml ([5a5a565](https://github.com/cds-snc/ai-answers/commit/5a5a56540484cd02897014eb04779439efbb9095))
+* update runtime version to NODEJS_22 in deployment workflow ([4483330](https://github.com/cds-snc/ai-answers/commit/4483330b27a99a1312035c3a417773f9e527ebf8))
+* update StartCommand to use 'npm run start-server' in configuration files ([76becad](https://github.com/cds-snc/ai-answers/commit/76becadd4f7c02822c9253377ded7591e2b25b15))
+* update StartCommand to use 'npm start-server' in deployment configurations ([8bbd13b](https://github.com/cds-snc/ai-answers/commit/8bbd13bffb6674ac675d74f6719bc95b4b7d65b3))
+* update workflow name from 'Deploy to App Runner' to 'Deploy to AWS' ([dda7f9e](https://github.com/cds-snc/ai-answers/commit/dda7f9e66953b97804476560640b14cb5b7ced5c))
+
+
+### Miscellaneous Chores
+
+* add spaces to test infra ([7522207](https://github.com/cds-snc/ai-answers/commit/752220724f3e21735da479841af7e38bde9005f0))
+* add spaces to test infra ([785d3ab](https://github.com/cds-snc/ai-answers/commit/785d3ab61a747df8264d44bd806652a9b8dcce89))
+* clean up whitespace and comments in deployment workflow ([754e894](https://github.com/cds-snc/ai-answers/commit/754e894fa830a13d44f305d404bf9de1382068b5))
+* fix whitespace in AWS credentials configuration step ([5c1ae5a](https://github.com/cds-snc/ai-answers/commit/5c1ae5a8d979d7ffc170b799aa7dda7db1ed0d9b))
+* fix whitespace in AWS credentials configuration step ([22b290d](https://github.com/cds-snc/ai-answers/commit/22b290de9c29420cc1d8c8ff99bd5f8b98c466e5))
+* fix whitespace in build command for App Runner deployment ([4b74e94](https://github.com/cds-snc/ai-answers/commit/4b74e94d521379e74bc0d247ec0effeea66b8c21))
+* fix whitespace in deploy to App Runner step ([f00113b](https://github.com/cds-snc/ai-answers/commit/f00113b3c9402e0598d2284208e36c588bc597ca))
+* fix whitespace in deploy to App Runner step ([4efb45f](https://github.com/cds-snc/ai-answers/commit/4efb45f3ad3ef163647d0f3c3addc090dd3a15f9))
+* fix whitespace in permissions section of deployment workflow ([713040b](https://github.com/cds-snc/ai-answers/commit/713040b63db658134d4225f52d2845b43f7d523a))
+
+
+### Code Refactoring
+
+* comment out export functions in MetricsDashboard ([255d8f3](https://github.com/cds-snc/ai-answers/commit/255d8f37571d0c3d28d01088055966b38e353c45))
+
 ## [1.7.3](https://github.com/cds-snc/ai-answers/compare/v1.7.2...v1.7.3) (2025-06-18)
 
 
