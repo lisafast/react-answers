@@ -7,6 +7,7 @@ import { Question } from '../../models/question.js';
 import { Logs } from '../../models/logs.js';
 import { Interaction } from '../../models/interaction.js';
 import { ExpertFeedback } from '../../models/expertFeedback.js';
+import { PublicFeedback } from '../../models/publicFeedback.js';
 import { Eval } from '../../models/eval.js';
 import { Embedding } from '../../models/embedding.js';
 import { Context } from '../../models/context.js';
@@ -23,6 +24,7 @@ const MODELS = {
   Logs,
   Interaction,
   ExpertFeedback,
+  PublicFeedback,
   Eval,
   Embedding,
   Context,

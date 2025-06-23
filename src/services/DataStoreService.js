@@ -85,29 +85,34 @@ class DataStoreService {
   }
 
   
-  static async persistFeedback(expertFeedback, chatId, userMessageId) {
-    // Standardize expert feedback format - only accept new format
-    let formattedExpertFeedback = null;
-    if (expertFeedback) {
-      formattedExpertFeedback = {
-        ...expertFeedback, // Spread the incoming feedback object
-        totalScore: expertFeedback.totalScore ?? null,
-        sentence1Score: expertFeedback.sentence1Score ?? null,
-        sentence2Score: expertFeedback.sentence2Score ?? null,
-        sentence3Score: expertFeedback.sentence3Score ?? null,
-        sentence4Score: expertFeedback.sentence4Score ?? null,
-        citationScore: expertFeedback.citationScore ?? null,
-        answerImprovement: expertFeedback.answerImprovement || '',
-        expertCitationUrl: expertFeedback.expertCitationUrl || '',
-        feedback: expertFeedback.feedback, // Directly use the feedback string provided by the component
-        publicFeedbackReason: expertFeedback.publicFeedbackReason || '',
-        publicFeedbackScore: expertFeedback.publicFeedbackScore ?? null
-        // Remove isPositive if it was part of expertFeedback object, as 'feedback' string is now canonical
+  static async persistFeedback(feedback, chatId, userMessageId) {
+    let payload = {};
+    if (feedback?.type === 'expert') {
+      const formattedExpertFeedback = {
+        ...feedback,
+        totalScore: feedback.totalScore ?? null,
+        sentence1Score: feedback.sentence1Score ?? null,
+        sentence2Score: feedback.sentence2Score ?? null,
+        sentence3Score: feedback.sentence3Score ?? null,
+        sentence4Score: feedback.sentence4Score ?? null,
+        citationScore: feedback.citationScore ?? null,
+        answerImprovement: feedback.answerImprovement || '',
+        expertCitationUrl: feedback.expertCitationUrl || '',
+        feedback: feedback.feedback
       };
-      // Ensure isPositive is not part of the final object if feedback string exists
-      
+      payload.expertFeedback = formattedExpertFeedback;
+      console.log('User feedback:', JSON.stringify(formattedExpertFeedback, null, 2));
+    } else if (feedback?.type === 'public') {
+      const formattedPublicFeedback = {
+        feedback: feedback.feedback,
+        publicFeedbackReason: feedback.publicFeedbackReason || '',
+        publicFeedbackScore: feedback.publicFeedbackScore ?? null
+      };
+      payload.publicFeedback = formattedPublicFeedback;
+      console.log('User feedback:', JSON.stringify(formattedPublicFeedback, null, 2));
+    } else {
+      return;
     }
-    console.log('User feedback:', JSON.stringify(formattedExpertFeedback, null, 2));
 
     try {
       const response = await fetch(getApiUrl('db-persist-feedback'), {
@@ -118,7 +123,7 @@ class DataStoreService {
         body: JSON.stringify({
           chatId: chatId,
           interactionId: userMessageId,
-          expertFeedback: formattedExpertFeedback
+          ...payload
         }),
       });
 
@@ -128,9 +133,7 @@ class DataStoreService {
 
       console.log('Feedback logged successfully to database');
     } catch (error) {
-      console.log('Development mode: Feedback not logged to console', {
-        ...formattedExpertFeedback
-      });
+      console.log('Development mode: Feedback not logged to console', payload);
     }
 
   }
@@ -388,6 +391,25 @@ class DataStoreService {
       return await response.json();
     } catch (error) {
       console.error('Error repairing expert feedback:', error);
+      throw error;
+    }
+  }
+
+  static async migratePublicFeedback() {
+    try {
+      const response = await AuthService.fetchWithAuth(getApiUrl('db-migrate-public-feedback'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to migrate public feedback');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error migrating public feedback:', error);
       throw error;
     }
   }
