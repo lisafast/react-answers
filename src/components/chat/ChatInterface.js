@@ -30,6 +30,7 @@ const ChatInterface = ({
   lang,
   extractSentences,
   chatId,
+  readOnly = false,
 }) => {
   // Add safeT helper function
   const safeT = useCallback(
@@ -322,7 +323,7 @@ const ChatInterface = ({
                       chatId={chatId}
                       userMessageId={message.id}
                       // Add the new props for the skip button
-                      showSkipButton={turnCount < MAX_CONVERSATION_TURNS && !isLoading}
+                      showSkipButton={!readOnly && turnCount < MAX_CONVERSATION_TURNS && !isLoading}
                       onSkip={focusTextarea}
                       skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
                     />
@@ -350,7 +351,7 @@ const ChatInterface = ({
           </>
         )}
 
-        {turnCount >= MAX_CONVERSATION_TURNS && (
+        {!readOnly && turnCount >= MAX_CONVERSATION_TURNS && (
           <div key="limit-reached" className="message ai">
             <div className="limit-reached-message">
               <p>{safeT('homepage.chat.messages.limitReached', { count: MAX_CONVERSATION_TURNS })}</p>
@@ -362,7 +363,7 @@ const ChatInterface = ({
         )}
       </div>
 
-      {turnCount < MAX_CONVERSATION_TURNS && (
+      {!readOnly && turnCount < MAX_CONVERSATION_TURNS && (
         <div className="input-area mt-200">
           {!isLoading && (
             <form className="mrgn-tp-xl mrgn-bttm-lg">

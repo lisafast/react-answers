@@ -16,6 +16,7 @@ import SettingsPage from './pages/SettingsPage.js';
 import { AuthProvider } from './contexts/AuthContext.js';
 import { AdminRoute, RoleProtectedRoute } from './components/RoleProtectedRoute.js';
 import MetricsPage from './pages/MetricsPage.js';
+import PublicEvalPage from './pages/PublicEvalPage.js';
 
 // Helper function to get alternate language path
 const getAlternatePath = (currentPath, currentLang) => {
@@ -94,6 +95,8 @@ export default function App() {
       { path: '/fr/users', element: <AdminRoute lang="fr"><UsersPage lang="fr" /></AdminRoute> },
       { path: '/en/eval', element: <AdminRoute lang="en"><EvalPage lang="en" /></AdminRoute> },
       { path: '/fr/eval', element: <AdminRoute lang="fr"><EvalPage lang="fr" /></AdminRoute> },
+      { path: '/en/public-eval', element: <AdminRoute lang="en"><PublicEvalPage lang="en" /></AdminRoute> },
+      { path: '/fr/public-eval', element: <AdminRoute lang="fr"><PublicEvalPage lang="fr" /></AdminRoute> },
       { path: '/en/database', element: <AdminRoute lang="en"><DatabasePage lang="en" /></AdminRoute> },
       { path: '/fr/database', element: <AdminRoute lang="fr"><DatabasePage lang="fr" /></AdminRoute> },
       { path: '/en/metrics', element: <AdminRoute lang="en"><MetricsPage lang="en" /></AdminRoute> },

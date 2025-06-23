@@ -17,7 +17,7 @@ const extractSentences = (paragraph) => {
   return sentences.length > 0 ? sentences : [paragraph];
 };
 
-const ChatAppContainer = ({ lang = 'en', chatId }) => {
+const ChatAppContainer = ({ lang = 'en', chatId, readOnly = false, initialMessages = [] }) => {
   const MAX_CONVERSATION_TURNS = 3;
   const MAX_CHAR_LIMIT = 400;
   const { t } = useTranslations(lang);
@@ -48,6 +48,15 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
   const [ariaLiveMessage, setAriaLiveMessage] = useState('');
   // Add this new state to prevent multiple loading announcements
   const [loadingAnnounced, setLoadingAnnounced] = useState(false);
+
+  useEffect(() => {
+    if (initialMessages && initialMessages.length > 0) {
+      setMessages(initialMessages);
+      const userTurns = initialMessages.filter(m => m.sender === 'user').length;
+      setTurnCount(userTurns);
+      setShowFeedback(true);
+    }
+  }, [initialMessages]);
 
   // This effect monitors displayStatus changes to update screen reader announcements
   useEffect(() => {
@@ -416,6 +425,7 @@ const ChatAppContainer = ({ lang = 'en', chatId }) => {
         }
         extractSentences={extractSentences}
         chatId={chatId}
+        readOnly={readOnly}
       />
       <div
         aria-live="polite"
