@@ -138,6 +138,9 @@ jobs:
                   --region ${{ env.AWS_REGION }}
                 touch "$FORCED_FLAG"
                 sleep 10
+              else
+                echo "✅ Service is RUNNING and deployment was already forced. Exiting."
+                exit 0
               fi
             elif [[ "$STATE" == "RUNNING" && "$OP_STATUS" == "IN_PROGRESS" ]]; then
               echo "🟢 Deployment in progress."
