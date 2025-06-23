@@ -2,13 +2,14 @@ name: Deploy to AWS App Runner
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
-  deployments: write  # needed for create/update Deployment API calls :contentReference[oaicite:3]{index=3}
+  deployments: write
 
 jobs:
   deploy:
@@ -37,60 +38,133 @@ jobs:
         id: deployment
         uses: chrnorm/deployment-action@v2
         with:
-          token:            ${{ secrets.GITHUB_TOKEN }}
-          environment:      experimentation
-          # no need to supply environment-url yet :contentReference[oaicite:4]{index=4}
+          token:       ${{ secrets.GITHUB_TOKEN }}
+          environment: experimentation
 
       - name: Mark deployment as “in_progress”
         uses: chrnorm/deployment-status@v2
         with:
           token:         ${{ secrets.GITHUB_TOKEN }}
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
-          state:         in_progress  # shows “running” :contentReference[oaicite:5]{index=5}
+          state:         in_progress
 
       - name: Write update-input.json
         run: |
           cat > update-input.json <<-EOF
           {
             "ServiceArn": "${{ env.APP_RUNNER_SERVICE_ARN }}",
-            "SourceConfiguration": { ... }
+            "SourceConfiguration": {
+              "CodeRepository": {
+                "RepositoryUrl": "https://github.com/${{ github.repository }}",
+                "SourceCodeVersion": {
+                  "Type": "BRANCH",
+                  "Value": "main"
+                },
+                "CodeConfiguration": {
+                  "ConfigurationSource": "API",
+                  "CodeConfigurationValues": {
+                    "Runtime": "NODEJS_22",
+                    "BuildCommand": "npm install && npm run build",
+                    "StartCommand": "npm run start-server",
+                    "RuntimeEnvironmentVariables": {
+                      "DEPLOY_RUN_ID": "${{ github.run_id }}",
+                      "ANTHROPIC_API_KEY": "${{ env.ANTHROPIC_API_KEY }}",
+                      "OPENAI_API_KEY": "${{ env.OPENAI_API_KEY }}",
+                      "GOOGLE_API_KEY": "${{ env.GOOGLE_API_KEY }}",
+                      "GOOGLE_SEARCH_ENGINE_ID": "${{ env.GOOGLE_SEARCH_ENGINE_ID }}",
+                      "DOCDB_URI": "${{ env.DOCDB_URI }}",
+                      "JWT_SECRET_KEY": "${{ env.JWT_SECRET_KEY }}",
+                      "NODE_ENV": "${{ env.NODE_ENV }}"
+                    }
+                  }
+                }
+              }
+            },
+            "InstanceConfiguration": { "Cpu": "512", "Memory": "1024" },
+            "HealthCheckConfiguration": {
+              "Protocol": "HTTP",
+              "Path": "/health",
+              "Interval": 20,
+              "Timeout": 15,
+              "HealthyThreshold": 1,
+              "UnhealthyThreshold": 10
+            }
           }
           EOF
 
       - name: Wait up to 4h for idle
         run: |
-          # (your existing “idle” loop here)
+          echo "Waiting for App Runner to be idle…"
+          for i in {1..240}; do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.OperationSummary.Status' --output text)
+            [[ "$STATUS" != "IN_PROGRESS" ]] && break
+            sleep 60
+          done
 
       - name: Update service (retries)
         run: |
-          # (your existing update-service loop here)
+          set -e
+          for i in {1..10}; do
+            if aws apprunner update-service --cli-input-json file://update-input.json --region ${{ env.AWS_REGION }}; then
+              echo "✅ update-service succeeded"
+              break
+            else
+              echo "🔁 Retrying in 60s…"
+              sleep 60
+            fi
+          done
 
       - name: Wait up to 4h for RUNNING (force if idle)
         run: |
-          # (your existing force-deploy loop here)
+          echo "Waiting for service to deploy or forcing deployment if idle…"
+          FORCED_FLAG=".forced_deployment"
+          for i in {1..240}; do
+            STATE=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.Status' --output text)
+            OP_STATUS=$(aws apprunner describe-service \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }} \
+              --query 'Service.OperationSummary.Status' --output text)
+            if [[ "$STATE" == "RUNNING" && "$OP_STATUS" != "IN_PROGRESS" ]]; then
+              if [[ ! -f "$FORCED_FLAG" ]]; then
+                echo "⚠️ Forcing a fresh deployment…"
+                aws apprunner start-deployment \
+                  --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+                  --region ${{ env.AWS_REGION }}
+                touch "$FORCED_FLAG"
+                sleep 10
+              fi
+            elif [[ "$STATE" == "RUNNING" && "$OP_STATUS" == "IN_PROGRESS" ]]; then
+              echo "🟢 Deployment in progress."
+              exit 0
+            elif [[ "$STATE" == "FAILED" ]]; then
+              echo "❌ Deployment FAILED!"
+              exit 1
+            else
+              echo "⏳ State: $STATE, Op: $OP_STATUS… waiting."
+            fi
+            sleep 60
+          done
+          echo "❌ Timed out"; exit 1
 
-      - name: Fetch App Runner URL
-        id: get-url
-        run: |
-          URL=$(aws apprunner describe-service \
-            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-            --region ${{ env.AWS_REGION }} \
-            --query 'Service.ServiceUrl' --output text)
-          echo "::set-output name=url::$URL"
-
-      - name: Mark deployment as “success”
+      - name: Set deployment status to “success”
         if: success()
         uses: chrnorm/deployment-status@v2
         with:
-          token:          ${{ secrets.GITHUB_TOKEN }}
-          deployment-id:  ${{ steps.deployment.outputs.deployment_id }}
-          state:          success       # shows “published” :contentReference[oaicite:6]{index=6}
-          environment-url: ${{ steps.get-url.outputs.url }}
+          token:           ${{ secrets.GITHUB_TOKEN }}
+          deployment-id:   ${{ steps.deployment.outputs.deployment_id }}
+          state:           success
+          environment-url: https://ai-answers.experimentation.ca
 
-      - name: Mark deployment as “failure”
+      - name: Set deployment status to “failure”
         if: failure()
         uses: chrnorm/deployment-status@v2
         with:
-          token:          ${{ secrets.GITHUB_TOKEN }}
-          deployment-id:  ${{ steps.deployment.outputs.deployment_id }}
-          state:          failure
+          token:         ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state:         failure
