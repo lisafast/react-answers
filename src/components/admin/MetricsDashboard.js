@@ -250,9 +250,9 @@ const MetricsDashboard = ({ lang = 'en' }) => {
     metrics.totalConversationsFr = uniqueChatIdsFr.size;
 
     // Add to metrics: publicFeedback breakdown by reason and score
-    const publicFeedbackReasons = {};
-    const publicFeedbackScores = {};
-    const publicFeedbackReasonsByLang = { en: {}, fr: {} };
+    const publicFeedbackReasons = { yes: {}, no: {} };
+    const publicFeedbackScores = { yes: {}, no: {} };
+    const publicFeedbackReasonsByLang = { en: { yes: {}, no: {} }, fr: { yes: {}, no: {} } };
     // New: userScored metrics from publicFeedback
     metrics.userScored = {
       total: { total: 0, en: 0, fr: 0 },
@@ -263,21 +263,31 @@ const MetricsDashboard = ({ lang = 'en' }) => {
       chat.interactions?.forEach(interaction => {
         if (interaction.publicFeedback) {
           const reason = interaction.publicFeedback.publicFeedbackReason || 'Other';
-          const score = interaction.publicFeedback.publicFeedbackScore || 'Other';
-          publicFeedbackReasons[reason] = (publicFeedbackReasons[reason] || 0) + 1;
-          publicFeedbackScores[score] = (publicFeedbackScores[score] || 0) + 1;
+          const score = interaction.publicFeedback.publicFeedbackScore;
           const lang = chat.pageLanguage === 'fr' ? 'fr' : 'en';
-          publicFeedbackReasonsByLang[lang][reason] = (publicFeedbackReasonsByLang[lang][reason] || 0) + 1;
-
-          // Count userScored metrics from publicFeedbackScore
-          if (score && score !== 'Other' && score !== 'undefined' && score !== 'null') {
+          // Bucket into yes/no
+          let bucket;
+          if (score === true || String(score).toLowerCase() === 'yes' || (typeof score === 'number' && score <= 4)) {
+            bucket = 'yes';
+          } else if (score === false || String(score).toLowerCase() === 'no' || (typeof score === 'number' && score > 4)) {
+            bucket = 'no';
+          } else {
+            bucket = null;
+          }
+          if (bucket) {
+            // Reasons
+            publicFeedbackReasons[bucket][reason] = (publicFeedbackReasons[bucket][reason] || 0) + 1;
+            // Scores
+            publicFeedbackScores[bucket][score] = (publicFeedbackScores[bucket][score] || 0) + 1;
+            // Reasons by lang
+            publicFeedbackReasonsByLang[lang][bucket][reason] = (publicFeedbackReasonsByLang[lang][bucket][reason] || 0) + 1;
+            // userScored
             metrics.userScored.total.total++;
             metrics.userScored.total[lang]++;
-            const scoreStr = String(score).toLowerCase();
-            if (scoreStr === 'yes' || score === true) {
+            if (bucket === 'yes') {
               metrics.userScored.helpful.total++;
               metrics.userScored.helpful[lang]++;
-            } else if (scoreStr === 'no' || score === false) {
+            } else if (bucket === 'no') {
               metrics.userScored.unhelpful.total++;
               metrics.userScored.unhelpful[lang]++;
             }
@@ -417,7 +427,7 @@ const MetricsDashboard = ({ lang = 'en' }) => {
                       count: metrics.totalQuestions,
                       percentage: metrics.totalConversations ? Math.round((metrics.totalQuestions / metrics.totalConversations) * 100) + '%' : '0%',
                       enCount: metrics.totalQuestionsEn,
-                      enPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsEn / metrics.totalQuestions) * 100) + '%' : '0%',
+                      enPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsEn / metrics.totalQuestions) + 100) + '%' : '0%',
                       frCount: metrics.totalQuestionsFr,
                       frPercentage: metrics.totalQuestions ? Math.round((metrics.totalQuestionsFr / metrics.totalQuestions) * 100) + '%' : '0%'
                     },
