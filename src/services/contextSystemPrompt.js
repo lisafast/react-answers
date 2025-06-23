@@ -1,19 +1,18 @@
 // import { menuStructure_EN } from './systemPrompt/menuStructure_EN.js';
 // import { menuStructure_FR } from './systemPrompt/menuStructure_FR.js';
-import { departments_EN } from './systemPrompt/departments_EN.js';
-import { departments_FR } from './systemPrompt/departments_FR.js';
+import { departments } from './systemPrompt/departments.js';
 import LoggingService from './ClientLoggingService.js';
 
 async function loadContextSystemPrompt(language = 'en') {
   try {
     // Validate base imports
-    if (!departments_EN || !departments_FR) {
+    if (!departments) {
       throw new Error('Required imports are undefined');
     }
 
     // Select language-specific content
     // const menuStructure = language === 'fr' ? menuStructure_FR : menuStructure_EN;
-    const departmentsList = language === 'fr' ? departments_FR : departments_EN;
+    // Use the consolidated departments array - we'll handle language selection in the formatting
 
     //     // Convert menu structure object to formatted string
     //     const menuStructureString = Object.entries(menuStructure)
@@ -36,8 +35,12 @@ async function loadContextSystemPrompt(language = 'en') {
     //       .join('\n\n');
 
     // Convert departments array to formatted string
-    const departmentsString = departmentsList
-      .map((dept) => `${dept.name} (${dept.abbr || 'No abbreviation'})\n  ${dept.url}`)
+    const departmentsString = departments
+      .map((dept) => {
+        const name = language === 'fr' ? dept.name_fr : dept.name_en;
+        const url = language === 'fr' ? dept.url_fr : dept.url_en;
+        return `${name} (${dept.abbr_en})\n  ${url}`;
+      })
       .join('\n\n');
 
     // // Add debug logging
@@ -101,8 +104,8 @@ async function loadContextSystemPrompt(language = 'en') {
 
 ## Response Format:
 <analysis>
-<department>[EXACT department abbreviation from departments_list> OR empty string]</department>
-<departmentUrl>[EXACT departmentmatching URL from departments_list> OR empty string]</departmentUrl>
+<department>[EXACT English abbreviation (abbr_en) from departments_list OR empty string]</department>
+<departmentUrl>[EXACT language-appropriate URL from departments_list OR empty string]</departmentUrl>
 </analysis>
 
 ## Examples:
