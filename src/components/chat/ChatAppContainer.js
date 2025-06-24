@@ -335,19 +335,27 @@ const ChatAppContainer = ({ lang = 'en', chatId, readOnly = false, initialMessag
 
   const formatAIResponse = useCallback((aiService, message) => {
     const messageId = message.id;
-    let paragraphs = message.interaction.answer.paragraphs;
-    if (paragraphs) {
-      paragraphs = paragraphs.map(paragraph =>
-        paragraph.replace(/<translated-question>.*?<\/translated-question>/g, '')
-      );
+    // Prefer paragraphs, fallback to sentences, fallback to empty array
+    let contentArr = [];
+    if (message.interaction && message.interaction.answer) {
+      if (Array.isArray(message.interaction.answer.paragraphs) && message.interaction.answer.paragraphs.length > 0) {
+        contentArr = message.interaction.answer.paragraphs.map(paragraph =>
+          paragraph.replace(/<translated-question>.*?<\/translated-question>/g, '')
+        );
+      } else if (Array.isArray(message.interaction.answer.sentences) && message.interaction.answer.sentences.length > 0) {
+        contentArr = message.interaction.answer.sentences;
+      }
     }
-    const displayUrl = message.interaction.citationUrl;
+    const displayUrl = message.interaction?.citationUrl;
     // Confidence rating and department are currently unused
   
     return (
       <div className="ai-message-content">
-        {paragraphs.map((paragraph, index) => {
-          const sentences = extractSentences(paragraph);
+        {contentArr.map((content, index) => {
+          // If using paragraphs, split into sentences; if using sentences, just display
+          const sentences = (message.interaction.answer.paragraphs && Array.isArray(message.interaction.answer.paragraphs))
+            ? extractSentences(content)
+            : [content];
           return sentences.map((sentence, sentenceIndex) => (
             <p key={`${messageId}-p${index}-s${sentenceIndex}`} className="ai-sentence">
               {sentence}
@@ -369,12 +377,6 @@ const ChatAppContainer = ({ lang = 'en', chatId, readOnly = false, initialMessag
                 </a>
               </p>
             )}
-            {/* <p key={`${messageId}-confidence`} className="confidence-rating">
-              {finalConfidenceRating !== undefined && `${safeT('homepage.chat.citation.confidence')} ${finalConfidenceRating}`}
-              {finalConfidenceRating !== undefined && (aiService || messageDepartment) && ' | '}
-              {aiService && `${safeT('homepage.chat.citation.ai')} ${aiService}`}
-              {messageDepartment && ` | ${messageDepartment}`}
-            </p> */}
           </div>
         )}
       </div>

@@ -313,7 +313,28 @@ const ChatInterface = ({
                   </>
                 )}
                 
-                {message.id === messages[messages.length - 1].id &&
+                {/* Show feedback in review mode for all answers/interactions that do not have expertFeedback */}
+                {readOnly &&
+                  message.sender === 'ai' &&
+                  !message.error &&
+                  message.interaction &&
+                  message.interaction.answer &&
+                  message.interaction.answer.answerType !== 'question' &&
+                  !message.interaction.expertFeedback && (
+                    <FeedbackComponent
+                      lang={lang}
+                      sentenceCount={getLastMessageSentenceCount()}
+                      chatId={chatId}
+                      userMessageId={message.id}
+                      showSkipButton={false}
+                      onSkip={focusTextarea}
+                      skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
+                    />
+                  )}
+
+                {/* Only show feedback for the last message if not in review mode */}
+                {!readOnly &&
+                  message.id === messages[messages.length - 1].id &&
                   showFeedback &&
                   !message.error &&
                   message.interaction.answer.answerType !== 'question' && (
@@ -322,7 +343,6 @@ const ChatInterface = ({
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
-                      // Add the new props for the skip button
                       showSkipButton={!readOnly && turnCount < MAX_CONVERSATION_TURNS && !isLoading}
                       onSkip={focusTextarea}
                       skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}

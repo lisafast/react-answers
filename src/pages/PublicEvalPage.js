@@ -21,21 +21,21 @@ const PublicEvalPage = ({ lang = 'en' }) => {
 
   return (
     <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600">
-      <h1 className="mb-400">{t('publicEval.title', 'Public Evaluation')}</h1>
+      <h1 className="mb-400">{t('admin.publicEval.title', 'Public Evaluation')}</h1>
       <nav className="mb-400" aria-label={t('admin.navigation.ariaLabel', 'Admin Navigation')}>
         <GcdsText>
-          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin')}</GcdsLink>
+          <GcdsLink href={`/${language}/admin`}>{t('common.backToAdmin', 'Back to Admin')}</GcdsLink>
         </GcdsText>
       </nav>
       <DataTable
         data={rows}
         columns={[
           {
-            title: t('publicEval.chatId', 'Chat ID'),
+            title: t('admin.publicEval.chatId', 'Chat ID'),
             data: 'chatId',
             render: (data) => `<a href="/${language}?chat=${data}&review=1">${data}</a>`
           },
-          { title: t('publicEval.department', 'Department'), data: 'department' }
+          { title: t('admin.publicEval.department', 'Department'), data: 'department' }
         ]}
         options={{ paging: true, searching: true, ordering: true }}
       />

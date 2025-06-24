@@ -102,15 +102,25 @@ const HomePage = ({ lang = 'en' }) => {
       DataStoreService.getChat(reviewChatId)
         .then(data => {
           const chat = data.chat;
-          if (!chat) return;
+          if (!chat || !Array.isArray(chat.interactions)) {
+            setInitialMessages([]);
+            return;
+          }
           const msgs = [];
           chat.interactions.forEach((inter, idx) => {
-            msgs.push({ id: `${idx}-u`, text: inter.question?.redactedQuestion || '', sender: 'user' });
-            msgs.push({ id: `${idx}-a`, interaction: inter, sender: 'ai', aiService: chat.aiProvider });
+            if (inter && inter.question) {
+              msgs.push({ id: inter.interactionId, text: inter.question?.redactedQuestion || '', sender: 'user' });
+            }
+            if (inter) {
+              msgs.push({ id: inter.interactionId, interaction: inter, sender: 'ai', aiService: chat.aiProvider });
+            }
           });
-          setInitialMessages(msgs);
+          setInitialMessages(msgs.filter(Boolean));
         })
-        .catch(err => console.error('Failed to load chat', err));
+        .catch(err => {
+          setInitialMessages([]);
+          console.error('Failed to load chat', err);
+        });
     }
   }, [reviewChatId]);
 
