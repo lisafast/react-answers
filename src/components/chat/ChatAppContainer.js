@@ -346,14 +346,16 @@ const ChatAppContainer = ({ lang = 'en', chatId, readOnly = false, initialMessag
         contentArr = message.interaction.answer.sentences;
       }
     }
-    const displayUrl = message.interaction?.citationUrl;
-    // Confidence rating and department are currently unused
-  
+    // Updated citation logic
+    const answer = message.interaction?.answer || {};
+    const citation = answer.citation || {};
+    const citationHead = answer.citationHead || citation.citationHead || '';
+    const displayUrl = message.interaction?.citationUrl || answer.providedCitationUrl || citation.providedCitationUrl || '';
     return (
       <div className="ai-message-content">
         {contentArr.map((content, index) => {
           // If using paragraphs, split into sentences; if using sentences, just display
-          const sentences = (message.interaction.answer.paragraphs && Array.isArray(message.interaction.answer.paragraphs))
+          const sentences = (answer.paragraphs && Array.isArray(answer.paragraphs))
             ? extractSentences(content)
             : [content];
           return sentences.map((sentence, sentenceIndex) => (
@@ -367,9 +369,9 @@ const ChatAppContainer = ({ lang = 'en', chatId, readOnly = false, initialMessag
           {safeT('homepage.chat.input.loadingHint')}
         </p>
        </div>
-        {message.interaction.answer.answerType === 'normal' && (message.interaction.answer.citationHead || displayUrl) && (
+        {answer.answerType === 'normal' && (citationHead || displayUrl) && (
           <div className="citation-container">
-            {message.interaction.answer.citationHead && <p key={`${messageId}-head`} className="citation-head">{message.interaction.answer.citationHead}</p>}
+            {citationHead && <p key={`${messageId}-head`} className="citation-head">{citationHead}</p>}
             {displayUrl && (
               <p key={`${messageId}-link`} className="citation-link">
                 <a href={displayUrl} target="_blank" rel="noopener noreferrer" tabIndex="0">
