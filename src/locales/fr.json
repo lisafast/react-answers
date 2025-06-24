@@ -280,9 +280,15 @@
       "chatViewer": "Voir le journal complet pour un ID de chat",
       "database": "Gérer la base de données",
       "eval": "Contrôler les intégrations d'évaluation",
-      "metrics": "Voir les métriques de performance",
-      "logout": "Se déconnecter"
-    },
+  "metrics": "Voir les métriques de performance",
+  "publicEval": "Évaluation publique",
+  "logout": "Se déconnecter"
+},
+ "publicEval": {
+   "title": "Évaluation publique",
+   "chatId": "ID de chat",
+   "department": "Ministère"
+ },
     "deleteChat": {
       "title": "Supprimer une conversation avec des rétroactions incorrectes",
       "idLabel": "ID de chat",

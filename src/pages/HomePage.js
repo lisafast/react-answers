@@ -1,5 +1,6 @@
 // src/pages/HomePage.js
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ChatAppContainer from '../components/chat/ChatAppContainer.js';
 import { GcdsContainer, GcdsDetails, GcdsText, GcdsLink } from '@cdssnc/gcds-components-react';
 import { useTranslations } from '../hooks/useTranslations.js';
@@ -44,9 +45,13 @@ class ErrorBoundary extends React.Component {
 
 const HomePage = ({ lang = 'en' }) => {
   const { t } = useTranslations(lang);
+  const [searchParams] = useSearchParams();
+  const reviewChatId = searchParams.get('chat');
+  const reviewMode = searchParams.get('review') === '1';
   const isPrivileged = useHasAnyRole(['admin', 'partner']);
   const [serviceStatus, setServiceStatus] = useState({ isAvailable: null, message: '' });
-  const [chatId, setChatId] = useState(null);
+  const [chatId, setChatId] = useState(reviewChatId || null);
+  const [initialMessages, setInitialMessages] = useState([]);
   const [isLoadingSiteStatus, setIsLoadingSiteStatus] = useState(true); // Retained for clarity, though not primary in new logic
   const [chatSessionFailed, setChatSessionFailed] = useState(false);
 
@@ -84,13 +89,40 @@ const HomePage = ({ lang = 'en' }) => {
   }
 
   useEffect(() => {
-    // Only fetch session if service is not explicitly false, or if privileged
+    if (reviewChatId) return; // existing chat mode
     if (serviceStatus.isAvailable !== false || isPrivileged) {
-      if (!chatId) { // Only fetch if chatId is not already set
-          fetchSession();
+      if (!chatId) {
+        fetchSession();
       }
     }
-  }, [serviceStatus.isAvailable, isPrivileged, chatId]); // Added chatId as a dependency
+  }, [serviceStatus.isAvailable, isPrivileged, chatId, reviewChatId]);
+
+  useEffect(() => {
+    if (reviewChatId) {
+      DataStoreService.getChat(reviewChatId)
+        .then(data => {
+          const chat = data.chat;
+          if (!chat || !Array.isArray(chat.interactions)) {
+            setInitialMessages([]);
+            return;
+          }
+          const msgs = [];
+          chat.interactions.forEach((inter, idx) => {
+            if (inter && inter.question) {
+              msgs.push({ id: inter.interactionId, text: inter.question?.redactedQuestion || '', sender: 'user' });
+            }
+            if (inter) {
+              msgs.push({ id: inter.interactionId, interaction: inter, sender: 'ai', aiService: chat.aiProvider });
+            }
+          });
+          setInitialMessages(msgs.filter(Boolean));
+        })
+        .catch(err => {
+          setInitialMessages([]);
+          console.error('Failed to load chat', err);
+        });
+    }
+  }, [reviewChatId]);
 
   const WrappedErrorBoundary = ({ children }) => <ErrorBoundary t={t}>{children}</ErrorBoundary>;
 
@@ -131,7 +163,7 @@ const HomePage = ({ lang = 'en' }) => {
             </GcdsLink>
           </GcdsText>
         </GcdsDetails>
-        <ChatAppContainer lang={lang} chatId={chatId} />
+        <ChatAppContainer lang={lang} chatId={chatId} readOnly={reviewMode} initialMessages={initialMessages} />
       </GcdsContainer>
       <GcdsContainer size="xl" mainContainer centered tag="below" className="mb-600" tabIndex={0}>
         <GcdsText>

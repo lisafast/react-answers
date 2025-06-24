@@ -52,6 +52,11 @@ const AdminPage = ({ lang = 'en' }) => {
             </GcdsLink>
           </li>
           <li>
+            <GcdsLink href={`/${lang}/public-eval`}>
+              {t('admin.navigation.publicEval', 'Public Evaluation')}
+            </GcdsLink>
+          </li>
+          <li>
             <GcdsLink href={`/${lang}/metrics`}>
               {t('admin.navigation.metrics', 'View performance metrics')}
             </GcdsLink>

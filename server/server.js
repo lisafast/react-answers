@@ -43,6 +43,8 @@ import dbDatabaseManagementHandler from '../api/db/db-database-management.js';
 import dbDeleteSystemLogsHandler from '../api/db/db-delete-system-logs.js';
 import dbSettingsHandler from '../api/db/db-settings.js';
 import dbPublicSiteStatusHandler from '../api/db/db-public-site-status.js';
+import dbPublicEvalListHandler from '../api/db/db-public-eval-list.js';
+import dbChatHandler from '../api/db/db-chat.js';
 import dbExpertFeedbackCountHandler from '../api/db/db-expert-feedback-count.js';
 import dbTableCountsHandler from '../api/db/db-table-counts.js';
 import dbRepairTimestampsHandler from '../api/db/db-repair-timestamps.js';
@@ -85,6 +87,8 @@ app.get("*", (req, res, next) => {
   res.sendFile(path.join(__dirname, "../build", "index.html"));
 });
 app.get('/api/db/db-public-site-status', dbPublicSiteStatusHandler);
+app.get('/api/db/db-public-eval-list', dbPublicEvalListHandler);
+app.get('/api/db/db-chat', dbChatHandler);
 app.post('/api/db/db-persist-feedback', dbPersistFeedback);
 app.post('/api/db/db-persist-interaction', dbPersistInteraction);
 app.get('/api/db/db-chat-session', dbChatSessionHandler);
