@@ -11,6 +11,7 @@ const DatabasePage = ({ lang }) => {
   const [isDroppingIndexes, setIsDroppingIndexes] = useState(false);  const [isDeletingSystemLogs, setIsDeletingSystemLogs] = useState(false);
   const [isRepairingTimestamps, setIsRepairingTimestamps] = useState(false);
   const [isRepairingExpertFeedback, setIsRepairingExpertFeedback] = useState(false);
+  const [isMigratingPublicFeedback, setIsMigratingPublicFeedback] = useState(false);
   const [message, setMessage] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -346,6 +347,32 @@ const DatabasePage = ({ lang }) => {
     }
   };
 
+  const handleMigratePublicFeedback = async () => {
+    if (!window.confirm(
+      lang === 'en'
+        ? 'This will migrate all public feedback from expert feedback to the new public feedback collection. Are you sure you want to continue?'
+        : 'Cela migrera tous les commentaires publics des commentaires d\'experts vers la nouvelle collection de commentaires publics. Êtes-vous sûr de vouloir continuer?'
+    )) return;
+    setIsMigratingPublicFeedback(true);
+    setMessage('');
+    try {
+      const result = await DataStoreService.migratePublicFeedback();
+      setMessage(
+        lang === 'en'
+          ? `Migration completed. Migrated ${result.migrated || 0} feedback documents.`
+          : `Migration terminée. ${result.migrated || 0} commentaires migrés.`
+      );
+    } catch (error) {
+      setMessage(
+        lang === 'en'
+          ? `Migration failed: ${error.message}`
+          : `Échec de la migration: ${error.message}`
+      );
+    } finally {
+      setIsMigratingPublicFeedback(false);
+    }
+  };
+
   return (
     <GcdsContainer  size="xl" centered>
       <GcdsHeading tag="h1">Database Management</GcdsHeading>
@@ -483,6 +510,25 @@ const DatabasePage = ({ lang }) => {
           {isRepairingExpertFeedback
             ? (lang === 'en' ? 'Repairing...' : 'Réparation...')
             : (lang === 'en' ? 'Repair Expert Feedback Types' : 'Réparer les types de commentaires d\'experts')}
+        </GcdsButton>
+      </div>
+
+      <div className="mb-400">
+        <GcdsHeading tag="h2">{lang === 'en' ? 'Migrate Public Feedback' : 'Migrer les commentaires publics'}</GcdsHeading>
+        <GcdsText>
+          {lang === 'en'
+            ? 'Move all public feedback from the expert feedback collection to the new public feedback collection.'
+            : 'Déplacer tous les commentaires publics de la collection des commentaires d\'experts vers la nouvelle collection des commentaires publics.'}
+        </GcdsText>
+        <GcdsButton
+          onClick={handleMigratePublicFeedback}
+          disabled={isMigratingPublicFeedback}
+          variant="secondary"
+          className="mb-200"
+        >
+          {isMigratingPublicFeedback
+            ? (lang === 'en' ? 'Migrating...' : 'Migration...')
+            : (lang === 'en' ? 'Migrate Public Feedback' : 'Migrer les commentaires publics')}
         </GcdsButton>
       </div>
 
