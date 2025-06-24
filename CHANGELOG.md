@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/cds-snc/ai-answers/compare/v1.8.0...v1.8.1) (2025-06-24)
+
+
+### Bug Fixes
+
+* add repository condition to workflow jobs for consistency ([cf28a14](https://github.com/cds-snc/ai-answers/commit/cf28a14230ac20cfec74f3c624819719226b6a91))
+
 ## [1.8.0](https://github.com/cds-snc/ai-answers/compare/v1.7.3...v1.8.0) (2025-06-23)
 
 
