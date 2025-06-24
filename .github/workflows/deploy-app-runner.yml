@@ -1,37 +1,58 @@
 name: Deploy to AWS App Runner
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
+  deployments: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION:             ${{ secrets.AWS_REGION }}
-      AWS_ASSUME_ROLE_ARN:    ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-      APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-      ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY:         ${{ secrets.OPENAI_API_KEY }}
-      GOOGLE_API_KEY:         ${{ secrets.GOOGLE_API_KEY }}
+      AWS_REGION:              ${{ secrets.AWS_REGION }}
+      AWS_ASSUME_ROLE_ARN:     ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+      APP_RUNNER_SERVICE_ARN:  ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ANTHROPIC_API_KEY:       ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY:          ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY:          ${{ secrets.GOOGLE_API_KEY }}
       GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
-      DOCDB_URI:              ${{ secrets.DOCDB_URI }}
-      JWT_SECRET_KEY:         ${{ secrets.JWT_SECRET_KEY }}
-      NODE_ENV:               ${{ secrets.NODE_ENV }}
+      DOCDB_URI:               ${{ secrets.DOCDB_URI }}
+      JWT_SECRET_KEY:          ${{ secrets.JWT_SECRET_KEY }}
+      NODE_ENV:                ${{ secrets.NODE_ENV }}
 
     steps:
+      - name: Exit if not lisafast/react-answers
+        if: github.repository != 'lisafast/react-answers'
+        run: |
+          echo "Not running on lisafast/react-answers, exiting."
+          exit 0
+
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ env.AWS_ASSUME_ROLE_ARN }}
           aws-region:     ${{ env.AWS_REGION }}
+
+      - name: Create GitHub Deployment
+        id: deployment
+        uses: chrnorm/deployment-action@v2
+        with:
+          token:       ${{ secrets.GITHUB_TOKEN }}
+          environment: experimentation
+
+      - name: Mark deployment as “in_progress”
+        uses: chrnorm/deployment-status@v2
+        with:
+          token:         ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state:         in_progress
 
       - name: Write update-input.json
         run: |
@@ -65,7 +86,7 @@ jobs:
                 }
               }
             },
-            "InstanceConfiguration": { "Cpu": "1024", "Memory": "2048" },
+            "InstanceConfiguration": { "Cpu": "512", "Memory": "1024" },
             "HealthCheckConfiguration": {
               "Protocol": "HTTP",
               "Path": "/health",
@@ -79,7 +100,7 @@ jobs:
 
       - name: Wait up to 4h for idle
         run: |
-          echo "Waiting for App Runner to be idle..."
+          echo "Waiting for App Runner to be idle…"
           for i in {1..240}; do
             STATUS=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
@@ -97,29 +118,57 @@ jobs:
               echo "✅ update-service succeeded"
               break
             else
-              echo "🔁 Retrying in 60s..."
+              echo "🔁 Retrying in 60s…"
               sleep 60
             fi
           done
 
-      - name: Wait up to 4h for RUNNING
+      - name: Wait up to 4h for RUNNING (force if idle)
         run: |
-          echo "Waiting for service RUNNING..."
+          echo "Waiting for service to deploy or forcing deployment if idle…"
+          FORCED_FLAG=".forced_deployment"
           for i in {1..240}; do
             STATE=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            [[ "$STATE" == "RUNNING" ]] && { echo "🟢 Service is RUNNING."; exit 0; }
-            [[ "$STATE" == "FAILED" ]] && { echo "❌ Deployment FAILED!"; exit 1; }
+            if [[ "$STATE" == "OPERATION_IN_PROGRESS" ]]; then
+              echo "⏳ State: $STATE… waiting."
+            elif [[ "$STATE" == "RUNNING" ]]; then
+              if [[ ! -f "$FORCED_FLAG" ]]; then
+                echo "⚠️ Forcing a fresh deployment…"
+                aws apprunner start-deployment \
+                  --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+                  --region ${{ env.AWS_REGION }}
+                touch "$FORCED_FLAG"
+                sleep 10
+              else
+                echo "✅ Service is RUNNING and deployment was already forced. Exiting."
+                exit 0
+              fi
+            elif [[ "$STATE" == "FAILED" ]]; then
+              echo "❌ Deployment FAILED!"
+              exit 1
+            else
+              echo "⏳ State: $STATE… waiting."
+            fi
             sleep 60
           done
           echo "❌ Timed out"; exit 1
 
-      - name: Output App Runner URL
-        run: |
-          URL=$(aws apprunner describe-service \
-            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-            --region ${{ env.AWS_REGION }} \
-            --query 'Service.ServiceUrl' --output text)
-          echo "✅ App Runner URL: $URL"
+      - name: Set deployment status to “success”
+        if: success()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token:           ${{ secrets.GITHUB_TOKEN }}
+          deployment-id:   ${{ steps.deployment.outputs.deployment_id }}
+          state:           success
+          environment-url: https://ai-answers.experimentation.ca
+
+      - name: Set deployment status to “failure”
+        if: failure()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token:         ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state:         failure

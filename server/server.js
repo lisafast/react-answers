@@ -49,6 +49,7 @@ import dbExpertFeedbackCountHandler from '../api/db/db-expert-feedback-count.js'
 import dbTableCountsHandler from '../api/db/db-table-counts.js';
 import dbRepairTimestampsHandler from '../api/db/db-repair-timestamps.js';
 import dbRepairExpertFeedbackHandler from '../api/db/db-repair-expert-feedback.js';
+import dbMigratePublicFeedbackHandler from '../api/db/db-migrate-public-feedback.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -111,6 +112,7 @@ app.get('/api/db/db-expert-feedback-count', dbExpertFeedbackCountHandler);
 app.get('/api/db/db-table-counts', dbTableCountsHandler);
 app.post('/api/db/db-repair-timestamps', dbRepairTimestampsHandler);
 app.post('/api/db/db-repair-expert-feedback', dbRepairExpertFeedbackHandler);
+app.post('/api/db/db-migrate-public-feedback', dbMigratePublicFeedbackHandler);
 
 app.post("/api/openai/openai-message", openAIHandler);
 app.post("/api/openai/openai-context", openAIContextAgentHandler);
