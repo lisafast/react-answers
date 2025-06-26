@@ -72,7 +72,6 @@ async function loadContextSystemPrompt(language = 'en') {
    - OR if applicable, set the department abbreviation to CDS-SNC and select one of these cross-department canada.ca urls as the departmentUrl in the matching page-language (CDS-SNC is responsible for these cross-department services):
       Change of address/Changement d'adresse: https://www.canada.ca/en/government/change-address.html or fr: https://www.canada.ca/fr/gouvernement/changement-adresse.html
       GCKey help/Aide pour GCKey: https://www.canada.ca/en/government/sign-in-online-account/gckey.html or fr: https://www.canada.ca/fr/gouvernement/ouvrir-session-dossier-compte-en-ligne/clegc.html
-      Find a member of Parliament/Trouver un député: https://www.ourcommons.ca/Members/en/search or fr: https://www.noscommunes.ca/Members/fr/search
       Response to US tariffs: https://international.canada.ca/en/global-affairs/campaigns/canada-us-engagement or fr: https://international.canada.ca/fr/affaires-mondiales/campagnes/engagement-canada-etats-unis
      All Government of Canada contacts: https://www.canada.ca/en/contact.html or fr: https://www.canada.ca/fr/contact.html
      All Government of Canada departments and agencies: https://www.canada.ca/en/government/dept.html or fr:  https://www.canada.ca/fr/gouvernement/min.html
@@ -82,28 +81,28 @@ async function loadContextSystemPrompt(language = 'en') {
 
 ## Examples of Program-to-Department Mapping:
 - Canada Pension Plan (CPP), OAS, Disability pension, EI, Canadian Dental Care Plan → ESDC (administering department)
-- Canada Child Benefit → CRA (administering department)
-- Job Bank, Apprenticeships, Student Loans→ ESDC (administering department)
+- Canada Child Benefit → CRA-ARC (administering department)
+- Job Bank, Apprenticeships, Student Loans→ EDSC-ESDC (administering department)
 - Weather Forecasts → ECCC (administering department)
-- My Service Canada Account (MSCA) → ESDC (administering department)
+- My Service Canada Account (MSCA) → EDSC-ESDC (administering department)
 - Visa, ETA, entry to Canada → IRCC (administering department)
-- Ontario Trillium Benefit → CRA (administering department)
-- Canadian Armed Forces Pensions → PSPC (administering department)
-- Veterans benefits → VAC (administering department)
-- Public service group insurance benefit plans → TBS (administering department)
-- Public service collective agreements → TBS (administering department)
-- Public service pay system → PSPC (administering department)
-- Public service jobs, language requirements, tests, applications and GC Jobs → PSC (administering department)
+- Ontario Trillium Benefit → CRA-ARC (administering department)
+- Canadian Armed Forces Pensions → PSPC-SPAC (administering department)
+- Veterans benefits → VAC-ACC (administering department)
+- Public service group insurance benefit plans → TBS-SCT (administering department)
+- Public service collective agreements → TBS-SCT (administering department)
+- Public service pay system → PSPC-SPAC (administering department)
+- Public service jobs, language requirements, tests, applications and GC Jobs → PSC-CFP (administering department)
 - International students study permits and visas → IRCC (administering department)
-- International students find schools and apply for scholarships on Educanada → EDU (separate official website administered by GAC)
-- Travel advice and travel advisories for Canadians travelling abroad → GAC (on GAC's travel.gc.ca site)
-- Collection and assessment of duties and import taxes, CARM → CBSA (administering department)
-- Find a member of Parliament →  
+- International students find schools and apply for scholarships on Educanada → EDU (separate official website administered by GAC-AMC)
+- Travel advice and travel advisories for Canadians travelling abroad → GAC-AMC (on GAC's travel.gc.ca site)
+- Collection and assessment of duties and import taxes, CARM → CBSA-ASFC (administering department)
+- Find a member of Parliament →  HOC-CDC (administering department)
 
 ## Response Format:
 <analysis>
-<department>[EXACT department bilingual abbreviation from departments_list> OR empty string]</department>
-<departmentUrl>[EXACT departmentmatching URL from departments_list> OR empty string]</departmentUrl>
+<department>[EXACT department abbrKey from departments_list (e.g., CRA-ARC, EDSC-ESDC) OR empty string]</department>
+<departmentUrl>[EXACT department matching URL from departments_list OR empty string]</departmentUrl>
 </analysis>
 
 ## Examples:
@@ -125,10 +124,18 @@ async function loadContextSystemPrompt(language = 'en') {
 </example>
 
 <example>
-* A question about renewing a passport (asked on the French page) would match IRCC:
+* A question about taxes (asked on the English page) would match CRA-ARC:
 <analysis>
-<department>IRCC</department>
-<departmentUrl>https://www.canada.ca/fr/immigration-refugies-citoyennete.html</departmentUrl>
+<department>CRA-ARC</department>
+<departmentUrl>https://www.canada.ca/en/revenue-agency.html</departmentUrl>
+</analysis>
+</example>
+
+<example>
+* A question about employment benefits (asked on the French page) would match EDSC-ESDC:
+<analysis>
+<department>EDSC-ESDC</department>
+<departmentUrl>https://www.canada.ca/fr/emploi-developpement-social.html</departmentUrl>
 </analysis>
 </example>
 </examples>
