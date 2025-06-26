@@ -2,7 +2,7 @@ const config = {
     thresholds: {
         questionAnswerSimilarity: 0.85, // Minimum similarity score for question-answer pairs to be considered similar
         answerSimilarity: 0.8, // Minimum similarity score for answers to be considered similar
-        sentenceSimilarity: 0.9 // Minimum similarity score for individual sentences to be considered similar
+        sentenceSimilarity: 0.85 // Minimum similarity score for individual sentences to be considered similar
     },
     searchLimits: {
         similarEmbeddings: 20, // Maximum number of similar embeddings to retrieve
