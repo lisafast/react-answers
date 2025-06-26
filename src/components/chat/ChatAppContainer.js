@@ -33,7 +33,7 @@ const ChatAppContainer = ({ lang = 'en', chatId, readOnly = false, initialMessag
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [textareaKey, setTextareaKey] = useState(0);
-  const [selectedAI, setSelectedAI] = useState('openai');
+  const [selectedAI, setSelectedAI] = useState('azure');
   const [selectedSearch, setSelectedSearch] = useState('google'); 
   const [showFeedback, setShowFeedback] = useState(false);
   const [referringUrl, setReferringUrl] = useState(pageUrl || '');
