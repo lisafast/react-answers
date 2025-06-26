@@ -37,7 +37,7 @@ async function loadContextSystemPrompt(language = 'en') {
 
     // Convert departments array to formatted string
     const departmentsString = departmentsList
-      .map((dept) => `${dept.name} (${dept.abbr || 'No abbreviation'})\n  ${dept.url}`)
+      .map((dept) => `${dept.name} (${dept.abbrKey || 'No abbreviation'})\n  ${dept.url}`)
       .join('\n\n');
 
     // // Add debug logging
@@ -57,7 +57,7 @@ async function loadContextSystemPrompt(language = 'en') {
       }
 
 <departments_list>
-## List of Government of Canada departments and agencies labelled by name, matching url, and abbreviation, in the official language context. - MUST SELECT FROM THIS LIST 
+## List of Government of Canada departments and agencies labelled by name, matching url in the official language context,  and bilingual abbreviation key (abbrKey) - MUST SELECT FROM THIS LIST 
   ${departmentsString}
 </departments_list> 
 
@@ -65,19 +65,18 @@ async function loadContextSystemPrompt(language = 'en') {
 1. Extract key topics and entities from the user's question and context
 - Prioritize your analysis of the question and context, including referring-url (the page the user was on when they asked the question) over the <searchResults> 
 - <referring-url> often identifies the department in a segment but occasionally may betray a misunderstanding. For example, the user may be on the MSCA sign in page but their question is how to sign in to get their Notice of Assessment, which is done through their CRA account.
-2. Compare and select ONLY from <departments_list> or from the list of generic canada.ca pages
+2. Compare and select ONLY from <departments_list> or from the list of CDS-SNC cross-department canada.ca pages below
 3. DO NOT match to programs, benefits, or services - only match to their administering department from the <departments_list>
 4. If multiple departments could be responsible:
    - Select the department that most likely directly administers and delivers web content for the program/service
-   - OR leave department empty and if relevant, select one of the cross-department canada.ca urls from this set as the departmentUrl in the matching page-language:
-      Direct deposit/Dépôt direct: https://www.canada.ca/en/public-services-procurement/services/payments-to-from-government/direct-deposit.html or fr:  https://www.canada.ca/fr/services-publics-approvisionnement/services/paiements-vers-depuis-gouvernement/depot-direct.html 
+   - OR if applicable, set the department abbreviation to CDS-SNC and select one of these cross-department canada.ca urls as the departmentUrl in the matching page-language (CDS-SNC is responsible for these cross-department services):
       Change of address/Changement d'adresse: https://www.canada.ca/en/government/change-address.html or fr: https://www.canada.ca/fr/gouvernement/changement-adresse.html
       GCKey help/Aide pour GCKey: https://www.canada.ca/en/government/sign-in-online-account/gckey.html or fr: https://www.canada.ca/fr/gouvernement/ouvrir-session-dossier-compte-en-ligne/clegc.html
       Find a member of Parliament/Trouver un député: https://www.ourcommons.ca/Members/en/search or fr: https://www.noscommunes.ca/Members/fr/search
       Response to US tariffs: https://international.canada.ca/en/global-affairs/campaigns/canada-us-engagement or fr: https://international.canada.ca/fr/affaires-mondiales/campagnes/engagement-canada-etats-unis
      All Government of Canada contacts: https://www.canada.ca/en/contact.html or fr: https://www.canada.ca/fr/contact.html
      All Government of Canada departments and agencies: https://www.canada.ca/en/government/dept.html or fr:  https://www.canada.ca/fr/gouvernement/min.html
-     All Government of Canada services (updated Feb 2025): https://www.canada.ca/en/services.html or fr: https://www.canada.ca/fr/services.html
+     All Government of Canada services (updated April 2025): https://www.canada.ca/en/services.html or fr: https://www.canada.ca/fr/services.html
 
 5. If no clear department match exists and no cross-department canada.ca url is relevant, return empty values  
 
@@ -86,7 +85,7 @@ async function loadContextSystemPrompt(language = 'en') {
 - Canada Child Benefit → CRA (administering department)
 - Job Bank, Apprenticeships, Student Loans→ ESDC (administering department)
 - Weather Forecasts → ECCC (administering department)
-- My Service Canada Account → ESDC (administering department)
+- My Service Canada Account (MSCA) → ESDC (administering department)
 - Visa, ETA, entry to Canada → IRCC (administering department)
 - Ontario Trillium Benefit → CRA (administering department)
 - Canadian Armed Forces Pensions → PSPC (administering department)
@@ -98,10 +97,12 @@ async function loadContextSystemPrompt(language = 'en') {
 - International students study permits and visas → IRCC (administering department)
 - International students find schools and apply for scholarships on Educanada → EDU (separate official website administered by GAC)
 - Travel advice and travel advisories for Canadians travelling abroad → GAC (on GAC's travel.gc.ca site)
+- Collection and assessment of duties and import taxes, CARM → CBSA (administering department)
+- Find a member of Parliament →  
 
 ## Response Format:
 <analysis>
-<department>[EXACT department abbreviation from departments_list> OR empty string]</department>
+<department>[EXACT department bilingual abbreviation from departments_list> OR empty string]</department>
 <departmentUrl>[EXACT departmentmatching URL from departments_list> OR empty string]</departmentUrl>
 </analysis>
 

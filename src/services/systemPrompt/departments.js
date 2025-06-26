@@ -226,12 +226,12 @@ export const departments = [
   },
   {
     "name_en": "Canada Pension Plan Investment Board",
-    "name_fr": "Conseil de la pension de retraite du Canada",
+    "name_fr": "Office d'investissement du régime de pensions du Canada",
     "url_en": "https://www.cppinvestments.com/",
-    "url_fr": "https://www.cppinvestments.com/fr/",
+    "url_fr": "https://www.investissementsrpc.com/fr/",
     "abbr_en": "CPPIB",
-    "abbr_fr": "CPPIB",
-    "abbrev": "CPPIB"
+    "abbr_fr": "OIRPC",
+    "abbrev": "CPPIB-OIRPC"
   },
   {
     "name_en": "Canada Post",
@@ -828,6 +828,15 @@ export const departments = [
     "abbrev": "DCC-CDC"
   },
   {
+    "name_en": "Defence Research and Development Canada",
+    "name_fr": "Recherche et développement pour la Défense Canada",
+    "url_en": "https://www.canada.ca/en/defence-research-development.html",
+    "url_fr": "https://www.canada.ca/fr/recherche-developpement-defense.html",
+    "abbr_en": "DRDC",
+    "abbr_fr": "RDDC",
+    "abbrev": "DRDC-RDDC"
+  },
+  {
     "name_en": "Democratic Institutions",
     "name_fr": "Institutions démocratiques",
     "url_en": "https://www.canada.ca/en/democratic-institutions.html",
@@ -1062,6 +1071,15 @@ export const departments = [
     "abbrev": "HC-SC"
   },
   {
+    "name_en": "House of Commons of Canada",
+    "name_fr": "Chambre des communes du Canada",
+    "url_en": "https://www.ourcommons.ca/en",
+    "url_fr": "https://www.noscommunes.ca/fr",
+    "abbr_en": "HOC",
+    "abbr_fr": "CDC",
+    "abbrev": "HOC-CDC"
+  },
+  {
     "name_en": "Historic Sites and Monuments Board of Canada",
     "name_fr": "Commission des lieux et monuments historiques du Canada",
     "url_en": "https://parks.canada.ca/culture/designation",
@@ -1085,8 +1103,8 @@ export const departments = [
     "url_en": "https://www.canada.ca/en/intelligence-commissioner.html",
     "url_fr": "https://www.canada.ca/fr/commissaire-renseignement.html",
     "abbr_en": "OICIntel",
-    "abbr_fr": null,
-    "abbrev": "OICIntel"
+    "abbr_fr": "BCR",
+    "abbrev": "OICIntel-BCR"
   },
   {
     "name_en": "Immigration and Refugee Board of Canada",
@@ -1956,5 +1974,5 @@ export const departments = [
 
 // Statistics
 export const consolidationStats = {
-  total_departments: 216
+  total_departments: 217
 };
