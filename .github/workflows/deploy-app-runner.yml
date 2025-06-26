@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   deploy:
+    if: github.repository == 'lisafast/react-answers'
     runs-on: ubuntu-latest
 
     env:
@@ -28,12 +29,6 @@ jobs:
       NODE_ENV:                ${{ secrets.NODE_ENV }}
 
     steps:
-      - name: Exit if not lisafast/react-answers
-        if: github.repository != 'lisafast/react-answers'
-        run: |
-          echo "Not running on lisafast/react-answers, exiting."
-          exit 0
-
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -127,28 +122,30 @@ jobs:
         run: |
           echo "Waiting for service to deploy or forcing deployment if idle…"
           FORCED_FLAG=".forced_deployment"
+          # Check initial state
+          STATE=$(aws apprunner describe-service \
+            --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Service.Status' --output text)
+          if [[ "$STATE" == "RUNNING" ]]; then
+            echo "⚠️ Service is RUNNING, triggering a fresh deployment..."
+            aws apprunner start-deployment \
+              --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
+              --region ${{ env.AWS_REGION }}
+            sleep 10
+          elif [[ "$STATE" == "FAILED" ]]; then
+            echo "❌ Deployment FAILED!"
+            exit 1
+          fi
+          # Now wait for RUNNING
           for i in {1..240}; do
             STATE=$(aws apprunner describe-service \
               --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
               --region ${{ env.AWS_REGION }} \
               --query 'Service.Status' --output text)
-            if [[ "$STATE" == "OPERATION_IN_PROGRESS" ]]; then
-              echo "⏳ State: $STATE… waiting."
-              if [[ ! -f "$FORCED_FLAG" ]]; then
-                touch "$FORCED_FLAG"
-              fi
-            elif [[ "$STATE" == "RUNNING" ]]; then
-              if [[ ! -f "$FORCED_FLAG" ]]; then
-                echo "⚠️ Forcing a fresh deployment…"
-                aws apprunner start-deployment \
-                  --service-arn "${{ env.APP_RUNNER_SERVICE_ARN }}" \
-                  --region ${{ env.AWS_REGION }}
-                touch "$FORCED_FLAG"
-                sleep 10
-              else
-                echo "✅ Service is RUNNING and deployment was already forced or in progress. Exiting."
-                exit 0
-              fi
+            if [[ "$STATE" == "RUNNING" ]]; then
+              echo "✅ Service is RUNNING. Exiting."
+              exit 0
             elif [[ "$STATE" == "FAILED" ]]; then
               echo "❌ Deployment FAILED!"
               exit 1
