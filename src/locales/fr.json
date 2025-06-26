@@ -287,7 +287,8 @@
  "publicEval": {
    "title": "Évaluation publique",
    "chatId": "ID de chat",
-   "department": "Ministère"
+   "department": "Ministère",
+   "date": "Date"
  },
     "deleteChat": {
       "title": "Supprimer une conversation avec des rétroactions incorrectes",

@@ -285,7 +285,8 @@
  "publicEval": {
    "title": "Public Evaluation",
    "chatId": "Chat ID",
-   "department": "Department"
+   "department": "Department",
+   "date": "Date"
  },
     "chatLogs": {
       "title": "Download recent chat logs",
