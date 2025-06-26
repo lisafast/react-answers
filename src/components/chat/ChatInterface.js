@@ -164,11 +164,20 @@ const ChatInterface = ({
   // TOOD is there a difference between paragraphs and sentrences?
   const getLastMessageSentenceCount = () => {
     const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
-    if (lastAiMessage && lastAiMessage.interaction && lastAiMessage.interaction.answer && lastAiMessage.interaction.answer.paragraphs && lastAiMessage.interaction.answer.paragraphs.length > 0) {
-      return lastAiMessage.interaction.answer.paragraphs.reduce(
-        (count, paragraph) => count + extractSentences(paragraph).length,
-        0
-      );
+    if (
+      lastAiMessage &&
+      lastAiMessage.interaction &&
+      lastAiMessage.interaction.answer
+    ) {
+      const answer = lastAiMessage.interaction.answer;
+      if (answer.paragraphs && Array.isArray(answer.paragraphs) && answer.paragraphs.length > 0) {
+        return answer.paragraphs.reduce(
+          (count, paragraph) => count + extractSentences(paragraph).length,
+          0
+        );
+      } else if (answer.content) {     
+        return extractSentences(answer.content).length;
+      }
     }
     return 1;
   };
@@ -318,12 +327,13 @@ const ChatInterface = ({
                   message.sender === 'ai' &&
                   !message.error &&
                   message.interaction &&
-                  message.interaction.answer &&
+                  caches &&
                   message.interaction.answer.answerType !== 'question' &&
                   !message.interaction.expertFeedback && (
                     <FeedbackComponent
                       lang={lang}
                       sentenceCount={getLastMessageSentenceCount()}
+                      sentences={extractSentences(message.interaction.answer.content) || []}
                       chatId={chatId}
                       userMessageId={message.id}
                       showSkipButton={false}
@@ -341,6 +351,9 @@ const ChatInterface = ({
                     <FeedbackComponent
                       lang={lang}
                       sentenceCount={getLastMessageSentenceCount()}
+                      sentences={message.interaction.answer.paragraphs
+                        ? message.interaction.answer.paragraphs.flatMap(paragraph => extractSentences(paragraph))
+                        : []}
                       chatId={chatId}
                       userMessageId={message.id}
                       showSkipButton={!readOnly && turnCount < MAX_CONVERSATION_TURNS && !isLoading}

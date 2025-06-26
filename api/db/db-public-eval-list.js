@@ -68,7 +68,8 @@ async function handler(req, res) {
     const items = chats.map((chat) => ({
       chatId: chat.chatId,
       department: chat.interactionDocs?.context?.department || '',
-      date: chat.date || '',
+      // Always return ISO string for date (or empty string)
+      date: chat.date ? new Date(chat.date).toISOString() : '',
     }));
 
     res.status(200).json({ chats: items });
