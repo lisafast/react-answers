@@ -9,21 +9,67 @@ async function handler(req, res) {
 
   try {
     await dbConnect();
-    const chats = await Chat.find({ user: { $exists: false } })
-      .populate({ path: 'interactions', populate: { path: 'context' } });
-
-    const items = [];
-    for (const chat of chats) {
-      for (const interaction of chat.interactions) {
-        if (!interaction.expertFeedback) {
-          items.push({
-            chatId: chat.chatId,
-            department: interaction.context?.department || '',
-            date: interaction.updatedAt || interaction.createdAt || chat.updatedAt || chat.createdAt || '',
-          });
+    // Correct aggregation for referenced interactions
+    const chats = await Chat.aggregate([
+      { $match: { user: { $exists: false } } },
+      // Lookup interactions from Interaction collection
+      {
+        $lookup: {
+          from: 'interactions',
+          localField: 'interactions',
+          foreignField: '_id',
+          as: 'interactionDocs',
+        },
+      },
+      { $unwind: '$interactionDocs' },
+      // Only interactions without expertFeedback (null or missing)
+      { $match: {
+          $or: [
+            { 'interactionDocs.expertFeedback': { $exists: false } },
+            { 'interactionDocs.expertFeedback': null }
+          ]
         }
-      }
-    }
+      },
+      // Lookup context for each interaction
+      {
+        $lookup: {
+          from: 'contexts',
+          localField: 'interactionDocs.context',
+          foreignField: '_id',
+          as: 'contextDoc',
+        },
+      },
+      {
+        $addFields: {
+          'interactionDocs.context': { $arrayElemAt: ['$contextDoc', 0] },
+        },
+      },
+      {
+        $project: {
+          chatId: 1,
+          interactionDocs: 1,
+          updatedAt: 1,
+          createdAt: 1,
+        },
+      },
+      {
+        $addFields: {
+          date: {
+            $ifNull: [
+              '$interactionDocs.updatedAt',
+              { $ifNull: ['$interactionDocs.createdAt', { $ifNull: ['$updatedAt', '$createdAt'] }] },
+            ],
+          },
+        },
+      },
+      { $sort: { date: -1 } },
+    ]);
+
+    const items = chats.map((chat) => ({
+      chatId: chat.chatId,
+      department: chat.interactionDocs?.context?.department || '',
+      date: chat.date || '',
+    }));
 
     res.status(200).json({ chats: items });
   } catch (error) {
