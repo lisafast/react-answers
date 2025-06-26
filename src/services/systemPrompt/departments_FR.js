@@ -110,7 +110,7 @@ export const departments_FR = [
     "name": "Agence du revenu du Canada",
     "url": "https://www.canada.ca/fr/agence-revenu.html",
     "abbr": "ARC",
-    "abbrKey": "RCAF-ARC"
+    "abbrKey": "CRA-ARC"
   },
   {
     "name": "Agence fédérale de développement économique pour le Sud de l'Ontario",
