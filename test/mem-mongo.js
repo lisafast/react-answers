@@ -39,6 +39,7 @@ async function start() {
             ...process.env,
             REACT_APP_API_URL: `${apiUrl}`,
           },
+          shell: true, // Fix for Windows
         });
         build.on("exit", (code) => {
           if (code === 0) resolve();
@@ -64,6 +65,7 @@ async function start() {
       PORT: port,
       REACT_APP_API_URL: `${apiUrl}/api`,
     },
+    shell: true, // Fix for Windows
   });
 
   backend.on("exit", (code) => {

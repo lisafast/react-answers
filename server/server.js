@@ -147,7 +147,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-fetch("http://localhost:3001/health")
+fetch(`http://localhost:${PORT}/health`)
   .then((response) => response.json())
   .then((data) => console.log("Health check:", data))
   .catch((error) => console.error("Error:", error));
