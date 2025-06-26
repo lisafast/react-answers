@@ -19,6 +19,7 @@ async function handler(req, res) {
           items.push({
             chatId: chat.chatId,
             department: interaction.context?.department || '',
+            date: interaction.updatedAt || interaction.createdAt || chat.updatedAt || chat.createdAt || '',
           });
         }
       }

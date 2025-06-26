@@ -19,6 +19,20 @@ const PublicEvalPage = ({ lang = 'en' }) => {
       .catch(err => console.error('Failed to load list', err));
   }, []);
 
+  // Localized date formatter
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    try {
+      const date = new Date(dateStr);
+      return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-CA' : 'en-CA', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      }).format(date);
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
     <GcdsContainer size="xl" mainContainer centered tag="main" className="mb-600">
       <h1 className="mb-400">{t('admin.publicEval.title', 'Public Evaluation')}</h1>
@@ -35,7 +49,12 @@ const PublicEvalPage = ({ lang = 'en' }) => {
             data: 'chatId',
             render: (data) => `<a href="/${language}?chat=${data}&review=1">${data}</a>`
           },
-          { title: t('admin.publicEval.department', 'Department'), data: 'department' }
+          { title: t('admin.publicEval.department', 'Department'), data: 'department' },
+          {
+            title: t('admin.publicEval.date', 'Date'),
+            data: 'date',
+            render: (data) => formatDate(data)
+          }
         ]}
         options={{ paging: true, searching: true, ordering: true }}
       />
