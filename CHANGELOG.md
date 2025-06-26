@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/cds-snc/ai-answers/compare/v1.8.1...v1.9.0) (2025-06-26)
+
+
+### Features
+
+* add date field to public evaluation and implement localized date formatting ([feb8ec2](https://github.com/cds-snc/ai-answers/commit/feb8ec268ce0f65f5156909ce3a29991590bfafa))
+
 ## [1.8.1](https://github.com/cds-snc/ai-answers/compare/v1.8.0...v1.8.1) (2025-06-24)
 
 
