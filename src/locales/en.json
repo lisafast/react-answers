@@ -278,9 +278,16 @@
       "chatViewer": "View full interaction for a Chat ID",
       "database": "Manage the database",
       "eval": "Control evaluation embeddings",
-      "metrics": "View performance metrics",
-      "logout": "Sign out"
-    },
+  "metrics": "View performance metrics",
+  "publicEval": "Public Evaluation",
+  "logout": "Sign out"
+},
+ "publicEval": {
+   "title": "Public Evaluation",
+   "chatId": "Chat ID",
+   "department": "Department",
+   "date": "Date"
+ },
     "chatLogs": {
       "title": "Download recent chat logs",
       "timeRange": "Time range",

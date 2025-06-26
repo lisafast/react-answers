@@ -30,6 +30,7 @@ const ChatInterface = ({
   lang,
   extractSentences,
   chatId,
+  readOnly = false,
 }) => {
   // Add safeT helper function
   const safeT = useCallback(
@@ -312,7 +313,28 @@ const ChatInterface = ({
                   </>
                 )}
                 
-                {message.id === messages[messages.length - 1].id &&
+                {/* Show feedback in review mode for all answers/interactions that do not have expertFeedback */}
+                {readOnly &&
+                  message.sender === 'ai' &&
+                  !message.error &&
+                  message.interaction &&
+                  message.interaction.answer &&
+                  message.interaction.answer.answerType !== 'question' &&
+                  !message.interaction.expertFeedback && (
+                    <FeedbackComponent
+                      lang={lang}
+                      sentenceCount={getLastMessageSentenceCount()}
+                      chatId={chatId}
+                      userMessageId={message.id}
+                      showSkipButton={false}
+                      onSkip={focusTextarea}
+                      skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
+                    />
+                  )}
+
+                {/* Only show feedback for the last message if not in review mode */}
+                {!readOnly &&
+                  message.id === messages[messages.length - 1].id &&
                   showFeedback &&
                   !message.error &&
                   message.interaction.answer.answerType !== 'question' && (
@@ -321,8 +343,7 @@ const ChatInterface = ({
                       sentenceCount={getLastMessageSentenceCount()}
                       chatId={chatId}
                       userMessageId={message.id}
-                      // Add the new props for the skip button
-                      showSkipButton={turnCount < MAX_CONVERSATION_TURNS && !isLoading}
+                      showSkipButton={!readOnly && turnCount < MAX_CONVERSATION_TURNS && !isLoading}
                       onSkip={focusTextarea}
                       skipButtonLabel={safeT('homepage.textarea.ariaLabel.skipfo')}
                     />
@@ -350,7 +371,7 @@ const ChatInterface = ({
           </>
         )}
 
-        {turnCount >= MAX_CONVERSATION_TURNS && (
+        {!readOnly && turnCount >= MAX_CONVERSATION_TURNS && (
           <div key="limit-reached" className="message ai">
             <div className="limit-reached-message">
               <p>{safeT('homepage.chat.messages.limitReached', { count: MAX_CONVERSATION_TURNS })}</p>
@@ -362,7 +383,7 @@ const ChatInterface = ({
         )}
       </div>
 
-      {turnCount < MAX_CONVERSATION_TURNS && (
+      {!readOnly && turnCount < MAX_CONVERSATION_TURNS && (
         <div className="input-area mt-200">
           {!isLoading && (
             <form className="mrgn-tp-xl mrgn-bttm-lg">
