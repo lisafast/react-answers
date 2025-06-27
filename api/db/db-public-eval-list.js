@@ -40,67 +40,51 @@ async function handler(req, res) {
       },
       // Only keep chats with at least one such interaction
       { $match: { 'filteredInteractions.0': { $exists: true } } },
-      // Lookup context for the most recent filtered interaction
-      {
-        $addFields: {
-          mostRecentInteraction: {
-            $arrayElemAt: [
-              {
-                $slice: [
-                  {
-                    $reverseArray: {
-                      $sortArray: {
-                        input: '$filteredInteractions',
-                        sortBy: { updatedAt: 1, createdAt: 1 }
-                      }
-                    }
-                  },
-                  1
-                ]
-              },
-              0
-            ]
-          }
-        }
-      },
+      // Lookup context for all filtered interactions (will pick most recent in JS)
       {
         $lookup: {
           from: 'contexts',
-          localField: 'mostRecentInteraction.context',
+          localField: 'filteredInteractions.context',
           foreignField: '_id',
-          as: 'contextDoc',
-        },
-      },
-      {
-        $addFields: {
-          'mostRecentInteraction.context': { $arrayElemAt: ['$contextDoc', 0] },
-        },
-      },
-      {
-        $addFields: {
-          date: {
-            $ifNull: [
-              '$mostRecentInteraction.updatedAt',
-              { $ifNull: ['$mostRecentInteraction.createdAt', { $ifNull: ['$updatedAt', '$createdAt'] }] },
-            ],
-          },
+          as: 'contextDocs',
         },
       },
       {
         $project: {
           chatId: 1,
-          department: '$mostRecentInteraction.context.department',
-          date: 1,
+          filteredInteractions: 1,
+          contextDocs: 1,
+          updatedAt: 1,
+          createdAt: 1,
         },
       },
-      { $sort: { date: -1 } },
     ]);
 
-    const items = chats.map((chat) => ({
-      chatId: chat.chatId,
-      department: chat.department || '',
-      date: chat.date ? new Date(chat.date).toISOString() : '',
-    }));
+    // Post-process in JS to find the most recent filtered interaction and its context
+    const items = chats.map((chat) => {
+      // Sort filteredInteractions by updatedAt or createdAt descending
+      const sortedInteractions = [...chat.filteredInteractions].sort((a, b) => {
+        const dateA = a.updatedAt || a.createdAt || 0;
+        const dateB = b.updatedAt || b.createdAt || 0;
+        return new Date(dateB) - new Date(dateA);
+      });
+      const mostRecentInteraction = sortedInteractions[0];
+      // Find the context for the most recent interaction
+      let department = '';
+      if (mostRecentInteraction && mostRecentInteraction.context && chat.contextDocs) {
+        const contextDoc = chat.contextDocs.find(
+          (ctx) => ctx._id.toString() === mostRecentInteraction.context.toString()
+        );
+        department = contextDoc ? contextDoc.department : '';
+      }
+      // Determine the date
+      const date = mostRecentInteraction && (mostRecentInteraction.updatedAt || mostRecentInteraction.createdAt || chat.updatedAt || chat.createdAt);
+      return {
+        chatId: chat.chatId,
+        department,
+        date: date ? new Date(date).toISOString() : '',
+      };
+    });
 
     res.status(200).json({ chats: items });
   } catch (error) {
