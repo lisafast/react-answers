@@ -9,10 +9,9 @@ async function handler(req, res) {
 
   try {
     await dbConnect();
-    // Correct aggregation for referenced interactions
+    // Aggregate per chat, not per interaction
     const chats = await Chat.aggregate([
       { $match: { user: { $exists: false } } },
-      // Lookup interactions from Interaction collection
       {
         $lookup: {
           from: 'interactions',
@@ -21,45 +20,77 @@ async function handler(req, res) {
           as: 'interactionDocs',
         },
       },
-      { $unwind: '$interactionDocs' },
-      // Only interactions without expertFeedback (null or missing)
-      { $match: {
-          $or: [
-            { 'interactionDocs.expertFeedback': { $exists: false } },
-            { 'interactionDocs.expertFeedback': null }
-          ]
+      // Filter interactions without expertFeedback
+      {
+        $addFields: {
+          filteredInteractions: {
+            $filter: {
+              input: '$interactionDocs',
+              as: 'interaction',
+              cond: {
+                $or: [
+                  { $eq: ['$$interaction.expertFeedback', null] },
+                  { $eq: ['$$interaction.expertFeedback', undefined] },
+                  { $not: { $ifNull: ['$$interaction.expertFeedback', false] } }
+                ]
+              }
+            }
+          }
         }
       },
-      // Lookup context for each interaction
+      // Only keep chats with at least one such interaction
+      { $match: { 'filteredInteractions.0': { $exists: true } } },
+      // Lookup context for the most recent filtered interaction
+      {
+        $addFields: {
+          mostRecentInteraction: {
+            $arrayElemAt: [
+              {
+                $slice: [
+                  {
+                    $reverseArray: {
+                      $sortArray: {
+                        input: '$filteredInteractions',
+                        sortBy: { updatedAt: 1, createdAt: 1 }
+                      }
+                    }
+                  },
+                  1
+                ]
+              },
+              0
+            ]
+          }
+        }
+      },
       {
         $lookup: {
           from: 'contexts',
-          localField: 'interactionDocs.context',
+          localField: 'mostRecentInteraction.context',
           foreignField: '_id',
           as: 'contextDoc',
         },
       },
       {
         $addFields: {
-          'interactionDocs.context': { $arrayElemAt: ['$contextDoc', 0] },
-        },
-      },
-      {
-        $project: {
-          chatId: 1,
-          interactionDocs: 1,
-          updatedAt: 1,
-          createdAt: 1,
+          'mostRecentInteraction.context': { $arrayElemAt: ['$contextDoc', 0] },
         },
       },
       {
         $addFields: {
           date: {
             $ifNull: [
-              '$interactionDocs.updatedAt',
-              { $ifNull: ['$interactionDocs.createdAt', { $ifNull: ['$updatedAt', '$createdAt'] }] },
+              '$mostRecentInteraction.updatedAt',
+              { $ifNull: ['$mostRecentInteraction.createdAt', { $ifNull: ['$updatedAt', '$createdAt'] }] },
             ],
           },
+        },
+      },
+      {
+        $project: {
+          chatId: 1,
+          department: '$mostRecentInteraction.context.department',
+          date: 1,
         },
       },
       { $sort: { date: -1 } },
@@ -67,8 +98,7 @@ async function handler(req, res) {
 
     const items = chats.map((chat) => ({
       chatId: chat.chatId,
-      department: chat.interactionDocs?.context?.department || '',
-      // Always return ISO string for date (or empty string)
+      department: chat.department || '',
       date: chat.date ? new Date(chat.date).toISOString() : '',
     }));
 
