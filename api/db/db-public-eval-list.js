@@ -1,5 +1,7 @@
 import dbConnect from './db-connect.js';
 import { Chat } from '../../models/chat.js';
+import { Interaction } from '../../models/interaction.js';
+import { Context } from '../../models/context.js';
 import { authMiddleware, adminMiddleware, withProtection } from '../../middleware/auth.js';
 
 async function handler(req, res) {
@@ -9,98 +11,41 @@ async function handler(req, res) {
 
   try {
     await dbConnect();
-    // Aggregate per chat, not per interaction
-    const chats = await Chat.aggregate([
-      { $match: { user: { $exists: false } } },
-      {
-        $lookup: {
-          from: 'interactions',
-          localField: 'interactions',
-          foreignField: '_id',
-          as: 'interactionDocs',
+    // Find chats with no user, populate interactions and their context
+    const chats = await Chat.find({ user: { $exists: false } })
+      .select('chatId interactions updatedAt createdAt')
+      .populate({
+        path: 'interactions',
+        select: 'context updatedAt createdAt expertFeedback',
+        populate: {
+          path: 'context',
+          select: 'department',
         },
-      },
-      // Filter interactions without expertFeedback
-      {
-        $addFields: {
-          filteredInteractions: {
-            $filter: {
-              input: '$interactionDocs',
-              as: 'interaction',
-              cond: {
-                $or: [
-                  { $eq: ['$$interaction.expertFeedback', null] },
-                  { $eq: ['$$interaction.expertFeedback', undefined] },
-                  { $not: { $ifNull: ['$$interaction.expertFeedback', false] } }
-                ]
-              }
-            }
-          }
-        }
-      },
-      // Only keep chats with at least one such interaction
-      { $match: { 'filteredInteractions.0': { $exists: true } } },
-      // Lookup context for the most recent filtered interaction
-      {
-        $addFields: {
-          mostRecentInteraction: {
-            $arrayElemAt: [
-              {
-                $slice: [
-                  {
-                    $reverseArray: {
-                      $sortArray: {
-                        input: '$filteredInteractions',
-                        sortBy: { updatedAt: 1, createdAt: 1 }
-                      }
-                    }
-                  },
-                  1
-                ]
-              },
-              0
-            ]
-          }
-        }
-      },
-      {
-        $lookup: {
-          from: 'contexts',
-          localField: 'mostRecentInteraction.context',
-          foreignField: '_id',
-          as: 'contextDoc',
-        },
-      },
-      {
-        $addFields: {
-          'mostRecentInteraction.context': { $arrayElemAt: ['$contextDoc', 0] },
-        },
-      },
-      {
-        $addFields: {
-          date: {
-            $ifNull: [
-              '$mostRecentInteraction.updatedAt',
-              { $ifNull: ['$mostRecentInteraction.createdAt', { $ifNull: ['$updatedAt', '$createdAt'] }] },
-            ],
-          },
-        },
-      },
-      {
-        $project: {
-          chatId: 1,
-          department: '$mostRecentInteraction.context.department',
-          date: 1,
-        },
-      },
-      { $sort: { date: -1 } },
-    ]);
+      })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
 
-    const items = chats.map((chat) => ({
-      chatId: chat.chatId,
-      department: chat.department || '',
-      date: chat.date ? new Date(chat.date).toISOString() : '',
-    }));
+    const items = chats
+      .map((chat) => {
+        // Filter interactions with no expertFeedback
+        const filteredInteractions = (chat.interactions || []).filter(
+          (i) => !i.expertFeedback
+        );
+        if (filteredInteractions.length === 0) return null;
+        // Use the context of the first such interaction
+        const firstInteraction = filteredInteractions[0];
+        let department = '';
+        if (firstInteraction && firstInteraction.context && firstInteraction.context.department) {
+          department = firstInteraction.context.department;
+        }
+        const date = chat.updatedAt ? new Date(chat.updatedAt).toISOString() : (chat.createdAt ? new Date(chat.createdAt).toISOString() : '');
+        return {
+          chatId: chat.chatId,
+          department,
+          date,
+        };
+      })
+      .filter(Boolean);
 
     res.status(200).json({ chats: items });
   } catch (error) {
